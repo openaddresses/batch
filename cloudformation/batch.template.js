@@ -66,60 +66,6 @@ const stack = {
                 "RoleName": cf.join("-", [cf.ref('AWS::StackName'), 'role'])
             }
         },
-        "SecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "GroupName": cf.join("-", [cf.ref('AWS::StackName'), 'sg']),
-                "GroupDescription": "Security Group for aws-batch-example",
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "aws-batch-example"
-                    },
-                    {
-                        "Key": "Project",
-                        "Value": "aws-batch-example"
-                    }
-                ],
-                "VpcId": "", // vpcId
-                "SecurityGroupEgress": {
-                    "CidrIp": "0.0.0.0/0",
-                    "IpProtocol": -1
-                },
-                "SecurityGroupIngress": [
-                    {
-                        "CidrIp": "0.0.0.0/0",
-                        "IpProtocol": "tcp",
-                        "FromPort": 80,
-                        "ToPort": 80
-                    },
-                    {
-                        "CidrIp": "0.0.0.0/0",
-                        "IpProtocol": "tcp",
-                        "FromPort": 443,
-                        "ToPort": 443
-                    },
-                    {
-                        "CidrIp": "0.0.0.0/0",
-                        "IpProtocol": "tcp",
-                        "FromPort": 22,
-                        "ToPort": 22
-                    },
-                    {
-                        "CidrIp": "0.0.0.0/0",
-                        "IpProtocol": "tcp",
-                        "FromPort": 5432,
-                        "ToPort": 5432
-                    },
-                    {
-                        "CidrIp": "0.0.0.0/0",
-                        "IpProtocol": "tcp",
-                        "FromPort": 8000,
-                        "ToPort": 8000
-                    }
-                ]
-            }
-        },
         "AWSBatchServiceRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -139,27 +85,6 @@ const stack = {
                     "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
                 ],
                 "Path": "/service-role/"
-            }
-        },
-        "AmazonEC2SpotFleetRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": "spotfleet.amazonaws.com"
-                            },
-                            "Action": "sts:AssumeRole"
-                        }
-                    ]
-                },
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole"
-                ],
-                "Path": "/"
             }
         },
         "BatchInstanceRole": {
@@ -233,25 +158,24 @@ const stack = {
                 "ServiceRole" : cf.getAtt('AWSBatchServiceRole', 'Arn'),
                 "ComputeEnvironmentName" : "CEExample",
                 "ComputeResources" : {
-                    "SpotIamFleetRole": cf.getAtt('AmazonEC2SpotFleetRole', 'Arn'),
-                    "ImageId": "ami-28456852",
+                    "ImageId": "ami-056807e883f197989",
                     "MaxvCpus" : 128,
-                    "DesiredvCpus" : 4,
-                    "MinvCpus" : 4,
-                    "BidPercentage" : 50,
-                    "SecurityGroupIds" : [ cf.getAtt('SecurityGroup', 'GroupId') ],
+                    "DesiredvCpus" : 2,
+                    "MinvCpus" : 2,
+                    "SecurityGroupIds" : [ cf.ref('SecurityGroup') ],
                     "Subnets" :  [
-                        // subnets
+                        'subnet-de35c1f5',
+                        'subnet-e67dc7ea',
+                        'subnet-38b72502',
+                        'subnet-76ae3713',
+                        'subnet-35d87242',
+                        'subnet-b978ade0'
                     ],
-                    "Type" : "SPOT",
+                    "Type" : "EC2",
                     "InstanceRole" : cf.getAtt('BatchInstanceProfile', 'Arn'),
                     "InstanceTypes" : [
-                        "c4.large",
-                        "c4.xlarge"
-                    ],
-                    "Tags" : {
-                        "Name": "CEExample"
-                    }
+                        "c5.large"
+                    ]
                 },
                 "State" : "ENABLED"
             }
@@ -274,8 +198,16 @@ const stack = {
                     "JobRoleArn": cf.getAtt('BatchJobRole', 'Arn'),
                     "ReadonlyRootFilesystem": false,
                     "Vcpus": 2,
-                    "Image": cf.join(['batch', cf.ref('GitSha')])
+                    "Image": cf.join(['batch/', cf.ref('GitSha')])
                 }
+            }
+        },
+        "SecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": "vpc-3f2aa15a",
+                "GroupDescription": "Batch Security Group",
+                SecurityGroupIngress: []
             }
         },
         "BatchJobQueue": {
@@ -310,43 +242,36 @@ const stack = {
                     ]
                 },
                 "Path": "/",
-                "Policies": [
-                    {
-                        "PolicyName": "lambda-batch",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "batch:SubmitJob"
-                                    ],
-                                    "Resource": "arn:aws:batch:*:*:*"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "PolicyName": "lambda-logs",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [{
-                                "Effect": "Allow",
-                                "Action": [ "logs:*" ],
-                                "Resource": "arn:aws:logs:*:*:*"
-                            }]
-                        }
-                    },
-                    {
-                        "PolicyName": "lambda-s3",
-                        "PolicyDocument": {
-                            "Statement": [{
-                                "Effect": "Allow",
-                                "Action": [ "s3:GetObject" ],
-                                "Resource": [ 'arn:aws:s3:::openaddresses-lambdas/*' ]
-                            }]
-                        }
+                "Policies": [{
+                    "PolicyName": "lambda-batch",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [ "batch:SubmitJob" ],
+                            "Resource": "arn:aws:batch:*:*:*"
+                        }]
                     }
-                ]
+                },
+                {
+                    "PolicyName": "lambda-logs",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [ "logs:*" ],
+                            "Resource": "arn:aws:logs:*:*:*"
+                        }]
+                    }
+                },{
+                    "PolicyName": "lambda-s3",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [ "s3:GetObject" ],
+                            "Resource": [ 'arn:aws:s3:::openaddresses-lambdas/*' ]
+                        }]
+                    }
+                }]
             }
         },
         "LambdaTriggerFunction": {

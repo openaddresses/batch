@@ -156,7 +156,7 @@ const stack = {
             "Properties" : {
                 "Type" : "MANAGED",
                 "ServiceRole" : cf.getAtt('AWSBatchServiceRole', 'Arn'),
-                "ComputeEnvironmentName" : "CEExample",
+                "ComputeEnvironmentName" : "Batch",
                 "ComputeResources" : {
                     "ImageId": "ami-056807e883f197989",
                     "MaxvCpus" : 128,
@@ -184,7 +184,7 @@ const stack = {
             "Type": "AWS::Batch::JobDefinition",
             "Properties": {
                 "Type": "container",
-                "JobDefinitionName": "machine",
+                "JobDefinitionName": "batch-job",
                 "RetryStrategy": {
                     "Attempts": 1
                 },

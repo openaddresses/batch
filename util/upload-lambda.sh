@@ -6,6 +6,8 @@
 GITSHA=$(git rev-parse HEAD)
 echo "ok - ${GITSHA}"
 
-zip -qr /tmp/${GITSHA}.zip $(dirname $0)/../lambda/*
+cd $(dirname $0)/../lambda/
+zip -qrj /tmp/${GITSHA}.zip * --exclude '*node_modules*'
+
 aws s3 cp /tmp/${GITSHA}.zip s3://openaddresses-lambdas/batch/${GITSHA}.zip
 rm /tmp/${GITSHA}.zip

@@ -4,28 +4,9 @@ const stack = {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "aws-batch-example",
     "Parameters": {
-        "AWSRegion": {
+        "GitSha": {
             "Type": "String",
-            "Description": "AWS Region to deploy this stack",
-            "Default": "us-east-1",
-            "AllowedValues": [
-                "us-east-1"
-            ]
-        },
-        "S3Bucket": {
-            "Type": "String",
-            "Description": "S3 bucket the job needs access to",
-            "Default": ""
-        },
-        "LambdaS3Bucket": {
-            "Type": "String",
-            "Description": "S3 bucket where the Lambda code is",
-            "Default": ""
-        },
-        "ImageUrl": {
-            "Type": "String",
-            "Description": "URL of the task Docker image",
-            "Default": ""
+            "Description": "Gitsha to Deploy"
         }
     },
     "Resources": {
@@ -82,33 +63,13 @@ const stack = {
                         }
                     }
                 ],
-                "RoleName": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Fn::Sub": "${AWS::StackName}"
-                            },
-                            "role"
-                        ]
-                    ]
-                }
+                "RoleName": cf.join("-", [cf.ref('AWS::StackName'), 'role'])
             }
         },
         "SecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupName": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Fn::Sub": "${AWS::StackName}"
-                            },
-                            "sg"
-                        ]
-                    ]
-                },
+                "GroupName": cf.join("-", [cf.ref('AWS::StackName'), 'sg']),
                 "GroupDescription": "Security Group for aws-batch-example",
                 "Tags": [
                     {
@@ -225,11 +186,7 @@ const stack = {
         "BatchInstanceProfile": {
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
-                "Roles": [
-                    {
-                        "Ref": "BatchInstanceRole"
-                    }
-                ],
+                "Roles": [ cf.ref('BatchInstanceRole') ],
                 "Path": "/"
             }
         },
@@ -256,22 +213,10 @@ const stack = {
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:PutObject",
                                         "s3:GetObject"
                                     ],
                                     "Resource": [
-                                        {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    "arn:aws:s3:::",
-                                                    {
-                                                        "Ref": "S3Bucket"
-                                                    },
-                                                    "/*"
-                                                ]
-                                            ]
-                                        }
+                                        "arn:aws:s3:::data.openaddresses.io/*"
                                     ]
                                 }
                             ]
@@ -285,43 +230,21 @@ const stack = {
             "Type" : "AWS::Batch::ComputeEnvironment",
             "Properties" : {
                 "Type" : "MANAGED",
-                "ServiceRole" : {
-                    "Fn::GetAtt": [
-                        "AWSBatchServiceRole",
-                        "Arn"
-                    ]
-                },
+                "ServiceRole" : cf.getAtt('AWSBatchServiceRole', 'Arn'),
                 "ComputeEnvironmentName" : "CEExample",
                 "ComputeResources" : {
-                    "SpotIamFleetRole" : {
-                        "Fn::GetAtt": [
-                            "AmazonEC2SpotFleetRole",
-                            "Arn"
-                        ]
-                    },
+                    "SpotIamFleetRole": cf.getAtt('AmazonEC2SpotFleetRole', 'Arn'),
                     "ImageId": "ami-28456852",
                     "MaxvCpus" : 128,
                     "DesiredvCpus" : 4,
                     "MinvCpus" : 4,
                     "BidPercentage" : 50,
-                    "SecurityGroupIds" : [
-                        {
-                            "Fn::GetAtt": [
-                                "SecurityGroup",
-                                "GroupId"
-                            ]
-                        }
-                    ],
+                    "SecurityGroupIds" : [ cf.getAtt('SecurityGroup', 'GroupId') ],
                     "Subnets" :  [
                         // subnets
                     ],
                     "Type" : "SPOT",
-                    "InstanceRole" : {
-                        "Fn::GetAtt": [
-                            "BatchInstanceProfile",
-                            "Arn"
-                        ]
-                    },
+                    "InstanceRole" : cf.getAtt('BatchInstanceProfile', 'Arn'),
                     "InstanceTypes" : [
                         "c4.large",
                         "c4.xlarge"
@@ -337,57 +260,31 @@ const stack = {
             "Type": "AWS::Batch::JobDefinition",
             "Properties": {
                 "Type": "container",
-                "JobDefinitionName": "aws-batch-example-task",
+                "JobDefinitionName": "machine",
                 "RetryStrategy": {
                     "Attempts": 1
                 },
-                "Parameters": {
-                    "validator": "filterdate",
-                    "country": "botswana",
-                    "awsbucket": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                {
-                                    "Ref": "LambdaS3Bucket"
-                                },
-                                "/output"
-                            ]
-                        ]
-                    }
-                },
+                "Parameters": { },
                 "ContainerProperties": {
                     "Command": [
                         "./task.sh",
-                        "Ref::validator",
-                        "Ref::country",
-                        "Ref::awsbucket"
                     ],
                     "Memory": 4000,
                     "Privileged": true,
-                    "JobRoleArn": {
-                        "Fn::GetAtt": [
-                            "BatchJobRole",
-                            "Arn"
-                        ]
-                    },
+                    "JobRoleArn": cf.getAtt('BatchJobRole', 'Arn'),
                     "ReadonlyRootFilesystem": false,
                     "Vcpus": 2,
-                    "Image": {
-                        "Ref": "ImageUrl"
-                    }
+                    "Image": cf.join(['batch', cf.ref('GitSha')])
                 }
             }
         },
         "BatchJobQueue": {
             "Type": "AWS::Batch::JobQueue",
             "Properties": {
-                "ComputeEnvironmentOrder": [
-                    {
-                        "Order": 1,
-                        "ComputeEnvironment": {"Ref": "BatchComputeEnvironment"}
-                    }
-                ],
+                "ComputeEnvironmentOrder": [{
+                    "Order": 1,
+                    "ComputeEnvironment": cf.ref('BatchComputeEnvironment')
+                }],
                 "State": "ENABLED",
                 "Priority": 1,
                 "JobQueueName": "HighPriority"
@@ -432,42 +329,21 @@ const stack = {
                         "PolicyName": "lambda-logs",
                         "PolicyDocument": {
                             "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "logs:*"
-                                    ],
-                                    "Resource": "arn:aws:logs:*:*:*"
-                                }
-                            ]
+                            "Statement": [{
+                                "Effect": "Allow",
+                                "Action": [ "logs:*" ],
+                                "Resource": "arn:aws:logs:*:*:*"
+                            }]
                         }
                     },
                     {
                         "PolicyName": "lambda-s3",
                         "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:GetObject"
-                                    ],
-                                    "Resource": [
-                                        {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    "arn:aws:s3:::",
-                                                    {
-                                                        "Ref": "LambdaS3Bucket"
-                                                    },
-                                                    "/*"
-                                                ]
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
+                            "Statement": [{
+                                "Effect": "Allow",
+                                "Action": [ "s3:GetObject" ],
+                                "Resource": [ 'arn:aws:s3:::openaddresses-lambdas/*' ]
+                            }]
                         }
                     }
                 ]
@@ -477,18 +353,10 @@ const stack = {
             "Type": "AWS::Lambda::Function",
             "Properties": {
                 "Handler": "index.trigger",
-                "Role": {
-                    "Fn::GetAtt":
-                    [
-                        "LambdaExecutionRole",
-                        "Arn"
-                    ]
-                },
+                "Role": cf.getAtt('LambdaExecutionRole', 'Arn'),
                 "Code": {
-                    "S3Bucket": {
-                        "Ref": "LambdaS3Bucket"
-                    },
-                    "S3Key": "lambda/lambda.zip" // lambda location
+                    "S3Bucket": 'openaddresses-lambdas',
+                    "S3Key": cf.join(['batch/', cf.ref('GitSha'), '.zip' ])
                 },
                 "Environment": {
                     "Variables": {
@@ -501,7 +369,7 @@ const stack = {
                         "JOB_NAME": "lambda-trigger-job"
                     }
                 },
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Timeout": "25"
             }
         },
@@ -512,7 +380,7 @@ const stack = {
                 "ScheduleExpression": "rate(10 minutes)",
                 "State": "ENABLED",
                 "Targets": [{
-                    "Arn": { "Fn::GetAtt": ["LambdaTriggerFunction", "Arn"] },
+                    "Arn": cf.getAtt('LambdaTriggerFunction', 'Arn'),
                     "Id": "TriggerFunction"
                 }]
             }
@@ -523,7 +391,7 @@ const stack = {
                 "FunctionName": { "Ref": "LambdaTriggerFunction" },
                 "Action": "lambda:InvokeFunction",
                 "Principal": "events.amazonaws.com",
-                "SourceArn": { "Fn::GetAtt": ["ScheduledRule", "Arn"] }
+                "SourceArn": cf.getAtt('ScheduledRule', 'Arn')
             }
         }
     }

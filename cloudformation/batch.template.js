@@ -2,7 +2,7 @@ const cf = require('@mapbox/cloudfriend');
 
 const stack = {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "aws-batch-example",
+    "Description": "OpenAddresses Batch Processing",
     "Parameters": {
         "GitSha": {
             "Type": "String",
@@ -10,7 +10,7 @@ const stack = {
         }
     },
     "Resources": {
-        "IAM": {
+        "BatchInstanceERCRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
@@ -111,7 +111,10 @@ const stack = {
         "BatchInstanceProfile": {
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
-                "Roles": [ cf.ref('BatchInstanceRole') ],
+                "Roles": [
+                    cf.ref('BatchInstanceRole'),
+                    cf.ref('BatchInstanceERCRole')
+                ],
                 "Path": "/"
             }
         },
@@ -156,12 +159,11 @@ const stack = {
             "Properties" : {
                 "Type" : "MANAGED",
                 "ServiceRole" : cf.getAtt('AWSBatchServiceRole', 'Arn'),
-                "ComputeEnvironmentName" : "Batch",
+                "ComputeEnvironmentName" : cf.join('-', ['batch', cf.ref('AWS::StackName')]),
                 "ComputeResources" : {
                     "ImageId": "ami-056807e883f197989",
                     "MaxvCpus" : 128,
-                    "DesiredvCpus" : 2,
-                    "MinvCpus" : 2,
+                    "MinvCpus" : 0,
                     "SecurityGroupIds" : [ cf.ref('SecurityGroup') ],
                     "Subnets" :  [
                         'subnet-de35c1f5',
@@ -173,9 +175,7 @@ const stack = {
                     ],
                     "Type" : "EC2",
                     "InstanceRole" : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    "InstanceTypes" : [
-                        "c5.large"
-                    ]
+                    "InstanceTypes" : [ "optimal" ]
                 },
                 "State" : "ENABLED"
             }

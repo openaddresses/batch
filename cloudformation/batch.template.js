@@ -15,19 +15,15 @@ const stack = {
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": "batch.amazonaws.com"
-                            },
-                            "Action": "sts:AssumeRole"
-                        }
-                    ]
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "batch.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
                 },
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
-                ],
+                "ManagedPolicyArns": [ "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole" ],
                 "Path": "/service-role/"
             }
         },
@@ -36,58 +32,22 @@ const stack = {
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": "ec2.amazonaws.com"
-                            },
-                            "Action": "sts:AssumeRole"
-                        }
-                    ]
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "ec2.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
                 },
-                "Policies": [{
-                    "PolicyName": "root",
-                    "PolicyDocument": {
-                        "Version": "2012-10-17",
-                        "Statement": [{
-                            "Effect": "Allow",
-                            "Action": [
-                                "ecr:BatchCheckLayerAvailability",
-                                "ecr:BatchGetImage",
-                                "ecr:GetDownloadUrlForLayer",
-                                "ecr:GetAuthorizationToken",
-                                "ecs:CreateCluster",
-                                "ecs:DeregisterContainerInstance",
-                                "ecs:DiscoverPollEndpoint",
-                                "ecs:Poll",
-                                "ecs:RegisterContainerInstance",
-                                "ecs:StartTelemetrySession",
-                                "ecs:Submit*",
-                                "ecr:GetAuthorizationToken",
-                                "ecr:BatchCheckLayerAvailability",
-                                "ecr:GetDownloadUrlForLayer",
-                                "ecr:BatchGetImage",
-                                "logs:CreateLogStream",
-                                "logs:PutLogEvents"
-                            ],
-                            "Resource": "*"
-                        }]
-                    }
-                }],
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-                ],
+                "ManagedPolicyArns": [ "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role" ],
                 "Path": "/"
             }
         },
         "BatchInstanceProfile": {
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
-                "Roles": [
-                    cf.ref('BatchInstanceRole'),
-                    cf.ref('BatchInstanceERCRole')
-                ],
+                "Roles": [ cf.ref('BatchInstanceRole') ],
                 "Path": "/"
             }
         },
@@ -106,24 +66,16 @@ const stack = {
                         }
                     ]
                 },
-                "Policies": [
-                    {
-                        "PolicyName": "batch-job-policy",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:GetObject"
-                                    ],
-                                    "Resource": [
-                                        "arn:aws:s3:::data.openaddresses.io/*"
-                                    ]
-                                }
-                            ]
-                        }
+                "Policies": [{
+                    "PolicyName": "batch-job-policy",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [ "s3:GetObject" ],
+                            "Resource": [ "arn:aws:s3:::data.openaddresses.io/*" ]
+                        }]
                     }
-                ],
+                }],
                 "Path": "/"
             }
         },
@@ -136,6 +88,7 @@ const stack = {
                 "ComputeResources" : {
                     "ImageId": "ami-056807e883f197989",
                     "MaxvCpus" : 128,
+                    "DesiredvCpus" : 32,
                     "MinvCpus" : 0,
                     "SecurityGroupIds" : [ cf.ref('SecurityGroup') ],
                     "Subnets" :  [
@@ -163,15 +116,13 @@ const stack = {
                 },
                 "Parameters": { },
                 "ContainerProperties": {
-                    "Command": [
-                        "./task.sh",
-                    ],
+                    "Command": [ "./task.sh", ],
                     "Memory": 4000,
                     "Privileged": true,
                     "JobRoleArn": cf.getAtt('BatchJobRole', 'Arn'),
                     "ReadonlyRootFilesystem": false,
                     "Vcpus": 2,
-                    "Image": cf.join(['batch/', cf.ref('GitSha')])
+                    "Image": cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/batch:', cf.ref('GitSha')])
                 }
             }
         },
@@ -200,19 +151,13 @@ const stack = {
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal":{
-                                "Service": [
-                                    "lambda.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal":{
+                            "Service": [ "lambda.amazonaws.com" ]
+                        },
+                        "Action": [ "sts:AssumeRole" ]
+                    }]
                 },
                 "Path": "/",
                 "Policies": [{
@@ -224,8 +169,7 @@ const stack = {
                             "Resource": "arn:aws:batch:*:*:*"
                         }]
                     }
-                },
-                {
+                },{
                     "PolicyName": "lambda-logs",
                     "PolicyDocument": {
                         "Version": "2012-10-17",
@@ -258,12 +202,8 @@ const stack = {
                 },
                 "Environment": {
                     "Variables": {
-                        "JOB_DEFINITION": {
-                            "Ref": "BatchJobDefinition"
-                        },
-                        "JOB_QUEUE": {
-                            "Ref": "BatchJobQueue"
-                        },
+                        "JOB_DEFINITION": cf.ref('BatchJobDefinition'),
+                        "JOB_QUEUE": cf.ref('BatchJobQueue'),
                         "JOB_NAME": "lambda-trigger-job"
                     }
                 },
@@ -286,7 +226,7 @@ const stack = {
         "PermissionForEventsToInvokeLambda": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
-                "FunctionName": { "Ref": "LambdaTriggerFunction" },
+                "FunctionName": cf.ref('LambdaTriggerFunction'),
                 "Action": "lambda:InvokeFunction",
                 "Principal": "events.amazonaws.com",
                 "SourceArn": cf.getAtt('ScheduledRule', 'Arn')

@@ -10,62 +10,6 @@ const stack = {
         }
     },
     "Resources": {
-        "BatchInstanceERCRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
-                },
-                "Path": "/",
-                "Policies": [
-                    {
-                        "PolicyName": "root",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ecr:BatchCheckLayerAvailability",
-                                        "ecr:BatchGetImage",
-                                        "ecr:GetDownloadUrlForLayer",
-                                        "ecr:GetAuthorizationToken",
-                                        "ecs:CreateCluster",
-                                        "ecs:DeregisterContainerInstance",
-                                        "ecs:DiscoverPollEndpoint",
-                                        "ecs:Poll",
-                                        "ecs:RegisterContainerInstance",
-                                        "ecs:StartTelemetrySession",
-                                        "ecs:Submit*",
-                                        "ecr:GetAuthorizationToken",
-                                        "ecr:BatchCheckLayerAvailability",
-                                        "ecr:GetDownloadUrlForLayer",
-                                        "ecr:BatchGetImage",
-                                        "logs:CreateLogStream",
-                                        "logs:PutLogEvents"
-                                    ],
-                                    "Resource": "*"
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "RoleName": cf.join("-", [cf.ref('AWS::StackName'), 'role'])
-            }
-        },
         "AWSBatchServiceRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -102,6 +46,35 @@ const stack = {
                         }
                     ]
                 },
+                "Policies": [{
+                    "PolicyName": "root",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [
+                                "ecr:BatchCheckLayerAvailability",
+                                "ecr:BatchGetImage",
+                                "ecr:GetDownloadUrlForLayer",
+                                "ecr:GetAuthorizationToken",
+                                "ecs:CreateCluster",
+                                "ecs:DeregisterContainerInstance",
+                                "ecs:DiscoverPollEndpoint",
+                                "ecs:Poll",
+                                "ecs:RegisterContainerInstance",
+                                "ecs:StartTelemetrySession",
+                                "ecs:Submit*",
+                                "ecr:GetAuthorizationToken",
+                                "ecr:BatchCheckLayerAvailability",
+                                "ecr:GetDownloadUrlForLayer",
+                                "ecr:BatchGetImage",
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": "*"
+                        }]
+                    }
+                }],
                 "ManagedPolicyArns": [
                     "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
                 ],

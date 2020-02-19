@@ -34,5 +34,3 @@ WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch
 
 RUN yarn install
-
-CMD 

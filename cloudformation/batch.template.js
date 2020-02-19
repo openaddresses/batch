@@ -116,7 +116,7 @@ const stack = {
                 },
                 "Parameters": { },
                 "ContainerProperties": {
-                    "Command": [ "./task.sh", ],
+                    "Command": [ "./task.js", ],
                     "Memory": 4000,
                     "Privileged": true,
                     "JobRoleArn": cf.getAtt('BatchJobRole', 'Arn'),

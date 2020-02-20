@@ -22,3 +22,8 @@ jobs:
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v1
 
+            - name: Docker Tag
+              run: docker tag base ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/batch:${GITHUB_SHA}
+
+            - name: Docker Push
+              run: docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/batch:${GITHUB_SHA}

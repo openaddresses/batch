@@ -4,21 +4,27 @@ const batch = new AWS.Batch({
     apiVersion: '2016-08-10'
 });
 
-function trigger() {
+function trigger(event) {
     const jobDefinition = process.env.JOB_DEFINITION;
     const jobQueue = process.env.JOB_QUEUE;
     const jobName = process.env.JOB_NAME;
 
+    if (typeof event !== 'object' || Array.isArray(event)) {
+        throw new Error('event must be Key/Value pairs');
+    }
+
     const params = {
-        'jobDefinition': jobDefinition,
-        'jobQueue': jobQueue,
-        'jobName': jobName
+        jobDefinition: jobDefinition,
+        jobQueue: jobQueue,
+        jobName: jobName,
+        containerOverrides: {
+            environment: event
+        }
     };
 
-    console.log('params', JSON.stringify(params));
-
     batch.submitJob(params, (err, res) => {
-        if (err) return console.error(err);
+        if (err) throw err;
+
         console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
     });
 }

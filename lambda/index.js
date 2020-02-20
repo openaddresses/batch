@@ -13,12 +13,18 @@ function trigger(event) {
         throw new Error('event must be Key/Value pairs');
     }
 
+    if (!event.source) throw new Error('URL of source required');
+
     const params = {
         jobDefinition: jobDefinition,
         jobQueue: jobQueue,
         jobName: jobName,
         containerOverrides: {
-            environment: event
+            environment: {
+                OA_SOURCE: event.source,
+                OA_SOURCE_LAYER: event.layer,
+                OA_SOURCE_LAYER_NAME: event.name
+            }
         }
     };
 

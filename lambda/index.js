@@ -33,6 +33,8 @@ function trigger(event) {
         }
     };
 
+    console.error(params);
+
     batch.submitJob(params, (err, res) => {
         if (err) throw err;
 

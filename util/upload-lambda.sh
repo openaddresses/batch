@@ -10,7 +10,7 @@ cd $(dirname $0)/../lambda/
 
 yarn install
 
-zip -qrj /tmp/${GITSHA}.zip *
+zip -qr /tmp/${GITSHA}.zip *
 
 aws s3 cp /tmp/${GITSHA}.zip s3://openaddresses-lambdas/batch/${GITSHA}.zip
 

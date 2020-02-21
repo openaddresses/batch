@@ -14,6 +14,8 @@ if (!job.source) throw new Error('No OA_SOURCE env var defined');
 if (!job.layer) throw new Error('No OA_SOURCE_LAYER env var defined');
 if (!job.name) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
 
+fetch(job);
+
 function fetch(job) {
     request({
         url: job.source,

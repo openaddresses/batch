@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const require = require('request');
+const request = require('request');
 
 const job = {
     source: process.env.OA_SOURCE,

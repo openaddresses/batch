@@ -20,11 +20,16 @@ function trigger(event) {
         jobQueue: jobQueue,
         jobName: jobName,
         containerOverrides: {
-            environment: {
-                OA_SOURCE: event.source,
-                OA_SOURCE_LAYER: event.layer,
-                OA_SOURCE_LAYER_NAME: event.name
-            }
+            environment: [{
+                name: 'OA_SOURCE',
+                value: event.source
+            },{
+                name: 'OA_SOURCE_LAYER',
+                value: event.layer
+            },{
+                name: 'OA_SOURCE_LAYER_NAME',
+                value: event.name
+            }]
         }
     };
 

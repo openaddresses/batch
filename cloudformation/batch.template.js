@@ -215,7 +215,7 @@ const stack = {
             "Type": "AWS::Events::Rule",
             "Properties": {
                 "Description": "ScheduledRule",
-                "ScheduleExpression": "cron(0 18 ?  * FRI *)"
+                "ScheduleExpression": "cron(0 18 ? * FRI *)",
                 "State": "ENABLED",
                 "Targets": [{
                     "Arn": cf.getAtt('LambdaTriggerFunction', 'Arn'),

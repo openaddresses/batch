@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@mapbox/decrypt-kms-env": "^3.0.0",
     "request": "^2.88.2"
   }
 }

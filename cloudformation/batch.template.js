@@ -8,6 +8,10 @@ const stack = {
             "Type": "String",
             "Description": "Gitsha to Deploy"
         }
+        "MapboxToken": {
+            "Type": "String",
+            "Description": "[secure] Mapbox API Token to create Slippy Maps With"
+        }
     },
     "Resources": {
         "AWSBatchServiceRole": {
@@ -117,6 +121,10 @@ const stack = {
                 "Parameters": { },
                 "ContainerProperties": {
                     "Command": [ "./task.js", ],
+                    "Environment": [{
+                        "Name": "MapboxToken",
+                        "Value": cf.ref('MapboxToken')
+                    }],
                     "Memory": 4000,
                     "Privileged": true,
                     "JobRoleArn": cf.getAtt('BatchJobRole', 'Arn'),

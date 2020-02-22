@@ -2,41 +2,62 @@
 
 var dke = require('@mapbox/decrypt-kms-env');
 const request = require('request');
+const path = require('path');
 const CP = require('child_process');
 const os = require('os');
 const fs = require('fs');
 
-if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
-if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');
-if (!process.env.OA_SOURCE_LAYER_NAME) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
+if (require.main === module) {
+    if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
+    if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');
+    if (!process.env.OA_SOURCE_LAYER_NAME) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
 
-const job = new Job(
-    process.env.OA_SOURCE,
-    process.env.OA_SOURCE_LAYER,
-    process.env.OA_SOURCE_LAYER_NAME
-);
+    const job = new Job(
+        process.env.OA_SOURCE,
+        process.env.OA_SOURCE_LAYER,
+        process.env.OA_SOURCE_LAYER_NAME
+    );
 
-dke(process.env, (err, scrubbed) => {
-    if (err) throw err;
+    dke(process.env, (err, scrubbed) => {
+        if (err) throw err;
 
-    job.fetch((err, source) => {
-        fs.writeFileSync(path.resolve(job.tmp, 'source.json'), JSON.stringify(source, null, 4));
-
-        processOne(job);
+        return flow(job, (err) => {
+            if (err) throw err;
+        });
     });
-});
+}
 
-function processOne(job) {
-    CP.spawn('openaddr-process-one', [
-        '--source', '',
-        '--destination', '',
-        '--layer', '',
-        '--layersource', '',
+function flow(job, cb) {
+    job.fetch((err, source) => {
+        const source_path = path.resolve(job.tmp, 'source.json');
+        fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
+
+        processOne(job, source_path, cb);
+    });
+}
+
+function processOne(job, source_path, cb) {
+    const source_out = path.resolve(job.tmp, 'source.csv');
+
+    const task = CP.spawn('openaddr-process-one', [
+        source_path,
+        source_out,
+        '--layer', job.layer,
+        '--layersource', job.name,
         '--render-preview',
-        '--mapbox-key',
+        '--mapbox-key', process.env.MapboxToken,
         '--verbose',
     ],{
         env: process.env
+    });
+
+    task.stderr.pipe(process.stderr);
+    task.stdout.pipe(process.stdout);
+
+    task.on('error', cb);
+
+    task.on('close', (exit) => {
+        return cb(null, source_out);
     });
 }
 
@@ -70,4 +91,9 @@ class Job {
         });
     }
 
+}
+
+module.exports = {
+    Job,
+    flow
 }

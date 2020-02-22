@@ -7,7 +7,7 @@ const stack = {
         "GitSha": {
             "Type": "String",
             "Description": "Gitsha to Deploy"
-        }
+        },
         "MapboxToken": {
             "Type": "String",
             "Description": "[secure] Mapbox API Token to create Slippy Maps With"

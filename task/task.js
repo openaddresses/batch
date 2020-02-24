@@ -79,11 +79,12 @@ class Job {
     fetch(cb) {
         request({
             url: this.url,
+            json: true,
             method: 'GET'
-        }, (err, source) => {
+        }, (err, res) => {
             if (err) return cb(err);
 
-            this.source = source;
+            this.source = res.body;
 
             return cb(null, source);
         });

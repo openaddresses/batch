@@ -86,7 +86,7 @@ class Job {
 
             this.source = res.body;
 
-            return cb(null, source);
+            return cb(null, this.source);
         });
     }
 

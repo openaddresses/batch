@@ -86,9 +86,17 @@ async function cli() {
     }
 
     lambda.invoke({
-
+        FunctionName: `batch-${stack}-invoke`,
+        InvocationType: 'Event',
+        LogType: 'Tail',
+        Payload: JSON.stringify({
+            url: url,
+            layer: layer,
+            name: name
+        })
     }, (err, data) => {
-        if (err) throw errl
+        if (err) throw err;
 
+        console.error(data);
     });
 }

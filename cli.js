@@ -4,19 +4,25 @@ const AWS = require('aws-sdk');
 const prompt = require('prompts');
 const {promisify} = require('util');
 const request = promisify(require('request'));
-const batch = new AWS.Batch({
+const lambda = new AWS.Lambda({
     region: 'us-east-1'
 });
 
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
-    string: ['url', 'layer', 'name']
+    string: ['stack', 'url', 'layer', 'name']
 });
 
 cli();
 
 async function cli() {
-    let url = await prompt([{
+    let params = await prompt([{
+        name: 'stack',
+        message: 'batch stack to queue to',
+        required: true,
+        type: 'text',
+        initial: args.stack
+    },{
         name: 'url',
         message: 'URL of source to send to batch',
         required: true,
@@ -24,7 +30,8 @@ async function cli() {
         initial: args.url
     }]);
 
-    url = url.url;
+    const url = params.url;
+    const stack = params.stack;
 
     let source = await request({
         url: url,
@@ -78,15 +85,10 @@ async function cli() {
          name = source.layers[layer][0].name;
     }
 
-    //TODO this should fire the batch lambda to ensure the task has the proper env vars
-    // Batch should not be called directly
-    batch.submitJob({
-        url: url,
-        layer: layer,
-        name: name
-    }, (err, res) => {
-        if (err) throw err;
+    lambda.invoke({
 
-        console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
+    }, (err, data) => {
+        if (err) throw errl
+
     });
 }

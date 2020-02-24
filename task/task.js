@@ -37,11 +37,9 @@ function flow(job, cb) {
 }
 
 function processOne(job, source_path, cb) {
-    const source_out = path.resolve(job.tmp, 'source.csv');
-
     const task = CP.spawn('openaddr-process-one', [
         source_path,
-        source_out,
+        job.tmp,
         '--layer', job.layer,
         '--layersource', job.name,
         '--render-preview',
@@ -57,7 +55,7 @@ function processOne(job, source_path, cb) {
     task.on('error', cb);
 
     task.on('close', (exit) => {
-        return cb(null, source_out);
+        return cb(null, job.tmp);
     });
 }
 

@@ -114,16 +114,16 @@ const stack = {
             }
         },
         BatchJobDefinition: {
-            'Type': 'AWS::Batch::JobDefinition',
-            'Properties': {
-                'Type': 'container',
-                'JobDefinitionName': 'batch-job',
-                'RetryStrategy': {
-                    'Attempts': 1
+            Type: 'AWS::Batch::JobDefinition',
+            Properties: {
+                Type: 'container',
+                JobDefinitionName: cf.join('-', [cf.stackName, 'job']),
+                RetryStrategy: {
+                    Attempts: 1
                 },
-                'Parameters': { },
-                'ContainerProperties': {
-                    'Command': [ './task.js', ],
+                Parameters: { },
+                ContainerProperties: {
+                    'Command': [ './task.js' ],
                     'Environment': [{
                         'Name': 'MapboxToken',
                         'Value': cf.ref('MapboxToken')
@@ -356,11 +356,11 @@ const stack = {
                 RequiresCompatibilities: ['FARGATE'],
                 Tags: [{
                     Key: 'Name',
-                    Value: cf.stackName
+                    Value: cf.join('-', [cf.stackName, 'api'])
                 }],
                 ExecutionRoleArn: cf.getAtt('APITaskRole', 'Arn'),
                 ContainerDefinitions: [{
-                    Name: 'app',
+                    Name: 'api',
                     Image: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/batch:api-', cf.ref('GitSha')]),
                     PortMappings: [{
                         ContainerPort: 5000
@@ -381,6 +381,65 @@ const stack = {
                     Essential: true
                 }]
             }
+        },
+        APIService: {
+            Type: 'AWS::ECS::Service',
+            Properties: {
+                ServiceName: cf.join('-', [cf.stackName, 'Service']),
+                Cluster: cf.ref('APIECSCluster'),
+                TaskDefinition: cf.ref('APITaskDefinition'),
+                LaunchType: 'FARGATE',
+                HealthCheckGracePeriodSeconds: 300,
+                DesiredCount: 1,
+                NetworkConfiguration: {
+                    AwsvpcConfiguration: {
+                        AssignPublicIp: 'ENABLED',
+                        SecurityGroups: [ cf.ref('APIServiceSecurityGroup') ],
+                        Subnets:  [
+                            'subnet-de35c1f5',
+                            'subnet-e67dc7ea',
+                            'subnet-38b72502',
+                            'subnet-76ae3713',
+                            'subnet-35d87242',
+                            'subnet-b978ade0'
+                        ],
+                    }
+                },
+                LoadBalancers: [{
+                    ContainerName: 'api',
+                    ContainerPort: 5000,
+                    TargetGroupArn: cf.ref('APITargetGroup')
+                }]
+            }
+        },
+        APIServiceSecurityGroup: {
+            'Type' : 'AWS::EC2::SecurityGroup',
+            'Properties' : {
+                GroupDescription: cf.join('-', [cf.stackName, 'ec2-sg']),
+                VpcId: 'vpc-3f2aa15a',
+                SecurityGroupIngress: [{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 5000,
+                    ToPort: 5000
+                }],
+                SecurityGroupEgress: [{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 5432,
+                    ToPort: 5432
+                },{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 80,
+                    ToPort: 80
+                },{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 443,
+                    ToPort: 443
+                }]
+            },
         }
     },
     Conditions: {

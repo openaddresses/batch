@@ -133,7 +133,7 @@ const stack = {
                     'JobRoleArn': cf.getAtt('BatchJobRole', 'Arn'),
                     'ReadonlyRootFilesystem': false,
                     'Vcpus': 2,
-                    'Image': cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/batch:', cf.ref('GitSha')])
+                    'Image': cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/batch:task-', cf.ref('GitSha')])
                 }
             }
         },

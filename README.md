@@ -25,3 +25,15 @@ On every commit, GitHub actions will build the latest Docker image and push it t
 This parameter will be populated automatically by the `deploy` cli and simply points the stack
 to use the correspondingly Docker image from ECR.
 
+## Components
+
+The project is divided into several componenets
+
+| Component | Purpose |
+| --------- | ------- |
+| cloudformation | Deploy Configuration |
+| api | Dockerized server for handling all API interactions |
+| cli | CLI for manually queueing work to batch |
+| lambda | Lambda responsible for instantiating a batch job environement and submitting it |
+| task | Docker container for running a batch job |
+

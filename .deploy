@@ -3,7 +3,7 @@
     "artifacts": {
         "docker": [
             "{{project}}:task-{{gitsha}}",
-            "{{project}}:api-{{gitsha}}
+            "{{project}}:api-{{gitsha}}"
         ]
     }
 }

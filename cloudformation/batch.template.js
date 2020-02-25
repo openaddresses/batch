@@ -245,7 +245,7 @@ const stack = {
         Properties: {
             Name: cf.stackName,
             Type: 'application',
-            SecurityGroups: [ cf.ref('MLEnablerELBSecurityGroup') ],
+            SecurityGroups: [ cf.ref('APIELBSecurityGroup') ],
             Subnets:  [
                 'subnet-de35c1f5',
                 'subnet-e67dc7ea',
@@ -275,20 +275,20 @@ const stack = {
             VpcId: 'vpc-3f2aa15a'
         }
     },
-    MLEnablerHTTPListener: {
+    APIHTTPListener: {
         Type: 'AWS::ElasticLoadBalancingV2::Listener',
         Condition: 'HasNoSSL',
         Properties: {
             DefaultActions: [{
                 Type: 'forward',
-                TargetGroupArn: cf.ref('MLEnablerTargetGroup')
+                TargetGroupArn: cf.ref('APITargetGroup')
             }],
             LoadBalancerArn: cf.ref('APIELB'),
             Port: 80,
             Protocol: 'HTTP'
         }
     },
-    MLEnablerTargetGroup: {
+    APITargetGroup: {
         Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
         Properties: {
             Port: 5000,
@@ -342,7 +342,7 @@ const stack = {
             'Path': '/service-role/'
         }
     },
-    MLEnablerTaskDefinition: {
+    APITaskDefinition: {
         Type: 'AWS::ECS::TaskDefinition',
         Properties: {
             Family: cf.stackName,

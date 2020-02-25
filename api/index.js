@@ -15,7 +15,13 @@ app.use(minify());
 router.use(bodyparser.urlencoded({ extended: true }));
 router.use(bodyparser.json());
 
-router.get('sets', (req, res) => {
+app.get('/', (req, res) => {
+    return res.json({
+        healthy: true
+    });
+});
+
+router.get('/sets', (req, res) => {
     return res.json([]);
 });
 

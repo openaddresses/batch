@@ -90,7 +90,7 @@ async function cli() {
         InvocationType: 'Event',
         LogType: 'Tail',
         Payload: JSON.stringify({
-            url: url,
+            source: url,
             layer: layer,
             name: name
         })

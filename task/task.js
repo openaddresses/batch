@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-var dke = require('@mapbox/decrypt-kms-env');
+const dke = require('@mapbox/decrypt-kms-env');
+const Job = require('./lib/Job');
 const request = require('request');
 const path = require('path');
 const CP = require('child_process');

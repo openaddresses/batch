@@ -202,7 +202,7 @@ const stack = {
             Properties: {
                 Handler: 'index.trigger',
                 Role: cf.getAtt('LambdaExecutionRole', 'Arn'),
-                FunctionName: cf.join('-', cf.stackName, 'invoke'),
+                FunctionName: cf.join('-', [cf.stackName, 'invoke']),
                 Code: {
                     S3Bucket: 'openaddresses-lambdas',
                     S3Key: cf.join(['batch/', cf.ref('GitSha'), '.zip' ])

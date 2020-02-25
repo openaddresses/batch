@@ -7,8 +7,6 @@ WORKDIR $HOME
 COPY ./ $HOME/api
 WORKDIR $HOME/api
 
-
-
 RUN apt-get update -y \
     && apt-get install -y git curl \
     && curl 'https://nodejs.org/dist/v13.8.0/node-v13.8.0-linux-x64.tar.gz' | tar -xzv \

@@ -1,0 +1,9 @@
+{
+    "profile": "oa",
+    "artifacts": {
+        "docker": [
+            "{{project}}:task-{{gitsha}}",
+            "{{project}}:api-{{gitsha}}
+        ]
+    }
+}

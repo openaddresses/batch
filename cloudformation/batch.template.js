@@ -11,6 +11,11 @@ const stack = {
         MapboxToken: {
             Type: 'String',
             Description: '[secure] Mapbox API Token to create Slippy Maps With'
+        },
+        SSLCertificateIdentifier: {
+            Type: 'String',
+            Description: 'SSL certificate for HTTPS protocol',
+            Default: ''
         }
     },
     Resources: {
@@ -238,144 +243,154 @@ const stack = {
                 'Principal': 'events.amazonaws.com',
                 'SourceArn': cf.getAtt('ScheduledRule', 'Arn')
             }
-        }
-    },
-    APIELB: {
-        Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer',
-        Properties: {
-            Name: cf.stackName,
-            Type: 'application',
-            SecurityGroups: [ cf.ref('APIELBSecurityGroup') ],
-            Subnets:  [
-                'subnet-de35c1f5',
-                'subnet-e67dc7ea',
-                'subnet-38b72502',
-                'subnet-76ae3713',
-                'subnet-35d87242',
-                'subnet-b978ade0'
-            ],
-        }
+        },
+        APIELB: {
+            Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer',
+            Properties: {
+                Name: cf.stackName,
+                Type: 'application',
+                SecurityGroups: [ cf.ref('APIELBSecurityGroup') ],
+                Subnets:  [
+                    'subnet-de35c1f5',
+                    'subnet-e67dc7ea',
+                    'subnet-38b72502',
+                    'subnet-76ae3713',
+                    'subnet-35d87242',
+                    'subnet-b978ade0'
+                ],
+            }
 
-    },
-    APIELBSecurityGroup: {
-        'Type' : 'AWS::EC2::SecurityGroup',
-        'Properties' : {
-            GroupDescription: cf.join('-', [cf.stackName, 'elb-sg']),
-            SecurityGroupIngress: [{
-                CidrIp: '0.0.0.0/0',
-                IpProtocol: 'tcp',
-                FromPort: 80,
-                ToPort: 80
-            },{
-                CidrIp: '0.0.0.0/0',
-                IpProtocol: 'tcp',
-                FromPort: 443,
-                ToPort: 443
-            }],
-            VpcId: 'vpc-3f2aa15a'
-        }
-    },
-    APIHTTPListener: {
-        Type: 'AWS::ElasticLoadBalancingV2::Listener',
-        Condition: 'HasNoSSL',
-        Properties: {
-            DefaultActions: [{
-                Type: 'forward',
-                TargetGroupArn: cf.ref('APITargetGroup')
-            }],
-            LoadBalancerArn: cf.ref('APIELB'),
-            Port: 80,
-            Protocol: 'HTTP'
-        }
-    },
-    APITargetGroup: {
-        Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
-        Properties: {
-            Port: 5000,
-            Protocol: 'HTTP',
-            TargetType: 'ip',
-            VpcId: 'vpc-3f2aa15a',
-            Matcher: {
-                HttpCode: '200,202,302,304'
+        },
+        APIELBSecurityGroup: {
+            'Type' : 'AWS::EC2::SecurityGroup',
+            'Properties' : {
+                GroupDescription: cf.join('-', [cf.stackName, 'elb-sg']),
+                SecurityGroupIngress: [{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 80,
+                    ToPort: 80
+                },{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 443,
+                    ToPort: 443
+                }],
+                VpcId: 'vpc-3f2aa15a'
+            }
+        },
+        APIHTTPListener: {
+            Type: 'AWS::ElasticLoadBalancingV2::Listener',
+            Condition: 'HasNoSSL',
+            Properties: {
+                DefaultActions: [{
+                    Type: 'forward',
+                    TargetGroupArn: cf.ref('APITargetGroup')
+                }],
+                LoadBalancerArn: cf.ref('APIELB'),
+                Port: 80,
+                Protocol: 'HTTP'
+            }
+        },
+        APITargetGroup: {
+            Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
+            Properties: {
+                Port: 5000,
+                Protocol: 'HTTP',
+                TargetType: 'ip',
+                VpcId: 'vpc-3f2aa15a',
+                Matcher: {
+                    HttpCode: '200,202,302,304'
+                }
+            }
+        },
+        APIECSCluster: {
+            Type: 'AWS::ECS::Cluster',
+            Properties: {
+                ClusterName: cf.join('-', [cf.stackName, 'cluster'])
+            }
+        },
+        APITaskRole: {
+            'Type': 'AWS::IAM::Role',
+            'Properties': {
+                'AssumeRolePolicyDocument': {
+                    'Version': '2012-10-17',
+                    'Statement': [{
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: 'ecs-tasks.amazonaws.com'
+                        },
+                        'Action': 'sts:AssumeRole'
+                    }]
+                },
+                Policies: [{
+                    PolicyName: cf.join([cf.stackName, '-api-logging']),
+                    PolicyDocument: {
+                        'Statement': [{
+                            'Effect': 'Allow',
+                            'Action': [
+                                'logs:CreateLogGroup',
+                                'logs:CreateLogStream',
+                                'logs:PutLogEvents',
+                                'logs:DescribeLogStreams'
+                            ],
+                            'Resource': [ 'arn:aws:logs:*:*:*' ]
+                        }]
+                    }
+                }],
+                'ManagedPolicyArns': [
+                    'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
+                    'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role',
+                    'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+                ],
+                'Path': '/service-role/'
+            }
+        },
+        APITaskDefinition: {
+            Type: 'AWS::ECS::TaskDefinition',
+            Properties: {
+                Family: cf.stackName,
+                Cpu: 512,
+                Memory: 1024,
+                NetworkMode: 'awsvpc',
+                RequiresCompatibilities: ['FARGATE'],
+                Tags: [{
+                    Key: 'Name',
+                    Value: cf.stackName
+                }],
+                ExecutionRoleArn: cf.getAtt('APITaskRole', 'Arn'),
+                ContainerDefinitions: [{
+                    Name: 'app',
+                    Image: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/batch:api-', cf.ref('GitSha')]),
+                    PortMappings: [{
+                        ContainerPort: 5000
+                    }],
+                    Environment: [{
+                        Name: 'ECS_LOG_LEVEL',
+                        Value: 'debug'
+                    }],
+                    LogConfiguration: {
+                        LogDriver: 'awslogs',
+                        Options: {
+                            'awslogs-group': cf.join('-', ['awslogs', cf.stackName]),
+                            'awslogs-region': cf.region,
+                            'awslogs-stream-prefix': cf.join('-', ['awslogs', cf.stackName]),
+                            'awslogs-create-group': true
+                        }
+                    },
+                    Essential: true
+                }]
             }
         }
     },
-    APIECSCluster: {
-        Type: 'AWS::ECS::Cluster',
-        Properties: {
-            ClusterName: cf.join('-', [cf.stackName, 'cluster'])
-        }
+    Conditions: {
+        HasSSL: cf.notEquals(cf.ref('SSLCertificateIdentifier'), ''),
+        HasNoSSL: cf.equals(cf.ref('SSLCertificateIdentifier'), '')
     },
-    APITaskRole: {
-        'Type': 'AWS::IAM::Role',
-        'Properties': {
-            'AssumeRolePolicyDocument': {
-                'Version': '2012-10-17',
-                'Statement': [{
-                    Effect: 'Allow',
-                    Principal: {
-                        Service: 'ecs-tasks.amazonaws.com'
-                    },
-                    'Action': 'sts:AssumeRole'
-                }]
-            },
-            Policies: [{
-                PolicyName: 'ml-enabler-logging',
-                PolicyDocument: {
-                    "Statement": [{
-                        "Effect": "Allow",
-                        "Action": [
-                            "logs:CreateLogGroup",
-                            "logs:CreateLogStream",
-                            "logs:PutLogEvents",
-                            "logs:DescribeLogStreams"
-                        ],
-                        "Resource": [ "arn:aws:logs:*:*:*" ]
-                    }]
-                }
-            }],
-            'ManagedPolicyArns': [
-                'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
-                'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role',
-                'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
-            ],
-            'Path': '/service-role/'
-        }
-    },
-    APITaskDefinition: {
-        Type: 'AWS::ECS::TaskDefinition',
-        Properties: {
-            Family: cf.stackName,
-            Cpu: 512,
-            Memory: 1024,
-            NetworkMode: 'awsvpc',
-            RequiresCompatibilities: ['FARGATE'],
-            Tags: [{
-                Key: 'Name',
-                Value: cf.stackName
-            }],
-            ExecutionRoleArn: cf.getAtt('APITaskRole', 'Arn'),
-            ContainerDefinitions: [{
-                Name: 'app',
-                Image: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/batch:api-', cf.ref('GitSha')]),
-                PortMappings: [{
-                    ContainerPort: 5000
-                }],
-                Environment: [{
-                    Name: 'ECS_LOG_LEVEL',
-                    Value: 'debug'
-                }],
-                LogConfiguration: {
-                    LogDriver: 'awslogs',
-                    Options: {
-                        'awslogs-group': cf.join('-', ['awslogs', cf.stackName]),
-                        'awslogs-region': cf.region,
-                        'awslogs-stream-prefix': cf.join('-', ['awslogs', cf.stackName]),
-                        'awslogs-create-group': true
-                    }
-                },
-                Essential: true
-            }]
+    Outputs: {
+        APIELB: {
+            Description: 'API URL',
+            Value: cf.getAtt('APIELB', 'DNSName')
         }
     }
 }

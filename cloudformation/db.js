@@ -34,10 +34,10 @@ const stack = {
             }
         },
         DBSubnet: {
-            'Type' : 'AWS::RDS::DBSubnetGroup',
-            'Properties' : {
-                'DBSubnetGroupDescription': cf.join('-', [cf.stackName, 'rds-subnets']),
-                'SubnetIds': [
+            Type: 'AWS::RDS::DBSubnetGroup',
+            Properties: {
+                DBSubnetGroupDescription: cf.join('-', [cf.stackName, 'rds-subnets']),
+                SubnetIds: [
                     'subnet-de35c1f5',
                     'subnet-e67dc7ea',
                     'subnet-38b72502',
@@ -47,9 +47,9 @@ const stack = {
                 ]
             }
         },
-        'DBSecurityGroup': {
-            Type : 'AWS::RDS::DBSecurityGroup',
-            Properties : {
+        DBSecurityGroup: {
+            Type: 'AWS::RDS::DBSecurityGroup',
+            Properties: {
                 GroupDescription: cf.join('-', [cf.stackName, 'rds-sg']),
                 EC2VpcId: 'vpc-3f2aa15a',
                 DBSecurityGroupIngress: {

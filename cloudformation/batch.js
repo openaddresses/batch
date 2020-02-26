@@ -8,7 +8,7 @@ const stack = {
         }
     },
     Resources: {
-        AWSBatchServiceRole: {
+        BatchServiceRole: {
             Type: 'AWS::IAM::Role',
             Properties: {
                 AssumeRolePolicyDocument: {
@@ -79,7 +79,7 @@ const stack = {
             Type: 'AWS::Batch::ComputeEnvironment',
             Properties: {
                 Type: 'MANAGED',
-                ServiceRole: cf.getAtt('AWSBatchServiceRole', 'Arn'),
+                ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
                 ComputeResources: {
                     ImageId: 'ami-056807e883f197989',
@@ -146,7 +146,7 @@ const stack = {
                 'JobQueueName': 'HighPriority'
             }
         },
-        LambdaExecutionRole: {
+        BatchLambdaExecutionRole: {
             'Type': 'AWS::IAM::Role',
             'Properties': {
                 'AssumeRolePolicyDocument': {
@@ -191,11 +191,11 @@ const stack = {
                 }]
             }
         },
-        LambdaTriggerFunction: {
+        BatchLambdaTriggerFunction: {
             Type: 'AWS::Lambda::Function',
             Properties: {
                 Handler: 'index.trigger',
-                Role: cf.getAtt('LambdaExecutionRole', 'Arn'),
+                Role: cf.getAtt('BatchLambdaExecutionRole', 'Arn'),
                 FunctionName: cf.join('-', [cf.stackName, 'invoke']),
                 Code: {
                     S3Bucket: 'openaddresses-lambdas',
@@ -212,25 +212,25 @@ const stack = {
                 Timeout: '25'
             }
         },
-        ScheduledRule: {
+        BatchScheduledRule: {
             'Type': 'AWS::Events::Rule',
             'Properties': {
                 'Description': 'ScheduledRule',
                 'ScheduleExpression': 'cron(0 18 ? * FRI *)',
                 'State': 'ENABLED',
                 'Targets': [{
-                    'Arn': cf.getAtt('LambdaTriggerFunction', 'Arn'),
+                    'Arn': cf.getAtt('BatchLambdaTriggerFunction', 'Arn'),
                     'Id': 'TriggerFunction'
                 }]
             }
         },
-        'PermissionForEventsToInvokeLambda': {
+        BatchPermissionForEventsToInvokeLambda: {
             'Type': 'AWS::Lambda::Permission',
             'Properties': {
-                'FunctionName': cf.ref('LambdaTriggerFunction'),
+                'FunctionName': cf.ref('BatchLambdaTriggerFunction'),
                 'Action': 'lambda:InvokeFunction',
                 'Principal': 'events.amazonaws.com',
-                'SourceArn': cf.getAtt('ScheduledRule', 'Arn')
+                'SourceArn': cf.getAtt('BatchScheduledRule', 'Arn')
             }
         }
     }

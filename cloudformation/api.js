@@ -59,6 +59,7 @@ const stack = {
         },
         APITargetGroup: {
             Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
+            DependsOn: 'APIELB',
             Properties: {
                 Port: 5000,
                 Protocol: 'HTTP',
@@ -133,6 +134,14 @@ const stack = {
                     Environment: [{
                         Name: 'ECS_LOG_LEVEL',
                         Value: 'debug'
+                    },{
+                        Name: 'POSTGRES',
+                        Value: cf.join([
+                            'postgres://openaddresses:',
+                            cf.ref('DatabasePassword'),
+                            '@',
+                            cf.getAtt('MLEnablerRDS', 'Endpoint.Address'),
+                            ':5432/openaddresses',
                     }],
                     LogConfiguration: {
                         LogDriver: 'awslogs',

@@ -25,6 +25,9 @@ app.use(minify());
 router.use(bodyparser.urlencoded({ extended: true }));
 router.use(bodyparser.json());
 
+
+const Run = require('./lib/run');
+
 app.get('/', (req, res) => {
     return res.json({
         healthy: true
@@ -35,6 +38,13 @@ app.get('/api', (req, res) => {
     return res.json({
         version: config.version
     });
+});
+
+router.get('/data', (req, res) => {
+    // Allow getting S3 links in various ways
+    // - bbox
+    // - name prefix
+    // - layer
 });
 
 router.get('/run', (req, res) => {
@@ -54,27 +64,20 @@ router.get('/run', (req, res) => {
 });
 
 router.post('/run', (req, res) => {
-    pool.query(`
-        INSERT INTO runs (
-            id,
-            created,
-            github
-        ) VALUES (
-            uuid_generate_v4(),
-            NOW(),
-            '{}'::JSONB
-        ) RETURNING *
-    `, (err, pgres) => {
-        if (err) throw err;
+    const run = new Run();
+    run.generate();
 
-        res.json(pgres.rows[0]);
-    });
+    return res.json(run.json());
 });
 
 /**
- * Given a source, explode it into multiple jobs and submit to batch
+ * Given an array sources, explode it into multiple jobs and submit to batch
+ * or pass in a predefined list of sources/layer/names
+ * 
+ * Note: once jobs are attached to a run, the run is "closed" and subsequent
+ * jobs cannot be attached to it
  */
-router.post('run/:run/batch', (req, res) => {
+router.post('run/:run/jobs', (req, res) => {
     request({
         url: req.body.url,
         method: 'GET',
@@ -86,25 +89,10 @@ router.post('run/:run/batch', (req, res) => {
 
 
 router.get('/run/:run', (req, res) => {
-    pool.query(`
-        SELECT
-            id,
-            created,
-            github
-        FROM
-            runs
-        WHERE
-            id = $1
-    `, [ req.params.run ], (err, pgres) => {
+    Run.from(req.params.run, (err, run) => {
         if (err) throw err;
 
-        if (!pgres.rows.length) {
-            res.json({
-                error: 'I\'m a 404'
-            });
-        } else {
-            res.json(pgres.rows[0]);
-        }
+        return res.json(run.json());
     });
 });
 

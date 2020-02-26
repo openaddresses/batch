@@ -27,6 +27,7 @@ router.use(bodyparser.json());
 
 
 const Run = require('./lib/run');
+const Job = require('./lib/job');
 
 app.get('/', (req, res) => {
     return res.json({
@@ -70,10 +71,22 @@ router.post('/run', (req, res) => {
     return res.json(run.json());
 });
 
+router.get('/run/:run', (req, res) => {
+    Run.from(req.params.run, (err, run) => {
+        if (err) throw err;
+
+        return res.json(run.json());
+    });
+});
+
+router.patch('/run/:run', (req, res) => {
+});
+
+
 /**
  * Given an array sources, explode it into multiple jobs and submit to batch
  * or pass in a predefined list of sources/layer/names
- * 
+ *
  * Note: once jobs are attached to a run, the run is "closed" and subsequent
  * jobs cannot be attached to it
  */
@@ -87,15 +100,20 @@ router.post('run/:run/jobs', (req, res) => {
     });
 });
 
+router.get('run/:run/jobs', (req, res) => {
 
-router.get('/run/:run', (req, res) => {
-    Run.from(req.params.run, (err, run) => {
+});
+
+router.get('/job/:job', (req, res) => {
+    Job.from(req.params.job, (err, run) => {
         if (err) throw err;
 
         return res.json(run.json());
     });
 });
 
+router.patch('/job/:job', (req, res) => {
+});
 
 app.listen(5000, (err) => {
     if (err) return err;

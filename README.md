@@ -37,3 +37,45 @@ The project is divided into several componenets
 | lambda | Lambda responsible for instantiating a batch job environement and submitting it |
 | task | Docker container for running a batch job |
 
+## API
+
+All infrastructure in this repo must be used via the REST API. Individual
+components should never be fired directly to ensure database state.
+
+### Server
+
+### GET `/`
+
+Healthcheck, returns 200 if the server is healthy
+
+#### GET `/api`
+
+Returns high level info about the API
+
+```JSON
+{
+    "version": "1.0.0"
+}
+```
+
+### Runs
+
+#### GET `/api/run`
+
+Return information about a filtered set of runs
+
+#### POST `/api/run`
+
+Create a new run
+
+#### GET `/api/run/<run>`
+
+Get an individual run
+
+#### PUT `/api/run/<run>`
+
+Update an individual run
+
+#### POST `/api/run/<run>/batch`
+
+Given a source file, create jobs for all permutations

@@ -112,17 +112,20 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
-                    'Command': [ './task.js' ],
-                    'Environment': [{
-                        'Name': 'MapboxToken',
-                        'Value': cf.ref('MapboxToken')
+                    Command: [ './task.js' ],
+                    Environment: [{
+                        Name: 'MapboxToken',
+                        Value: cf.ref('MapboxToken')
+                    },{
+                        Name: 'OA_API' ,
+                        Value: cf.getAtt('APIELB', 'DNSName')
                     }],
-                    'Memory': 4000,
-                    'Privileged': true,
-                    'JobRoleArn': cf.getAtt('BatchJobRole', 'Arn'),
-                    'ReadonlyRootFilesystem': false,
-                    'Vcpus': 2,
-                    'Image': cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/batch:task-', cf.ref('GitSha')])
+                    Memory: 4000,
+                    Privileged: true,
+                    JobRoleArn: cf.getAtt('BatchJobRole', 'Arn'),
+                    ReadonlyRootFilesystem: false,
+                    Vcpus: 2,
+                    Image: cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/batch:task-', cf.ref('GitSha')])
                 }
             }
         },
@@ -205,7 +208,8 @@ const stack = {
                     Variables: {
                         JOB_DEFINITION: cf.ref('BatchJobDefinition'),
                         JOB_QUEUE: cf.ref('BatchJobQueue'),
-                        JOB_NAME: 'lambda-trigger-job'
+                        JOB_NAME: 'lambda-trigger-job',
+                        OA_API: cf.getAtt('APIELB', 'DNSName')
                     }
                 },
                 Runtime: 'nodejs12.x',

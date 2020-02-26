@@ -1,14 +1,14 @@
 {
-  "name": "batch-task",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "@mapbox/decrypt-kms-env": "^3.0.0",
-    "request": "^2.88.2"
-  },
-  "devDependencies": {
-    "tape": "^4.13.0"
-  }
+    "name": "batch-task",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "@mapbox/decrypt-kms-env": "^3.0.0",
+        "request": "^2.88.2"
+    },
+    "devDependencies": {
+        "tape": "^4.13.0"
+    }
 }

@@ -1,5 +1,6 @@
 class Job {
-    constructor(url, layer, name) {
+    constructor(job, url, layer, name) {
+        if (!job) throw new Error('No OA_JOB env var defined');
         if (!url) throw new Error('No OA_SOURCE env var defined');
         if (!layer) throw new Error('No OA_SOURCE_LAYER env var defined');
         if (!name) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
@@ -8,6 +9,7 @@ class Job {
 
         fs.mkdirSync(this.tmp);
 
+        this.job = job;
         this.url = url;
         this.source = false;
         this.layer = layer;

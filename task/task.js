@@ -9,11 +9,17 @@ const os = require('os');
 const fs = require('fs');
 
 if (require.main === module) {
+    if (!process.env.OA_JOB) throw new Error('No OA_JOB env var defined');
     if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
     if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');
     if (!process.env.OA_SOURCE_LAYER_NAME) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
 
+    if (!process.env.OA_API) throw new Error('No OA_API env var defined');
+
+    const api = process.env.OA_API;
+
     const job = new Job(
+        process.env.OA_JOB,
         process.env.OA_SOURCE,
         process.env.OA_SOURCE_LAYER,
         process.env.OA_SOURCE_LAYER_NAME
@@ -22,13 +28,13 @@ if (require.main === module) {
     dke(process.env, (err, scrubbed) => {
         if (err) throw err;
 
-        return flow(job, (err) => {
+        return flow(api, job, (err) => {
             if (err) throw err;
         });
     });
 }
 
-function flow(job, cb) {
+function flow(api, job, cb) {
     job.fetch((err, source) => {
         const source_path = path.resolve(job.tmp, 'source.json');
         fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));

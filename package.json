@@ -1,17 +1,17 @@
 {
-  "name": "batch",
-  "version": "1.0.0",
-  "description": "AWS Batch based ETL Processing",
-  "main": "index.js",
-  "repository": "git@github.com:openaddresses/batch",
-  "author": "ingalls <nick@ingalls.ca>",
-  "license": "MIT",
-  "private": false,
-  "dependencies": {
-    "@mapbox/cloudfriend": "^4.0.0",
-    "aws-sdk": "^2.624.0",
-    "minimist": "^1.2.0",
-    "prompts": "^2.3.1",
-    "request": "^2.88.2"
-  }
+    "name": "batch",
+    "version": "1.0.0",
+    "description": "AWS Batch based ETL Processing",
+    "main": "index.js",
+    "repository": "git@github.com:openaddresses/batch",
+    "author": "ingalls <nick@ingalls.ca>",
+    "license": "MIT",
+    "private": false,
+    "dependencies": {
+        "@mapbox/cloudfriend": "^4.0.0",
+        "aws-sdk": "^2.624.0",
+        "minimist": "^1.2.0",
+        "prompts": "^2.3.1",
+        "request": "^2.88.2"
+    }
 }

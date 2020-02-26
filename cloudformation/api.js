@@ -137,7 +137,7 @@ const stack = {
                     },{
                         Name: 'POSTGRES',
                         Value: cf.join([
-                            'postgres://openaddresses:',
+                            'postgresql://openaddresses:',
                             cf.ref('DatabasePassword'),
                             '@',
                             cf.getAtt('MLEnablerRDS', 'Endpoint.Address'),

@@ -142,6 +142,9 @@ const stack = {
                             '@',
                             cf.getAtt('MLEnablerRDS', 'Endpoint.Address'),
                             ':5432/openaddresses',
+                    },{
+                        Name: 'SharedSecret',
+                        value: cf.ref('SharedSecret')
                     }],
                     LogConfiguration: {
                         LogDriver: 'awslogs',

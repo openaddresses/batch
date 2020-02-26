@@ -10,6 +10,10 @@ const stack = {
         GitSha: {
             Type: 'String',
             Description: 'Gitsha to Deploy'
+        },
+        SharedSecret: {
+            Type: 'String',
+            Description: '[secure] Secret for auth against internal API functions'
         }
     }
 }

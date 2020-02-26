@@ -17,13 +17,21 @@ Or update to the latest GitSha or CloudFormation template via
 deploy update production
 ```
 
-### Paramaters
+### Parameters
 
 #### GitSha
 
 On every commit, GitHub actions will build the latest Docker image and push it to the `batch` ECR.
 This parameter will be populated automatically by the `deploy` cli and simply points the stack
 to use the correspondingly Docker image from ECR.
+
+#### SharedSecret
+
+API functions that are public currently do not require any auth at all. Internal functions however are protected
+by a stack-wide shared secret. This secret is an alpha-numeric string that is included in a `secret` header, to
+authenticate internal API calls.
+
+This value can be any secure alpha-numeric combination of characters and is safe to change at any time.
 
 ## Components
 

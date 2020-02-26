@@ -117,6 +117,9 @@ const stack = {
                         Name: 'MapboxToken',
                         Value: cf.ref('MapboxToken')
                     },{
+                        Name: 'SharedSecret',
+                        Value: cf.ref('SharedSecret')
+                    },{
                         Name: 'OA_API' ,
                         Value: cf.getAtt('APIELB', 'DNSName')
                     }],
@@ -209,7 +212,8 @@ const stack = {
                         JOB_DEFINITION: cf.ref('BatchJobDefinition'),
                         JOB_QUEUE: cf.ref('BatchJobQueue'),
                         JOB_NAME: 'lambda-trigger-job',
-                        OA_API: cf.getAtt('APIELB', 'DNSName')
+                        OA_API: cf.getAtt('APIELB', 'DNSName'),
+                        SharedSecret: cf.ref('SharedSecret')
                     }
                 },
                 Runtime: 'nodejs12.x',

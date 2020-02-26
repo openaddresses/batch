@@ -44,11 +44,11 @@ components should never be fired directly to ensure database state.
 
 ### Server
 
-### GET `/`
+### GET `/` (Public)
 
 Healthcheck, returns 200 if the server is healthy
 
-#### GET `/api`
+#### GET `/api` (Public)
 
 Returns high level info about the API
 
@@ -60,22 +60,29 @@ Returns high level info about the API
 
 ### Runs
 
-#### GET `/api/run`
+#### GET `/api/run` (Public)
 
 Return information about a filtered set of runs
 
-#### POST `/api/run`
+#### POST `/api/run` (Internal)
 
 Create a new run
 
-#### GET `/api/run/<run>`
+#### GET `/api/run/<run>` (Public)
 
 Get an individual run
 
-#### PUT `/api/run/<run>`
+#### PATCH `/api/run/<run>` (Internal)
 
 Update an individual run
 
-#### POST `/api/run/<run>/batch`
+#### POST `/api/run/<run>/jobs` (Internal)
 
 Given a source file, create jobs for all permutations
+
+### Jobs
+
+#### GET `/api/job/<job>` (Public)
+
+#### PATCH `/api/job/<job>` (Internal)
+

@@ -30,7 +30,8 @@ const stack = {
                 StorageType: 'gp2',
                 DBInstanceClass: cf.ref('DatabaseType'),
                 DBSecurityGroups: [ cf.ref('DBSecurityGroup') ],
-                DBSubnetGroupName: cf.ref('DBSubnet')
+                DBSubnetGroupName: cf.ref('DBSubnet'),
+                PubliclyAccessible: true
             }
         },
         DBSubnet: {

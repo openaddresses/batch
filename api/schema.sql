@@ -1,7 +1,7 @@
 CREATE EXTENSION "uuid-ossp";
 
 -- Store the latest known good data for a given source
-CREATE TABLE results (
+CREATE TABLE IF NOT EXISTS results (
     source      TEXT,
     created     TIMESTAMP,
     layer       TEXT,
@@ -11,11 +11,11 @@ CREATE TABLE results (
 
 -- A job corresponds 1:1 with a batch task
 -- Each batch task processes a single name, of a single layer, from a single source
-CREATE TABLE job (
+CREATE TABLE IF NOT EXISTS job (
     id          UUID PRIMARY KEY,
-    set         UUID, -- If part of a set
+    run         UUID, -- run id
     created     TIMESTAMP,
-    url         TEXT, -- URL to Source JSON
+    source      TEXT, -- URL to Source JSON
     layer       TEXT, -- Data Layer to process
     name        TEXT, -- Data provider to process
     output      TEXT, -- Final S3 Location (geojson.gz)
@@ -24,7 +24,7 @@ CREATE TABLE job (
     version     TEXT  -- Version of Batch to run the job
 );
 
-CREATE TABLE runs (
+CREATE TABLE IF NOT EXISTS runs (
     id          UUID PRIMARY KEY,
     created     TIMESTAMP,
     github      JSONB, -- If a GH CI response, store data needed to return status

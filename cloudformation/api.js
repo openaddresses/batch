@@ -144,7 +144,10 @@ const stack = {
                             ':5432/openaddresses',
                     },{
                         Name: 'SharedSecret',
-                        value: cf.ref('SharedSecret')
+                        Value: cf.ref('SharedSecret')
+                    },{
+                        Name: 'StackName',
+                        Value: cf.stackName
                     }],
                     LogConfiguration: {
                         LogDriver: 'awslogs',

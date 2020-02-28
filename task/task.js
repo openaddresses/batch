@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const dke = require('@mapbox/decrypt-kms-env');
-const Job = require('./lib/Job');
+const Job = require('./lib/job');
 const request = require('request');
 const path = require('path');
 const CP = require('child_process');
@@ -28,75 +28,51 @@ if (require.main === module) {
     dke(process.env, (err, scrubbed) => {
         if (err) throw err;
 
-        return flow(api, job, (err) => {
-            if (err) throw err;
+        flow(api, job).catch((err) => {
+            throw err;
         });
     });
 }
 
-function flow(api, job, cb) {
-    job.fetch((err, source) => {
+async function flow(api, job, cb) {
+    try {
+        let source = await job.fetch();
+
         const source_path = path.resolve(job.tmp, 'source.json');
         fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
 
-        processOne(job, source_path, cb);
-    });
-}
+        await processOne(job, source_path);
 
-function processOne(job, source_path, cb) {
-    const task = CP.spawn('openaddr-process-one', [
-        source_path,
-        job.tmp,
-        '--layer', job.layer,
-        '--layersource', job.name,
-        '--render-preview',
-        '--mapbox-key', process.env.MapboxToken,
-        '--verbose',
-    ],{
-        env: process.env
-    });
+        await job.report(api);
 
-    task.stderr.pipe(process.stderr);
-    task.stdout.pipe(process.stdout);
-
-    task.on('error', cb);
-
-    task.on('close', (exit) => {
-        return cb(null, job.tmp);
-    });
-}
-
-class Job {
-    constructor(url, layer, name) {
-        if (!url) throw new Error('No OA_SOURCE env var defined');
-        if (!layer) throw new Error('No OA_SOURCE_LAYER env var defined');
-        if (!name) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
-
-        this.tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
-
-        fs.mkdirSync(this.tmp);
-
-        this.url = url;
-        this.source = false;
-        this.layer = layer;
-        this.name = name;
-
+    } catch (err) {
+        throw err;
     }
+}
 
-    fetch(cb) {
-        request({
-            url: this.url,
-            json: true,
-            method: 'GET'
-        }, (err, res) => {
-            if (err) return cb(err);
-
-            this.source = res.body;
-
-            return cb(null, this.source);
+function processOne(job, source_path) {
+    return new Promise((resolve, reject) => {
+        const task = CP.spawn('openaddr-process-one', [
+            source_path,
+            job.tmp,
+            '--layer', job.layer,
+            '--layersource', job.name,
+            '--render-preview',
+            '--mapbox-key', process.env.MapboxToken,
+            '--verbose',
+        ],{
+            env: process.env
         });
-    }
 
+        task.stderr.pipe(process.stderr);
+        task.stdout.pipe(process.stdout);
+
+        task.on('error', reject);
+
+        task.on('close', (exit) => {
+            return resolve(job.tmp);
+        });
+    });
 }
 
 module.exports = {

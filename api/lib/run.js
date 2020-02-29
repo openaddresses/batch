@@ -50,6 +50,24 @@ class Run {
         });
     }
 
+    static close(pool, id) {
+        new Promise((resolve, reject) => {
+            pool.query(`
+                UPDATE
+                    runs
+                SET
+                    closed = true
+                WHERE
+                    id = $1
+            `, [id], (err, pgres) => {
+                if (err) return reject(err);
+
+                return resolve(true);
+            });
+        });
+
+    }
+
     json() {
         return {
             id: this.id,
@@ -87,12 +105,10 @@ class Run {
         return new Promise((resolve, reject) => {
             pool.query(`
                 INSERT INTO runs (
-                    id,
                     created,
                     github,
                     closed
                 ) VALUES (
-                    uuid_generate_v4(),
                     NOW(),
                     '{}'::JSONB,
                     false

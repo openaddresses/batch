@@ -1,5 +1,3 @@
-CREATE EXTENSION "uuid-ossp";
-
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (
     source      TEXT,
@@ -12,8 +10,8 @@ CREATE TABLE IF NOT EXISTS results (
 -- A job corresponds 1:1 with a batch task
 -- Each batch task processes a single name, of a single layer, from a single source
 CREATE TABLE IF NOT EXISTS job (
-    id          UUID PRIMARY KEY,
-    run         UUID, -- run id
+    id          BIGSERIAL PRIMARY KEY,
+    run         BIGINT, -- run id
     created     TIMESTAMP,
     source      TEXT, -- URL to Source JSON
     layer       TEXT, -- Data Layer to process
@@ -25,7 +23,7 @@ CREATE TABLE IF NOT EXISTS job (
 );
 
 CREATE TABLE IF NOT EXISTS runs (
-    id          UUID PRIMARY KEY,
+    id          BIGSERIAL PRIMARY KEY,
     created     TIMESTAMP,
     github      JSONB, -- If a GH CI response, store data needed to return status
     closed      BOOL

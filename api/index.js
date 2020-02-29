@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-
+const util = require('./lib/util');
 const express = require('express');
 const request = require('request');
 const config = require('./package.json');
@@ -7,194 +6,246 @@ const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
-    string: ['postgres', 'secret']
+    string: ['postgres', 'secret'],
 });
 
 const router = express.Router();
 const app = express();
 const {Pool} = require('pg');
 
-if (!args.postgres && !process.env.POSTGRES) {
-    throw new Error('No postgres connection given');
+if (require.main === module) {
+    server(args);
 }
 
-if (!process.env.StackName) {
-    throw new Error('No StackName env var set');
-}
+function server(args, cb) {
+    if (!args.postgres && !process.env.POSTGRES) {
+        throw new Error('No postgres connection given');
+    }
 
-const pool = new Pool({
-    connectionString: args.postgres ? args.postgres : process.env.POSTGRES
-});
-
-app.disable('x-powered-by');
-app.use('/api', router);
-app.use(minify());
-
-router.use(bodyparser.urlencoded({ extended: true }));
-router.use(bodyparser.json());
-
-const SECRET = args.secret ? args.secret : process.env.SharedSecret;
-
-const Run = require('./lib/run');
-const Job = require('./lib/job');
-
-/**
- * Return a successful healthcheck
- */
-app.get('/', (req, res) => {
-    return res.json({
-        healthy: true
+    const pool = new Pool({
+        connectionString: args.postgres ? args.postgres : process.env.POSTGRES
     });
-});
 
-/**
- * Return basic data about the API
- */
-app.get('/api', (req, res) => {
-    return res.json({
-        version: config.version
+    app.disable('x-powered-by');
+    app.use('/api', router);
+    app.use(minify());
+
+    router.use(bodyparser.urlencoded({ extended: true }));
+    router.use(bodyparser.json());
+
+    const SECRET = args.secret ? args.secret : process.env.SharedSecret;
+
+    const Run = require('./lib/run');
+    const Job = require('./lib/job');
+
+    /**
+     * Return a successful healthcheck
+     */
+    app.get('/', (req, res) => {
+        return res.json({
+            healthy: true
+        });
     });
-});
 
-/*
- * Search for processed data by various criteria
- */
-router.get('/data', (req, res) => {
-    // Allow getting S3 links in various ways
-    // - bbox
-    // - name prefix
-    // - layer
-});
-
-/**
- * Search for runs by various criteria
- */
-router.get('/run', (req, res) => {
-    pool.query(`
-        SELECT
-            *
-        FROM
-            runs
-        ORDER BY
-            created DESC
-        LIMIT 100
-    `, (err, pgres) => {
-        if (err) throw err;
-
-        res.json(pgres.rows);
+    /**
+     * Return basic data about the API
+     */
+    app.get('/api', (req, res) => {
+        return res.json({
+            version: config.version
+        });
     });
-});
 
-/**
- * Create a new run, a run is a top level object
- * that acts as a container for a given subset of jobs
- */
-router.post('/run', async (req, res) => {
-    try {
-        const run = await Run.generate(pool);
+    /*
+     * Search for processed data by various criteria
+     */
+    router.get('/data', (req, res) => {
+        // Allow getting S3 links in various ways
+        // - bbox
+        // - name prefix
+        // - layer
+    });
 
-        return res.json(run.json());
-    } catch (err) {
-        return res.status(500).send({
-            status: 500,
-            error: err.message
+    /**
+     * Search for runs by various criteria
+     */
+    router.get('/run', (req, res) => {
+        pool.query(`
+            SELECT
+                *
+            FROM
+                runs
+            ORDER BY
+                created DESC
+            LIMIT 100
+        `, (err, pgres) => {
+            if (err) throw err;
+
+            res.json(pgres.rows);
         });
-    }
-});
+    });
 
-/**
- * Get a specific run
- */
-router.get('/run/:run', async (req, res) => {
-    try {
-        const run = await Run.from(req.params.run)
+    /**
+     * Create a new run, a run is a top level object
+     * that acts as a container for a given subset of jobs
+     */
+    router.post('/run', async (req, res) => {
+        try {
+            const run = await Run.generate(pool);
 
-        return res.json(run.json());
-    } catch (err) {
-        return res.status(500).send({
-            status: 500,
-            error: err.message
-        });
-    }
-});
-
-router.patch('/run/:run', async (req, res) => {
-    try {
-        const run = await Run.from(req.params.run);
-
-        run.patch(req.body);
-
-        await run.commit(pool)
-
-        return res.json(run.json());
-    } catch (err) {
-        return res.status(500).send({
-            status: 500,
-            error: err.message
-        });
-    }
-});
-
-/**
- * Given an array sources, explode it into multiple jobs and submit to batch
- * or pass in a predefined list of sources/layer/names
- *
- * Note: once jobs are attached to a run, the run is "closed" and subsequent
- * jobs cannot be attached to it
- *
- * Example of both formats:
- * ['https://github.com/path_to_source', {
- *     "source": "https://github/path_to_source",
- *     "layer": "addresses",
- *     "name": "dcgis"
- * }]
- *
- */
-router.post('run/:run/jobs', (req, res) => {
-    if (!Array.isArray(req.body)) {
-        return res.status(400).send({
-            status: 400,
-            error: 'jobs body must be array'
-        });
-    }
-
-    for (const job in req.body) {
-        if (!job) return //ERROR
-        if (typeof job === 'string' && doesn't start with https://github.com) return // ERROR
-
-            request({
-                url: req.body.url,
-                method: 'GET',
-                json: true
-            }, (err, rres) => {
-
+            return res.json(run.json());
+        } catch (err) {
+            return res.status(500).send({
+                status: 500,
+                error: err.message
             });
+        }
+    });
+
+    /**
+     * Get a specific run
+     */
+    router.get('/run/:run', async (req, res) => {
+        try {
+            const run = await Run.from(req.params.run)
+
+            return res.json(run.json());
+        } catch (err) {
+            return res.status(500).send({
+                status: 500,
+                error: err.message
+            });
+        }
+    });
+
+    router.patch('/run/:run', async (req, res) => {
+        try {
+            const run = await Run.from(req.params.run);
+
+            run.patch(req.body);
+
+            await run.commit(pool)
+
+            return res.json(run.json());
+        } catch (err) {
+            return res.status(500).send({
+                status: 500,
+                error: err.message
+            });
+        }
+    });
+
+    /**
+     * Given an array sources, explode it into multiple jobs and submit to batch
+     * or pass in a predefined list of sources/layer/names
+     *
+     * Note: once jobs are attached to a run, the run is "closed" and subsequent
+     * jobs cannot be attached to it
+     *
+     * Example of both formats:
+     * ['https://github.com/path_to_source', {
+     *     "source": "https://github/path_to_source",
+     *     "layer": "addresses",
+     *     "name": "dcgis"
+     * }]
+     *
+     */
+    router.post('/run/:run/jobs', async (req, res) => {
+        if (!Array.isArray(req.body.jobs)) {
+            return res.status(400).send({
+                status: 400,
+                error: 'jobs body must be array'
+            });
+        }
+
+        let jobs = []
+
+        for (const job of req.body.jobs) {
+            if (!job) {
+                return res.status(400).send({
+                    status: 400,
+                    error: 'job element cannot be null'
+                });
+            } else if (
+                typeof job === 'string'
+                && !/https:\/\/github\.com\//.test(job)
+                && !/https:\/\/raw\.githubusercontent\.com\//.test(job)
+            ) {
+                return res.status(400).send({
+                    status: 400,
+                    error: 'job must reference github.com'
+                });
+            } else if (Array.isArray(job)) {
+                jobs.push(job);
+            } else if (typeof job === 'string') {
+                try {
+                    jobs = jobs.concat(await util.explode(job))
+                } catch(err) {
+                    return res.status(500).send({
+                        status: 400,
+                        error: 'failed to generate jobs'
+                    });
+                }
+            } else {
+                return res.status(400).send({
+                    status: 400,
+                    error: 'job must be string or job object'
+                });
+            }
+
+            for (const i = 0; i < jobs.length; i++) {
+                jobs[i] = new Job(req.params.run, jobs[i].source, jobs[i].layer, jobs[i].name);
+                try {
+                    await jobs[i].generate(pool);
+                    await jobs[i].batch();
+                } catch(err) {
+                    console.error(err);
+                    // TODO return list of successful ids
+                    return res.status(400).send({
+                        status: 400,
+                        error: 'jobs only partially queued',
+                    });
+                }
+            }
+
+            await Run.close(pool, req.params.run);
+
+            res.json({
+                jobs: jobs.map((job) => {
+                    return job.id;
+                })
+            });
+        }
+    });
+
+    /**
+     * Get all the jobs associated with a run
+     */
+    router.get('run/:run/jobs', (req, res) => {
+
+    });
+
+    router.get('/job/:job', (req, res) => {
+        Job.from(req.params.job, (err, run) => {
+            if (err) throw err;
+
+            return res.json(run.json());
         });
-});
-
-/**
- * Get all the jobs associated with a run
- */
-router.get('run/:run/jobs', (req, res) => {
-
-});
-
-router.get('/job/:job', (req, res) => {
-    Job.from(req.params.job, (err, run) => {
-        if (err) throw err;
-
-        return res.json(run.json());
     });
-});
 
-router.patch('/job/:job', (req, res) => {
-    Job.from(req.params.job, (err, run) => {
+    router.patch('/job/:job', (req, res) => {
+        Job.from(req.params.job, (err, run) => {
 
+        });
     });
-});
 
-app.listen(5000, (err) => {
-    if (err) return err;
+    const srv = app.listen(5000, (err) => {
+        if (err) return err;
 
-    console.log(`Server listening on port 5000`);
-});
+        if (cb) return cb(srv);
+
+        console.log(`Server listening on port 5000`);
+    });
+}
+
+module.exports = server;

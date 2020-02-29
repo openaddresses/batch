@@ -86,7 +86,11 @@ function server(args, cb) {
         `, (err, pgres) => {
             if (err) throw err;
 
-            res.json(pgres.rows);
+            res.json(pgres.rows.map((run) => {
+                run.id = parseInt(run.id);
+
+                return run;
+            }));
         });
     });
 

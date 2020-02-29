@@ -18,11 +18,16 @@ class Run {
                 FROM
                     jobs
                 WHERE
-                    jobs.run = $1::UUID
+                    jobs.run = $1
             `, [run.id], (err, pgres) => {
                 if (err) return reject(err);
 
-                return resolve(pgres.rows);
+                return resolve(pgres.rows.map((job) => {
+                    job.id = parseInt(job.id);
+                    job.run = parseInt(job.run);
+
+                    return job;
+                }));
             });
         });
     }

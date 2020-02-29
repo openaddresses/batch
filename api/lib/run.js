@@ -70,7 +70,7 @@ class Run {
 
     json() {
         return {
-            id: this.id,
+            id: parseInt(this.id),
             created: this.created,
             github: this.github,
             closed: this.closed

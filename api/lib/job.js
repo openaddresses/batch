@@ -18,6 +18,21 @@ class Job {
         this.version = config.version;
     }
 
+    json() {
+        return {
+            id: parseInt(this.id),
+            run: parseInt(this.run),
+            created: this.created,
+            source: this.source,
+            layer: this.layer,
+            name: this.name,
+            output: this.output,
+            loglink: this.loglink,
+            status: this.status,
+            version: this.version
+        };
+    }
+
     static from(pool, id) {
         return new Promise((resolve, reject) => {
             pool.query(`
@@ -88,21 +103,25 @@ class Job {
         return new Promise((resolve, reject) => {
             if (!this.id) return reject(new Error('Cannot batch a job without an ID'));
 
-            lambda.invoke({
-                FunctionName: `${process.env.StackName}-invoke`,
-                InvocationType: 'Event',
-                LogType: 'Tail',
-                Payload: JSON.stringify({
-                    job: this.id,
-                    source: this.source,
-                    layer: this.layer,
-                    name: this.name
-                })
-            }, (err, data) => {
-                if (err) return reject(err);
+            if (process.env.StackName === 'test') {
+                return resolve(true);
+            } else {
+                lambda.invoke({
+                    FunctionName: `${process.env.StackName}-invoke`,
+                    InvocationType: 'Event',
+                    LogType: 'Tail',
+                    Payload: JSON.stringify({
+                        job: this.id,
+                        source: this.source,
+                        layer: this.layer,
+                        name: this.name
+                    })
+                }, (err, data) => {
+                    if (err) return reject(err);
 
-                return resolve(data);
-            });
+                    return resolve(data);
+                });
+            }
         });
     }
 }

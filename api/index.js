@@ -22,6 +22,11 @@ function server(args, cb) {
         throw new Error('No postgres connection given');
     }
 
+    if (!process.env.StackName) {
+        consoe.error('ok - StackName not set - disabling AWS calls');
+        process.env.StackName = 'test';
+    }
+
     const pool = new Pool({
         connectionString: args.postgres ? args.postgres : process.env.POSTGRES
     });
@@ -193,7 +198,7 @@ function server(args, cb) {
                 });
             }
 
-            for (const i = 0; i < jobs.length; i++) {
+            for (let i = 0; i < jobs.length; i++) {
                 jobs[i] = new Job(req.params.run, jobs[i].source, jobs[i].layer, jobs[i].name);
                 try {
                     await jobs[i].generate(pool);
@@ -212,7 +217,7 @@ function server(args, cb) {
 
             res.json({
                 jobs: jobs.map((job) => {
-                    return job.id;
+                    return job.json().id;
                 })
             });
         }

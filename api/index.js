@@ -192,7 +192,7 @@ async function server(args, cb) {
                     status: 400,
                     error: 'job must reference github.com'
                 });
-            } else if (Array.isArray(job)) {
+            } else if (job.source) {
                 jobs.push(job);
             } else if (typeof job === 'string') {
                 try {

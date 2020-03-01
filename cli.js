@@ -85,22 +85,28 @@ async function cli() {
          name = source.layers[layer][0].name;
     }
 
-    let run = await request({
-        url: api + '/api/run',
-        method: 'POST'
-    });
+    try {
+        let run = await request({
+            url: api + '/api/run',
+            method: 'POST',
+            json: true
+        });
 
-    console.error(run.body);
+        const job = await request({
+            url: api + `/api/run/${run.body.id}/jobs`,
+            method: 'POST',
+            json: true,
+            body: {
+                jobs: [{
+                    source: url,
+                    layer: layer,
+                    name: name
+                }]
+            }
+        });
 
-    const job = await request({
-        url: api + `/api/run/${run.body.id}/jobs`,
-        method: 'POST',
-        body: JSON.stringify([{
-            source: url,
-            layer: layer,
-            name: name
-        }])
-    });
-
-    console.error(job.body);
+        console.error(job.body);
+    } catch(err) {
+        throw err;
+    }
 }

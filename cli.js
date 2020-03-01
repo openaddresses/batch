@@ -10,18 +10,18 @@ const lambda = new AWS.Lambda({
 
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
-    string: ['stack', 'url', 'layer', 'name']
+    string: ['api', 'url', 'layer', 'name']
 });
 
 cli();
 
 async function cli() {
     let params = await prompt([{
-        name: 'stack',
-        message: 'batch stack to queue to',
+        name: 'api',
+        message: 'batch api to queue to',
         required: true,
         type: 'text',
-        initial: args.stack
+        initial: args.api
     },{
         name: 'url',
         message: 'URL of source to send to batch',
@@ -31,7 +31,7 @@ async function cli() {
     }]);
 
     const url = params.url;
-    const stack = params.stack;
+    const api = params.api;
 
     let source = await request({
         url: url,
@@ -85,18 +85,22 @@ async function cli() {
          name = source.layers[layer][0].name;
     }
 
-    lambda.invoke({
-        FunctionName: `batch-${stack}-invoke`,
-        InvocationType: 'Event',
-        LogType: 'Tail',
-        Payload: JSON.stringify({
+    let run = await request({
+        url: api + '/api/run',
+        method: 'POST'
+    });
+
+    console.error(run.body);
+
+    const job = await request({
+        url: api + `/api/run/${run.body.id}/jobs`,
+        method: 'POST',
+        body: JSON.stringify([{
             source: url,
             layer: layer,
             name: name
-        })
-    }, (err, data) => {
-        if (err) throw err;
-
-        console.error(data);
+        }])
     });
+
+    console.error(job.body);
 }

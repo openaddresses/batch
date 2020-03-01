@@ -140,8 +140,9 @@ const stack = {
                             'postgresql://openaddresses:',
                             cf.ref('DatabasePassword'),
                             '@',
-                            cf.getAtt('MLEnablerRDS', 'Endpoint.Address'),
-                            ':5432/openaddresses',
+                            cf.getAtt('DBInstance', 'Endpoint.Address'),
+                            ':5432/openaddresses'
+                        ])
                     },{
                         Name: 'SharedSecret',
                         Value: cf.ref('SharedSecret')

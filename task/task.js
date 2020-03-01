@@ -43,7 +43,7 @@ async function flow(api, job, cb) {
 
         await processOne(job, source_path);
 
-        await job.report(api);
+        await job.success(api);
 
     } catch (err) {
         throw err;

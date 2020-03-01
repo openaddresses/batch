@@ -41,7 +41,7 @@ class Job {
 
     }
 
-    report_success(api) {
+    success(api) {
         return new Promise((resolve, reject) => {
             request({
                 url: `${api}/api/job/${this.job}`,

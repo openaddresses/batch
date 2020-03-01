@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const util = require('./lib/util');
 const express = require('express');
 const request = require('request');
@@ -17,7 +19,7 @@ if (require.main === module) {
     server(args);
 }
 
-function server(args, cb) {
+async function server(args, cb) {
     if (!args.postgres && !process.env.POSTGRES) {
         throw new Error('No postgres connection given');
     }
@@ -30,6 +32,12 @@ function server(args, cb) {
     const pool = new Pool({
         connectionString: args.postgres ? args.postgres : process.env.POSTGRES
     });
+
+    try {
+        await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
+    } catch(err) {
+        throw err;
+    }
 
     app.disable('x-powered-by');
     app.use('/api', router);

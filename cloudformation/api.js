@@ -101,6 +101,10 @@ const stack = {
                                 'logs:DescribeLogStreams'
                             ],
                             'Resource': [ 'arn:aws:logs:*:*:*' ]
+                        },{
+                            Effect: 'Allow',
+                            Action: 'lambda:InvokeFunction',
+                            Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
                         }]
                     }
                 }],

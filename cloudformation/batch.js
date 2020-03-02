@@ -1,3 +1,5 @@
+'use strict';
+
 const cf = require('@mapbox/cloudfriend');
 
 const stack = {
@@ -21,7 +23,7 @@ const stack = {
                         Action: 'sts:AssumeRole'
                     }]
                 },
-                ManagedPolicyArns: [ 'arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole' ],
+                ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole'],
                 Path: '/service-role/'
             }
         },
@@ -38,14 +40,14 @@ const stack = {
                         Action: 'sts:AssumeRole'
                     }]
                 },
-                ManagedPolicyArns: [ 'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role' ],
+                ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role'],
                 Path: '/'
             }
         },
         BatchInstanceProfile: {
             Type: 'AWS::IAM::InstanceProfile',
             Properties: {
-                Roles: [ cf.ref('BatchInstanceRole') ],
+                Roles: [cf.ref('BatchInstanceRole')],
                 Path: '/'
             }
         },
@@ -67,8 +69,8 @@ const stack = {
                     PolicyDocument: {
                         Statement: [{
                             Effect: 'Allow',
-                            Action: [ 's3:GetObject' ],
-                            Resource: [ 'arn:aws:s3:::data.openaddresses.io/*' ]
+                            Action: ['s3:GetObject'],
+                            Resource: ['arn:aws:s3:::data.openaddresses.io/*']
                         }]
                     }
                 }],
@@ -86,7 +88,7 @@ const stack = {
                     MaxvCpus: 128,
                     DesiredvCpus: 32,
                     MinvCpus: 0,
-                    SecurityGroupIds: [ cf.ref('BatchSecurityGroup') ],
+                    SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     Subnets:  [
                         'subnet-de35c1f5',
                         'subnet-e67dc7ea',
@@ -97,7 +99,7 @@ const stack = {
                     ],
                     Type : 'EC2',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    InstanceTypes : [ 'optimal' ]
+                    InstanceTypes : ['optimal']
                 },
                 State: 'ENABLED'
             }
@@ -112,7 +114,7 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
-                    Command: [ './task.js' ],
+                    Command: ['./task.js'],
                     Environment: [{
                         Name: 'MapboxToken',
                         Value: cf.ref('MapboxToken')
@@ -160,9 +162,9 @@ const stack = {
                     'Statement': [{
                         'Effect': 'Allow',
                         'Principal':{
-                            'Service': [ 'lambda.amazonaws.com' ]
+                            'Service': ['lambda.amazonaws.com']
                         },
-                        'Action': [ 'sts:AssumeRole' ]
+                        'Action': ['sts:AssumeRole']
                     }]
                 },
                 'Path': '/',
@@ -171,7 +173,7 @@ const stack = {
                     'PolicyDocument': {
                         'Statement': [{
                             'Effect': 'Allow',
-                            'Action': [ 'batch:SubmitJob' ],
+                            'Action': ['batch:SubmitJob'],
                             'Resource': 'arn:aws:batch:*:*:*'
                         }]
                     }
@@ -181,7 +183,7 @@ const stack = {
                         'Version': '2012-10-17',
                         'Statement': [{
                             'Effect': 'Allow',
-                            'Action': [ 'logs:*' ],
+                            'Action': ['logs:*'],
                             'Resource': 'arn:aws:logs:*:*:*'
                         }]
                     }
@@ -190,8 +192,8 @@ const stack = {
                     'PolicyDocument': {
                         'Statement': [{
                             'Effect': 'Allow',
-                            'Action': [ 's3:GetObject' ],
-                            'Resource': [ 'arn:aws:s3:::openaddresses-lambdas/*' ]
+                            'Action': ['s3:GetObject'],
+                            'Resource': ['arn:aws:s3:::openaddresses-lambdas/*']
                         }]
                     }
                 }]
@@ -205,7 +207,7 @@ const stack = {
                 FunctionName: cf.join('-', [cf.stackName, 'invoke']),
                 Code: {
                     S3Bucket: 'openaddresses-lambdas',
-                    S3Key: cf.join(['batch/', cf.ref('GitSha'), '.zip' ])
+                    S3Key: cf.join(['batch/', cf.ref('GitSha'), '.zip'])
                 },
                 Environment: {
                     Variables: {
@@ -242,6 +244,6 @@ const stack = {
             }
         }
     }
-}
+};
 
 module.exports = stack;

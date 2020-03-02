@@ -1,3 +1,5 @@
+'use strict';
+
 const cf = require('@mapbox/cloudfriend');
 
 const stack = {
@@ -29,7 +31,7 @@ const stack = {
                 BackupRetentionPeriod: 10,
                 StorageType: 'gp2',
                 DBInstanceClass: cf.ref('DatabaseType'),
-                DBSecurityGroups: [ cf.ref('DBSecurityGroup') ],
+                DBSecurityGroups: [cf.ref('DBSecurityGroup')],
                 DBSubnetGroupName: cf.ref('DBSubnet'),
                 PubliclyAccessible: true
             }
@@ -60,6 +62,6 @@ const stack = {
         }
 
     }
-}
+};
 
 module.exports = stack;

@@ -2,16 +2,27 @@
     "name": "batch",
     "version": "1.0.0",
     "description": "AWS Batch based ETL Processing",
-    "main": "index.js",
+    "main": "cli.js",
     "repository": "git@github.com:openaddresses/batch",
     "author": "ingalls <nick@ingalls.ca>",
     "license": "MIT",
     "private": false,
+    "scripts": {
+        "lint": "eslint cli.js cloudformation/**.js"
+    },
     "dependencies": {
         "@mapbox/cloudfriend": "^4.0.0",
         "aws-sdk": "^2.624.0",
         "minimist": "^1.2.0",
         "prompts": "^2.3.1",
         "request": "^2.88.2"
+    },
+    "devDependencies": {
+        "eslint": "^6.8.0",
+        "eslint-plugin-node": "^11.0.0",
+        "@mapbox/eslint-config-geocoding": "^2.0.2"
+    },
+    "eslintConfig": {
+        "extends": "@mapbox/eslint-config-geocoding"
     }
 }

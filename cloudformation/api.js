@@ -1,3 +1,4 @@
+'use strict';
 const cf = require('@mapbox/cloudfriend');
 
 const stack = {
@@ -14,7 +15,7 @@ const stack = {
             Properties: {
                 Name: cf.stackName,
                 Type: 'application',
-                SecurityGroups: [ cf.ref('APIELBSecurityGroup') ],
+                SecurityGroups: [cf.ref('APIELBSecurityGroup')],
                 Subnets:  [
                     'subnet-de35c1f5',
                     'subnet-e67dc7ea',
@@ -22,7 +23,7 @@ const stack = {
                     'subnet-76ae3713',
                     'subnet-35d87242',
                     'subnet-b978ade0'
-                ],
+                ]
             }
 
         },
@@ -125,7 +126,7 @@ const stack = {
                                 'logs:PutLogEvents',
                                 'logs:DescribeLogStreams'
                             ],
-                            'Resource': [ 'arn:aws:logs:*:*:*' ]
+                            'Resource': ['arn:aws:logs:*:*:*']
                         }]
                     }
                 }],
@@ -201,7 +202,7 @@ const stack = {
                 NetworkConfiguration: {
                     AwsvpcConfiguration: {
                         AssignPublicIp: 'ENABLED',
-                        SecurityGroups: [ cf.ref('APIServiceSecurityGroup') ],
+                        SecurityGroups: [cf.ref('APIServiceSecurityGroup')],
                         Subnets:  [
                             'subnet-de35c1f5',
                             'subnet-e67dc7ea',
@@ -209,7 +210,7 @@ const stack = {
                             'subnet-76ae3713',
                             'subnet-35d87242',
                             'subnet-b978ade0'
-                        ],
+                        ]
                     }
                 },
                 LoadBalancers: [{
@@ -230,7 +231,7 @@ const stack = {
                     FromPort: 5000,
                     ToPort: 5000
                 }]
-            },
+            }
         },
         APIPermissionToInvokeLambda: {
             Type: 'AWS::Lambda::Permission',
@@ -252,6 +253,6 @@ const stack = {
             Value: cf.getAtt('APIELB', 'DNSName')
         }
     }
-}
+};
 
 module.exports = stack;

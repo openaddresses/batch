@@ -51,7 +51,7 @@ class Job {
                     status: 'Success',
                     output: 's3://openaddresses/data.zip'
                 })
-            }
+            });
         });
     }
 }

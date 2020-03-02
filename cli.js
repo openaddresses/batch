@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 
-const AWS = require('aws-sdk');
+'use strict';
+
 const prompt = require('prompts');
-const {promisify} = require('util');
+const { promisify } = require('util');
 const request = promisify(require('request'));
-const lambda = new AWS.Lambda({
-    region: 'us-east-1'
-});
 
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
@@ -16,7 +14,7 @@ const args = require('minimist')(process.argv, {
 cli();
 
 async function cli() {
-    let params = await prompt([{
+    const params = await prompt([{
         name: 'api',
         message: 'batch api to queue to',
         required: true,
@@ -82,11 +80,11 @@ async function cli() {
 
         name = name.name;
     } else {
-         name = source.layers[layer][0].name;
+        name = source.layers[layer][0].name;
     }
 
     try {
-        let run = await request({
+        const run = await request({
             url: api + '/api/run',
             method: 'POST',
             json: true
@@ -106,7 +104,7 @@ async function cli() {
         });
 
         console.error(job.body);
-    } catch(err) {
-        throw err;
+    } catch (err) {
+        console.error(err);
     }
 }

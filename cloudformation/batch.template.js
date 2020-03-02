@@ -1,3 +1,5 @@
+'use strict';
+
 const cf = require('@mapbox/cloudfriend');
 const api = require('./api');
 const batch = require('./batch');
@@ -16,7 +18,7 @@ const stack = {
             Description: '[secure] Secret for auth against internal API functions'
         }
     }
-}
+};
 
 module.exports = cf.merge(
     stack,

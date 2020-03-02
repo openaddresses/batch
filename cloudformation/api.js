@@ -90,6 +90,31 @@ const stack = {
                     }]
                 },
                 Policies: [{
+                    PolicyName: cf.join([cf.stackName, '-api-task']),
+                    PolicyDocument: {
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: 'lambda:InvokeFunction',
+                            Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
+                        }]
+                    }
+                }]
+            }
+        },
+        APIExecRole: {
+            'Type': 'AWS::IAM::Role',
+            'Properties': {
+                'AssumeRolePolicyDocument': {
+                    'Version': '2012-10-17',
+                    'Statement': [{
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: 'ecs-tasks.amazonaws.com'
+                        },
+                        'Action': 'sts:AssumeRole'
+                    }]
+                },
+                Policies: [{
                     PolicyName: cf.join([cf.stackName, '-api-logging']),
                     PolicyDocument: {
                         'Statement': [{
@@ -101,10 +126,6 @@ const stack = {
                                 'logs:DescribeLogStreams'
                             ],
                             'Resource': [ 'arn:aws:logs:*:*:*' ]
-                        },{
-                            Effect: 'Allow',
-                            Action: 'lambda:InvokeFunction',
-                            Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
                         }]
                     }
                 }],
@@ -128,7 +149,8 @@ const stack = {
                     Key: 'Name',
                     Value: cf.join('-', [cf.stackName, 'api'])
                 }],
-                ExecutionRoleArn: cf.getAtt('APITaskRole', 'Arn'),
+                ExecutionRoleArn: cf.getAtt('APIExecRole', 'Arn'),
+                TaskRoleArn: cf.getAtt('APITaskRole', 'Arn'),
                 ContainerDefinitions: [{
                     Name: 'api',
                     Image: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/batch:api-', cf.ref('GitSha')]),
@@ -211,11 +233,12 @@ const stack = {
             },
         },
         APIPermissionToInvokeLambda: {
-            'Type': 'AWS::Lambda::Permission',
-            'Properties': {
-                'FunctionName': cf.ref('BatchLambdaTriggerFunction'),
-                'Action': 'lambda:InvokeFunction',
-                'Principal': cf.accountId
+            Type: 'AWS::Lambda::Permission',
+            Properties: {
+                FunctionName: cf.ref('BatchLambdaTriggerFunction'),
+                Action: 'lambda:InvokeFunction',
+                Principal: 'ecs-tasks.amazonaws.com',
+                SourceArn: cf.ref('APITaskDefinition')
             }
         }
     },

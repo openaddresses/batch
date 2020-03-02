@@ -250,7 +250,7 @@ const stack = {
     Outputs: {
         APIELB: {
             Description: 'API URL',
-            Value: cf.getAtt('APIELB', 'DNSName')
+            Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
         }
     }
 };

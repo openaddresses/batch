@@ -9,6 +9,10 @@ const os = require('os');
 const fs = require('fs');
 
 if (require.main === module) {
+    if (!process.env.AWS_DEFAULT_REGION) {
+        process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    }
+
     if (!process.env.OA_JOB) throw new Error('No OA_JOB env var defined');
     if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
     if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');

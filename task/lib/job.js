@@ -2,6 +2,10 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3({
+    region: 'us-east-1'
+});
 
 class Job {
     constructor(job, url, layer, name) {
@@ -38,7 +42,9 @@ class Job {
     }
 
     upload() {
+        const files = fs.readdirSync(this.tmp);
 
+        console.error(files);
     }
 
     success(api) {

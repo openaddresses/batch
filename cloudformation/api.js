@@ -225,6 +225,14 @@ const stack = {
                     ToPort: 443
                 }]
             },
+        },
+        APIPermissionToInvokeLambda: {
+            'Type': 'AWS::Lambda::Permission',
+            'Properties': {
+                'FunctionName': cf.ref('BatchLambdaTriggerFunction'),
+                'Action': 'lambda:InvokeFunction',
+                'Principal': cf.accountId
+            }
         }
     },
     Conditions: {

@@ -26,7 +26,7 @@ async function server(args, cb) {
     }
 
     if (!process.env.StackName) {
-        consoe.error('ok - StackName not set - disabling AWS calls');
+        console.error('ok - StackName not set - disabling AWS calls');
         process.env.StackName = 'test';
     }
 

@@ -1,9 +1,23 @@
 const Err = require('./error');
 const config = require('../package.json');
+
 const AWS = require('aws-sdk');
-const lambda = new AWS.Lambda({
-    region: 'us-east-1'
-});
+
+if (process.env.StackName !== 'test') {
+    AWS.config.credentials = new AWS.EC2MetadataCredentials({
+        httpOptions: { timeout: 5000 },
+        maxRetries: 10,
+        retryDelayOptions: { base: 200 }
+    });
+
+    const lambda = new AWS.Lambda({
+        region: 'us-east-1'
+    });
+} else {
+    const lambda = new AWS.Lambda({
+        region: 'us-east-1'
+    });
+}
 
 class Job {
     constructor(run, source, layer, name) {

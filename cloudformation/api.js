@@ -207,22 +207,6 @@ const stack = {
                     IpProtocol: 'tcp',
                     FromPort: 5000,
                     ToPort: 5000
-                }],
-                SecurityGroupEgress: [{
-                    CidrIp: '0.0.0.0/0',
-                    IpProtocol: 'tcp',
-                    FromPort: 5432,
-                    ToPort: 5432
-                },{
-                    CidrIp: '0.0.0.0/0',
-                    IpProtocol: 'tcp',
-                    FromPort: 80,
-                    ToPort: 80
-                },{
-                    CidrIp: '0.0.0.0/0',
-                    IpProtocol: 'tcp',
-                    FromPort: 443,
-                    ToPort: 443
                 }]
             },
         },

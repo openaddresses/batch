@@ -1,3 +1,5 @@
+const Err = require('./error');
+
 class Run {
     constructor() {
         this.attrs = ['id', 'created', 'github', 'closed'];
@@ -20,7 +22,7 @@ class Run {
                 WHERE
                     jobs.run = $1
             `, [run.id], (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to fetch jobs'));
 
                 return resolve(pgres.rows.map((job) => {
                     job.id = parseInt(job.id);
@@ -42,7 +44,7 @@ class Run {
                 WHERE
                     id = $1
             `, [id], (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to fetch run'));
 
                 const run = new Run();
 
@@ -65,7 +67,7 @@ class Run {
                 WHERE
                     id = $1
             `, [id], (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to close run'));
 
                 return resolve(true);
             });
@@ -99,7 +101,7 @@ class Run {
                         closed = $2
                     RETURNING *
            `, [ this.github, this.closed ], (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to save run'));
 
                 return resolve(pgres.rows[0]);
            });
@@ -119,7 +121,7 @@ class Run {
                     false
                 ) RETURNING *
             `, (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to generate run'));
 
                 const run = new Run();
 

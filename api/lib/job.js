@@ -1,3 +1,4 @@
+const Err = require('./error');
 const config = require('../package.json');
 const AWS = require('aws-sdk');
 const lambda = new AWS.Lambda({
@@ -43,7 +44,7 @@ class Job {
                 WHERE
                     id = $1
             `, [id], (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to load job'));
 
                 const job = new Job();
 
@@ -88,7 +89,7 @@ class Job {
                 this.name,
                 this.version
             ], (err, pgres) => {
-                if (err) return reject(err);
+                if (err) return reject(new Err(500, err, 'failed to generate job'));
 
                 for (const key of Object.keys(pgres.rows[0])) {
                     this[key] = pgres.rows[0][key];
@@ -101,7 +102,7 @@ class Job {
 
     batch() {
         return new Promise((resolve, reject) => {
-            if (!this.id) return reject(new Error('Cannot batch a job without an ID'));
+            if (!this.id) return reject(new Err(400, null, 'Cannot batch a job without an ID'));
 
             if (process.env.StackName === 'test') {
                 return resolve(true);
@@ -117,7 +118,7 @@ class Job {
                         name: this.name
                     })
                 }, (err, data) => {
-                    if (err) return reject(err);
+                    if (err) return reject(new Err(500, err, 'failed to submit job to batch'));
 
                     return resolve(data);
                 });

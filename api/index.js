@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const morgan = require('morgan');
 const util = require('./lib/util');
 const express = require('express');
 const request = require('request');
@@ -40,8 +41,10 @@ async function server(args, cb) {
     }
 
     app.disable('x-powered-by');
-    app.use('/api', router);
+    app.use(morgan('combined'));
     app.use(minify());
+
+    app.use('/api', router);
 
     router.use(bodyparser.urlencoded({ extended: true }));
     router.use(bodyparser.json());
@@ -112,10 +115,7 @@ async function server(args, cb) {
 
             return res.json(run.json());
         } catch (err) {
-            return res.status(500).send({
-                status: 500,
-                error: err.message
-            });
+            return err.res(res);
         }
     });
 
@@ -128,10 +128,7 @@ async function server(args, cb) {
 
             return res.json(run.json());
         } catch (err) {
-            return res.status(500).send({
-                status: 500,
-                error: err.message
-            });
+            return err.res(res);
         }
     });
 
@@ -145,10 +142,7 @@ async function server(args, cb) {
 
             return res.json(run.json());
         } catch (err) {
-            return res.status(500).send({
-                status: 500,
-                error: err.message
-            });
+            return err.res(res);
         }
     });
 

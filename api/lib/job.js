@@ -3,6 +3,7 @@ const config = require('../package.json');
 
 const AWS = require('aws-sdk');
 
+let lambda;
 if (process.env.StackName !== 'test') {
     AWS.config.credentials = new AWS.EC2MetadataCredentials({
         httpOptions: { timeout: 5000 },
@@ -10,11 +11,11 @@ if (process.env.StackName !== 'test') {
         retryDelayOptions: { base: 200 }
     });
 
-    const lambda = new AWS.Lambda({
+    lambda = new AWS.Lambda({
         region: 'us-east-1'
     });
 } else {
-    const lambda = new AWS.Lambda({
+    lambda = new AWS.Lambda({
         region: 'us-east-1'
     });
 }

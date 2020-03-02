@@ -59,7 +59,8 @@ async function server(args, cb) {
      */
     app.get('/', (req, res) => {
         return res.json({
-            healthy: true
+            healthy: true,
+            message: 'I work all day, I work all night to get the data I have to serve!'
         });
     });
 

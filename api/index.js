@@ -261,6 +261,8 @@ async function server(args, cb) {
             await CI.event(res.body);
 
             res.json(true);
+        } catch(err) {
+            return err.res(res);
         }
     });
 

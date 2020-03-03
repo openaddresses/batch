@@ -254,9 +254,13 @@ async function server(args, cb) {
         }
     });
 
-    router.post('/github/event', (req, res) => {
-        CI.post(res.body)  {
+    router.post('/github/event', async (req, res) => {
+        try {
+            // TODO SECRET CHECKING
 
+            await CI.event(res.body);
+
+            res.json(true);
         }
     });
 

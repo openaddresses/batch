@@ -2,7 +2,7 @@ name: AWS ECR API
 
 on: [push]
 
-jobs: API
+jobs:
     build:
         runs-on: ubuntu-latest
         steps:

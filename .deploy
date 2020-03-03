@@ -4,6 +4,9 @@
         "docker": [
             "{{project}}:task-{{gitsha}}",
             "{{project}}:api-{{gitsha}}"
+        ],
+        "lambda": [
+            "openaddresses-lambdas/batch/{{gitsha}}.zip"
         ]
     }
 }

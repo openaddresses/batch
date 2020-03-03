@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const morgan = require('morgan');
+const CI = require('./lib/ci');
 const util = require('./lib/util');
 const express = require('express');
 const request = require('request');
@@ -237,18 +238,26 @@ async function server(args, cb) {
 
     });
 
-    router.get('/job/:job', (req, res) => {
-        Job.from(req.params.job, (err, run) => {
-            if (err) throw err;
-
-            return res.json(run.json());
-        });
+    router.get('/job/:job', async (req, res) => {
+        try {
+            const job = await Job.from(req.params.job)
+        } catch(err) {
+            return err.res(res);
+        }
     });
 
-    router.patch('/job/:job', (req, res) => {
-        Job.from(req.params.job, (err, run) => {
+    router.patch('/job/:job', async (req, res) => {
+        try {
+            const job = await Job.from(req.params.job)
+        } catch(err) {
+            return err.res(res);
+        }
+    });
 
-        });
+    router.post('/github/event', (req, res) => {
+        CI.post(res.body)  {
+
+        }
     });
 
     const srv = app.listen(5000, (err) => {

@@ -123,7 +123,7 @@ const stack = {
                         Value: cf.ref('SharedSecret')
                     },{
                         Name: 'OA_API' ,
-                        Value: cf.getAtt('APIELB', 'DNSName')
+                        Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
                     }],
                     Memory: 4000,
                     Privileged: true,

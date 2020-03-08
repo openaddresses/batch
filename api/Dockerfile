@@ -10,4 +10,9 @@ WORKDIR $HOME/api
 RUN apk add nodejs yarn
 RUN yarn install
 
+RUN cd web \
+    && yarn install \
+    && yarn build \
+    && cd ..
+
 CMD yarn start

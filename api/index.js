@@ -20,7 +20,7 @@ const Run = require('./lib/run');
 const Job = require('./lib/job');
 
 const webhooks = new Webhooks({
-    secret: process.env.GithubSecret
+    secret: process.env.GithubSecret ? process.env.GithubSecret : 'no_secret'
 });
 
 const router = express.Router();
@@ -32,8 +32,12 @@ if (require.main === module) {
 }
 
 async function server(args, cb) {
-    if (!args.postgres && !process.env.POSTGRES) {
-        throw new Error('No postgres connection given');
+    let postgres = process.env.POSTGRES;
+
+    if (args.postgres) {
+        postgres = args.postgres;
+    } else if (!postgres) {
+        postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
     if (!process.env.StackName) {
@@ -42,7 +46,7 @@ async function server(args, cb) {
     }
 
     const pool = new Pool({
-        connectionString: args.postgres ? args.postgres : process.env.POSTGRES
+        connectionString: postgres
     });
 
     try {
@@ -53,6 +57,7 @@ async function server(args, cb) {
 
     app.disable('x-powered-by');
     app.use(minify());
+    app.use(express.static('web/dist'))
 
     app.use('/api', router);
 
@@ -64,21 +69,21 @@ async function server(args, cb) {
     // const SECRET = args.secret ? args.secret : process.env.SharedSecret;
 
     /**
-     * Return a successful healthcheck
-     */
-    app.get('/', (req, res) => {
-        return res.json({
-            healthy: true,
-            message: 'I work all day, I work all night to get the data I have to serve!'
-        });
-    });
-
-    /**
      * Return basic data about the API
      */
     app.get('/api', (req, res) => {
         return res.json({
             version: config.version
+        });
+    });
+
+    /**
+     * Return a successful healthcheck
+     */
+    router.get('/health', (req, res) => {
+        return res.json({
+            healthy: true,
+            message: 'I work all day, I work all night to get the data I have to serve!'
         });
     });
 
@@ -312,6 +317,8 @@ async function server(args, cb) {
     });
 
     router.post('/github/event', async (req, res) => {
+        if (!process.env.GithubSecret) return res.status(400).body('Invalid X-Hub-Signature');
+
         try {
             await webhooks.verify({
                 payload: req.body,

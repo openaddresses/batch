@@ -71,6 +71,9 @@ const stack = {
             Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
             DependsOn: 'APIELB',
             Properties: {
+                HealthCheckEnabled: true,
+                HealthCheckIntervalSeconds: 30,
+                HealthCheckPath: '/api/health',
                 Port: 5000,
                 Protocol: 'HTTP',
                 TargetType: 'ip',
@@ -111,7 +114,7 @@ const stack = {
                             Action: [
                                 's3:GetObject'
                             ],
-                            Resource: [ cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
+                            Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
                         }]
                     }
                 }]

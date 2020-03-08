@@ -1,6 +1,6 @@
 <template>
-    <div id="app" class='col col--12'>
-
+    <div id='app' class='col col--12'>
+        OpenAddresses
     </div>
 </template>
 

@@ -15,8 +15,7 @@ const stack = {
         },
         Bucket: {
             Type: 'String',
-            Description: 'S3 Asset Storage',
-            Default: 'v2.openaddresses.io'
+            Description: 'S3 Asset Storage'
         }
     }
 };

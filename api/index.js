@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Webhooks = require('@octokit/webhooks');
 const path = require('path');
 const morgan = require('morgan');
 const CI = require('./lib/ci');
@@ -11,6 +12,10 @@ const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
     string: ['postgres', 'secret'],
+});
+
+const webhooks = new Webhooks({
+    secret: process.env.GithubSecret
 });
 
 const router = express.Router();
@@ -256,8 +261,15 @@ async function server(args, cb) {
 
     router.post('/github/event', async (req, res) => {
         try {
-            // TODO SECRET CHECKING
+            await webhooks.verify({
+                payload: req.body,
+                signature: request.headers['x-hub-signature']
+            });
+        } catch(err) {
+            res.status(400).body('Invalid X-Hub-Signature');
+        }
 
+        try {
             await CI.event(res.body);
 
             res.json(true);

@@ -1,7 +1,7 @@
 class CI {
     static event(event) {
         return new Promise((resolve, reject) => {
-            console.error(event);
+            console.error(JSON.stringify(event));
 
             return resolve(true);
         });

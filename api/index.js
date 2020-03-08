@@ -15,6 +15,9 @@ const args = require('minimist')(process.argv, {
     string: ['postgres', 'secret'],
 });
 
+const Run = require('./lib/run');
+const Job = require('./lib/job');
+
 const webhooks = new Webhooks({
     secret: process.env.GithubSecret
 });
@@ -57,9 +60,6 @@ async function server(args, cb) {
     router.use(bodyparser.json());
 
     const SECRET = args.secret ? args.secret : process.env.SharedSecret;
-
-    const Run = require('./lib/run');
-    const Job = require('./lib/job');
 
     /**
      * Return a successful healthcheck

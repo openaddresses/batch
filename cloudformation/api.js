@@ -111,7 +111,7 @@ const stack = {
                             Action: [
                                 's3:GetObject'
                             ],
-                            Resource: [ cf.join('arn:aws:s3:::', cf.ref('Bucket'), '/*')]
+                            Resource: [ cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
                         }]
                     }
                 }]

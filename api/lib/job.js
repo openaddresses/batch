@@ -2,7 +2,7 @@ const Err = require('./error');
 const config = require('../package.json');
 const AWS = require('aws-sdk');
 
-const cwl = new AWS.CloudwatchLogs({ region: 'us-east-1' });
+const cwl = new AWS.CloudWatchLogs({ region: 'us-east-1' });
 const lambda = new AWS.Lambda({ region: 'us-east-1' });
 
 class Job {
@@ -72,7 +72,7 @@ class Job {
                         timestamp: event.timestamp,
                         message: event.message
                     };
-                });
+                }));
             });
         });
     }

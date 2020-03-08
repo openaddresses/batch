@@ -246,6 +246,8 @@ async function server(args, cb) {
     router.get('/job/:job', async (req, res) => {
         try {
             const job = await Job.from(req.params.job)
+
+            return res.json(job);
         } catch(err) {
             return err.res(res);
         }

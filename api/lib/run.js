@@ -1,18 +1,26 @@
+'use strict';
+
 const Err = require('./error');
 
 class Run {
     constructor() {
-        this.attrs = ['id', 'created', 'github', 'closed'];
         this.id = false;
         this.created = false;
         this.github = {};
         this.closed = false;
+
+        // Attributes which are allowed to be patched
+        this.attrs = ['github', 'closed'];
     }
 
     /**
      * Return all associated jobs for a given run
+     *
+     * @param {Object} pool Postgres Pool
+     * @param {Number} run_id run id
+     * @returns {Promise} promise
      */
-    static jobs(pool) {
+    static jobs(pool, run_id) {
         return new Promise((resolve, reject) => {
             pool.query(`
                 SELECT
@@ -21,7 +29,7 @@ class Run {
                     jobs
                 WHERE
                     jobs.run = $1
-            `, [run.id], (err, pgres) => {
+            `, [run_id], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to fetch jobs'));
 
                 return resolve(pgres.rows.map((job) => {
@@ -66,7 +74,7 @@ class Run {
                     closed = true
                 WHERE
                     id = $1
-            `, [id], (err, pgres) => {
+            `, [id], (err) => {
                 if (err) return reject(new Err(500, err, 'failed to close run'));
 
                 return resolve(true);
@@ -99,13 +107,12 @@ class Run {
                     SET
                         github = $1,
                         closed = $2
-                    RETURNING *
-           `, [ this.github, this.closed ], (err, pgres) => {
+           `, [this.github, this.closed], (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save run'));
 
-                return resolve(pgres.rows[0]);
-           });
-       });
+                return resolve(this);
+            });
+        });
     }
 
     static generate(pool) {

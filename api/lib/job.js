@@ -1,3 +1,5 @@
+'use strict';
+
 const Err = require('./error');
 const config = require('../package.json');
 const AWS = require('aws-sdk');
@@ -17,6 +19,9 @@ class Job {
         this.loglink = false;
         this.status = 'Pending';
         this.version = config.version;
+
+        // Attributes which are allowed to be patched
+        this.attrs = ['output', 'loglink', 'status', 'version'];
     }
 
     json() {
@@ -53,6 +58,31 @@ class Job {
                 }
 
                 return resolve(job);
+            });
+        });
+    }
+
+    patch(patch) {
+        for (const attr of this.attrs) {
+            if (patch[attr] !== undefined) {
+                this[attr] = patch[attr];
+            }
+        }
+    }
+
+    commit(pool) {
+        return new Promise((resolve, reject) => {
+            pool.query(`
+                UPDATE job
+                    SET
+                        output = $1,
+                        loglink = $2,
+                        status = $3,
+                        version = $4
+            `, [this.output, this.loglink, this.status, this.version], (err) => {
+                if (err) return reject(new Err(500, err, 'failed to save job'));
+
+                return resolve(this);
             });
         });
     }

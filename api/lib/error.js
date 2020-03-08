@@ -1,3 +1,5 @@
+'use strict';
+
 class PublicError {
     constructor(status, err, safe) {
         console.error(err ? err : 'Error: ' + safe);

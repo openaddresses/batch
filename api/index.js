@@ -1,5 +1,6 @@
+'use strict';
+
 const fs = require('fs');
-const Err = require('./lib/error');
 const Webhooks = require('@octokit/webhooks');
 const path = require('path');
 const morgan = require('morgan');
@@ -12,7 +13,7 @@ const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
-    string: ['postgres', 'secret'],
+    string: ['postgres', 'secret']
 });
 
 const Run = require('./lib/run');
@@ -24,7 +25,7 @@ const webhooks = new Webhooks({
 
 const router = express.Router();
 const app = express();
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 
 if (require.main === module) {
     server(args);
@@ -46,8 +47,8 @@ async function server(args, cb) {
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-    } catch(err) {
-        throw err;
+    } catch (err) {
+        throw new Error(err);
     }
 
     app.disable('x-powered-by');
@@ -59,7 +60,8 @@ async function server(args, cb) {
     router.use(morgan('combined'));
     router.use(bodyparser.json());
 
-    const SECRET = args.secret ? args.secret : process.env.SharedSecret;
+    // TODO: Auth with shared secret
+    // const SECRET = args.secret ? args.secret : process.env.SharedSecret;
 
     /**
      * Return a successful healthcheck
@@ -80,7 +82,7 @@ async function server(args, cb) {
         });
     });
 
-    /*
+    /**
      * Search for processed data by various criteria
      */
     router.get('/data', (req, res) => {
@@ -88,6 +90,8 @@ async function server(args, cb) {
         // - bbox
         // - name prefix
         // - layer
+
+        res.json([]);
     });
 
     /**
@@ -132,7 +136,7 @@ async function server(args, cb) {
      */
     router.get('/run/:run', async (req, res) => {
         try {
-            const run = await Run.from(req.params.run)
+            const run = await Run.from(req.params.run);
 
             return res.json(run.json());
         } catch (err) {
@@ -146,7 +150,7 @@ async function server(args, cb) {
 
             run.patch(req.body);
 
-            await run.commit(pool)
+            await run.commit(pool);
 
             return res.json(run.json());
         } catch (err) {
@@ -177,7 +181,7 @@ async function server(args, cb) {
             });
         }
 
-        let jobs = []
+        let jobs = [];
 
         for (const job of req.body.jobs) {
             if (!job) {
@@ -198,8 +202,8 @@ async function server(args, cb) {
                 jobs.push(job);
             } else if (typeof job === 'string') {
                 try {
-                    jobs = jobs.concat(await util.explode(job))
-                } catch(err) {
+                    jobs = jobs.concat(await util.explode(job));
+                } catch (err) {
                     return res.status(500).send({
                         status: 400,
                         error: 'failed to generate jobs'
@@ -217,12 +221,12 @@ async function server(args, cb) {
                 try {
                     await jobs[i].generate(pool);
                     await jobs[i].batch();
-                } catch(err) {
+                } catch (err) {
                     console.error(err);
                     // TODO return list of successful ids
                     return res.status(400).send({
                         status: 400,
-                        error: 'jobs only partially queued',
+                        error: 'jobs only partially queued'
                     });
                 }
             }
@@ -240,8 +244,14 @@ async function server(args, cb) {
     /**
      * Get all the jobs associated with a run
      */
-    router.get('run/:run/jobs', (req, res) => {
+    router.get('run/:run/jobs', async (req, res) => {
+        try {
+            const jobs = await Run.jobs(pool, req.params.run);
 
+            res.json(jobs);
+        } catch (err) {
+            return err.res(res);
+        }
     });
 
     /**
@@ -269,28 +279,34 @@ async function server(args, cb) {
 
     router.get('/job/:job', async (req, res) => {
         try {
-            const job = await Job.from(req.params.job)
+            const job = await Job.from(req.params.job);
 
             return res.json(job);
-        } catch(err) {
+        } catch (err) {
             return err.res(res);
         }
     });
 
     router.get('/job/:job/log', async (req, res) => {
         try {
-            const job = await Job.from(req.params.job)
+            const job = await Job.from(req.params.job);
 
             return res.json(await job.loglink());
-        } catch(err) {
+        } catch (err) {
             return err.res(res);
         }
     });
 
     router.patch('/job/:job', async (req, res) => {
         try {
-            const job = await Job.from(req.params.job)
-        } catch(err) {
+            const job = await Job.from(req.params.job);
+
+            job.patch(req.body);
+
+            await job.commit(pool);
+
+            return res.json(job.json());
+        } catch (err) {
             return err.res(res);
         }
     });
@@ -301,7 +317,7 @@ async function server(args, cb) {
                 payload: req.body,
                 signature: request.headers['x-hub-signature']
             });
-        } catch(err) {
+        } catch (err) {
             res.status(400).body('Invalid X-Hub-Signature');
         }
 
@@ -309,7 +325,7 @@ async function server(args, cb) {
             await CI.event(res.body);
 
             res.json(true);
-        } catch(err) {
+        } catch (err) {
             return err.res(res);
         }
     });
@@ -319,7 +335,7 @@ async function server(args, cb) {
 
         if (cb) return cb(srv);
 
-        console.log(`Server listening on port 5000`);
+        console.log('Server listening on port 5000');
     });
 }
 

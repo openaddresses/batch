@@ -1,6 +1,8 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
-const {Pool} = require('pg')
+const { Pool } = require('pg');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
@@ -14,8 +16,8 @@ test('start', async (t) => {
     try {
         await pool.query('DROP DATABASE IF EXISTS openaddresses_test');
         await pool.query('CREATE DATABASE openaddresses_test');
-        await pool.end()
-    } catch(err) {
+        await pool.end();
+    } catch (err) {
         t.error(err);
     }
 
@@ -25,7 +27,7 @@ test('start', async (t) => {
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, '../schema.sql'))));
-    } catch(err) {
+    } catch (err) {
         t.error(err);
     }
 
@@ -41,12 +43,12 @@ test('POST: api/run', (t) => {
     request({
         url: 'http://localhost:5000/api/run',
         method: 'POST',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err);
 
-        t.equals(res.body.id, 1)
-        t.ok(res.body.created)
+        t.equals(res.body.id, 1);
+        t.ok(res.body.created);
         t.deepEquals(res.body.github, {});
         t.deepEquals(res.body.closed, false);
 
@@ -58,7 +60,7 @@ test('GET: api/run', (t) => {
     request({
         url: 'http://localhost:5000/api/run',
         method: 'GET',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err);
 
@@ -69,18 +71,18 @@ test('GET: api/run', (t) => {
             'github',
             'closed'
         ].sort());
-        t.equals(res.body[0].id, 1)
-        t.ok(res.body[0].created)
+        t.equals(res.body[0].id, 1);
+        t.ok(res.body[0].created);
         t.deepEquals(res.body[0].github, {});
         t.deepEquals(res.body[0].closed, false);
 
         t.end();
     });
-})
+});
 
 test('POST: api/run/:run/jobs', (t) => {
     request({
-        url: `http://localhost:5000/api/run/1/jobs`,
+        url: 'http://localhost:5000/api/run/1/jobs',
         method: 'POST',
         json: true,
         body: {
@@ -92,11 +94,11 @@ test('POST: api/run/:run/jobs', (t) => {
         t.error(err);
 
         t.deepEquals(res.body, {
-            jobs: [ 1 ]
+            jobs: [1]
         });
         t.end();
     });
-})
+});
 
 test('stop', (t) => {
     app.close();

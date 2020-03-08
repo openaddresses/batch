@@ -1,3 +1,5 @@
+'use strict';
+
 const request = require('request');
 
 function explode(url) {
@@ -13,7 +15,7 @@ function explode(url) {
 
             const jobs = [];
 
-            const layers = Object.keys(source.layers)
+            const layers = Object.keys(source.layers);
             for (const layer of layers) {
                 for (const j of source.layers[layer]) {
                     jobs.push({

@@ -1,4 +1,6 @@
-const Err = require('./error');
+'use strict';
+
+// const Err = require('./error');
 
 class Data {
     constructor() {

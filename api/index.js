@@ -47,12 +47,12 @@ async function server(args, cb) {
     }
 
     app.disable('x-powered-by');
-    app.use(morgan('combined'));
     app.use(minify());
 
     app.use('/api', router);
 
     router.use(bodyparser.urlencoded({ extended: true }));
+    router.use(morgan('combined'));
     router.use(bodyparser.json());
 
     const SECRET = args.secret ? args.secret : process.env.SharedSecret;

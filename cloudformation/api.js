@@ -106,6 +106,12 @@ const stack = {
                             Effect: 'Allow',
                             Action: 'lambda:InvokeFunction',
                             Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                's3:GetObject'
+                            ],
+                            Resource: [ cf.join('arn:aws:s3:::', cf.ref('Bucket'), '/*')]
                         }]
                     }
                 }]

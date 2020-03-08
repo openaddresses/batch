@@ -9,20 +9,25 @@ const s3 = new AWS.S3({
 
 class Job {
     constructor(job, url, layer, name) {
-        if (!job) throw new Error('No OA_JOB env var defined');
-        if (!url) throw new Error('No OA_SOURCE env var defined');
-        if (!layer) throw new Error('No OA_SOURCE_LAYER env var defined');
-        if (!name) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
+        if (!job) throw new Error('job param required');
+        if (!url) throw new Error('url param required');
+        if (!layer) throw new Error('layer param required');
+        if (!name) throw new Error('name param required');
 
         this.tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
 
         fs.mkdirSync(this.tmp);
+
+        // pending => processed => uploaded
+        this.status = 'pending';
 
         this.job = job;
         this.url = url;
         this.source = false;
         this.layer = layer;
         this.name = name;
+
+        this.assets = false;
     }
 
     fetch() {
@@ -41,10 +46,32 @@ class Job {
         })
     }
 
-    upload() {
-        const files = fs.readdirSync(this.tmp);
+    async upload() {
+        if (this.status !== 'processed') {
+            return new Error('job state must be "processed" to perform asset upload');
+        }
 
-        console.error(files);
+        const processdir = Job.processdir(this.tmp, fs.readdirSync(this.tmp));
+        if (!processdir) return reject(new Error('could not determine process_dir'));
+
+        try {
+            await s3.putObject({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${this.job}/job.png`,
+                Body: fs.createReadStream(path.resolve(processdir, 'preview.png'))
+            }).promise();
+
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
+
+    static processdir(tmp, files) {
+        for (const file of files) {
+            if (/^process_one/.test(file)) return path.resolve(tmp, file);
+        }
+
+        return false;
     }
 
     success(api) {

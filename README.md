@@ -33,6 +33,15 @@ authenticate internal API calls.
 
 This value can be any secure alpha-numeric combination of characters and is safe to change at any time.
 
+#### GithubSecret
+
+This is the secret that Github uses to sign API events that are sent to this API. This shared signature allows
+us to verify that events are from github. Only the production stack should use this parameter.
+
+#### Bucket
+
+The bucket in which assets should be saved to. See the `S3 Assets` section of this document for more information
+
 ## Components
 
 The project is divided into several componenets
@@ -44,6 +53,17 @@ The project is divided into several componenets
 | cli | CLI for manually queueing work to batch |
 | lambda | Lambda responsible for instantiating a batch job environement and submitting it |
 | task | Docker container for running a batch job |
+
+## S3 Assets
+
+By default, processed job assets are uploaded to the bucket `v2.openaddresses.io` in the following format
+
+```
+s3://v2.openaddresses.io/<stack>/job/<job_id>/job.json
+s3://v2.openaddresses.io/<stack>/job/<job_id>/job.png
+s3://v2.openaddresses.io/<stack>/job/<job_id>/job.geojson
+s3://v2.openaddresses.io/<stack>/job/<job_id>/raw/
+```
 
 ## API
 

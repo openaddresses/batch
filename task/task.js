@@ -13,6 +13,9 @@ if (require.main === module) {
         process.env.AWS_DEFAULT_REGION = 'us-east-1'
     }
 
+    if (!process.env.StackName) process.env.StackName = 'local';
+    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
+
     if (!process.env.OA_JOB) throw new Error('No OA_JOB env var defined');
     if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
     if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');
@@ -43,9 +46,12 @@ async function flow(api, job, cb) {
         let source = await job.fetch();
 
         const source_path = path.resolve(job.tmp, 'source.json');
+
         fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
 
-        await processOne(job, source_path);
+        await processJob(job, source_path);
+
+        await job.upload();
 
         await job.success(api);
 
@@ -54,7 +60,7 @@ async function flow(api, job, cb) {
     }
 }
 
-function processOne(job, source_path) {
+function processJob(job, source_path) {
     return new Promise((resolve, reject) => {
         const task = CP.spawn('openaddr-process-one', [
             source_path,
@@ -74,6 +80,8 @@ function processOne(job, source_path) {
         task.on('error', reject);
 
         task.on('close', (exit) => {
+            job.status = 'processed';
+
             return resolve(job.tmp);
         });
     });

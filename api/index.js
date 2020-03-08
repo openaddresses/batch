@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Err = require('./lib/error');
 const Webhooks = require('@octokit/webhooks');
 const path = require('path');
 const morgan = require('morgan');
@@ -271,6 +272,16 @@ async function server(args, cb) {
             const job = await Job.from(req.params.job)
 
             return res.json(job);
+        } catch(err) {
+            return err.res(res);
+        }
+    });
+
+    router.get('/job/:job/log', async (req, res) => {
+        try {
+            const job = await Job.from(req.params.job)
+
+            return res.json(await job.loglink());
         } catch(err) {
             return err.res(res);
         }

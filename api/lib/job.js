@@ -1,10 +1,9 @@
 const Err = require('./error');
 const config = require('../package.json');
-
 const AWS = require('aws-sdk');
-const lambda = new AWS.Lambda({
-    region: 'us-east-1'
-});
+
+const cwl = new AWS.CloudwatchLogs({ region: 'us-east-1' });
+const lambda = new AWS.Lambda({ region: 'us-east-1' });
 
 class Job {
     constructor(run, source, layer, name) {
@@ -58,12 +57,32 @@ class Job {
         });
     }
 
+    loglink() {
+        return new Promise((resolve, reject) => {
+            if (!this.loglink) return reject(new Err(404, null, 'Job has not produced a log'));
+
+            cwl.getLogEvents({
+                logGroupName: '/aws/batch/job',
+                logStreamName: this.loglink
+            }, (err, res) => {
+                if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
+
+                return resolve(res.events.map((event) => {
+                    return {
+                        timestamp: event.timestamp,
+                        message: event.message
+                    };
+                });
+            });
+        });
+    }
+
     generate(pool) {
         return new Promise((resolve, reject) => {
-            if (!this.run) return reject(new Error('Cannot generate a job without a run'));
-            if (!this.source) return reject(new Error('Cannot generate a job without a source'));
-            if (!this.layer) return reject(new Error('Cannot generate a job without a layer'));
-            if (!this.name) return reject(new Error('Cannot generate a job without a name'));
+            if (!this.run) return reject(new Err(400, null, 'Cannot generate a job without a run'));
+            if (!this.source) return reject(new Err(400, null, 'Cannot generate a job without a source'));
+            if (!this.layer) return reject(new Err(400, null, 'Cannot generate a job without a layer'));
+            if (!this.name) return reject(new Err(400, null, 'Cannot generate a job without a name'));
 
             pool.query(`
                 INSERT INTO job (

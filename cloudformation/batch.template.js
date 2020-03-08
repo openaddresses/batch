@@ -13,9 +13,10 @@ const stack = {
             Type: 'String',
             Description: 'Gitsha to Deploy'
         },
-        SharedSecret: {
+        Bucket: {
             Type: 'String',
-            Description: '[secure] Secret for auth against internal API functions'
+            Description: 'S3 Asset Storage',
+            Default: 'v2.openaddresses.io'
         }
     }
 };

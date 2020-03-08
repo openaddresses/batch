@@ -7,7 +7,16 @@ const stack = {
             Type: 'String',
             Description: 'SSL certificate for HTTPS protocol',
             Default: ''
+        },
+        SharedSecret: {
+            Type: 'String',
+            Description: 'Secret for auth against internal API functions'
+        },
+        GithubSecret: {
+            Type: 'String',
+            Description: 'Github CI Integration Secret'
         }
+
     },
     Resources: {
         APIELB: {
@@ -173,6 +182,9 @@ const stack = {
                     },{
                         Name: 'SharedSecret',
                         Value: cf.ref('SharedSecret')
+                    },{
+                        Name: 'GithubSecret',
+                        Value: cf.ref('GithubSecret')
                     },{
                         Name: 'StackName',
                         Value: cf.stackName

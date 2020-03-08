@@ -52,7 +52,7 @@ components should never be fired directly to ensure database state.
 
 ### Server
 
-### GET `/` (Public)
+#### GET `/` (Public)
 
 Healthcheck, returns 200 if the server is healthy
 

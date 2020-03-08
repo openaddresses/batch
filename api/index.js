@@ -243,6 +243,29 @@ async function server(args, cb) {
 
     });
 
+    /**
+     * Return the last 100 jobs
+     */
+    router.get('/job', async (req, res) => {
+        pool.query(`
+            SELECT
+                *
+            FROM
+                job
+            ORDER BY
+                created DESC
+            LIMIT 100
+        `, (err, pgres) => {
+            if (err) throw err;
+
+            res.json(pgres.rows.map((job) => {
+                job.id = parseInt(job.id);
+
+                return job;
+            }));
+        });
+    });
+
     router.get('/job/:job', async (req, res) => {
         try {
             const job = await Job.from(req.params.job)

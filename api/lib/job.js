@@ -87,7 +87,7 @@ class Job {
         });
     }
 
-    loglink() {
+    log() {
         return new Promise((resolve, reject) => {
             if (!this.loglink) return reject(new Err(404, null, 'Job has not produced a log'));
 

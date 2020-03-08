@@ -281,7 +281,7 @@ async function server(args, cb) {
         try {
             const job = await Job.from(req.params.job);
 
-            return res.json(job);
+            return res.json(job.json());
         } catch (err) {
             return err.res(res);
         }
@@ -291,7 +291,7 @@ async function server(args, cb) {
         try {
             const job = await Job.from(req.params.job);
 
-            return res.json(await job.loglink());
+            return res.json(await job.log());
         } catch (err) {
             return err.res(res);
         }

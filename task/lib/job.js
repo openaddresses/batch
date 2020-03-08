@@ -82,7 +82,7 @@ class Job {
 
     update(api, body) {
         return new Promise((resolve, reject) => {
-            console.error(`ok - updating: /api/job/${this.job} with ${JSON.stringify(body)}`;
+            console.error(`ok - updating: /api/job/${this.job} with ${JSON.stringify(body)}`);
 
             request({
                 url: `${api}/api/job/${this.job}`,

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const config = require('./package.json');
 const dke = require('@mapbox/decrypt-kms-env');
 const Job = require('./lib/job');
 const request = require('request');
@@ -45,22 +46,70 @@ async function flow(api, job, cb) {
     try {
         let source = await job.fetch();
 
+        const update = {
+            status: 'Pending',
+            version: config.version
+        };
+
+        if (process.env.AWS_BATCH_JOB_ID) {
+            update.loglink = await log_link();
+        }
+
+        await job.update(api, update);
+
         const source_path = path.resolve(job.tmp, 'source.json');
 
         fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
 
-        await processJob(job, source_path);
+        await process_job(job, source_path);
 
         await job.upload();
 
-        await job.success(api);
+        await job.update(api, {
+            status: 'Success',
+            output: job.assets
+        });
 
     } catch (err) {
+        await job.update(api, {
+            status: 'Fail'
+        });
+
         throw err;
     }
 }
 
-function processJob(job, source_path) {
+function log_link() {
+    return new Promise((resolve, reject) => {
+        // Allow local runs
+
+        link();
+
+        function link() {
+            console.error(`ok - getting meta for job: ${process.env.AWS_BATCH_JOB_ID}`);
+            batch.describeJobs({
+                jobs: [ process.env.AWS_BATCH_JOB_ID ]
+            }, (err, res) => {
+                if (err) return reject(err);
+
+                if (
+                !res.jobs[0]
+                    || !res.jobs[0].container
+                    || !res.jobs[0].container.logStreamName
+            ) {
+                    setTimeout(() => {
+                        return link();
+                    }, 10000);
+                } else {
+                    resolve(res.jobs[0].container.logStreamName)
+                }
+            });
+        }
+    });
+}
+
+
+function process_job(job, source_path) {
     return new Promise((resolve, reject) => {
         const task = CP.spawn('openaddr-process-one', [
             source_path,

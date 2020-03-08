@@ -80,20 +80,13 @@ class Job {
         return false;
     }
 
-    success(api) {
+    update(api, body) {
         return new Promise((resolve, reject) => {
-            if (this.status !== 'uploaded') {
-                return new Error('job state must be "uploaded" to perform success');
-            }
-
             request({
                 url: `${api}/api/job/${this.job}`,
                 json: true,
                 method: 'PATCH',
-                body: JSON.stringify({
-                    status: 'Success',
-                    output: 's3://openaddresses/data.zip'
-                })
+                body: body
             });
         });
     }

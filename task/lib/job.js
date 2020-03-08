@@ -51,19 +51,25 @@ class Job {
             return new Error('job state must be "processed" to perform asset upload');
         }
 
+        this.assets = `${process.env.StackName}/job/${this.job}/`;
+
         const processdir = Job.processdir(this.tmp, fs.readdirSync(this.tmp));
         if (!processdir) return reject(new Error('could not determine process_dir'));
 
         try {
             await s3.putObject({
                 Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${this.job}/job.png`,
+                Key: `${this.assets}/job.png`,
                 Body: fs.createReadStream(path.resolve(processdir, 'preview.png'))
             }).promise();
 
         } catch(err) {
             throw new Error(err);
         }
+
+        this.status = 'uploaded';
+
+        return this.assets;
     }
 
     static processdir(tmp, files) {
@@ -76,6 +82,10 @@ class Job {
 
     success(api) {
         return new Promise((resolve, reject) => {
+            if (this.status !== 'uploaded') {
+                return new Error('job state must be "uploaded" to perform success');
+            }
+
             request({
                 url: `${api}/api/job/${this.job}`,
                 json: true,

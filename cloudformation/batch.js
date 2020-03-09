@@ -74,6 +74,12 @@ const stack = {
                                 's3:GetObject'
                             ],
                             Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
+                        },{
+                            Effect: 'Allow' ,
+                            Actions: [
+                                'batch:DescribeJobs'
+                            ],
+                            Resource: ['*']
                         }]
                     }
                 }],

@@ -71,6 +71,8 @@ async function flow(api, job, cb) {
         });
 
     } catch (err) {
+        console.error(err);
+
         await job.update(api, {
             status: 'Fail'
         });

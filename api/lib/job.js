@@ -1,7 +1,6 @@
 'use strict';
 
 const Err = require('./error');
-const config = require('../package.json');
 const AWS = require('aws-sdk');
 
 const cwl = new AWS.CloudWatchLogs({ region: 'us-east-1' });
@@ -18,7 +17,7 @@ class Job {
         this.output = false;
         this.loglink = false;
         this.status = 'Pending';
-        this.version = config.version;
+        this.version = '0.0.0';
 
         // Attributes which are allowed to be patched
         this.attrs = ['output', 'loglink', 'status', 'version'];

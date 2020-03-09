@@ -15,7 +15,7 @@ if (!process.env.AWS_DEFAULT_REGION) {
 }
 
 const batch = new AWS.Batch({
-    region: process.env.AWS_DEFAULT_REGION    
+    region: process.env.AWS_DEFAULT_REGION
 });
 
 if (require.main === module) {
@@ -82,7 +82,7 @@ async function flow(api, job, cb) {
             status: 'Fail'
         });
 
-        throw err;
+        throw new Error(err);
     }
 }
 

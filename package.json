@@ -12,15 +12,15 @@
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^4.0.0",
-        "aws-sdk": "^2.624.0",
+        "aws-sdk": "^2.635.0",
         "minimist": "^1.2.0",
         "prompts": "^2.3.1",
         "request": "^2.88.2"
     },
     "devDependencies": {
+        "@mapbox/eslint-config-geocoding": "^2.0.2",
         "eslint": "^6.8.0",
-        "eslint-plugin-node": "^11.0.0",
-        "@mapbox/eslint-config-geocoding": "^2.0.2"
+        "eslint-plugin-node": "^11.0.0"
     },
     "eslintConfig": {
         "extends": "@mapbox/eslint-config-geocoding"

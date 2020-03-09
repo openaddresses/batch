@@ -76,7 +76,7 @@ const stack = {
                             Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
                         },{
                             Effect: 'Allow' ,
-                            Actions: [
+                            Action: [
                                 'batch:DescribeJobs'
                             ],
                             Resource: ['*']

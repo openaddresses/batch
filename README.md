@@ -74,7 +74,7 @@ components should never be fired directly to ensure database state.
 
 #### GET `/` (Public)
 
-Healthcheck, returns 200 if the server is healthy
+OpenAddresses Data UI
 
 #### GET `/api` (Public)
 
@@ -85,6 +85,10 @@ Returns high level info about the API
     "version": "1.0.0"
 }
 ```
+
+#### GET `/api/health` (Public)
+
+Returns a simple HTTP 200 Healthcheck
 
 ### Runs
 
@@ -108,9 +112,29 @@ Update an individual run
 
 Given a source file, create jobs for all permutations
 
+#### GET `/api/run/<run>/jobs` (Public)
+
+Return all of the jobs for a given run
+
 ### Jobs
+
+#### GET `/api/job` (Public)
+
+Return information about a filtered set of jobs
 
 #### GET `/api/job/<job>` (Public)
 
+Return information about a single job
+
+#### GET `/api/job/<job>/log` (Public)
+
+If the job has started, return a log of the job's batch task
+
 #### PATCH `/api/job/<job>` (Internal)
+
+### CI
+
+#### POST `/api/github/event` (Internal)
+
+Accept and handle Github.com Events
 

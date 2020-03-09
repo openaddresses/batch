@@ -8,12 +8,17 @@ const path = require('path');
 const CP = require('child_process');
 const os = require('os');
 const fs = require('fs');
+const AWS = require('aws-sdk');
+
+if (!process.env.AWS_DEFAULT_REGION) {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+}
+
+const batch = new AWS.Batch({
+    region: process.env.AWS_DEFAULT_REGION    
+});
 
 if (require.main === module) {
-    if (!process.env.AWS_DEFAULT_REGION) {
-        process.env.AWS_DEFAULT_REGION = 'us-east-1'
-    }
-
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
 

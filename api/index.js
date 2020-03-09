@@ -141,7 +141,7 @@ async function server(args, cb) {
      */
     router.get('/run/:run', async (req, res) => {
         try {
-            const run = await Run.from(req.params.run);
+            const run = await Run.from(pool, req.params.run);
 
             return res.json(run.json());
         } catch (err) {
@@ -151,7 +151,7 @@ async function server(args, cb) {
 
     router.patch('/run/:run', async (req, res) => {
         try {
-            const run = await Run.from(req.params.run);
+            const run = await Run.from(pool, req.params.run);
 
             run.patch(req.body);
 
@@ -284,7 +284,7 @@ async function server(args, cb) {
 
     router.get('/job/:job', async (req, res) => {
         try {
-            const job = await Job.from(req.params.job);
+            const job = await Job.from(pool, req.params.job);
 
             return res.json(job.json());
         } catch (err) {
@@ -294,7 +294,7 @@ async function server(args, cb) {
 
     router.get('/job/:job/log', async (req, res) => {
         try {
-            const job = await Job.from(req.params.job);
+            const job = await Job.from(pool, req.params.job);
 
             return res.json(await job.log());
         } catch (err) {
@@ -304,7 +304,7 @@ async function server(args, cb) {
 
     router.patch('/job/:job', async (req, res) => {
         try {
-            const job = await Job.from(req.params.job);
+            const job = await Job.from(pool, req.params.job);
 
             job.patch(req.body);
 

@@ -80,7 +80,7 @@ async function server(args, cb) {
     /**
      * Return a successful healthcheck
      */
-    router.get('/health', (req, res) => {
+    app.get('/health', (req, res) => {
         return res.json({
             healthy: true,
             message: 'I work all day, I work all night to get the data I have to serve!'

@@ -73,7 +73,7 @@ const stack = {
             Properties: {
                 HealthCheckEnabled: true,
                 HealthCheckIntervalSeconds: 30,
-                HealthCheckPath: '/api/health',
+                HealthCheckPath: '/health',
                 Port: 5000,
                 Protocol: 'HTTP',
                 TargetType: 'ip',
@@ -109,6 +109,15 @@ const stack = {
                             Effect: 'Allow',
                             Action: 'lambda:InvokeFunction',
                             Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'logs:DescribeLogGroups',
+                                'logs:DescribeLogStreams',
+                                'logs:FilterLogEvents',
+                                'logs:GetLogEvents'
+                            ],
+                            Resource: cf.join(['arn:aws:logs:', cf.region, ':', cf.accountId, ':log-group:*'])
                         },{
                             Effect: 'Allow',
                             Action: [

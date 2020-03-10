@@ -86,7 +86,7 @@ Returns high level info about the API
 }
 ```
 
-#### GET `/api/health` (Public)
+#### GET `/health` (Public)
 
 Returns a simple HTTP 200 Healthcheck
 

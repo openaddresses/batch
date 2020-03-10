@@ -54,7 +54,9 @@ class Job {
         this.assets = `${process.env.StackName}/job/${this.job}/`;
 
         const processdir = Job.processdir(this.tmp, fs.readdirSync(this.tmp));
-        if (!processdir) return reject(new Error('could not determine process_dir'));
+        console.error(fs.readdirSync(this.tmp), processdir);
+
+        if (!processdir) throw new Error('could not determine process_dir');
 
         try {
             await s3.putObject({
@@ -74,7 +76,9 @@ class Job {
 
     static processdir(tmp, files) {
         for (const file of files) {
-            if (/^process_one/.test(file)) return path.resolve(tmp, file);
+            if (/^process_one/.test(file)) {
+                return path.resolve(tmp, file);
+            }
         }
 
         return false;

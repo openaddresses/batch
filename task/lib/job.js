@@ -2,7 +2,10 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
+const {promisify} = require('util');
 const AWS = require('aws-sdk');
+
+const find = promisify(require('find').file);
 const s3 = new AWS.S3({
     region: 'us-east-1'
 });
@@ -53,18 +56,23 @@ class Job {
 
         this.assets = `${process.env.StackName}/job/${this.job}/`;
 
-        const processdir = Job.processdir(this.tmp, fs.readdirSync(this.tmp));
-        console.error(fs.readdirSync(this.tmp), processdir);
-
-        if (!processdir) throw new Error('could not determine process_dir');
-
         try {
-            await s3.putObject({
-                Bucket: process.env.Bucket,
-                Key: `${this.assets}/job.png`,
-                Body: fs.createReadStream(path.resolve(processdir, 'preview.png'))
-            }).promise();
+            const preview = await find('preview.png', this.tmp);
+            if (preview.length === 1) {
+                await s3.putObject({
+                    Bucket: process.env.Bucket,
+                    Key: `${this.assets}/job.png`,
+                    Body: fs.createReadStream(preview[0])
+                }).promise();
+                console.error('ok - job.png uploaded');
+            }
 
+            let index = await find('index.json', this.tmp);
+            if (index.length === 1) {
+                index = JSON.parse(fs.readFileSync(index[0]));
+
+                console.error(JSON.stringify(index));
+            }
         } catch(err) {
             throw new Error(err);
         }
@@ -72,16 +80,6 @@ class Job {
         this.status = 'uploaded';
 
         return this.assets;
-    }
-
-    static processdir(tmp, files) {
-        for (const file of files) {
-            if (/^process_one/.test(file)) {
-                return path.resolve(tmp, file);
-            }
-        }
-
-        return false;
     }
 
     update(api, body) {

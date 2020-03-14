@@ -7,16 +7,18 @@
             <button @click='mode = "jobs"' class='btn btn--stroke round mr12'>Jobs</button>
         </div>
 
-        <div class='col col--12'>
-            <template v-if='mode === "data"'>
-                <Data/>
-            </template>
-            <template v-else-if='mode === "runs"'>
-                <Runs/>
-            </template>
-            <template v-else-if='mode === "jobs"'>
-                <Jobs/>
-            </template>
+        <div class='col col--12 flex-parent flex-parent--center-main'>
+            <div class='flex-child wmax600 col col--12'>
+                <template v-if='mode === "data"'>
+                    <Data/>
+                </template>
+                <template v-else-if='mode === "runs"'>
+                    <Runs/>
+                </template>
+                <template v-else-if='mode === "jobs"'>
+                    <Jobs/>
+                </template>
+            </div>
         </div>
     </div>
 </template>
@@ -28,6 +30,11 @@ import Jobs from './components/Jobs.vue';
 
 export default {
     name: 'OpenAddresses',
+    mounted: function() {
+        if (['data', 'runs', 'jobs'].includes(window.location.hash.replace('#', ''))) {
+            this.mode = window.location.hash.replace('#', '');
+        }
+    },
     data: function() {
         return {
             mode: 'data'

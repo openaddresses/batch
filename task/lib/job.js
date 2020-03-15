@@ -90,6 +90,13 @@ class Job {
         this.assets = `${process.env.StackName}/job/${this.job}/`;
 
         try {
+            let index = await find('index.json', this.tmp);
+            if (index.length === 1) {
+                index = JSON.parse(fs.readFileSync(index[0]));
+
+                console.error(JSON.stringify(index));
+            }
+
             const preview = await find('preview.png', this.tmp);
             if (preview.length === 1) {
                 await s3.putObject({
@@ -100,12 +107,6 @@ class Job {
                 console.error('ok - job.png uploaded');
             }
 
-            let index = await find('index.json', this.tmp);
-            if (index.length === 1) {
-                index = JSON.parse(fs.readFileSync(index[0]));
-
-                console.error(JSON.stringify(index));
-            }
         } catch(err) {
             throw new Error(err);
         }

@@ -71,7 +71,7 @@ class Job {
                 const valid = validate(source);
 
                 if (!valid) {
-                    console.error(JSON.stringify(valid));
+                    console.error(JSON.stringify(validate.errors));
                     return reject(new Error('Source does not conform to V2 schema'));
                 }
 

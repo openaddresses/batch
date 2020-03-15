@@ -4,10 +4,14 @@
     "description": "An OpenAddresses Source",
     "type": "object",
     "required": [
+        "schema",
         "coverage"
     ],
     "additionalProperties": false,
     "properties": {
+        "schema": {
+            "type": "number"
+        },
         "coverage": {
             "type": "object",
             "required": [
@@ -44,10 +48,6 @@
         "layers": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "addresses",
-                "buildings"
-            ],
             "properties": {
                 "addresses": {
                     "type": "array",
@@ -569,31 +569,23 @@
                 },
                 "lon": {
                     "description": "longitude value for the address row, only applies to CSV sources",
-                    "oneOf": [
-                        {
-                            "type": "null"
-                        },
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "$ref": "#/definitions/function_regexp"
-                        }
-                    ]
+                    "oneOf": [{
+                        "type": "null"
+                    },{
+                        "type": "string"
+                    },{
+                        "$ref": "#/definitions/function_regexp"
+                    }]
                 },
                 "lat": {
                     "description": "latitude value for the address row, only applies to CSV sources",
-                    "oneOf": [
-                        {
-                            "type": "null"
-                        },
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "$ref": "#/definitions/function_regexp"
-                        }
-                    ]
+                    "oneOf": [{
+                        "type": "null"
+                    },{
+                        "type": "string"
+                    },{
+                        "$ref": "#/definitions/function_regexp"
+                    }]
                 }
             }
         },

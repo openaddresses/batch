@@ -16,13 +16,13 @@
             <div @click='job.expand = !job.expand' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                 <div class='col col--1'>
                     <template v-if='job.status === "Pending"'>
-                        <svg class='icon ml12 color-yellow' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                        <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                     </template>
                     <template v-else-if='job.status === "Success"'>
-                        <svg class='icon ml12 color-green' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                        <svg class='icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                     </template>
                     <template v-else-if='job.status === "Fail"'>
-                        <svg class='icon ml12 color-red' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                        <svg class='icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                     </template>
                 </div>
                 <div class='col col--4'>

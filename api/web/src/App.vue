@@ -1,10 +1,12 @@
 <template>
     <div id='app' class='col col--12'>
-        <div class='col col--12 px12 py12 border-b'>
-            <button @click='external("https://openaddresses.io")' class='btn btn--stroke round mr12'>Home</button>
-            <button @click='mode = "data"' class='btn btn--stroke round mr12'>Data</button>
-            <button @click='mode = "runs"' class='btn btn--stroke round mr12'>Runs</button>
-            <button @click='mode = "jobs"' class='btn btn--stroke round mr12'>Jobs</button>
+        <div class='col col--12 px12 py12 border-b border--gray'>
+            <img @click='external("https://openaddresses.io")' class='h24 w24 round mr12 cursor-pointer' src='../public/logo.jpg'/>
+            <button @click='mode = "data"' class='btn btn--stroke btn--s btn--gray round mr12'>Data</button>
+            <button @click='mode = "runs"' class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button>
+            <button @click='mode = "jobs"' class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button>
+
+            <span class='fr'>OpenAddresses Data</span>
         </div>
 
         <div class='col col--12 flex-parent flex-parent--center-main'>

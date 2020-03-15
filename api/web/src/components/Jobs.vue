@@ -1,32 +1,40 @@
 <template>
     <div class='col col--12 grid'>
-        <div class='col col--12 grid'>
-            <div class='col col--1'>
+        <div class='col col--12 grid border-b border--gray-light'>
+            <div class='col col--2'>
                 Status
             </div>
-            <div class='col col--3'>
+            <div class='col col--4'>
                 Job ID
             </div>
         </div>
 
         <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
-            <div class='col col--1'>
-                <template v-if='job.status === "Pending"'>
-                    <button class='btn btn--stroke round btn--gray color--yellow'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
-                </template>
-                <template v-else-if='job.status === "Success"'>
-                    <button class='btn btn--stroke round'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
-                </template>
-                <template v-else-if='job.status === "Fail"'>
-                    <button class='btn btn--stroke round'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
-                </template>
+            <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                <div class='col col--2 flex-parent flex-parent--center-main'>
+                    <template v-if='job.status === "Pending"'>
+                        <button class='flex-child btn btn--stroke round btn--gray color--yellow'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
+                    </template>
+                    <template v-else-if='job.status === "Success"'>
+                        <button class='flex-child btn btn--stroke round'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
+                    </template>
+                    <template v-else-if='job.status === "Fail"'>
+                        <button class='flex-child btn btn--stroke round'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
+                    </template>
+                </div>
+                <div class='col col--4'>Job <span v-text='job.id'/></div>
+                <div class='col col--6'></div>
             </div>
-            <div class='col col--3'>Job <span v-text='job.id'/></div>
+            <template v-if='job.expand'>
+                <Job/>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
+import Job from './Job.vue';
+
 export default {
     name: 'Jobs',
     mounted: function() {
@@ -45,9 +53,15 @@ export default {
             }).then((res) => {
                 return res.json();
             }).then((res) => {
-                this.jobs = res;
+                this.jobs = res.map((r) => {
+                    r.expand = false;
+                    return r;
+                });
             });
         }
+    },
+    components: {
+        Job
     }
 }
 </script>

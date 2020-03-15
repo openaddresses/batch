@@ -29,7 +29,7 @@
                     Job <span v-text='job.id'/>
                 </div>
                 <div class='col col--7 pr12'>
-                    <span v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
+                    <span @click='log(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
                     <span v-if='job.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
                 </div>
             </div>
@@ -55,6 +55,9 @@ export default {
         };
     },
     methods: {
+        log: function(job_id) {
+            this.$emit('log', job_id);
+        },
         getJobs: function() {
             fetch(window.location.origin + '/api/job', {
                 method: 'GET'

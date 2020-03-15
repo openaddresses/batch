@@ -18,7 +18,10 @@
                     <Runs/>
                 </template>
                 <template v-else-if='mode === "jobs"'>
-                    <Jobs/>
+                    <Jobs v-on:log='log($event)'/>
+                </template>
+                <template v-else-if='mode === "log"'>
+                    <Log :job='job'/>
                 </template>
             </div>
         </div>
@@ -29,6 +32,7 @@
 import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
 import Jobs from './components/Jobs.vue';
+import Log from './components/Log.vue';
 
 export default {
     name: 'OpenAddresses',
@@ -37,19 +41,32 @@ export default {
             this.mode = window.location.hash.replace('#', '');
         }
     },
+    watch: {
+        mode: function() {
+            if (this.mode !== 'log') {
+                this.job = false;
+            }
+        }
+    },
     data: function() {
         return {
-            mode: 'data'
+            mode: 'data',
+            job: false
         };
     },
     components: {
         Data,
         Runs,
-        Jobs
+        Jobs,
+        Log
     },
     methods: {
         external: function(url) {
             window.location.href = url;
+        },
+        log: function(job) {
+            this.mode = 'log';
+            this.job = job;
         }
     }
 }

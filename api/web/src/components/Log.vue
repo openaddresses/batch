@@ -1,8 +1,6 @@
 <template>
     <div class='col col--12'>
-        <template v-for='line in lines'>
-            <div v-text='line.message'></div>
-        </template>
+        <div v-for='line in lines' :key='line.timestamp' v-text='line.message'></div>
     </div>
 </template>
 
@@ -11,10 +9,10 @@ export default {
     name: 'Log',
     props: ['job'],
     data: function() {
-        return: {
+        return {
             lines: []
-        }
-    }
+        };
+    },
     mounted: function() {
         this.getLog();
     },

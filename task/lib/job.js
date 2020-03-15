@@ -68,7 +68,10 @@ class Job {
                     return reject(new Error('Source missing schema: 2'));
                 }
 
-                if (!validate(source)) {
+                const valid = validate(source);
+
+                if (!valid) {
+                    console.error(JSON.stringify(valid));
                     return reject(new Error('Source does not conform to V2 schema'));
                 }
 

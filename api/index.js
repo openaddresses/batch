@@ -239,6 +239,7 @@ async function server(args, cb) {
             await Run.close(pool, req.params.run);
 
             res.json({
+                run: req.params.run,
                 jobs: jobs.map((job) => {
                     return job.json().id;
                 })
@@ -253,7 +254,10 @@ async function server(args, cb) {
         try {
             const jobs = await Run.jobs(pool, req.params.run);
 
-            res.json(jobs);
+            res.json({
+                run: req.params.run,
+                jobs: jobs
+            });
         } catch (err) {
             return err.res(res);
         }

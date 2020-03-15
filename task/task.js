@@ -49,8 +49,6 @@ if (require.main === module) {
 
 async function flow(api, job, cb) {
     try {
-        let source = await job.fetch();
-
         const update = {
             status: 'Pending',
             version: config.version
@@ -61,6 +59,8 @@ async function flow(api, job, cb) {
         }
 
         await job.update(api, update);
+
+        let source = await job.fetch();
 
         const source_path = path.resolve(job.tmp, 'source.json');
 

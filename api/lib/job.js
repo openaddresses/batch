@@ -96,10 +96,13 @@ class Job {
             }, (err, res) => {
                 if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
 
+                let line = 0;
                 return resolve(res.events.map((event) => {
                     return {
+                        id: ++line,
                         timestamp: event.timestamp,
                         message: event.message
+                            .replace(/[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
                     };
                 }));
             });

@@ -1,6 +1,6 @@
 <template>
     <div class='col col--12'>
-        <div v-for='line in lines' :key='line.timestamp' v-text='line.message'></div>
+        <div v-for='line in lines' :key='line.id' v-text='line.message'></div>
     </div>
 </template>
 

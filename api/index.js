@@ -140,6 +140,14 @@ async function server(args, cb) {
      * Get a specific run
      */
     router.get('/run/:run', async (req, res) => {
+        req.params.run = Number(req.params.run);
+        if (isNaN(req.params.run)) {
+            return res.stats(400).send({
+                status: 400,
+                error: 'run must be an integer'
+            });
+        }
+
         try {
             const run = await Run.from(pool, req.params.run);
 
@@ -150,6 +158,14 @@ async function server(args, cb) {
     });
 
     router.patch('/run/:run', async (req, res) => {
+        req.params.run = Number(req.params.run);
+        if (isNaN(req.params.run)) {
+            return res.stats(400).send({
+                status: 400,
+                error: 'run must be an integer'
+            });
+        }
+
         try {
             const run = await Run.from(pool, req.params.run);
 
@@ -179,6 +195,14 @@ async function server(args, cb) {
      *
      */
     router.post('/run/:run/jobs', async (req, res) => {
+        req.params.run = Number(req.params.run);
+        if (isNaN(req.params.run)) {
+            return res.stats(400).send({
+                status: 400,
+                error: 'run must be an integer'
+            });
+        }
+
         if (!Array.isArray(req.body.jobs)) {
             return res.status(400).send({
                 status: 400,
@@ -251,6 +275,14 @@ async function server(args, cb) {
      * Get all the jobs associated with a run
      */
     router.get('run/:run/jobs', async (req, res) => {
+        req.params.run = Number(req.params.run);
+        if (isNaN(req.params.run)) {
+            return res.stats(400).send({
+                status: 400,
+                error: 'run must be an integer'
+            });
+        }
+
         try {
             const jobs = await Run.jobs(pool, req.params.run);
 

@@ -63,6 +63,19 @@ const stack = {
             }
         }
 
+    },
+    Outputs: {
+        DB: {
+            Description: 'Postgres Connection String',
+            Value: cf.join([
+                'postgresql://openaddresses',
+                ':',
+                cf.ref('DatabasePassword'),
+                '@',
+                cf.getAtt('DBInstance', 'Endpoint.Address'),
+                ':5432/openaddresses'
+            ])
+        }
     }
 };
 

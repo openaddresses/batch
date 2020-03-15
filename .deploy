@@ -8,5 +8,12 @@
         "lambda": [
             "openaddresses-lambdas/batch/{{gitsha}}.zip"
         ]
-    }
+    },
+    "tags": [{
+        "Key": "Project",
+        "Value": "batch"
+    },{
+        "Key": "Owner",
+        "Value": "ingalls"
+    }]
 }

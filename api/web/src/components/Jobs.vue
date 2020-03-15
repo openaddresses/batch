@@ -35,6 +35,7 @@
                     <span v-text='job.layer + "-" + job.name'/>
                 </div>
                 <div class='col col--5 pr12'>
+                    <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
                     <span @click='log(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
                     <span v-if='job.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
                 </div>
@@ -61,6 +62,9 @@ export default {
         };
     },
     methods: {
+        external: function(url) {
+            window.location.href = url;
+        },
         log: function(job_id) {
             this.$emit('log', job_id);
         },

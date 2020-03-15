@@ -1,9 +1,20 @@
+const Ajv = require('ajv');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
 const {promisify} = require('util');
 const AWS = require('aws-sdk');
+const schema_v2 = require('./source_schema_v2.json');
+
+const ajv = new Ajv({
+    schemaId: 'auto'
+});
+
+ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'), "http://json-schema.org/draft-04/schema#");
+ajv.addMetaSchema(require('./geojson.json'), "http://json.schemastore.org/geojson#/definitions/geometry");
+
+const validate = ajv.compile(schema_v2);
 
 const find = promisify(require('find').file);
 const s3 = new AWS.S3({
@@ -37,12 +48,31 @@ class Job {
         return new Promise((resolve, reject) => {
             request({
                 url: this.url,
-                json: true,
                 method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);
 
-                this.source = res.body;
+                let source = false;
+                try {
+                    source = JSON.parse(res.body);
+                } catch(err) {
+                    return reject(err);
+                }
+
+                if (
+                    !source
+                    || !source.schema
+                    || typeof source.schema !== 'number'
+                    || source.schema !== 2
+                ) {
+                    return reject(new Error('Source missing schema: 2'));
+                }
+
+                if (!validate(source)) {
+                    return reject(new Error('Source does not conform to V2 schema'));
+                }
+
+                this.source = source;
 
                 return resolve(this.source);
             });

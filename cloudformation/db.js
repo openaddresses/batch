@@ -23,7 +23,7 @@ const stack = {
             Properties: {
                 Engine: 'postgres',
                 DBName: 'openaddresses',
-                EngineVersion: '11.2',
+                EngineVersion: '11.6',
                 MasterUsername: 'openaddresses',
                 MasterUserPassword: cf.ref('DatabasePassword'),
                 AllocatedStorage: 10,
@@ -55,9 +55,11 @@ const stack = {
             Properties: {
                 GroupDescription: cf.join('-', [cf.stackName, 'rds-sg']),
                 EC2VpcId: 'vpc-3f2aa15a',
-                DBSecurityGroupIngress: {
+                DBSecurityGroupIngress: [{
                     EC2SecurityGroupId: cf.getAtt('APIServiceSecurityGroup', 'GroupId')
-                }
+                },{
+                    CIDRIP: '0.0.0.0/0'
+                }]
             }
         }
 

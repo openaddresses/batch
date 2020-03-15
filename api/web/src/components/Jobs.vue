@@ -1,34 +1,34 @@
 <template>
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--2'>
+            <div class='col col--1'>
                 Status
             </div>
             <div class='col col--4'>
                 Job ID
             </div>
-            <div class='col col--6'>
-                Attributes
+            <div class='col col--7'>
+                <span class='fr'>Attributes</span>
             </div>
         </div>
 
         <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
-            <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                <div class='col col--2 flex-parent flex-parent--center-main'>
+            <div @click='job.expand = !job.expand' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                <div class='col col--1'>
                     <template v-if='job.status === "Pending"'>
-                        <button class='flex-child btn btn--stroke round btn--gray color--yellow'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
+                        <svg class='icon ml12 color-yellow' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                     </template>
                     <template v-else-if='job.status === "Success"'>
-                        <button class='flex-child btn btn--stroke round'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
+                        <svg class='icon ml12 color-green' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                     </template>
                     <template v-else-if='job.status === "Fail"'>
-                        <button class='flex-child btn btn--stroke round'><svg class='icon'><use xlink:href='#icon-circle'/></svg></button>
+                        <svg class='icon ml12 color-red' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                     </template>
                 </div>
                 <div class='col col--4'>
                     Job <span v-text='job.id'/>
                 </div>
-                <div class='col col--6 pr12'>
+                <div class='col col--7 pr12'>
                     <span v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
                     <span v-if='job.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
                 </div>

@@ -78,7 +78,9 @@ class Job {
                         loglink = $2,
                         status = $3,
                         version = $4
-            `, [this.output, this.loglink, this.status, this.version], (err) => {
+                    WHERE
+                        id = $5
+            `, [this.output, this.loglink, this.status, this.version, this.id], (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
                 return resolve(this);

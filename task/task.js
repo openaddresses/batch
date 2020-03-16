@@ -68,6 +68,8 @@ async function flow(api, job, cb) {
 
         await process_job(job, source_path);
 
+        await job.convert();
+
         await job.upload();
 
         await job.update(api, {

@@ -59,10 +59,9 @@ The project is divided into several componenets
 By default, processed job assets are uploaded to the bucket `v2.openaddresses.io` in the following format
 
 ```
-s3://v2.openaddresses.io/<stack>/job/<job_id>/job.json
-s3://v2.openaddresses.io/<stack>/job/<job_id>/job.png
-s3://v2.openaddresses.io/<stack>/job/<job_id>/job.geojson
-s3://v2.openaddresses.io/<stack>/job/<job_id>/raw/
+s3://v2.openaddresses.io/<stack>/job/<job_id>/source.png
+s3://v2.openaddresses.io/<stack>/job/<job_id>/source.geojson
+s3://v2.openaddresses.io/<stack>/job/<job_id>/cache.zip
 ```
 
 ## API

@@ -5,9 +5,9 @@ test('Basic Source', async (t) => {
     try {
         await task.flow('http://api.com', new task.Job(
             1,
-            'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json',
+            'https://raw.githubusercontent.com/openaddresses/openaddresses/a807875e0cbf6fdadc2ae06428f93462f860ad06/sources/us/tn/city_of_nashville.json',
             'addresses',
-            'dcgis'
+            'city-of-nashville'
         ));
     } catch(err) {
         t.error(err);

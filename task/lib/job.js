@@ -3,9 +3,11 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
-const {promisify} = require('util');
+const {pipeline} = require('stream');
+const csv = require('csv-parse');
 const AWS = require('aws-sdk');
 const schema_v2 = require('./source_schema_v2.json');
+const transform = require('parallel-transform');
 
 const ajv = new Ajv({
     schemaId: 'auto'
@@ -16,7 +18,7 @@ ajv.addMetaSchema(require('./geojson.json'), "http://json.schemastore.org/geojso
 
 const validate = ajv.compile(schema_v2);
 
-const find = promisify(require('find').file);
+const find = require('find');
 const s3 = new AWS.S3({
     region: 'us-east-1'
 });
@@ -82,6 +84,55 @@ class Job {
         })
     }
 
+    static find(pattern, path) {
+        return new Promise((resolve, reject) => {
+            find.file(pattern, path, resolve);
+        });
+    }
+
+    convert() {
+        return new Promise(async (resolve, reject) => {
+            const output = await Job.find('out.csv', this.tmp);
+
+            if (output.length !== 1) return reject(new Error('out.csv not found'));
+
+            pipeline(
+                fs.createReadStream(output[0]),
+                csv({
+                    delimiter: ','
+                }),
+                transform(100, (data, cb) => {
+                    return cb(null, JSON.stringify({
+                        type: 'Feature',
+                        properties: {
+                            id: data[9],
+                            unit: data[4],
+                            number: data[2],
+                            street: data[3],
+                            city: data[5],
+                            district: data[6],
+                            region: data[7],
+                            postcode: data[8],
+                            hash: data[10]
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [data[0], data[1]]
+                        }
+                    }) + '\n')
+                }),
+                fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),
+                (err) => {
+                    if (err) return reject(err);
+
+                    return resolve(path.resolve(this.tmp, 'out.geojson'));
+                }
+            );
+
+
+        });
+    }
+
     async upload() {
         if (this.status !== 'processed') {
             return new Error('job state must be "processed" to perform asset upload');
@@ -90,21 +141,38 @@ class Job {
         this.assets = `${process.env.StackName}/job/${this.job}/`;
 
         try {
-            let index = await find('index.json', this.tmp);
-            if (index.length === 1) {
-                index = JSON.parse(fs.readFileSync(index[0]));
+            const data = path.resolve(this.tmp, 'out.geojson');
+            await s3.putObject({
+                Bucket: process.env.Bucket,
+                Key: `${this.assets}/source.geojson`,
+                Body: fs.createReadStream(data)
+            }).promise();
+            console.error('ok - source.geojson uploaded');
 
-                console.error(JSON.stringify(index));
-            }
-
-            const preview = await find('preview.png', this.tmp);
+            const preview = await Job.find('preview.png', this.tmp);
             if (preview.length === 1) {
+                console.error('ok - found preview', preview[0]);
+
                 await s3.putObject({
                     Bucket: process.env.Bucket,
-                    Key: `${this.assets}/job.png`,
+                    Key: `${this.assets}/source.png`,
                     Body: fs.createReadStream(preview[0])
                 }).promise();
-                console.error('ok - job.png uploaded');
+
+                console.error('ok - source.png uploaded');
+            }
+
+            const cache = await Job.find('cache.zip', this.tmp);
+            if (cache.length === 1) {
+                console.error('ok - found cache', cache[0]);
+
+                await s3.putObject({
+                    Bucket: process.env.Bucket,
+                    Key: `${this.assets}/cache.zip`,
+                    Body: fs.createReadStream(cache[0])
+                }).promise();
+
+                console.error('ok - cache.zip uploaded');
             }
 
         } catch(err) {

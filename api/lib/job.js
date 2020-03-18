@@ -3,8 +3,9 @@
 const Err = require('./error');
 const AWS = require('aws-sdk');
 
-const cwl = new AWS.CloudWatchLogs({ region: 'us-east-1' });
-const lambda = new AWS.Lambda({ region: 'us-east-1' });
+const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
+const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
+const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
 
 class Job {
     constructor(run, source, layer, name) {
@@ -67,6 +68,14 @@ class Job {
                 this[attr] = patch[attr];
             }
         }
+    }
+
+    static preview(job_id) {
+        console.error(process.env.Bucket, `${process.env.StackName}/job/${job_id}/source.png`)
+        return s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `batch-${process.env.StackName}/job/${job_id}/source.png`
+        }).createReadStream()
     }
 
     commit(pool) {

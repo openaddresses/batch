@@ -204,8 +204,14 @@ const stack = {
                         Name: 'GithubSecret',
                         Value: cf.ref('GithubSecret')
                     },{
+                        Name: 'Bucket',
+                        Value: cf.ref('Bucket')
+                    },{
                         Name: 'StackName',
                         Value: cf.stackName
+                    },{
+                        Name: 'AWS_DEFAULT_REGION',
+                        Value: cf.region
                     }],
                     LogConfiguration: {
                         LogDriver: 'awslogs',

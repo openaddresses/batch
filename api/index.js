@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const {pipeline} = require('stream');
 const Webhooks = require('@octokit/webhooks');
 const path = require('path');
 const morgan = require('morgan');
@@ -19,8 +20,10 @@ const args = require('minimist')(process.argv, {
 const Run = require('./lib/run');
 const Job = require('./lib/job');
 
+require('./lib/config')();
+
 const webhooks = new Webhooks({
-    secret: process.env.GithubSecret ? process.env.GithubSecret : 'no_secret'
+    secret: process.env.GithubSecret
 });
 
 const router = express.Router();
@@ -142,7 +145,7 @@ async function server(args, cb) {
     router.get('/run/:run', async (req, res) => {
         req.params.run = Number(req.params.run);
         if (isNaN(req.params.run)) {
-            return res.stats(400).send({
+            return res.status(400).send({
                 status: 400,
                 error: 'run must be an integer'
             });
@@ -160,7 +163,7 @@ async function server(args, cb) {
     router.patch('/run/:run', async (req, res) => {
         req.params.run = Number(req.params.run);
         if (isNaN(req.params.run)) {
-            return res.stats(400).send({
+            return res.status(400).send({
                 status: 400,
                 error: 'run must be an integer'
             });
@@ -197,7 +200,7 @@ async function server(args, cb) {
     router.post('/run/:run/jobs', async (req, res) => {
         req.params.run = Number(req.params.run);
         if (isNaN(req.params.run)) {
-            return res.stats(400).send({
+            return res.status(400).send({
                 status: 400,
                 error: 'run must be an integer'
             });
@@ -277,7 +280,7 @@ async function server(args, cb) {
     router.get('run/:run/jobs', async (req, res) => {
         req.params.run = Number(req.params.run);
         if (isNaN(req.params.run)) {
-            return res.stats(400).send({
+            return res.status(400).send({
                 status: 400,
                 error: 'run must be an integer'
             });
@@ -319,6 +322,14 @@ async function server(args, cb) {
     });
 
     router.get('/job/:job', async (req, res) => {
+        req.params.job = Number(req.params.job);
+        if (isNaN(req.params.job)) {
+            return res.status(400).send({
+                status: 400,
+                error: 'job must be an integer'
+            });
+        }
+
         try {
             const job = await Job.from(pool, req.params.job);
 
@@ -328,7 +339,34 @@ async function server(args, cb) {
         }
     });
 
+    router.get('/job/:job/source.png', async (req, res) => {
+        req.params.job = Number(req.params.job);
+        if (isNaN(req.params.job)) {
+            return res.status(400).send({
+                status: 400,
+                error: 'job must be an integer'
+            });
+        }
+
+        res.setHeader('Content-Type', 'image/png');
+        Job.preview(req.params.job).on('error', (err) => {
+            console.error(err);
+            return res.status(404).send({
+                status: 404,
+                error: 'source.png not found'
+            });
+        }).pipe(res);
+    });
+
     router.get('/job/:job/log', async (req, res) => {
+        req.params.job = Number(req.params.job);
+        if (isNaN(req.params.job)) {
+            return res.status(400).send({
+                status: 400,
+                error: 'job must be an integer'
+            });
+        }
+
         try {
             const job = await Job.from(pool, req.params.job);
 
@@ -339,6 +377,14 @@ async function server(args, cb) {
     });
 
     router.patch('/job/:job', async (req, res) => {
+        req.params.job = Number(req.params.job);
+        if (isNaN(req.params.job)) {
+            return res.status(400).send({
+                status: 400,
+                error: 'job must be an integer'
+            });
+        }
+
         try {
             const job = await Job.from(pool, req.params.job);
 
@@ -378,7 +424,7 @@ async function server(args, cb) {
 
         if (cb) return cb(srv);
 
-        console.log('Server listening on port 5000');
+        console.log('ok - http://localhost:5000');
     });
 }
 

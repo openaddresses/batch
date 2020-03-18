@@ -1,6 +1,19 @@
 'use strict';
 
+const Err = require('./error');
 const request = require('request');
+
+class Param {
+    static int(req, res, name) {
+        req.params[name] = Number(req.params[name]);
+        if (isNaN(req.params[name])) {
+            return res.status(400).send({
+                status: 400,
+                error: `${name} param must be an integer`
+            });
+        }
+    }
+}
 
 function explode(url) {
     return new Promise((resolve, reject) => {
@@ -32,3 +45,4 @@ function explode(url) {
 }
 
 module.exports.explode = explode;
+module.exports.Param = Param;

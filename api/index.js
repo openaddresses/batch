@@ -22,6 +22,7 @@ const Job = require('./lib/job');
 
 require('./lib/config')();
 
+const Param = util.Param;
 const webhooks = new Webhooks({
     secret: process.env.GithubSecret
 });
@@ -143,13 +144,7 @@ async function server(args, cb) {
      * Get a specific run
      */
     router.get('/run/:run', async (req, res) => {
-        req.params.run = Number(req.params.run);
-        if (isNaN(req.params.run)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'run must be an integer'
-            });
-        }
+        Param.int(req, res, 'run');
 
         try {
             const run = await Run.from(pool, req.params.run);
@@ -161,13 +156,7 @@ async function server(args, cb) {
     });
 
     router.patch('/run/:run', async (req, res) => {
-        req.params.run = Number(req.params.run);
-        if (isNaN(req.params.run)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'run must be an integer'
-            });
-        }
+        Param.int(req, res, 'run');
 
         try {
             const run = await Run.from(pool, req.params.run);
@@ -198,13 +187,7 @@ async function server(args, cb) {
      *
      */
     router.post('/run/:run/jobs', async (req, res) => {
-        req.params.run = Number(req.params.run);
-        if (isNaN(req.params.run)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'run must be an integer'
-            });
-        }
+        Param.int(req, res, 'run');
 
         if (!Array.isArray(req.body.jobs)) {
             return res.status(400).send({
@@ -278,13 +261,7 @@ async function server(args, cb) {
      * Get all the jobs associated with a run
      */
     router.get('run/:run/jobs', async (req, res) => {
-        req.params.run = Number(req.params.run);
-        if (isNaN(req.params.run)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'run must be an integer'
-            });
-        }
+        Param.int(req, res, 'run');
 
         try {
             const jobs = await Run.jobs(pool, req.params.run);
@@ -302,33 +279,15 @@ async function server(args, cb) {
      * Return the last 100 jobs
      */
     router.get('/job', async (req, res) => {
-        pool.query(`
-            SELECT
-                *
-            FROM
-                job
-            ORDER BY
-                created DESC
-            LIMIT 100
-        `, (err, pgres) => {
-            if (err) throw err;
-
-            res.json(pgres.rows.map((job) => {
-                job.id = parseInt(job.id);
-
-                return job;
-            }));
-        });
+        try {
+            return res.json(await Job.list(pool));
+        } catch (err) {
+            return err.res(res);
+        }
     });
 
     router.get('/job/:job', async (req, res) => {
-        req.params.job = Number(req.params.job);
-        if (isNaN(req.params.job)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'job must be an integer'
-            });
-        }
+        Param.int(req, res, 'job');
 
         try {
             const job = await Job.from(pool, req.params.job);
@@ -339,14 +298,8 @@ async function server(args, cb) {
         }
     });
 
-    router.get('/job/:job/source.png', async (req, res) => {
-        req.params.job = Number(req.params.job);
-        if (isNaN(req.params.job)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'job must be an integer'
-            });
-        }
+    router.get('/job/:job/output/source.png', async (req, res) => {
+        Param.int(req, res, 'job');
 
         res.setHeader('Content-Type', 'image/png');
         Job.preview(req.params.job).on('error', (err) => {
@@ -358,14 +311,34 @@ async function server(args, cb) {
         }).pipe(res);
     });
 
-    router.get('/job/:job/log', async (req, res) => {
-        req.params.job = Number(req.params.job);
-        if (isNaN(req.params.job)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'job must be an integer'
+    router.get('/job/:job/output/source.geojson', async (req, res) => {
+        Param.int(req, res, 'job');
+
+        res.setHeader('Content-Type', 'application/json-seq');
+        Job.data(req.params.job).on('error', (err) => {
+            console.error(err);
+            return res.status(404).send({
+                status: 404,
+                error: 'source.geojson not found'
             });
-        }
+        }).pipe(res);
+    });
+
+    router.get('/job/:job/output/cache.zip', async (req, res) => {
+        Param.int(req, res, 'job');
+
+        res.setHeader('Content-Type', 'application/zip');
+        Job.data(req.params.job).on('error', (err) => {
+            console.error(err);
+            return res.status(404).send({
+                status: 404,
+                error: 'cache.zip not found'
+            });
+        }).pipe(res);
+    });
+
+    router.get('/job/:job/log', async (req, res) => {
+        Param.int(req, res, 'job');
 
         try {
             const job = await Job.from(pool, req.params.job);
@@ -377,13 +350,7 @@ async function server(args, cb) {
     });
 
     router.patch('/job/:job', async (req, res) => {
-        req.params.job = Number(req.params.job);
-        if (isNaN(req.params.job)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'job must be an integer'
-            });
-        }
+        Param.int(req, res, 'job');
 
         try {
             const job = await Job.from(pool, req.params.job);

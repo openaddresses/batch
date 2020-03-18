@@ -38,6 +38,31 @@ class Job {
             version: this.version
         };
     }
+    static list(pool) {
+        return new Promise((resolve, reject) => {
+            pool.query(`
+                SELECT
+                    *
+                FROM
+                    job
+                ORDER BY
+                    created DESC
+                LIMIT 100
+            `, (err, pgres) => {
+                if (err) return reject(new Err(500, err, 'failed to load jobs'));
+
+                if (!pgres.rows.length) {
+                    return reject(new Err(404, null, 'no job by that id'));
+                }
+
+                return resolve(pgres.rows.map((job) => {
+                    job.id = parseInt(job.id);
+
+                    return job;
+                }));
+            });
+        });
+    }
 
     static from(pool, id) {
         return new Promise((resolve, reject) => {
@@ -50,6 +75,10 @@ class Job {
                     id = $1
             `, [id], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to load job'));
+
+                if (!pgres.rows.length) {
+                    return reject(new Err(404, null, 'no job by that id'));
+                }
 
                 const job = new Job();
 
@@ -71,10 +100,23 @@ class Job {
     }
 
     static preview(job_id) {
-        console.error(process.env.Bucket, `${process.env.StackName}/job/${job_id}/source.png`)
         return s3.getObject({
             Bucket: process.env.Bucket,
             Key: `batch-${process.env.StackName}/job/${job_id}/source.png`
+        }).createReadStream()
+    }
+
+    static data(job_id) {
+        return s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `batch-${process.env.StackName}/job/${job_id}/source.geojson`
+        }).createReadStream()
+    }
+
+    static cache(job_id) {
+        return s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `batch-${process.env.StackName}/job/${job_id}/cache.zip`
         }).createReadStream()
     }
 

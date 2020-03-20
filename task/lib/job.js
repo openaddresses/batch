@@ -1,4 +1,5 @@
 const Ajv = require('ajv');
+const gzip = require('zlib').createGzip;
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -162,8 +163,8 @@ class Job {
             const data = path.resolve(this.tmp, 'out.geojson');
             await s3.putObject({
                 Bucket: process.env.Bucket,
-                Key: `${this.assets}/source.geojson`,
-                Body: fs.createReadStream(data)
+                Key: `${this.assets}/source.geojson.gz`,
+                Body: fs.createReadStream(data).pipe(gzip).
             }).promise();
             console.error('ok - source.geojson uploaded');
             this.assets.output = true;

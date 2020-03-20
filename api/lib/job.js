@@ -109,7 +109,7 @@ class Job {
     static data(job_id) {
         return s3.getObject({
             Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${job_id}/source.geojson`
+            Key: `${process.env.StackName}/job/${job_id}/source.geojson.gz`
         }).createReadStream()
     }
 

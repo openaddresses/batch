@@ -102,21 +102,21 @@ class Job {
     static preview(job_id) {
         return s3.getObject({
             Bucket: process.env.Bucket,
-            Key: `batch-${process.env.StackName}/job/${job_id}/source.png`
+            Key: `${process.env.StackName}/job/${job_id}/source.png`
         }).createReadStream()
     }
 
     static data(job_id) {
         return s3.getObject({
             Bucket: process.env.Bucket,
-            Key: `batch-${process.env.StackName}/job/${job_id}/source.geojson`
+            Key: `${process.env.StackName}/job/${job_id}/source.geojson`
         }).createReadStream()
     }
 
     static cache(job_id) {
         return s3.getObject({
             Bucket: process.env.Bucket,
-            Key: `batch-${process.env.StackName}/job/${job_id}/cache.zip`
+            Key: `${process.env.StackName}/job/${job_id}/cache.zip`
         }).createReadStream()
     }
 

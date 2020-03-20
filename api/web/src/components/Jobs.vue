@@ -66,6 +66,8 @@ export default {
             window.location.href = url;
         },
         log: function(job_id) {
+            window.location.hash = `jobs:${job_id}:log`
+
             this.$emit('log', job_id);
         },
         getJobs: function() {

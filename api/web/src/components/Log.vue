@@ -1,6 +1,6 @@
 <template>
     <div class='col col--12'>
-        <div v-for='line in lines' :key='line.id' v-text='line.message'></div>
+        <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
     </div>
 </template>
 
@@ -25,6 +25,9 @@ export default {
             }).then((res) => {
                 this.lines = res;
             });
+        },
+        linenum: function(line) {
+            window.location.hash = `jobs:${this.job}:log:${line.id}`
         }
     }
 }

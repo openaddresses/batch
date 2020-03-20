@@ -51,7 +51,8 @@ async function flow(api, job, cb) {
     try {
         const update = {
             status: 'Pending',
-            version: config.version
+            version: config.version,
+            output: job.assets
         };
 
         if (process.env.AWS_BATCH_JOB_ID) {

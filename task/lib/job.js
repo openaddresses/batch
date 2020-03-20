@@ -43,7 +43,11 @@ class Job {
         this.layer = layer;
         this.name = name;
 
-        this.assets = false;
+        this.assets = {
+            cache: false,
+            output: false,
+            preview: false
+        };
     }
 
     fetch() {
@@ -141,6 +145,20 @@ class Job {
         this.assets = `${process.env.StackName}/job/${this.job}`;
 
         try {
+            const cache = await Job.find('cache.zip', this.tmp);
+            if (cache.length === 1) {
+                console.error('ok - found cache', cache[0]);
+
+                await s3.putObject({
+                    Bucket: process.env.Bucket,
+                    Key: `${this.assets}/cache.zip`,
+                    Body: fs.createReadStream(cache[0])
+                }).promise();
+
+                console.error('ok - cache.zip uploaded');
+                this.assets.cache = true;
+            }
+
             const data = path.resolve(this.tmp, 'out.geojson');
             await s3.putObject({
                 Bucket: process.env.Bucket,
@@ -148,6 +166,7 @@ class Job {
                 Body: fs.createReadStream(data)
             }).promise();
             console.error('ok - source.geojson uploaded');
+            this.assets.output = true;
 
             const preview = await Job.find('preview.png', this.tmp);
             if (preview.length === 1) {
@@ -160,21 +179,8 @@ class Job {
                 }).promise();
 
                 console.error('ok - source.png uploaded');
+                this.assets.preview = true;
             }
-
-            const cache = await Job.find('cache.zip', this.tmp);
-            if (cache.length === 1) {
-                console.error('ok - found cache', cache[0]);
-
-                await s3.putObject({
-                    Bucket: process.env.Bucket,
-                    Key: `${this.assets}/cache.zip`,
-                    Body: fs.createReadStream(cache[0])
-                }).promise();
-
-                console.error('ok - cache.zip uploaded');
-            }
-
         } catch(err) {
             throw new Error(err);
         }

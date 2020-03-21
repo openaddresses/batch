@@ -26,11 +26,13 @@
                 <template v-else-if='mode === "log"'>
                     <Log
                         :jobid='jobid'
+                        v-on:close='mode = "job"'
                     />
                 </template>
                 <template v-else-if='mode === "job"'>
                     <Job
                         :jobid='jobid'
+                        v-on:close='mode = "jobs"'
                     />
                 </template>
             </div>

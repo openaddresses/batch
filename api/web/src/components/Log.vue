@@ -1,6 +1,26 @@
 <template>
-    <div class='col col--12'>
-        <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
+    <div class='col col--12 pt12'>
+        <div class='col col--12 grid border-b border--gray-light'>
+            <div class='col col--12'>
+                <button @click='close' class='btn round btn--stroke fl color-gray'>
+                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
+                </button>
+                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/>: Log:</h2>
+
+                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
+                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
+                </button>
+            </div>
+        </div>
+
+        <template v-if='loading'>
+            <div class='flex-parent flex-parent--center-main w-full'>
+                <div class='flex-child loading py24'></div>
+            </div>
+        </template>
+        <template v-else>
+            <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
+        </template>
     </div>
 </template>
 
@@ -10,6 +30,7 @@ export default {
     props: ['jobid'],
     data: function() {
         return {
+            loading: false,
             lines: []
         };
     },
@@ -18,15 +39,20 @@ export default {
         this.refresh();
     },
     methods: {
+        close: function() {
+            this.$emit('close');
+        },
         refresh: function() {
             this.getLog();
         },
         getLog: function() {
+            this.loading = true;
             fetch(`${window.location.origin}/api/job/${this.jobid}/log`, {
                 method: 'GET'
             }).then((res) => {
                 return res.json();
             }).then((res) => {
+                this.loading = false;
                 this.lines = res;
             });
         },

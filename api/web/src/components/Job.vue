@@ -2,13 +2,17 @@
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <h2 class='txt-h4 pb12 fl'>Job #<span v-text='jobid'/></h2>
+                <button @click='close' class='btn round btn--stroke fl color-gray'>
+                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
+                </button>
+                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
             </div>
         </div>
+
         <template v-if='loading'>
             <div class='flex-parent flex-parent--center-main w-full'>
                 <div class='flex-child loading py24'></div>
@@ -36,6 +40,9 @@ export default {
         this.refresh();
     },
     methods: {
+        close: function() {
+            this.$emit('close');
+        },
         refresh: function() {
             this.getJob();
         },

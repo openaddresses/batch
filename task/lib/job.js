@@ -135,8 +135,25 @@ class Job {
                     return resolve(path.resolve(this.tmp, 'out.geojson'));
                 }
             );
+        });
+    }
 
+    compress() {
+        return new Promise((resolve, reject) => {
+            const data = path.resolve(this.tmp, 'out.geojson');
 
+            if (!data.length) return reject(new Error('Could not find out.geojson'));
+
+            pipeline(
+                fs.createReadStream(data[0]),
+                gzip,
+                fs.createWriteStream(data[0] + '.gz'),
+                (err) => {
+                    if (err) return reject(err);
+
+                    return resolve(data[0] + '.gz');
+                }
+            );
         });
     }
 
@@ -160,13 +177,13 @@ class Job {
                 this.assets.cache = true;
             }
 
-            const data = path.resolve(this.tmp, 'out.geojson');
+            const data = path.resolve(this.tmp, 'out.geojson.gz');
             await s3.putObject({
                 Bucket: process.env.Bucket,
                 Key: `${this.assets}/source.geojson.gz`,
-                Body: fs.createReadStream(data).pipe(gzip)
+                Body: fs.createReadStream(data)
             }).promise();
-            console.error('ok - source.geojson uploaded');
+            console.error('ok - source.geojson.gz uploaded');
             this.assets.output = true;
 
             const preview = await Job.find('preview.png', this.tmp);

@@ -60,7 +60,6 @@ async function flow(api, job) {
         }
 
         await job.update(api, update);
-
         await job.fetch();
 
         const source_path = path.resolve(job.tmp, 'source.json');
@@ -70,9 +69,8 @@ async function flow(api, job) {
         await process_job(job, source_path);
 
         await job.convert();
-
+        await job.compress();
         await job.upload();
-
         await job.update(api, {
             status: 'Success',
             output: job.assets

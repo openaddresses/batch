@@ -33,6 +33,7 @@
                     <Job
                         :jobid='jobid'
                         v-on:close='mode = "jobs"'
+                        v-on:log='emitlog($event)'
                     />
                 </template>
             </div>

@@ -75,7 +75,7 @@ export default {
     },
     methods: {
         external: function(url) {
-            window.location.href = url;
+            window.open(url, "_blank");
         },
         emitlog: function(jobid) {
             this.$emit('log', jobid);

@@ -10,6 +10,10 @@
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
+
+                <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
+                <span @click='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
+                <span v-if='job.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
             </div>
         </div>
 
@@ -42,6 +46,15 @@ export default {
     methods: {
         close: function() {
             this.$emit('close');
+        },
+        external: function(url) {
+            window.open(url, "_blank");
+        },
+        emitlog: function(jobid) {
+            this.$emit('log', jobid);
+        },
+        emitjob: function(jobid) {
+            this.$emit('job', jobid);
         },
         refresh: function() {
             this.getJob();

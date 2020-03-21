@@ -145,8 +145,6 @@ class Job {
             return new Error('job state must be "processed" to perform asset upload');
         }
 
-        this.assets = `${process.env.StackName}/job/${this.job}`;
-
         try {
             const cache = await Job.find('cache.zip', this.tmp);
             if (cache.length === 1) {

@@ -18,10 +18,20 @@
                     <Runs/>
                 </template>
                 <template v-else-if='mode === "jobs"'>
-                    <Jobs v-on:log='log($event)'/>
+                    <Jobs
+                        v-on:log='emitlog($event)'
+                        v-on:job='emitjob($event)'
+                    />
                 </template>
                 <template v-else-if='mode === "log"'>
-                    <Log :job='job'/>
+                    <Log
+                        :jobid='jobid'
+                    />
+                </template>
+                <template v-else-if='mode === "job"'>
+                    <Job
+                        :jobid='jobid'
+                    />
                 </template>
             </div>
         </div>
@@ -32,42 +42,62 @@
 import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
 import Jobs from './components/Jobs.vue';
+import Job from './components/Job.vue';
 import Log from './components/Log.vue';
 
 export default {
     name: 'OpenAddresses',
+    data: function() {
+        return {
+            mode: 'data',
+            jobid: false
+        };
+    },
     mounted: function() {
-        if (['data', 'runs', 'jobs'].includes(window.location.hash.replace('#', ''))) {
-            this.mode = window.location.hash.replace('#', '');
+        const mode = window.location.hash.replace('#', '').split(':');
+        if (mode.length && ['data', 'runs', 'jobs'].includes(mode[0])) {
+
+            if (mode[0] === 'jobs') {
+                if (mode.length >= 2) {
+                    this.jobid = parseInt(mode[1]);
+
+                    if (mode.length >= 3) {
+                        this.mode = 'log'
+                    } else {
+                        this.mode = 'job';
+                    }
+                } else {
+                    this.mode = 'jobs';
+                }
+            }
         }
     },
     watch: {
         mode: function() {
-            if (this.mode !== 'log') {
-                this.job = false;
+            if (!['log', 'job'].includes(this.mode)) {
+                this.jobid = false;
             }
         }
-    },
-    data: function() {
-        return {
-            mode: 'data',
-            job: false
-        };
-    },
-    components: {
-        Data,
-        Runs,
-        Jobs,
-        Log
     },
     methods: {
         external: function(url) {
             window.location.href = url;
         },
-        log: function(job) {
+        emitlog: function(jobid) {
+            this.jobid = jobid;
             this.mode = 'log';
-            this.job = job;
+        },
+        emitjob: function(jobid) {
+            this.jobid = jobid;
+            this.mode = 'job';
         }
+    },
+    components: {
+        Data,
+        Runs,
+        Jobs,
+        Log,
+        Job
     }
 }
 </script>

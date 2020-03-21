@@ -7,18 +7,22 @@
 <script>
 export default {
     name: 'Log',
-    props: ['job'],
+    props: ['jobid'],
     data: function() {
         return {
             lines: []
         };
     },
     mounted: function() {
-        this.getLog();
+        window.location.hash = `jobs:${this.jobid}:log`
+        this.refresh();
     },
     methods: {
+        refresh: function() {
+            this.getLog();
+        },
         getLog: function() {
-            fetch(`${window.location.origin}/api/job/${this.job}/log`, {
+            fetch(`${window.location.origin}/api/job/${this.jobid}/log`, {
                 method: 'GET'
             }).then((res) => {
                 return res.json();
@@ -27,7 +31,7 @@ export default {
             });
         },
         linenum: function(line) {
-            window.location.hash = `jobs:${this.job}:log:${line.id}`
+            window.location.hash = `jobs:${this.jobid}:log:${line.id}`
         }
     }
 }

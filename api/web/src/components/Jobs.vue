@@ -24,11 +24,13 @@
         </div>
 
         <template v-if='loading'>
-
+            <div class='flex-parent flex-parent--center-main w-full'>
+                <div class='flex-child loading py24'></div>
+            </div>
         </template>
         <template v-else>
             <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
-                <div @click='job.expand = !job.expand' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <template v-if='job.status === "Pending"'>
                             <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
@@ -48,21 +50,16 @@
                     </div>
                     <div class='col col--5 pr12'>
                         <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
-                        <span @click='log(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
+                        <span @click='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
                         <span v-if='job.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
                     </div>
                 </div>
-                <template v-if='job.expand'>
-                    <Job/>
-                </template>
             </div>
         </template>
     </div>
 </template>
 
 <script>
-import Job from './Job.vue';
-
 export default {
     name: 'Jobs',
     mounted: function() {
@@ -80,10 +77,11 @@ export default {
         external: function(url) {
             window.location.href = url;
         },
-        log: function(job_id) {
-            window.location.hash = `jobs:${job_id}:log`
-
-            this.$emit('log', job_id);
+        emitlog: function(jobid) {
+            this.$emit('log', jobid);
+        },
+        emitjob: function(jobid) {
+            this.$emit('job', jobid);
         },
         refresh: function() {
             this.getJobs();
@@ -95,16 +93,10 @@ export default {
             }).then((res) => {
                 return res.json();
             }).then((res) => {
-                this.jobs = res.map((r) => {
-                    r.expand = false;
-                    return r;
-                });
+                this.jobs = res;
                 this.loading = false;
             });
         }
-    },
-    components: {
-        Job
     }
 }
 </script>

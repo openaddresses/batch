@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
+'use strict';
+
 const config = require('./package.json');
 const dke = require('@mapbox/decrypt-kms-env');
 const Job = require('./lib/job');
-const request = require('request');
 const path = require('path');
 const CP = require('child_process');
-const os = require('os');
 const fs = require('fs');
 const AWS = require('aws-sdk');
 
 if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1'
+    process.env.AWS_DEFAULT_REGION = 'us-east-1';
 }
 
 const batch = new AWS.Batch({
@@ -38,7 +38,7 @@ if (require.main === module) {
         process.env.OA_SOURCE_LAYER_NAME
     );
 
-    dke(process.env, (err, scrubbed) => {
+    dke(process.env, (err) => {
         if (err) throw err;
 
         flow(api, job).catch((err) => {
@@ -47,7 +47,7 @@ if (require.main === module) {
     });
 }
 
-async function flow(api, job, cb) {
+async function flow(api, job) {
     try {
         const update = {
             status: 'Pending',
@@ -61,7 +61,7 @@ async function flow(api, job, cb) {
 
         await job.update(api, update);
 
-        let source = await job.fetch();
+        await job.fetch();
 
         const source_path = path.resolve(job.tmp, 'source.json');
 
@@ -98,20 +98,20 @@ function log_link() {
         function link() {
             console.error(`ok - getting meta for job: ${process.env.AWS_BATCH_JOB_ID}`);
             batch.describeJobs({
-                jobs: [ process.env.AWS_BATCH_JOB_ID ]
+                jobs: [process.env.AWS_BATCH_JOB_ID]
             }, (err, res) => {
                 if (err) return reject(err);
 
                 if (
-                !res.jobs[0]
+                    !res.jobs[0]
                     || !res.jobs[0].container
                     || !res.jobs[0].container.logStreamName
-            ) {
+                ) {
                     setTimeout(() => {
                         return link();
                     }, 10000);
                 } else {
-                    resolve(res.jobs[0].container.logStreamName)
+                    resolve(res.jobs[0].container.logStreamName);
                 }
             });
         }
@@ -128,7 +128,7 @@ function process_job(job, source_path) {
             '--layersource', job.name,
             '--render-preview',
             '--mapbox-key', process.env.MapboxToken,
-            '--verbose',
+            '--verbose'
         ],{
             env: process.env
         });
@@ -138,7 +138,7 @@ function process_job(job, source_path) {
 
         task.on('error', reject);
 
-        task.on('close', (exit) => {
+        task.on('close', () => {
             job.status = 'processed';
 
             return resolve(job.tmp);
@@ -149,4 +149,4 @@ function process_job(job, source_path) {
 module.exports = {
     Job,
     flow
-}
+};

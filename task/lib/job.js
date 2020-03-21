@@ -1,10 +1,12 @@
+'use strict';
+
 const Ajv = require('ajv');
 const gzip = require('zlib').createGzip;
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
-const {pipeline} = require('stream');
+const { pipeline } = require('stream');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
 const schema_v2 = require('./source_schema_v2.json');
@@ -14,8 +16,8 @@ const ajv = new Ajv({
     schemaId: 'auto'
 });
 
-ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'), "http://json-schema.org/draft-04/schema#");
-ajv.addMetaSchema(require('./geojson.json'), "http://json.schemastore.org/geojson#/definitions/geometry");
+ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'), 'http://json-schema.org/draft-04/schema#');
+ajv.addMetaSchema(require('./geojson.json'), 'http://json.schemastore.org/geojson#/definitions/geometry');
 
 const validate = ajv.compile(schema_v2);
 
@@ -62,7 +64,7 @@ class Job {
                 let source = false;
                 try {
                     source = JSON.parse(res.body);
-                } catch(err) {
+                } catch (err) {
                     return reject(err);
                 }
 
@@ -86,11 +88,11 @@ class Job {
 
                 return resolve(this.source);
             });
-        })
+        });
     }
 
     static find(pattern, path) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             find.file(pattern, path, resolve);
         });
     }
@@ -124,7 +126,7 @@ class Job {
                             type: 'Point',
                             coordinates: [data[0], data[1]]
                         }
-                    }) + '\n')
+                    }) + '\n');
                 }),
                 fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),
                 (err) => {
@@ -164,7 +166,7 @@ class Job {
             await s3.putObject({
                 Bucket: process.env.Bucket,
                 Key: `${this.assets}/source.geojson.gz`,
-                Body: fs.createReadStream(data).pipe(gzip).
+                Body: fs.createReadStream(data).pipe(gzip)
             }).promise();
             console.error('ok - source.geojson uploaded');
             this.assets.output = true;
@@ -182,7 +184,7 @@ class Job {
                 console.error('ok - source.png uploaded');
                 this.assets.preview = true;
             }
-        } catch(err) {
+        } catch (err) {
             throw new Error(err);
         }
 

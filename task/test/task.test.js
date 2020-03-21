@@ -1,3 +1,5 @@
+'use strict';
+
 const test = require('tape');
 const task = require('../task');
 
@@ -9,7 +11,7 @@ test('Basic Source', async (t) => {
             'addresses',
             'city-of-nashville'
         ));
-    } catch(err) {
+    } catch (err) {
         t.error(err);
     }
 

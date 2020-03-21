@@ -71,6 +71,12 @@ export default {
                 } else {
                     this.mode = 'jobs';
                 }
+            } else if (mode[0] === 'runs') {
+                this.mode = 'runs';
+            } else if (mode[0] === 'data') {
+                this.mode = 'data';
+            } else {
+                this.mode = 'data';
             }
         }
     },

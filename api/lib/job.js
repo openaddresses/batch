@@ -155,7 +155,7 @@ class Job {
                         id: ++line,
                         timestamp: event.timestamp,
                         message: event.message
-                            .replace(/[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
+                            .replace(/access_token=[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
                     };
                 }));
             });

@@ -138,16 +138,23 @@ class Job {
         });
     }
 
-    compress() {
+    async compress() {
+        let data = [];
+        try {
+            data = await Job.find('out.geojson', this.tmp);
+        } catch (err) {
+            throw new Error(err);
+        }
+
+        if (!data || !data.length) {
+            throw new Error('out.geojson not found');
+        }
+
         return new Promise((resolve, reject) => {
-            const data = path.resolve(this.tmp, 'out.geojson');
-
-            if (!data.length) return reject(new Error('Could not find out.geojson'));
-
-            const compressed = data + '.gz';
+            const compressed = data[0] + '.gz';
 
             pipeline(
-                fs.createReadStream(data),
+                fs.createReadStream(data[0]),
                 gzip(),
                 fs.createWriteStream(compressed),
                 (err) => {

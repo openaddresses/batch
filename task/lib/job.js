@@ -144,14 +144,16 @@ class Job {
 
             if (!data.length) return reject(new Error('Could not find out.geojson'));
 
+            const compressed = data + '.gz';
+
             pipeline(
-                fs.createReadStream(data[0]),
-                gzip,
-                fs.createWriteStream(data[0] + '.gz'),
+                fs.createReadStream(data),
+                gzip(),
+                fs.createWriteStream(compressed),
                 (err) => {
                     if (err) return reject(err);
 
-                    return resolve(data[0] + '.gz');
+                    return resolve(compressed);
                 }
             );
         });

@@ -13,6 +13,28 @@ class Run {
         this.attrs = ['github', 'closed'];
     }
 
+    static list(pool) {
+        return new Promise((resolve, reject) => {
+            pool.query(`
+                SELECT
+                    *
+                FROM
+                    runs
+                ORDER BY
+                    created DESC
+                LIMIT 100
+            `, (err, pgres) => {
+                if (err) throw err;
+
+                res.json(pgres.rows.map((run) => {
+                    run.id = parseInt(run.id);
+
+                    return run;
+                }));
+            });
+        });
+    }
+
     /**
      * Return all associated jobs for a given run
      *

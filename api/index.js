@@ -19,6 +19,7 @@ const args = require('minimist')(process.argv, {
 
 const Run = require('./lib/run');
 const Job = require('./lib/job');
+const Data = require('./lib/data');
 
 require('./lib/config')();
 
@@ -94,36 +95,27 @@ async function server(args, cb) {
     /**
      * Search for processed data by various criteria
      */
-    router.get('/data', (req, res) => {
-        // Allow getting S3 links in various ways
-        // - bbox
-        // - name prefix
-        // - layer
+    router.get('/data', async (req, res) => {
+        try {
+            const data = await Data.list(pool, req.query);
 
-        res.json([]);
+            return res.json(data);
+        } catch (err) {
+            return err.res(res);
+        }
     });
 
     /**
      * Search for runs by various criteria
      */
-    router.get('/run', (req, res) => {
-        pool.query(`
-            SELECT
-                *
-            FROM
-                runs
-            ORDER BY
-                created DESC
-            LIMIT 100
-        `, (err, pgres) => {
-            if (err) throw err;
+    router.get('/run', async (req, res) => {
+        try {
+            const runs = await Run.list(pool);
 
-            res.json(pgres.rows.map((run) => {
-                run.id = parseInt(run.id);
-
-                return run;
-            }));
-        });
+            return res.json(runs);
+        } catch (err) {
+            return err.res(res);
+        }
     });
 
     /**

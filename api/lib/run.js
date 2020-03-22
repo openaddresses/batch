@@ -26,11 +26,11 @@ class Run {
             `, (err, pgres) => {
                 if (err) throw err;
 
-                res.json(pgres.rows.map((run) => {
+                pgres.rows.map((run) => {
                     run.id = parseInt(run.id);
 
                     return run;
-                }));
+                });
             });
         });
     }

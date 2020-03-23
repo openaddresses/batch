@@ -178,7 +178,7 @@ class Job {
 
                 await s3.putObject({
                     Bucket: process.env.Bucket,
-                    Key: `${process.env.StackName}/job/${this.id}/cache.zip`,
+                    Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
                     Body: fs.createReadStream(cache[0])
                 }).promise();
 
@@ -189,7 +189,7 @@ class Job {
             const data = path.resolve(this.tmp, 'out.geojson.gz');
             await s3.putObject({
                 Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${this.id}/source.geojson.gz`,
+                Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
                 Body: fs.createReadStream(data)
             }).promise();
             console.error('ok - source.geojson.gz uploaded');
@@ -201,7 +201,7 @@ class Job {
 
                 await s3.putObject({
                     Bucket: process.env.Bucket,
-                    Key: `${process.env.StackName}/job/${this.id}/source.png`,
+                    Key: `${process.env.StackName}/job/${this.job}/source.png`,
                     Body: fs.createReadStream(preview[0])
                 }).promise();
 

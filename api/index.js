@@ -366,6 +366,7 @@ async function server(args, cb) {
                 signature: request.headers['x-hub-signature']
             });
         } catch (err) {
+            console.error('VALIDATION ERROR', err);
             res.status(400).body('Invalid X-Hub-Signature');
         }
 

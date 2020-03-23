@@ -1,7 +1,3 @@
-DROP TABLE results;
-DROP TABLE job;
-DROP TABLE runs;
-
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (
     source      TEXT,       -- text name of the source "us/ca/orange"

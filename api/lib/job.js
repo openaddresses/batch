@@ -86,6 +86,8 @@ class Job {
                     job[key] = pgres.rows[0][key];
                 }
 
+                job.id = parseInt(job.id);
+
                 return resolve(job);
             });
         });
@@ -177,7 +179,8 @@ class Job {
                     layer,
                     name,
                     status,
-                    version
+                    version,
+                    output
                 ) VALUES (
                     $1,
                     NOW(),
@@ -185,14 +188,16 @@ class Job {
                     $3,
                     $4,
                     'Pending',
-                    $5
+                    $5,
+                    $6
                 ) RETURNING *
             `, [
                 this.run,
                 this.source,
                 this.layer,
                 this.name,
-                this.version
+                this.version,
+                { cache: false, output: false, preview: false }
             ], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to generate job'));
 

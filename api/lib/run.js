@@ -22,7 +22,8 @@ class Run {
                     runs.created,
                     runs.github,
                     runs.closed,
-                    ARRAY_AGG(job.status) AS status
+                    ARRAY_AGG(job.status) AS status,
+                    COUNT(job.*) AS jobs
                 FROM
                     runs,
                     job
@@ -42,6 +43,7 @@ class Run {
 
                 resolve(pgres.rows.map((run) => {
                     run.id = parseInt(run.id);
+                    run.jobs = parseInt(run.jobs);
 
                     if (run.status.includes('Fail')) {
                         run.status = 'Fail';

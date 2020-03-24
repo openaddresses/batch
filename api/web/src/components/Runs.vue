@@ -30,7 +30,7 @@
         <template v-else>
             <div :key='run.id' v-for='run in runs' class='col col--12 grid'>
                 <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--1 flex-parent flex-parent--center-main'>
+                    <div class='col col--1'>
                         <template v-if='run.status === "Pending"'>
                             <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
                         </template>

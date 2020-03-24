@@ -10,6 +10,27 @@
                 <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
                     <svg class='icon'><use xlink:href='#icon-search'/></svg>
                 </button>
+
+                <template v-if='showFilter'>
+                    <div class='col col--12 grid border border--gray px6 py6 round'>
+                        <div class='col col--8'>
+                            <label>Source</label>
+                            <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
+                        </div>
+                        <div class='col col--4'>
+                            <label>Layer</label>
+                            <div class='w-full select-container'>
+                                <select v-model='filter.layer' class='select'>
+                                    <option>all</option>
+                                    <option>addresses</option>
+                                    <option>buildings</option>
+                                    <option>parcels</option>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <div class='col col--5'>
@@ -52,13 +73,24 @@ export default {
         return {
             loading: false,
             showFilter: false,
-            filter: '',
+            filter: {
+                source: '',
+                layer: 'all'
+            },
             datas: []
         };
     },
     mounted: function() {
         window.location.hash = 'data';
         this.refresh();
+    },
+    watch: {
+        'filter.layer': function() {
+            this.refresh();
+        },
+        'filter.source': function() {
+            this.refresh();
+        }
     },
     methods: {
         refresh: function() {
@@ -75,7 +107,7 @@ export default {
         },
         getData: function() {
             this.loading = true;
-            fetch(window.location.origin + `/api/data`, {
+            fetch(window.location.origin + `/api/data?source=${this.filter.source}&layer=${this.filter.layer}`, {
                 method: 'GET'
             }).then((res) => {
                 return res.json();

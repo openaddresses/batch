@@ -5,10 +5,10 @@ const Err = require('./error');
 class Data {
     static list(pool, query) {
         if (!query.source) query.source = '';
-        if (!query.layer) query.layer = '';
+        if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';
 
-        query.source = query.source + '%';
+        query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
         query.name = query.name + '%';
 

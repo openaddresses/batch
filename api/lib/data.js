@@ -36,14 +36,19 @@ class Data {
             ], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to load data'));
 
-                return resolve(pgres.rows);
+                return resolve(pgres.rows.map((res) => {
+                    res.job = parseInt(res.job);
+
+                    return res;
+                }));
             });
         });
     }
 
     static async update(pool, job) {
+        let data;
         try {
-            const data = await Data.list(pool, {
+            data = await Data.list(pool, {
                 source: job.fullname(),
                 layer: job.layer,
                 name: job.name
@@ -57,7 +62,7 @@ class Data {
                 throw Err(500, null, 'More than 1 source matches job');
             } else if (data.length === 0) {
                 pool.query(`
-                    INSERT INTO data (
+                    INSERT INTO results (
                         source,
                         layer,
                         name,
@@ -82,7 +87,7 @@ class Data {
                 });
             } else {
                 pool.query(`
-                    UPDATE data
+                    UPDATE results
                         SET
                             source = $1,
                             layer = $2,

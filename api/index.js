@@ -124,7 +124,7 @@ async function server(args, cb) {
      */
     router.post('/run', async (req, res) => {
         try {
-            const run = await Run.generate(pool, req.params);
+            const run = await Run.generate(pool, req.body);
 
             return res.json(run.json());
         } catch (err) {

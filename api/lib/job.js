@@ -258,7 +258,7 @@ class Job {
             const run = await Run.from(pool, this.run);
 
             if (run.live) {
-                return await Data.update(this);
+                return await Data.update(pool, this);
             }  else {
                 return false;
             }

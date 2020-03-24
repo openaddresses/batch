@@ -65,7 +65,7 @@ class Run {
     }
 
     static from(pool, id) {
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             pool.query(`
                 SELECT
                     *
@@ -88,7 +88,7 @@ class Run {
     }
 
     static close(pool, id) {
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             pool.query(`
                 UPDATE
                     runs
@@ -137,8 +137,8 @@ class Run {
         });
     }
 
-    static generate(pool, params) {
-        if (params.live !== true) live = false;
+    static generate(pool, params = {}) {
+        if (params.live !== true) params.live = false;
 
         return new Promise((resolve, reject) => {
             pool.query(`

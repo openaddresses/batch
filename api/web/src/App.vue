@@ -12,7 +12,9 @@
         <div class='col col--12 flex-parent flex-parent--center-main'>
             <div class='flex-child wmax600 col col--12'>
                 <template v-if='mode === "data"'>
-                    <Data/>
+                    <Data
+                        v-on:job='emitjob($event)'
+                    />
                 </template>
                 <template v-else-if='mode === "runs"'>
                     <Runs/>

@@ -9,6 +9,7 @@
         "start": "node index.js"
     },
     "dependencies": {
+        "@mapbox/tilebelt": "^1.0.1",
         "@octokit/webhooks": "^7.1.0",
         "aws-sdk": "^2.630.0",
         "body-parser": "^1.19.0",

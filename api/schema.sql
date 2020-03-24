@@ -1,4 +1,4 @@
-CREATE EXTENSION POSTGIS;
+CREATE EXTENSION IF NOT EXISTS POSTGIS;
 
 -- Store coverage map
 CREATE TABLE IF NOT EXISTS map (
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS map (
     place       TEXT,                       -- City/Village/Equivalent
     geom        GEOMETRY(GEOMETRY, 4326),   -- Geometry
     layers      JSONB                       -- ["layer", ... ]
-)
+);
 
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (

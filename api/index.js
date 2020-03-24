@@ -17,6 +17,7 @@ const args = require('minimist')(process.argv, {
     string: ['postgres', 'secret']
 });
 
+const Bin = require('./lib/bin');
 const Run = require('./lib/run');
 const Job = require('./lib/job');
 const Data = require('./lib/data');

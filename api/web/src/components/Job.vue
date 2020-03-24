@@ -7,13 +7,13 @@
                 </button>
 
                 <template v-if='job.status === "Pending"'>
-                    <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                    <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
                 </template>
                 <template v-else-if='job.status === "Success"'>
-                    <svg class='fl icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                    <svg class='fl icon ml12 color-green opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
                 </template>
                 <template v-else-if='job.status === "Fail"'>
-                    <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                    <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
                 </template>
 
                 <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
@@ -35,11 +35,22 @@
         </template>
         <template v-else>
             <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6'><span v-text='job.name'/></h3>
+                <h3 class='flex-child txt-h4 py6' v-text='name'></h3>
             </div>
 
             <template v-if='job.output.preview'>
                 <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
+            </template>
+            <template v-else>
+                <div class='col col--12 border border--gray-light round'>
+                    <div class='flex-parent flex-parent--center-main pt36'>
+                        <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
+                    </div>
+
+                    <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                        <h1 class='flex-child txt-h4 cursor-default'>No Preview Image Found</h1>
+                    </div>
+                </div>
             </template>
         </template>
     </div>
@@ -52,6 +63,7 @@ export default {
     data: function() {
         return {
             loading: false,
+            name: '',
             job: {
                 output: {
                     cache: false,
@@ -90,6 +102,11 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.job = res;
+
+                this.name = this.job.source
+                    .replace(/.*sources\//, '')
+                    .replace(/\.json/, '');
+
                 this.loading = false;
             });
         }

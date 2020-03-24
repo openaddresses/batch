@@ -4,6 +4,9 @@ const Err = require('./error');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');
 
+const Run = require('./run');
+const Data = require('./data');
+
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
 
@@ -22,6 +25,12 @@ class Job {
 
         // Attributes which are allowed to be patched
         this.attrs = ['output', 'loglink', 'status', 'version'];
+    }
+
+    fullname() {
+        return this.source
+            .replace(/.*sources\//, '')
+            .replace(/\.json/, '');
     }
 
     json() {
@@ -240,6 +249,16 @@ class Job {
                 });
             }
         });
+    }
+
+    async success(pool) {
+        try {
+            const run = await Run.from(pool, this.run);
+
+            if (run.live) Data.update(this);
+        } catch(err) {
+            throw err;
+        }
     }
 }
 

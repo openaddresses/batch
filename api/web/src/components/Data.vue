@@ -12,14 +12,11 @@
                 </button>
             </div>
 
-            <div class='col col--1'>
+            <div class='col col--5'>
                 Source
             </div>
             <div class='col col--2'>
                 Updated
-            </div>
-            <div class='col col--4'>
-                Job
             </div>
             <div class='col col--5'>
                 <span class='fr'>Attributes</span>
@@ -31,7 +28,17 @@
             </div>
         </template>
         <template v-else>
-
+            <div :key='d.id' v-for='d in datas' class='col col--12 grid'>
+                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                    <div class='col col--5'>
+                        <span v-text='d.source'/>
+                    </div>
+                    <div class='col col--2'>
+                    </div>
+                    <div class='col col--5'>
+                    </div>
+                </div>
+            </div>
         </template>
     </div>
 </template>

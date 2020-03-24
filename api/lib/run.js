@@ -10,7 +10,7 @@ class Run {
         this.closed = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = ['github', 'closed'];
+        this.attrs = ['github', 'closed', 'live'];
     }
 
     static list(pool) {

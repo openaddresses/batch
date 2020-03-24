@@ -14,6 +14,10 @@ class S3 {
             res.writeHead(statusCode, headers);
         });
 
+        s3stream.on('error', (err) => {
+            // Could not find object, ignore
+        });
+
         s3stream.pipe(res);
     }
 }

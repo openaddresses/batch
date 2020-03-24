@@ -148,7 +148,7 @@ class Job {
                         version = $4
                     WHERE
                         id = $5
-            `, [this.output, this.loglink, this.status, this.version, this.id], (err) => {
+            `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
                 await this.success(pool);

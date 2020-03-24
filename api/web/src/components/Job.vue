@@ -24,7 +24,7 @@
 
                 <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
                 <span @click='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                <span v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                <span @click='datapls' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
             </div>
         </div>
 
@@ -81,6 +81,9 @@ export default {
     methods: {
         close: function() {
             this.$emit('close');
+        },
+        datapls: function() {
+            this.external(`${window.location.origin}/api/job/${this.job.id}/output/source.geojson.gz`);
         },
         external: function(url) {
             window.open(url, "_blank");

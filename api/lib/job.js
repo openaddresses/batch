@@ -2,8 +2,8 @@
 
 const Err = require('./error');
 const AWS = require('aws-sdk');
+const S3 = require('./s3');
 
-const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
 
@@ -101,25 +101,31 @@ class Job {
         }
     }
 
-    static preview(job_id) {
-        return s3.getObject({
+    static preview(job_id, res) {
+        const s3 = new S3({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${job_id}/source.png`
-        }).createReadStream()
+        });
+
+        return s3.stream(res);
     }
 
-    static data(job_id) {
-        return s3.getObject({
+    static data(job_id, res) {
+        const s3 = new S3({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${job_id}/source.geojson.gz`
-        }).createReadStream()
+        });
+
+        return s3.stream(res);
     }
 
-    static cache(job_id) {
-        return s3.getObject({
+    static cache(job_id, res) {
+        const s3 = new S3({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${job_id}/cache.zip`
-        }).createReadStream()
+        });
+
+        return s3.stream(res);
     }
 
     commit(pool) {

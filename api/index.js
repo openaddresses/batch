@@ -292,41 +292,17 @@ async function server(args, cb) {
 
     router.get('/job/:job/output/source.png', async (req, res) => {
         Param.int(req, res, 'job');
-
-        res.setHeader('Content-Type', 'image/png');
-        Job.preview(req.params.job).on('error', (err) => {
-            console.error(err);
-            return res.status(404).send({
-                status: 404,
-                error: 'source.png not found'
-            });
-        }).pipe(res);
+        Job.preview(req.params.job, res);
     });
 
-    router.get('/job/:job/output/source.geojson', async (req, res) => {
+    router.get('/job/:job/output/source.geojson.gz', async (req, res) => {
         Param.int(req, res, 'job');
-
-        res.setHeader('Content-Type', 'application/json-seq');
-        Job.data(req.params.job).on('error', (err) => {
-            console.error(err);
-            return res.status(404).send({
-                status: 404,
-                error: 'source.geojson not found'
-            });
-        }).pipe(res);
+        Job.data(req.params.job, res);
     });
 
     router.get('/job/:job/output/cache.zip', async (req, res) => {
         Param.int(req, res, 'job');
-
-        res.setHeader('Content-Type', 'application/zip');
-        Job.data(req.params.job).on('error', (err) => {
-            console.error(err);
-            return res.status(404).send({
-                status: 404,
-                error: 'cache.zip not found'
-            });
-        }).pipe(res);
+        Job.data(req.params.job, res);
     });
 
     router.get('/job/:job/log', async (req, res) => {

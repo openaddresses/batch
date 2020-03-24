@@ -52,7 +52,7 @@ export default {
     name: 'OpenAddresses',
     data: function() {
         return {
-            mode: 'data',
+            mode: false,
             jobid: false
         };
     },

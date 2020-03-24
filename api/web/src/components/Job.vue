@@ -5,6 +5,17 @@
                 <button @click='close' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
+
+                <template v-if='job.status === "Pending"'>
+                    <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                </template>
+                <template v-else-if='job.status === "Success"'>
+                    <svg class='fl icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                </template>
+                <template v-else-if='job.status === "Fail"'>
+                    <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                </template>
+
                 <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
@@ -13,7 +24,7 @@
 
                 <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
                 <span @click='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                <span v-if='job.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                <span v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
             </div>
         </div>
 
@@ -23,7 +34,13 @@
             </div>
         </template>
         <template v-else>
+            <div class='col col--12 flex-parent flex-parent--center-main'>
+                <h3 class='flex-child txt-h4 py6'><span v-text='job.name'/></h3>
+            </div>
 
+            <template v-if='job.output.preview'>
+                <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
+            </template>
         </template>
     </div>
 </template>
@@ -35,7 +52,13 @@ export default {
     data: function() {
         return {
             loading: false,
-            job: {}
+            job: {
+                output: {
+                    cache: false,
+                    output: false,
+                    preview: false
+                }
+            }
         };
     },
     mounted: function() {

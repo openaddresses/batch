@@ -151,6 +151,8 @@ class Job {
             `, [this.output, this.loglink, this.status, this.version, this.id], (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
+                await this.success(pool);
+
                 return resolve(this);
             });
         });
@@ -255,7 +257,11 @@ class Job {
         try {
             const run = await Run.from(pool, this.run);
 
-            if (run.live) Data.update(this);
+            if (run.live) {
+                return await Data.update(this);
+            }  else {
+                return false;
+            }
         } catch(err) {
             throw err;
         }

@@ -17,9 +17,23 @@ class Run {
         return new Promise((resolve, reject) => {
             pool.query(`
                 SELECT
-                    *
+                    runs.id,
+                    runs.live,
+                    runs.created,
+                    runs.github,
+                    runs.closed,
+                    ARRAY_AGG(job.status) AS status
                 FROM
-                    runs
+                    runs,
+                    job
+                WHERE
+                    job.id = runs.id
+                GROUP BY
+                    runs.id,
+                    runs.live,
+                    runs.created,
+                    runs.github,
+                    runs.closed
                 ORDER BY
                     created DESC
                 LIMIT 100
@@ -28,6 +42,14 @@ class Run {
 
                 resolve(pgres.rows.map((run) => {
                     run.id = parseInt(run.id);
+
+                    if (run.status.includes('Fail')) {
+                        run.status = 'Fail';
+                    } else if (run.status.includes('Pending')) {
+                        run.status = 'Pending';
+                    } else {
+                        run.status = 'Success';
+                    }
 
                     return run;
                 }));
@@ -48,9 +70,9 @@ class Run {
                 SELECT
                     *
                 FROM
-                    jobs
+                    job
                 WHERE
-                    jobs.run = $1
+                    job.run = $1
             `, [run_id], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to fetch jobs'));
 

@@ -58,7 +58,7 @@
                         <span v-text='d.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                     </div>
                     <div class='col col--5'>
-                        <span @click='datapls(d)' v-if='d.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                        <span @click='datapls(d)' v-if='d.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
                     </div>
                 </div>
             </div>

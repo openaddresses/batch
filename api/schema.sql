@@ -1,3 +1,15 @@
+CREATE EXTENSION POSTGIS;
+
+-- Store coverage map
+CREATE TABLE IF NOT EXISTS map (
+    country     TEXT,                       -- ISO Country Code
+    region      TEXT,                       -- ISO Region Code
+    district    TEXT,                       -- County/Equivalent
+    place       TEXT,                       -- City/Village/Equivalent
+    geom        GEOMETRY(GEOMETRY, 4326),   -- Geometry
+    layers      JSONB                       -- ["layer", ... ]
+)
+
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (
     source      TEXT,       -- text name of the source "us/ca/orange"

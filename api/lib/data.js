@@ -1,6 +1,6 @@
 'use strict';
 
-// const Err = require('./error');
+const Err = require('./error');
 
 class Data {
     static list(pool, query) {
@@ -13,21 +13,22 @@ class Data {
         return new Promise((resolve, reject) => {
             pool.query(`
                 SELECT
-                    data.source,
-                    data.updated,
-                    data.layer,
-                    data.name,
-                    data.job,
+                    results.source,
+                    results.updated,
+                    results.layer,
+                    results.name,
+                    results.job,
                     job.output
                 FROM
-                    data,
+                    results,
                     job
                 WHERE
-                    data.job = job.id
-                    AND data.source ilike $1
-                    AND data.layer ilike $2
+                    results.job = job.id
+                    AND results.source ilike $1
+                    AND results.layer ilike $2
             `, [
-                query.name
+                query.name,
+                query.layer
             ], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to load data'));
 

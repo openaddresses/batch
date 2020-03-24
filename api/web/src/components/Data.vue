@@ -44,7 +44,7 @@ export default {
             loading: false,
             showFilter: false,
             filter: '',
-            data: []
+            datas: []
         };
     },
     mounted: function() {
@@ -56,7 +56,16 @@ export default {
             this.getData();
         },
         getData: function() {
-            this.data = [];
+            this.loading = true;
+            fetch(window.location.origin + `/api/data`, {
+                method: 'GET'
+            }).then((res) => {
+                return res.json();
+            }).then((res) => {
+                this.datas = res;
+
+                this.loading = false;
+            });
         }
     }
 }

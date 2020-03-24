@@ -26,11 +26,11 @@ class Run {
             `, (err, pgres) => {
                 if (err) throw err;
 
-                pgres.rows.map((run) => {
+                resolve(pgres.rows.map((run) => {
                     run.id = parseInt(run.id);
 
                     return run;
-                });
+                }));
             });
         });
     }
@@ -137,19 +137,25 @@ class Run {
         });
     }
 
-    static generate(pool) {
+    static generate(pool, params) {
+        if (params.live !== true) live = false;
+
         return new Promise((resolve, reject) => {
             pool.query(`
                 INSERT INTO runs (
                     created,
+                    live,
                     github,
                     closed
                 ) VALUES (
                     NOW(),
+                    $1,
                     '{}'::JSONB,
                     false
                 ) RETURNING *
-            `, (err, pgres) => {
+            `, [
+                params.live
+            ], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to generate run'));
 
                 const run = new Run();

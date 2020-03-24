@@ -87,7 +87,10 @@ async function cli() {
         const run = await request({
             url: api + '/api/run',
             method: 'POST',
-            json: true
+            json: true,
+            body: {
+                live: true
+            }
         });
 
         const job = await request({

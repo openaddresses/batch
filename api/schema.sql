@@ -1,10 +1,10 @@
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (
-    source      TEXT,       -- text name of the source "us/ca/orange"
-    updated     TIMESTAMP,  -- timestamp as to when the data was last successfully updated
-    layer       TEXT,       -- name of the layer "addresses"
-    name        TEXT,       -- name of the provider within the layer
-    job         BIGINT      -- Job ID that ran the last successful source
+    source      TEXT,               -- text name of the source "us/ca/orange"
+    updated     TIMESTAMP,          -- timestamp as to when the data was last successfully updated
+    layer       TEXT,               -- name of the layer "addresses"
+    name        TEXT PRIMARY KEY,   -- name of the provider within the layer
+    job         BIGINT              -- Job ID that ran the last successful source
 );
 
 -- A job corresponds 1:1 with a batch task

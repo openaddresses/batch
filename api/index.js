@@ -340,7 +340,7 @@ async function server(args, cb) {
         try {
             await webhooks.verify({
                 payload: req.body,
-                signature: request.headers['x-hub-signature']
+                signature: req.headers['x-hub-signature']
             });
         } catch (err) {
             console.error('VALIDATION ERROR', err);

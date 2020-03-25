@@ -11,6 +11,7 @@ const csv = require('csv-parse');
 const AWS = require('aws-sdk');
 const schema_v2 = require('./source_schema_v2.json');
 const transform = require('parallel-transform');
+const Stats = require('./stats');
 
 const ajv = new Ajv({
     schemaId: 'auto'

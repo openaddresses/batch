@@ -34,4 +34,8 @@ class Stats {
             )
         });
     }
+
+    bounds(feat) {
+
+    }
 }

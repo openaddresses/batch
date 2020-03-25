@@ -61,7 +61,6 @@ export default {
     mounted: function() {
         const mode = window.location.hash.replace('#', '').split(':');
         if (mode.length && ['data', 'runs', 'jobs'].includes(mode[0])) {
-
             if (mode[0] === 'jobs') {
                 if (mode.length >= 2) {
                     this.jobid = parseInt(mode[1]);
@@ -81,6 +80,8 @@ export default {
             } else {
                 this.mode = 'data';
             }
+        } else {
+            this.mode = 'data';
         }
     },
     watch: {

@@ -2,10 +2,8 @@ CREATE EXTENSION IF NOT EXISTS POSTGIS;
 
 -- Store coverage map
 CREATE TABLE IF NOT EXISTS map (
-    country     TEXT,                       -- ISO Country Code
-    region      TEXT,                       -- ISO Region Code
-    district    TEXT,                       -- County/Equivalent
-    place       TEXT,                       -- City/Village/Equivalent
+    name        TEXT,                       -- Common Name
+    code        TEXT,                       -- ISO Country/Region Code
     geom        GEOMETRY(GEOMETRY, 4326),   -- Geometry
     layers      JSONB                       -- ["layer", ... ]
 );

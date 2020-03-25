@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const {pipeline} = require('stream');
-const Webhooks = require('@octokit/webhooks');
+const ghverify = require('@octokit/webhooks/verify')
 const path = require('path');
 const morgan = require('morgan');
 const CI = require('./lib/ci');
@@ -25,9 +25,6 @@ const Data = require('./lib/data');
 require('./lib/config')();
 
 const Param = util.Param;
-const webhooks = new Webhooks({
-    secret: process.env.GithubSecret
-});
 
 const router = express.Router();
 const app = express();
@@ -337,12 +334,11 @@ async function server(args, cb) {
     router.post('/github/event', async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).body('Invalid X-Hub-Signature');
 
-        try {
-            await webhooks.verify({
-                payload: req.body,
-                signature: req.headers['x-hub-signature']
-            });
-        } catch (err) {
+        if (!ghverify(
+            process.env.GithubSecret,
+            req.body,
+            req.headers['x-hub-signature']
+        )) {
             console.error('VALIDATION ERROR', err);
             res.status(400).body('Invalid X-Hub-Signature');
         }

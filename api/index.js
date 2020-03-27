@@ -19,6 +19,7 @@ const args = require('minimist')(process.argv, {
 const Run = require('./lib/run');
 const Job = require('./lib/job');
 const Data = require('./lib/data');
+const Err = require('./lib/error');
 
 require('./lib/config')();
 
@@ -97,7 +98,7 @@ async function server(args, cb) {
 
             return res.json(data);
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -110,7 +111,7 @@ async function server(args, cb) {
 
             return res.json(runs);
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -124,7 +125,7 @@ async function server(args, cb) {
 
             return res.json(run.json());
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -139,7 +140,7 @@ async function server(args, cb) {
 
             return res.json(run.json());
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -155,7 +156,7 @@ async function server(args, cb) {
 
             return res.json(run.json());
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -259,7 +260,7 @@ async function server(args, cb) {
                 jobs: jobs
             });
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -270,7 +271,7 @@ async function server(args, cb) {
         try {
             return res.json(await Job.list(pool));
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -282,7 +283,7 @@ async function server(args, cb) {
 
             return res.json(job.json());
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -309,7 +310,7 @@ async function server(args, cb) {
 
             return res.json(await job.log());
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -325,7 +326,7 @@ async function server(args, cb) {
 
             return res.json(job.json());
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 
@@ -353,7 +354,7 @@ async function server(args, cb) {
                 res.status(400).body('Accepted but ignored');
             }
         } catch (err) {
-            return err.res(res);
+            return Err.respond(err, res);
         }
     });
 

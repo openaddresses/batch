@@ -1,3 +1,5 @@
+'use strict';
+
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 
@@ -14,7 +16,7 @@ class S3 {
             res.writeHead(statusCode, headers);
         });
 
-        s3stream.on('error', (err) => {
+        s3stream.on('error', () => {
             // Could not find object, ignore
         });
 

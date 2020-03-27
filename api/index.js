@@ -1,14 +1,12 @@
 'use strict';
 
 const fs = require('fs');
-const {pipeline} = require('stream');
-const ghverify = require('@octokit/webhooks/verify')
+const ghverify = require('@octokit/webhooks/verify');
 const path = require('path');
 const morgan = require('morgan');
 const CI = require('./lib/ci');
 const util = require('./lib/util');
 const express = require('express');
-const request = require('request');
 const config = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
@@ -17,7 +15,7 @@ const args = require('minimist')(process.argv, {
     string: ['postgres', 'secret']
 });
 
-const Bin = require('./lib/bin');
+// const Bin = require('./lib/bin');
 const Run = require('./lib/run');
 const Job = require('./lib/job');
 const Data = require('./lib/data');
@@ -60,7 +58,7 @@ async function server(args, cb) {
 
     app.disable('x-powered-by');
     app.use(minify());
-    app.use(express.static('web/dist'))
+    app.use(express.static('web/dist'));
 
     app.use('/api', router);
 
@@ -339,14 +337,21 @@ async function server(args, cb) {
             req.body,
             req.headers['x-hub-signature']
         )) {
-            console.error('VALIDATION ERROR', err);
             res.status(400).body('Invalid X-Hub-Signature');
         }
 
         try {
-            await CI.event(res.body);
+            if (req.headers['X-GitHub-Event'] === 'pull_request') {
+                await CI.pull(pool, res.body);
 
-            res.json(true);
+                res.json(true);
+            } else if (req.headers['X-GitHub-Event'] === 'issue_comment') {
+                await CI.issue(pool, res.body);
+
+                res.json(true);
+            } else {
+                res.status(400).body('Accepted but ignored');
+            }
         } catch (err) {
             return err.res(res);
         }

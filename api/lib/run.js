@@ -39,7 +39,7 @@ class Run {
                     created DESC
                 LIMIT 100
             `, (err, pgres) => {
-                if (err) throw err;
+                if (err) return reject(new Err(500, err, 'failed to fetch runs'));
 
                 resolve(pgres.rows.map((run) => {
                     run.id = parseInt(run.id);

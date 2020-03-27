@@ -254,16 +254,12 @@ class Job {
     }
 
     async success(pool) {
-        try {
-            const run = await Run.from(pool, this.run);
+        const run = await Run.from(pool, this.run);
 
-            if (run.live) {
-                return await Data.update(pool, this);
-            }  else {
-                return false;
-            }
-        } catch(err) {
-            throw err;
+        if (run.live) {
+            return await Data.update(pool, this);
+        }  else {
+            return false;
         }
     }
 }

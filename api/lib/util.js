@@ -1,6 +1,5 @@
 'use strict';
 
-const Err = require('./error');
 const request = require('request');
 
 class Param {

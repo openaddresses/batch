@@ -46,16 +46,11 @@ class Data {
     }
 
     static async update(pool, job) {
-        let data;
-        try {
-            data = await Data.list(pool, {
-                source: job.fullname(),
-                layer: job.layer,
-                name: job.name
-            });
-        } catch(err) {
-            throw err;
-        }
+        const data = await Data.list(pool, {
+            source: job.fullname(),
+            layer: job.layer,
+            name: job.name
+        });
 
         return new Promise((resolve, reject) => {
             if (data.length > 1) {
@@ -80,7 +75,7 @@ class Data {
                     job.layer,
                     job.name,
                     job.id
-                ], (err, pgres) => {
+                ], (err) => {
                     if (err) return reject(new Err(500, err, 'Failed to update data'));
 
                     return resolve(true);
@@ -103,7 +98,7 @@ class Data {
                     job.layer,
                     job.name,
                     job.id
-                ], (err, pgres) => {
+                ], (err) => {
                     if (err) return reject(new Err(500, err, 'Failed to update data'));
 
                     return resolve(true);

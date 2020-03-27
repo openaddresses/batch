@@ -1,3 +1,5 @@
+'use strict';
+
 function env() {
     if (!process.env.AWS_DEFAULT_REGION) {
         console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');

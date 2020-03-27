@@ -1,5 +1,6 @@
 'use strict';
 
+/*
 const tb = require('@mapbox/tilebelt');
 
 const Err = require('./error');
@@ -19,3 +20,4 @@ class Bin {
 }
 
 module.exports = Bin;
+*/

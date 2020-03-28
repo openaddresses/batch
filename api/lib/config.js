@@ -21,11 +21,9 @@ class Config {
                 .replace('-----END RSA PRIVATE KEY-----', '')
                 .replace(/ /g, '\n');
 
-            github = `
-                -----BEGIN RSA PRIVATE KEY-----
-                ${github}
-                -----END RSA PRIVATE KEY-----
-            `;
+            github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
+
+            console.error(github);
 
             this.okta = new Octokit({
                 type: 'app',

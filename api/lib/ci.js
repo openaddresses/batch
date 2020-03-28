@@ -66,7 +66,7 @@ class CI {
                 github: GH.json()
             });
 
-            await Run.jobs(pool, run.id)
+            await Run.populate(pool, run.id, jobs);
         } catch (err) {
             throw new Error(err);
         }

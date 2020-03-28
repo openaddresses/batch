@@ -39,7 +39,7 @@ class CI {
                 event.after
             );
 
-            await this.GHRest.checks.create({
+            await this.okta.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
                 name: 'data-pls',

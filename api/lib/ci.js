@@ -13,7 +13,29 @@ class GH {
 }
 
 class CI {
-    static pull(pool, event) {
+    constructor(config) {
+        this.config = config;
+    }
+
+    async push(pool, event) {
+        console.error(JSON.stringify(event));
+
+        try {
+            await this.GHRest.checks.create({
+                owner: 'openaddresses',
+                repo: 'openaddresses',
+                name: 'data-pls',
+                head_sha: event.head
+            });
+
+        } catch (err) {
+            throw new Error(err);
+        }
+
+        return true;
+    }
+
+    pull(pool, event) {
         return new Promise((resolve, reject) => {
             console.error('PULL', JSON.stringify(event));
 
@@ -59,7 +81,7 @@ class CI {
         });
     }
 
-    static comment(pool, event) {
+    comment(pool, event) {
         return new Promise((resolve) => {
             console.error('COMMENT', JSON.stringify(event));
 

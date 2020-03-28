@@ -4,7 +4,6 @@ const fs = require('fs');
 const ghverify = require('@octokit/webhooks/verify');
 const path = require('path');
 const morgan = require('morgan');
-const CI = require('./lib/ci');
 const util = require('./lib/util');
 const express = require('express');
 const pkg = require('./package.json');
@@ -38,6 +37,7 @@ function configure(args) {
 async function server(args, config, cb) {
     // these must be run after lib/config
     // const Bin = require('./lib/bin');
+    const ci = new (require('./lib/ci'))(config);
     const Run = require('./lib/run');
     const Job = require('./lib/job');
     const Data = require('./lib/data');
@@ -353,11 +353,15 @@ async function server(args, config, cb) {
 
         try {
             if (req.headers['X-GitHub-Event'] === 'pull_request') {
-                await CI.pull(pool, res.body);
+                await ci.push(pool, res.body);
+
+                res.json(true);
+            } else if (req.headers['X-GitHub-Event'] === 'pull_request') {
+                await ci.pull(pool, res.body);
 
                 res.json(true);
             } else if (req.headers['X-GitHub-Event'] === 'issue_comment') {
-                await CI.issue(pool, res.body);
+                await ci.issue(pool, res.body);
 
                 res.json(true);
             } else {

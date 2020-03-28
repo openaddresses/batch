@@ -1,6 +1,10 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const pkg = require('../package.json');
+const { createAppAuth } = require("@octokit/auth-app");
+const { Octokit } = require("@octokit/rest");
+
 class Config {
     static async env() {
         try {
@@ -9,18 +13,31 @@ class Config {
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
-            let github = await Config.secret('Batch');
+            let secrets = await Config.secret('Batch');
 
-            github = github.GitHub
+            let github = secrets.GitHubKey
                 .replace('-----BEGIN RSA PRIVATE KEY-----', '')
                 .replace('-----END RSA PRIVATE KEY-----', '')
                 .replace(/ /g, '\n');
 
-            this.github = `
+            github = `
                 -----BEGIN RSA PRIVATE KEY-----
                 ${github}
                 -----END RSA PRIVATE KEY-----
             `;
+
+            this.okta = new Octokit({
+                type: 'app',
+                userAgent: `OpenAddresses v${pkg.version}`,
+                authStrategy: createAppAuth,
+                auth: {
+                    id: 56179,
+                    privateKey: github,
+                    installationId: 7214840,
+                    clientId: secrets.GitHubClientID,
+                    clientSecret: secrets.GitHubClientSecret
+                }
+            });
 
             if (!process.env.Bucket) {
                 console.error('ok - set env Bucket: v2.openaddresses.io');

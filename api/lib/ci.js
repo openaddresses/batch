@@ -2,13 +2,27 @@
 
 const Run = require('./run');
 const Err = require('./error');
-const diff = require('parse-diff');
 const request = require('request');
 
 class GH {
-    constructor(pr, sha) {
-        this.pr = pr;
+    constructor(url, ref, sha) {
+        this.url = url;
+        this.ref = ref;
         this.sha = sha;
+
+        this.jobs = [];
+    }
+
+    add_job(source_url) {
+        this.jobs.push(source_url);
+    }
+
+    json() {
+        return {
+            url: this.url,
+            ref: this.ref,
+            sha: this.sha
+        }
     }
 }
 
@@ -18,9 +32,13 @@ class CI {
     }
 
     async push(pool, event) {
-        console.error(JSON.stringify(event));
-
         try {
+            const gh = new GH(
+                event.head_commit.url,
+                event.ref,
+                event.after
+            );
+
             await this.GHRest.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
@@ -28,6 +46,27 @@ class CI {
                 head_sha: event.head
             });
 
+            const files = [].concat(event.head_commit.added, event.head_commit.modified);
+
+            const jobs = files.filter((file) => {
+                if (
+                    !/sources\//.test(file)
+                    || !/\.json$\//.test(file)
+                ) {
+                    return false;
+                }
+
+                return true;
+            }).forEach(GH.add_job);
+
+            console.error(JSON.stringify(GH.jobs));
+
+            const run = await Run.generate(pool, {
+                live: false, //TODO if ref is master - live should be true
+                github: GH.json()
+            });
+
+            await Run.jobs(pool, run.id)
         } catch (err) {
             throw new Error(err);
         }
@@ -35,58 +74,14 @@ class CI {
         return true;
     }
 
-    pull(pool, event) {
-        return new Promise((resolve, reject) => {
-            console.error('PULL', JSON.stringify(event));
-
-            if (event.action === 'opened') {
-                const gh = new GH(event.number, event.head.sha);
-
-                request({
-                    url: event.pull_request.diff_url,
-                    method: 'GET'
-                }, async (err, res) => {
-                    if (err) return reject(new Err(500, err, 'failed to fetch pull diff'));
-
-                    const jobs = diff(res.body).map((file) => {
-                        return file.to;
-                    }).filter((file) => {
-                        if (
-                            !/sources\//.test(file)
-                            || !/\.json$\//.test(file)
-                        ) {
-                            return false;
-                        }
-
-                        return true;
-                    }).map((file) => {
-                        return `https://raw.githubusercontent.com/openaddresses/openaddresses/${gh.sha}/${file}`;
-                    });
-
-                    console.error(JSON.stringify(jobs));
-
-                    try {
-                        await Run.generate(pool, {
-                            live: false
-                        });
-                    } catch (err) {
-                        return reject(err);
-                    }
-
-                    return resolve(true);
-                });
-            } else {
-                return resolve(true);
-            }
-        });
+    async pull(pool, event) {
+        console.error('PULL', JSON.stringify(event));
+        return true;
     }
 
-    comment(pool, event) {
-        return new Promise((resolve) => {
-            console.error('COMMENT', JSON.stringify(event));
-
-            return resolve(true);
-        });
+    async comment(pool, event) {
+        console.error('COMMENT', JSON.stringify(event));
+        return true;
     }
 }
 

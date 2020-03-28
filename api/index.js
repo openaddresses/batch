@@ -194,64 +194,12 @@ async function server(args, config, cb) {
             });
         }
 
-        let jobs = [];
+        try {
+            const jobs = await Run.populate(pool, req.params.run, req.body.jobs);
 
-        for (const job of req.body.jobs) {
-            if (!job) {
-                return res.status(400).send({
-                    status: 400,
-                    error: 'job element cannot be null'
-                });
-            } else if (
-                typeof job === 'string'
-                && !/https:\/\/github\.com\//.test(job)
-                && !/https:\/\/raw\.githubusercontent\.com\//.test(job)
-            ) {
-                return res.status(400).send({
-                    status: 400,
-                    error: 'job must reference github.com'
-                });
-            } else if (job.source) {
-                jobs.push(job);
-            } else if (typeof job === 'string') {
-                try {
-                    jobs = jobs.concat(await util.explode(job));
-                } catch (err) {
-                    return res.status(500).send({
-                        status: 400,
-                        error: 'failed to generate jobs'
-                    });
-                }
-            } else {
-                return res.status(400).send({
-                    status: 400,
-                    error: 'job must be string or job object'
-                });
-            }
-
-            for (let i = 0; i < jobs.length; i++) {
-                jobs[i] = new Job(req.params.run, jobs[i].source, jobs[i].layer, jobs[i].name);
-                try {
-                    await jobs[i].generate(pool);
-                    await jobs[i].batch();
-                } catch (err) {
-                    console.error(err);
-                    // TODO return list of successful ids
-                    return res.status(400).send({
-                        status: 400,
-                        error: 'jobs only partially queued'
-                    });
-                }
-            }
-
-            await Run.close(pool, req.params.run);
-
-            res.json({
-                run: req.params.run,
-                jobs: jobs.map((job) => {
-                    return job.json().id;
-                })
-            });
+            return res.json(jobs);
+        } catch (err) {
+            return Err.respond(err, res);
         }
     });
 
@@ -352,7 +300,7 @@ async function server(args, config, cb) {
         }
 
         try {
-            if (req.headers['X-GitHub-Event'] === 'pull_request') {
+            if (req.headers['X-GitHub-Event'] === 'push') {
                 await ci.push(pool, res.body);
 
                 res.json(true);

@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const util = require('./util');
 
 class Run {
     constructor() {
@@ -57,6 +58,54 @@ class Run {
                 }));
             });
         });
+    }
+
+    static async populate(pool, run_id, jobs) {
+        for (const job of jobs) {
+            if (!job) {
+                throw new Err(400, err, 'job element cannot be null');
+            } else if (
+                typeof job === 'string'
+                && !/https:\/\/github\.com\//.test(job)
+                && !/https:\/\/raw\.githubusercontent\.com\//.test(job)
+            ) {
+                throw new Err(400, null, 'job must reference github.com');
+            } else if (job.source) {
+                jobs.push(job);
+            } else if (typeof job === 'string') {
+                try {
+                    jobs = jobs.concat(await util.explode(job));
+                } catch (err) {
+                    throw new Err(400, err, 'job must reference github.com');
+                }
+            } else {
+                throw new Err(400, err, 'job must be string or job object');
+            }
+
+            for (let i = 0; i < jobs.length; i++) {
+                jobs[i] = new Job(req.params.run, jobs[i].source, jobs[i].layer, jobs[i].name);
+                try {
+                    await jobs[i].generate(pool);
+                    await jobs[i].batch();
+                } catch (err) {
+                    // TODO return list of successful ids
+                    throw new Err(400, err, 'jobs only partially queued');
+                }
+            }
+
+            try {
+                await Run.close(pool, req.params.run);
+            } catch (err) {
+                throw new Err(500, err, 'failed to close run');
+            }
+        }
+
+        return {
+            run: run_id,
+            jobs: jobs.map((job) => {
+                return job.json().id
+            })
+        };
     }
 
     /**
@@ -174,11 +223,12 @@ class Run {
                 ) VALUES (
                     NOW(),
                     $1,
-                    '{}'::JSONB,
+                    $2,
                     false
                 ) RETURNING *
             `, [
-                params.live
+                params.live,
+                params.github
             ], (err, pgres) => {
                 if (err) return reject(new Err(500, err, 'failed to generate run'));
 

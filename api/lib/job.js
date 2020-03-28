@@ -47,6 +47,7 @@ class Job {
             version: this.version
         };
     }
+
     static list(pool) {
         return new Promise((resolve, reject) => {
             pool.query(`

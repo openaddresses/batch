@@ -39,7 +39,7 @@ class CI {
                 event.after
             );
 
-            await this.okta.checks.create({
+            await this.config.okta.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
                 name: 'data-pls',

@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const CI = require('./lib/ci');
 const util = require('./lib/util');
 const express = require('express');
-const config = require('./package.json');
+const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
@@ -15,25 +15,34 @@ const args = require('minimist')(process.argv, {
     string: ['postgres', 'secret']
 });
 
-// const Bin = require('./lib/bin');
-const Run = require('./lib/run');
-const Job = require('./lib/job');
-const Data = require('./lib/data');
-const Err = require('./lib/error');
-
-require('./lib/config')();
-
 const Param = util.Param;
-
 const router = express.Router();
 const app = express();
 const { Pool } = require('pg');
+const Config = require('./lib/config');
 
 if (require.main === module) {
-    server(args);
+    configure(args);
 }
 
-async function server(args, cb) {
+function configure(args) {
+    Config.env().then((config) => {
+        return server(args, config);
+    }).catch((err) => {
+        console.error(err);
+        process.exit(1);
+    })
+}
+
+
+async function server(args, config, cb) {
+    // these must be run after lib/config
+    // const Bin = require('./lib/bin');
+    const Run = require('./lib/run');
+    const Job = require('./lib/job');
+    const Data = require('./lib/data');
+    const Err = require('./lib/error');
+
     let postgres = process.env.POSTGRES;
 
     if (args.postgres) {
@@ -75,7 +84,7 @@ async function server(args, cb) {
      */
     app.get('/api', (req, res) => {
         return res.json({
-            version: config.version
+            version: pkg.version
         });
     });
 
@@ -331,14 +340,15 @@ async function server(args, cb) {
     });
 
     router.post('/github/event', async (req, res) => {
-        if (!process.env.GithubSecret) return res.status(400).body('Invalid X-Hub-Signature');
+        if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
+        console.error(req.headers);
         if (!ghverify(
             process.env.GithubSecret,
             req.body,
             req.headers['x-hub-signature']
         )) {
-            res.status(400).body('Invalid X-Hub-Signature');
+            res.status(400).send('Invalid X-Hub-Signature');
         }
 
         try {
@@ -351,7 +361,7 @@ async function server(args, cb) {
 
                 res.json(true);
             } else {
-                res.status(400).body('Accepted but ignored');
+                res.status(400).send('Accepted but ignored');
             }
         } catch (err) {
             return Err.respond(err, res);

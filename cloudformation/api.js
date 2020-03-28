@@ -90,16 +90,16 @@ const stack = {
             }
         },
         APITaskRole: {
-            'Type': 'AWS::IAM::Role',
-            'Properties': {
-                'AssumeRolePolicyDocument': {
-                    'Version': '2012-10-17',
-                    'Statement': [{
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [{
                         Effect: 'Allow',
                         Principal: {
                             Service: 'ecs-tasks.amazonaws.com'
                         },
-                        'Action': 'sts:AssumeRole'
+                        Action: 'sts:AssumeRole'
                     }]
                 },
                 Policies: [{
@@ -124,6 +124,14 @@ const stack = {
                                 's3:GetObject'
                             ],
                             Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'secretsmanager:Describe*',
+                                'secretsmanager:Get*',
+                                'secretsmanager:List*'
+                            ],
+                            'Resource': '*'
                         }]
                     }
                 }]

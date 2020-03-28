@@ -33,7 +33,7 @@ test('start', async (t) => {
 
     srv({
         postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-    }, (a) => {
+    }, {},  (a) => {
         app = a;
         t.end();
     });

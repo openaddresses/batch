@@ -301,15 +301,15 @@ async function server(args, config, cb) {
         }
 
         try {
-            if (req.headers['X-GitHub-Event'] === 'push') {
+            if (req.headers['x-github-event'] === 'push') {
                 await ci.push(pool, res.body);
 
                 res.json(true);
-            } else if (req.headers['X-GitHub-Event'] === 'pull_request') {
+            } else if (req.headers['x-github-event'] === 'pull_request') {
                 await ci.pull(pool, res.body);
 
                 res.json(true);
-            } else if (req.headers['X-GitHub-Event'] === 'issue_comment') {
+            } else if (req.headers['x-github-event'] === 'issue_comment') {
                 await ci.issue(pool, res.body);
 
                 res.json(true);

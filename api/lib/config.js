@@ -1,14 +1,15 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const client = new AWS.SecretsManager({
-    region: process.env.AWS_DEFAULT_REGION
-});
-
 class Config {
-    async env() {
+    static async env() {
         try {
-            let github = Config.secret('Batch');
+            if (!process.env.AWS_DEFAULT_REGION) {
+                console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
+                process.env.AWS_DEFAULT_REGION = 'us-east-1';
+            }
+
+            let github = await Config.secret('Batch');
 
             github = github.GitHub
                 .replace('-----BEGIN RSA PRIVATE KEY-----', '')
@@ -20,11 +21,6 @@ class Config {
                 ${github}
                 -----END RSA PRIVATE KEY-----
             `;
-
-            if (!process.env.AWS_DEFAULT_REGION) {
-                console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
-                process.env.AWS_DEFAULT_REGION = 'us-east-1';
-            }
 
             if (!process.env.Bucket) {
                 console.error('ok - set env Bucket: v2.openaddresses.io');
@@ -49,6 +45,10 @@ class Config {
 
     static secret(secretName) {
         return new Promise((resolve, reject) => {
+            const client = new AWS.SecretsManager({
+                region: process.env.AWS_DEFAULT_REGION
+            });
+
             client.getSecretValue({
                 SecretId: secretName
             }, (err, data) => {

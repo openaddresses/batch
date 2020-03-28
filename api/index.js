@@ -18,15 +18,16 @@ const Param = util.Param;
 const router = express.Router();
 const app = express();
 const { Pool } = require('pg');
+
 const Config = require('./lib/config');
 
 if (require.main === module) {
     configure(args);
 }
 
-function configure(args) {
+function configure(args, cb) {
     Config.env().then((config) => {
-        return server(args, config);
+        return server(args, config, cb);
     }).catch((err) => {
         console.error(err);
         process.exit(1);
@@ -38,10 +39,10 @@ async function server(args, config, cb) {
     // these must be run after lib/config
     // const Bin = require('./lib/bin');
     const ci = new (require('./lib/ci'))(config);
+    const Err = require('./lib/error');
     const Run = require('./lib/run');
     const Job = require('./lib/job');
     const Data = require('./lib/data');
-    const Err = require('./lib/error');
 
     let postgres = process.env.POSTGRES;
 
@@ -279,7 +280,7 @@ async function server(args, config, cb) {
 
             job.patch(req.body);
 
-            await job.commit(pool);
+            await job.commit(pool, Run, Data);
 
             return res.json(job.json());
         } catch (err) {
@@ -329,4 +330,4 @@ async function server(args, config, cb) {
     });
 }
 
-module.exports = server;
+module.exports = configure;

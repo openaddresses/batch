@@ -4,9 +4,6 @@ const Err = require('./error');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');
 
-const Run = require('./run');
-const Data = require('./data');
-
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
 
@@ -138,7 +135,7 @@ class Job {
         return s3.stream(res);
     }
 
-    commit(pool) {
+    commit(pool, Run, Data) {
         return new Promise((resolve, reject) => {
             pool.query(`
                 UPDATE job
@@ -152,7 +149,7 @@ class Job {
             `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
-                await this.success(pool);
+                await this.success(pool, Run, Data);
 
                 return resolve(this);
             });
@@ -254,13 +251,17 @@ class Job {
         });
     }
 
-    async success(pool) {
-        const run = await Run.from(pool, this.run);
+    async success(pool, Run, Data) {
+        try {
+            const run = await Run.from(pool, this.run);
 
-        if (run.live) {
-            return await Data.update(pool, this);
-        }  else {
-            return false;
+            if (run.live) {
+                return await Data.update(pool, this);
+            }  else {
+                return false;
+            }
+        } catch (err) {
+            throw new Err(500, err, 'Failed to mark job success');
         }
     }
 }

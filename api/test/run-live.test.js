@@ -33,7 +33,7 @@ test('start', async (t) => {
 
     srv({
         postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-    }, {},  (a) => {
+    }, (a) => {
         app = a;
         t.end();
     });
@@ -67,18 +67,8 @@ test('GET: api/run', (t) => {
     }, (err, res) => {
         t.error(err);
 
-        t.equals(res.body.length, 1);
-        t.deepEquals(Object.keys(res.body[0]).sort(), [
-            'id',
-            'created',
-            'github',
-            'closed',
-            'live'
-        ].sort());
-        t.equals(res.body[0].id, 1);
-        t.ok(res.body[0].created);
-        t.deepEquals(res.body[0].github, {});
-        t.deepEquals(res.body[0].closed, false);
+        // Run will not return as it has not yet been populated
+        t.equals(res.body.length, 0);
 
         t.end();
     });

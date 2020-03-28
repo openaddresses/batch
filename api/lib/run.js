@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const Job = require('./job');
 const util = require('./util');
 
 class Run {
@@ -14,9 +15,9 @@ class Run {
         this.attrs = ['github', 'closed', 'live'];
     }
 
-    static list(pool) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    static async list(pool) {
+        try {
+            const pgres = await pool.query(`
                 SELECT
                     runs.id,
                     runs.live,
@@ -39,29 +40,31 @@ class Run {
                 ORDER BY
                     created DESC
                 LIMIT 100
-            `, (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to fetch runs'));
+            `);
 
-                resolve(pgres.rows.map((run) => {
-                    run.id = parseInt(run.id);
-                    run.jobs = parseInt(run.jobs);
+            return pgres.rows.map((run) => {
+                run.id = parseInt(run.id);
+                run.jobs = parseInt(run.jobs);
 
-                    if (run.status.includes('Fail')) {
-                        run.status = 'Fail';
-                    } else if (run.status.includes('Pending')) {
-                        run.status = 'Pending';
-                    } else {
-                        run.status = 'Success';
-                    }
+                if (run.status.includes('Fail')) {
+                    run.status = 'Fail';
+                } else if (run.status.includes('Pending')) {
+                    run.status = 'Pending';
+                } else {
+                    run.status = 'Success';
+                }
 
-                    return run;
-                }));
+                return run;
             });
-        });
+        } catch (err) {
+            throw new Err(500, err, 'failed to fetch runs');
+        }
     }
 
-    static async populate(pool, run_id, jobs) {
-        for (const job of jobs) {
+    static async populate(pool, run_id, rawjobs) {
+        let jobs = [];
+
+        for (const job of rawjobs) {
             if (!job) {
                 throw new Err(400, err, 'job element cannot be null');
             } else if (
@@ -83,7 +86,8 @@ class Run {
             }
 
             for (let i = 0; i < jobs.length; i++) {
-                jobs[i] = new Job(req.params.run, jobs[i].source, jobs[i].layer, jobs[i].name);
+                jobs[i] = new Job(run_id, jobs[i].source, jobs[i].layer, jobs[i].name);
+
                 try {
                     await jobs[i].generate(pool);
                     await jobs[i].batch();
@@ -94,7 +98,7 @@ class Run {
             }
 
             try {
-                await Run.close(pool, req.params.run);
+                await Run.close(pool, run_id);
             } catch (err) {
                 throw new Err(500, err, 'failed to close run');
             }
@@ -137,27 +141,27 @@ class Run {
         });
     }
 
-    static from(pool, id) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    static async from(pool, id) {
+        try {
+            const pgres = await pool.query(`
                 SELECT
                     *
                 FROM
                     runs
                 WHERE
                     id = $1
-            `, [id], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to fetch run'));
+            `, [id]);
 
-                const run = new Run();
+            const run = new Run();
 
-                for (const key of Object.keys(pgres.rows[0])) {
-                    run[key] = pgres.rows[0][key];
-                }
+            for (const key of Object.keys(pgres.rows[0])) {
+                run[key] = pgres.rows[0][key];
+            }
 
-                return resolve(run);
-            });
-        });
+            return run;
+        } catch (err) {
+            throw new Err(500, err, 'failed to fetch run');
+        }
     }
 
     static close(pool, id) {
@@ -212,6 +216,7 @@ class Run {
 
     static generate(pool, params = {}) {
         if (params.live !== true) params.live = false;
+        if (!params.github) params.github = {};
 
         return new Promise((resolve, reject) => {
             pool.query(`

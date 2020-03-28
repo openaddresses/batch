@@ -291,7 +291,6 @@ async function server(args, config, cb) {
     router.post('/github/event', async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
-        console.error(req.headers);
         if (!ghverify(
             process.env.GithubSecret,
             req.body,
@@ -302,15 +301,15 @@ async function server(args, config, cb) {
 
         try {
             if (req.headers['x-github-event'] === 'push') {
-                await ci.push(pool, res.body);
+                await ci.push(pool, req.body);
 
                 res.json(true);
             } else if (req.headers['x-github-event'] === 'pull_request') {
-                await ci.pull(pool, res.body);
+                await ci.pull(pool, req.body);
 
                 res.json(true);
             } else if (req.headers['x-github-event'] === 'issue_comment') {
-                await ci.issue(pool, res.body);
+                await ci.issue(pool, req.body);
 
                 res.json(true);
             } else {

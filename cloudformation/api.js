@@ -197,6 +197,9 @@ const stack = {
                         Name: 'ECS_LOG_LEVEL',
                         Value: 'debug'
                     },{
+                        Name: 'MapboxToken',
+                        Value: cf.ref('MapboxToken')
+                    },{
                         Name: 'POSTGRES',
                         Value: cf.join([
                             'postgresql://openaddresses:',

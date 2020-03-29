@@ -13,6 +13,10 @@ const stack = {
             Type: 'String',
             Description: 'Gitsha to Deploy'
         },
+        MapboxToken: {
+            Type: 'String',
+            Description: '[secure] Mapbox API Token to create Slippy Maps With'
+        },
         Bucket: {
             Type: 'String',
             Description: 'S3 Asset Storage'

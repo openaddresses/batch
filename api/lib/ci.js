@@ -42,7 +42,7 @@ class CI {
             await this.config.okta.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
-                name: 'data-pls',
+                name: 'openaddresses/data-pls',
                 head_sha: event.after
             });
 
@@ -57,13 +57,13 @@ class CI {
                 }
 
                 return true;
-            }).forEach(GH.add_job);
+            }).forEach(gh.add_job);
 
-            console.error(JSON.stringify(GH.jobs));
+            console.error(JSON.stringify(gh.jobs));
 
             const run = await Run.generate(pool, {
                 live: false, //TODO if ref is master - live should be true
-                github: GH.json()
+                github: gh.json()
             });
 
             await Run.populate(pool, run.id, jobs);

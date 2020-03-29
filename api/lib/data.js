@@ -2,6 +2,9 @@
 
 const Err = require('./error');
 
+/**
+ * @class Data
+ */
 class Data {
     static list(pool, query) {
         if (!query.source) query.source = '';

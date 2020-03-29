@@ -14,15 +14,13 @@ const Err = require('./error');
 const MAP_LAYERS = ['district.geojson'];
 
 class Bin {
-    constructor(pool) {
-        this.pool = pool;
+    static mvt() {
+        return {
+            token: process.env.MAPBOX_TOKEN
+        }
     }
 
-    map(job) {
-
-    }
-
-    tile(z, x, y) {
+    static async tile(pool, z, x, y) {
 
     }
 

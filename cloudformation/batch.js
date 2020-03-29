@@ -3,12 +3,6 @@
 const cf = require('@mapbox/cloudfriend');
 
 const stack = {
-    Parameters: {
-        MapboxToken: {
-            Type: 'String',
-            Description: '[secure] Mapbox API Token to create Slippy Maps With'
-        }
-    },
     Resources: {
         BatchServiceRole: {
             Type: 'AWS::IAM::Role',

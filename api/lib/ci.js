@@ -43,7 +43,7 @@ class CI {
                 owner: 'openaddresses',
                 repo: 'openaddresses',
                 name: 'data-pls',
-                head_sha: event.head
+                head_sha: event.after
             });
 
             const files = [].concat(event.head_commit.added, event.head_commit.modified);

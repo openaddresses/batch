@@ -10,8 +10,8 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
-    boolean: ['help'],
-    string: ['postgres', 'secret']
+    boolean: ['help', 'populate'],
+    string: ['postgres']
 });
 
 const Param = util.Param;
@@ -37,7 +37,7 @@ function configure(args, cb) {
 
 async function server(args, config, cb) {
     // these must be run after lib/config
-    // const Bin = require('./lib/bin');
+    const Bin = require('./lib/bin');
     const ci = new (require('./lib/ci'))(config);
     const Auth = require('./lib/auth');
     const Err = require('./lib/error');
@@ -53,17 +53,16 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
-    if (!process.env.StackName) {
-        console.error('ok - StackName not set - disabling AWS calls');
-        process.env.StackName = 'test';
-    }
-
     const pool = new Pool({
         connectionString: postgres
     });
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
+
+        if (args.populate) {
+            await Bin.populate(pool);
+        }
     } catch (err) {
         throw new Error(err);
     }
@@ -77,9 +76,6 @@ async function server(args, config, cb) {
     router.use(bodyparser.urlencoded({ extended: true }));
     router.use(morgan('combined'));
     router.use(bodyparser.json());
-
-    // TODO: Auth with shared secret
-    // const SECRET = args.secret ? args.secret : process.env.SharedSecret;
 
     /**
      * Return basic data about the API

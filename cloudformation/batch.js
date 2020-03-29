@@ -3,12 +3,6 @@
 const cf = require('@mapbox/cloudfriend');
 
 const stack = {
-    Parameters: {
-        MapboxToken: {
-            Type: 'String',
-            Description: '[secure] Mapbox API Token to create Slippy Maps With'
-        }
-    },
     Resources: {
         BatchServiceRole: {
             Type: 'AWS::IAM::Role',
@@ -69,8 +63,17 @@ const stack = {
                     PolicyDocument: {
                         Statement: [{
                             Effect: 'Allow',
-                            Action: ['s3:GetObject'],
-                            Resource: ['arn:aws:s3:::data.openaddresses.io/*']
+                            Action: [
+                                's3:PutObject',
+                                's3:GetObject'
+                            ],
+                            Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
+                        },{
+                            Effect: 'Allow' ,
+                            Action: [
+                                'batch:DescribeJobs'
+                            ],
+                            Resource: ['*']
                         }]
                     }
                 }],
@@ -124,6 +127,12 @@ const stack = {
                     },{
                         Name: 'OA_API' ,
                         Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
+                    },{
+                        Name: 'StackName',
+                        Value: cf.stackName
+                    },{
+                        Name: 'Bucket',
+                        Value: cf.ref('Bucket')
                     }],
                     Memory: 4000,
                     Privileged: true,

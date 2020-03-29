@@ -7,7 +7,16 @@ const stack = {
             Type: 'String',
             Description: 'SSL certificate for HTTPS protocol',
             Default: ''
+        },
+        SharedSecret: {
+            Type: 'String',
+            Description: 'Secret for auth against internal API functions'
+        },
+        GithubSecret: {
+            Type: 'String',
+            Description: 'Github CI Integration Secret'
         }
+
     },
     Resources: {
         APIELB: {
@@ -62,6 +71,9 @@ const stack = {
             Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
             DependsOn: 'APIELB',
             Properties: {
+                HealthCheckEnabled: true,
+                HealthCheckIntervalSeconds: 30,
+                HealthCheckPath: '/health',
                 Port: 5000,
                 Protocol: 'HTTP',
                 TargetType: 'ip',
@@ -78,16 +90,16 @@ const stack = {
             }
         },
         APITaskRole: {
-            'Type': 'AWS::IAM::Role',
-            'Properties': {
-                'AssumeRolePolicyDocument': {
-                    'Version': '2012-10-17',
-                    'Statement': [{
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [{
                         Effect: 'Allow',
                         Principal: {
                             Service: 'ecs-tasks.amazonaws.com'
                         },
-                        'Action': 'sts:AssumeRole'
+                        Action: 'sts:AssumeRole'
                     }]
                 },
                 Policies: [{
@@ -97,6 +109,29 @@ const stack = {
                             Effect: 'Allow',
                             Action: 'lambda:InvokeFunction',
                             Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'logs:DescribeLogGroups',
+                                'logs:DescribeLogStreams',
+                                'logs:FilterLogEvents',
+                                'logs:GetLogEvents'
+                            ],
+                            Resource: cf.join(['arn:aws:logs:', cf.region, ':', cf.accountId, ':log-group:*'])
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                's3:GetObject'
+                            ],
+                            Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'secretsmanager:Describe*',
+                                'secretsmanager:Get*',
+                                'secretsmanager:List*'
+                            ],
+                            'Resource': '*'
                         }]
                     }
                 }]
@@ -162,6 +197,9 @@ const stack = {
                         Name: 'ECS_LOG_LEVEL',
                         Value: 'debug'
                     },{
+                        Name: 'MapboxToken',
+                        Value: cf.ref('MapboxToken')
+                    },{
                         Name: 'POSTGRES',
                         Value: cf.join([
                             'postgresql://openaddresses:',
@@ -174,8 +212,17 @@ const stack = {
                         Name: 'SharedSecret',
                         Value: cf.ref('SharedSecret')
                     },{
+                        Name: 'GithubSecret',
+                        Value: cf.ref('GithubSecret')
+                    },{
+                        Name: 'Bucket',
+                        Value: cf.ref('Bucket')
+                    },{
                         Name: 'StackName',
                         Value: cf.stackName
+                    },{
+                        Name: 'AWS_DEFAULT_REGION',
+                        Value: cf.region
                     }],
                     LogConfiguration: {
                         LogDriver: 'awslogs',

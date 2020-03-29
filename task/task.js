@@ -1,17 +1,26 @@
 #!/usr/bin/env node
 
+'use strict';
+
+const config = require('./package.json');
 const dke = require('@mapbox/decrypt-kms-env');
 const Job = require('./lib/job');
-const request = require('request');
 const path = require('path');
 const CP = require('child_process');
-const os = require('os');
 const fs = require('fs');
+const AWS = require('aws-sdk');
+
+if (!process.env.AWS_DEFAULT_REGION) {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1';
+}
+
+const batch = new AWS.Batch({
+    region: process.env.AWS_DEFAULT_REGION
+});
 
 if (require.main === module) {
-    if (!process.env.AWS_DEFAULT_REGION) {
-        process.env.AWS_DEFAULT_REGION = 'us-east-1'
-    }
+    if (!process.env.StackName) process.env.StackName = 'local';
+    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
 
     if (!process.env.OA_JOB) throw new Error('No OA_JOB env var defined');
     if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
@@ -29,7 +38,7 @@ if (require.main === module) {
         process.env.OA_SOURCE_LAYER_NAME
     );
 
-    dke(process.env, (err, scrubbed) => {
+    dke(process.env, (err) => {
         if (err) throw err;
 
         flow(api, job).catch((err) => {
@@ -38,23 +47,77 @@ if (require.main === module) {
     });
 }
 
-async function flow(api, job, cb) {
+async function flow(api, job) {
     try {
-        let source = await job.fetch();
+        const update = {
+            status: 'Pending',
+            version: config.version,
+            output: job.assets
+        };
+
+        if (process.env.AWS_BATCH_JOB_ID) {
+            update.loglink = await log_link();
+        }
+
+        await job.update(api, update);
+        await job.fetch();
 
         const source_path = path.resolve(job.tmp, 'source.json');
+
         fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
 
-        await processOne(job, source_path);
+        await process_job(job, source_path);
 
-        await job.success(api);
+        await job.convert();
+        await job.compress();
+        await job.upload();
+        await job.update(api, {
+            status: 'Success',
+            output: job.assets
+        });
 
     } catch (err) {
-        throw err;
+        console.error(err);
+
+        await job.update(api, {
+            status: 'Fail'
+        });
+
+        throw new Error(err);
     }
 }
 
-function processOne(job, source_path) {
+function log_link() {
+    return new Promise((resolve, reject) => {
+        // Allow local runs
+
+        link();
+
+        function link() {
+            console.error(`ok - getting meta for job: ${process.env.AWS_BATCH_JOB_ID}`);
+            batch.describeJobs({
+                jobs: [process.env.AWS_BATCH_JOB_ID]
+            }, (err, res) => {
+                if (err) return reject(err);
+
+                if (
+                    !res.jobs[0]
+                    || !res.jobs[0].container
+                    || !res.jobs[0].container.logStreamName
+                ) {
+                    setTimeout(() => {
+                        return link();
+                    }, 10000);
+                } else {
+                    resolve(res.jobs[0].container.logStreamName);
+                }
+            });
+        }
+    });
+}
+
+
+function process_job(job, source_path) {
     return new Promise((resolve, reject) => {
         const task = CP.spawn('openaddr-process-one', [
             source_path,
@@ -63,7 +126,7 @@ function processOne(job, source_path) {
             '--layersource', job.name,
             '--render-preview',
             '--mapbox-key', process.env.MapboxToken,
-            '--verbose',
+            '--verbose'
         ],{
             env: process.env
         });
@@ -73,7 +136,9 @@ function processOne(job, source_path) {
 
         task.on('error', reject);
 
-        task.on('close', (exit) => {
+        task.on('close', () => {
+            job.status = 'processed';
+
             return resolve(job.tmp);
         });
     });
@@ -82,4 +147,4 @@ function processOne(job, source_path) {
 module.exports = {
     Job,
     flow
-}
+};

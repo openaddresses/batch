@@ -4,18 +4,35 @@
     "main": "index.js",
     "license": "MIT",
     "private": true,
+    "scripts": {
+        "lint": "eslint index.js lib/**.js test/**.js",
+        "start": "node index.js"
+    },
     "dependencies": {
+        "@mapbox/tilebelt": "^1.0.1",
+        "@octokit/auth-app": "^2.4.4",
+        "@octokit/request": "^5.3.4",
+        "@octokit/rest": "^17.1.4",
+        "@octokit/webhooks": "^7.1.0",
         "aws-sdk": "^2.630.0",
         "body-parser": "^1.19.0",
+        "d3-queue": "^3.0.7",
         "express": "^4.17.1",
         "express-minify": "^1.0.0",
-        "minimist": "^1.2.0",
+        "minimist": "^1.2.2",
         "morgan": "^1.9.1",
+        "parallel-transform": "^1.2.0",
         "pg": "^7.18.2",
         "request": "^2.88.2",
+        "split": "^1.0.1",
         "tape": "^4.13.0"
     },
-    "scripts": {
-        "start": "node index.js"
+    "devDependencies": {
+        "@mapbox/eslint-config-geocoding": "^2.0.2",
+        "eslint": "^6.8.0",
+        "eslint-plugin-node": "^11.0.0"
+    },
+    "eslintConfig": {
+        "extends": "@mapbox/eslint-config-geocoding"
     }
 }

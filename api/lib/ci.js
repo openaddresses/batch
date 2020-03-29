@@ -43,6 +43,7 @@ class CI {
                 name: 'openaddresses/data-pls',
                 head_sha: event.after
             });
+            console.error(`ok - GH:Push:${event.after}: Added Check`);
 
             const files = [].concat(event.head_commit.added, event.head_commit.modified);
 
@@ -56,13 +57,16 @@ class CI {
 
                 return true;
             }).forEach(gh.add_job);
+            console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             const run = await Run.generate(pool, {
                 live: false, // TODO if ref is master - live should be true
                 github: gh.json()
             });
+            console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);
 
             await Run.populate(pool, run.id, gh.jobs);
+            console.error(`ok - GH:Push:${event.after}: Run Populated`);
         } catch (err) {
             throw new Error(err);
         }

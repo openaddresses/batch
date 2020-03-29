@@ -334,7 +334,7 @@ async function server(args, config, cb) {
 
                 res.json(true);
             } else {
-                res.status(400).send('Accepted but ignored');
+                res.status(200).send('Accepted but ignored');
             }
         } catch (err) {
             return Err.respond(err, res);

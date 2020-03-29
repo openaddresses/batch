@@ -39,6 +39,7 @@ async function server(args, config, cb) {
     // these must be run after lib/config
     // const Bin = require('./lib/bin');
     const ci = new (require('./lib/ci'))(config);
+    const Auth = require('./lib/auth');
     const Err = require('./lib/error');
     const Run = require('./lib/run');
     const Job = require('./lib/job');
@@ -97,6 +98,16 @@ async function server(args, config, cb) {
             healthy: true,
             message: 'I work all day, I work all night to get the data I have to serve!'
         });
+    });
+
+    router.post('/login', async (req, res) => {
+        try {
+            await Auth.login(pool, req.body);
+
+            return res.json(data);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**

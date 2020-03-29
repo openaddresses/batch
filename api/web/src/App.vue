@@ -6,11 +6,16 @@
             <button @click='mode = "runs"' class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button>
             <button @click='mode = "jobs"' class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button>
 
-            <span class='fr'>OpenAddresses Data</span>
+            <button @click='mode = "login"' class='fr btn btn--stroke btn--s btn--gray round mr12'>Login</button>
         </div>
 
         <div class='col col--12 flex-parent flex-parent--center-main'>
             <div class='flex-child wmax600 col col--12'>
+                <template v-if='mode === "login"'>
+                    <Login
+                        v-on:job='emitlogin($event)'
+                    />
+                </template>
                 <template v-if='mode === "data"'>
                     <Data
                         v-on:job='emitjob($event)'
@@ -44,6 +49,7 @@
 </template>
 
 <script>
+import Login from './components/Login.vue';
 import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
 import Jobs from './components/Jobs.vue';
@@ -75,6 +81,8 @@ export default {
                 }
             } else if (mode[0] === 'runs') {
                 this.mode = 'runs';
+            } else if (mode[0] === 'login') {
+                this.mode = 'login';
             } else if (mode[0] === 'data') {
                 this.mode = 'data';
             } else {
@@ -105,6 +113,7 @@ export default {
         }
     },
     components: {
+        Login,
         Data,
         Runs,
         Jobs,

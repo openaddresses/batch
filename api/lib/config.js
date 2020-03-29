@@ -23,8 +23,6 @@ class Config {
 
             github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
 
-            console.error(github);
-
             this.okta = new Octokit({
                 type: 'app',
                 userAgent: `OpenAddresses v${pkg.version}`,

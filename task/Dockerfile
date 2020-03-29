@@ -1,6 +1,8 @@
 FROM alpine:3.11
 
-RUN apk add nodejs yarn git python3 py3-pip py3-gdal gdal
+RUN apk add nodejs yarn git python3 py3-pip \
+    py3-gdal gdal gdal-dev \
+    postgresql-libs gcc musl-dev postgresql-dev
 
 # Install Machine Process One Script
 RUN git clone --depth 1 https://github.com/openaddresses/machine.git \

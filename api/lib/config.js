@@ -2,8 +2,8 @@
 
 const AWS = require('aws-sdk');
 const pkg = require('../package.json');
-const { createAppAuth } = require("@octokit/auth-app");
-const { Octokit } = require("@octokit/rest");
+const { createAppAuth } = require('@octokit/auth-app');
+const { Octokit } = require('@octokit/rest');
 
 class Config {
     static async env() {
@@ -14,7 +14,7 @@ class Config {
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
-            let secrets = await Config.secret('Batch');
+            const secrets = await Config.secret('Batch');
 
             let github = secrets.GitHubKey
                 .replace('-----BEGIN RSA PRIVATE KEY-----', '')

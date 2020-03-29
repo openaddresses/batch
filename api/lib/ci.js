@@ -1,8 +1,6 @@
 'use strict';
 
 const Run = require('./run');
-const Err = require('./error');
-const request = require('request');
 
 class GH {
     constructor(url, ref, sha) {
@@ -22,7 +20,7 @@ class GH {
             url: this.url,
             ref: this.ref,
             sha: this.sha
-        }
+        };
     }
 }
 
@@ -62,7 +60,7 @@ class CI {
             console.error(JSON.stringify(gh.jobs));
 
             const run = await Run.generate(pool, {
-                live: false, //TODO if ref is master - live should be true
+                live: false, // TODO if ref is master - live should be true
                 github: gh.json()
             });
 

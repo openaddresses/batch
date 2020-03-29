@@ -66,7 +66,7 @@ class Run {
 
         for (const job of rawjobs) {
             if (!job) {
-                throw new Err(400, err, 'job element cannot be null');
+                throw new Err(400, null, 'job element cannot be null');
             } else if (
                 typeof job === 'string'
                 && !/https:\/\/github\.com\//.test(job)
@@ -82,7 +82,7 @@ class Run {
                     throw new Err(400, err, 'job must reference github.com');
                 }
             } else {
-                throw new Err(400, err, 'job must be string or job object');
+                throw new Err(400, null, 'job must be string or job object');
             }
 
             for (let i = 0; i < jobs.length; i++) {
@@ -107,7 +107,7 @@ class Run {
         return {
             run: run_id,
             jobs: jobs.map((job) => {
-                return job.json().id
+                return job.json().id;
             })
         };
     }

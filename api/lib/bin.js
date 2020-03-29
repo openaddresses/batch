@@ -1,6 +1,5 @@
 'use strict';
 
-const os = require('os');
 const split = require('split');
 const { pipeline } = require('stream');
 const transform = require('parallel-transform');
@@ -17,11 +16,37 @@ class Bin {
     static mvt() {
         return {
             token: process.env.MAPBOX_TOKEN
-        }
+        };
     }
 
     static async tile(pool, z, x, y) {
+        try {
+            const bbox = tb.tileToBBOX([x, y, z]);
 
+            const pgres = await pool.query(`
+                SELECT
+                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                FROM (
+                    SELECT
+                        id,
+                        props,
+                        ST_AsMVTGeom(geom, ST_Transform(ST_MakeEnvelope($1, $2, $3, $4, 3857), 4326), 4096, 256, false) AS geom
+                    FROM
+                        geo
+                    WHERE
+                        ST_Intersects(geom, ST_Transform(ST_MakeEnvelope($1, $2, $3, $4, 3857), 4326))
+                ) q
+            `, [
+                bbox[0],
+                bbox[1],
+                bbox[2],
+                bbox[3]
+            ]);
+
+            return pgres.rows[0].mvt;
+        } catch (err) {
+            return new Err(500, err, 'Failed to generate tile');
+        }
     }
 
     static async populate(pool) {
@@ -38,7 +63,7 @@ class Bin {
                     split(),
                     transform(100, (feat, cb) => {
                         try {
-                            feat = JSON.parse(feat)
+                            feat = JSON.parse(feat);
                         } catch (err) {
                             return cb(err);
                         }

@@ -31,7 +31,7 @@ function configure(args, cb) {
     }).catch((err) => {
         console.error(err);
         process.exit(1);
-    })
+    });
 }
 
 
@@ -98,9 +98,23 @@ async function server(args, config, cb) {
 
     router.post('/login', async (req, res) => {
         try {
-            await Auth.login(pool, req.body);
+            const user = await Auth.login(pool, req.body);
 
-            return res.json(data);
+            return res.json(user);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    router.get('/map', (req, res) => {
+        return res.json(Bin.map());
+    });
+
+    router.get('/map/:z/:x/:y', async (req, res) => {
+        try {
+            const tile = await Bin.tile(pool, req.params.z, req.params.x, req.params.y);
+
+            return res.send(tile);
         } catch (err) {
             return Err.respond(err, res);
         }

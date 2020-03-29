@@ -57,14 +57,12 @@ class CI {
                 return true;
             }).forEach(gh.add_job);
 
-            console.error(JSON.stringify(gh.jobs));
-
             const run = await Run.generate(pool, {
                 live: false, // TODO if ref is master - live should be true
                 github: gh.json()
             });
 
-            await Run.populate(pool, run.id, jobs);
+            await Run.populate(pool, run.id, gh.jobs);
         } catch (err) {
             throw new Error(err);
         }

@@ -51,21 +51,20 @@ class CI {
 
             const files = [].concat(event.head_commit.added, event.head_commit.modified);
 
-            console.error(JSON.stringify(files));
-            const jobs = files.filter((file) => {
+            files.filter((file) => {
                 if (
                     !/sources\//.test(file)
                     || !/\.json$\//.test(file)
                 ) {
-                    return false;
+                    return true;
                 }
 
-                return true;
+                return false;
             }).forEach(gh.add_job);
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             if (!gh.jobs.length) {
-                await this.config.okta.checks.create({
+                await this.config.okta.checks.update({
                     owner: 'openaddresses',
                     repo: 'openaddresses',
                     check_run_id: gh.check,

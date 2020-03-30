@@ -49,6 +49,29 @@ class Bin {
         }
     }
 
+    static async covered(pool, code, layer) {
+        try {
+            const pgres = await pool.query(`
+                UPDATE map
+                    SET
+                        layers = (
+                            SELECT Array_Agg(DISTINCT e)
+                            FROM Unnest(layers || '{$2}') e
+                        )
+                WHERE
+                    NOT layers @> '{$2}'
+                    AND code = $1
+            `, [
+                code,
+                layer
+            ]);
+
+            return true;
+        } catch (err) {
+            return new Err(500, err, 'Failed to update map');
+        }
+    }
+
     static async populate(pool) {
         console.error('ok - populating map table');
         const q = new Q();

@@ -12,12 +12,12 @@
                 </button>
 
                 <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round'>
-                        <div class='col col--8'>
+                    <div class='col col--12 grid border border--gray px6 py6 round mb12'>
+                        <div class='col col--8 px6'>
                             <label>Source</label>
                             <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
                         </div>
-                        <div class='col col--4'>
+                        <div class='col col--4 px6'>
                             <label>Layer</label>
                             <div class='w-full select-container'>
                                 <select v-model='filter.layer' class='select'>

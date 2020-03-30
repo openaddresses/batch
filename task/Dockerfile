@@ -1,7 +1,7 @@
 FROM alpine:3.11
 
 RUN apk add nodejs yarn git python3 python3-dev py3-pip \
-    py3-gdal gdal gdal-dev make bash sqlite-dev \
+    py3-gdal gdal gdal-dev make bash sqlite-dev zlib-dev \
     postgresql-libs gcc g++ musl-dev postgresql-dev
 
 # Install Machine Process One Script

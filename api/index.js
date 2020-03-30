@@ -110,10 +110,11 @@ async function server(args, config, cb) {
         return res.json(Bin.map());
     });
 
-    router.get('/map/:z/:x/:y', async (req, res) => {
+    router.get('/map/:z/:x/:y.mvt', async (req, res) => {
         try {
             const tile = await Bin.tile(pool, req.params.z, req.params.x, req.params.y);
 
+            res.type('application/vnd.mapbox-vector-tile');
             return res.send(tile);
         } catch (err) {
             return Err.respond(err, res);

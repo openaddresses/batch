@@ -60,7 +60,11 @@ class CI {
                 }
 
                 return false;
-            }).forEach((file) => gh.add_job(file));
+            }).forEach((file) => {
+                file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${gh.sha}/${file}`
+
+                gh.add_job(file)
+            });
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             if (!gh.jobs.length) {

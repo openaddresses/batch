@@ -9,7 +9,7 @@
         "start": "node index.js"
     },
     "dependencies": {
-        "@mapbox/tilebelt": "^1.0.1",
+        "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^2.4.4",
         "@octokit/request": "^5.3.4",
         "@octokit/rest": "^17.1.4",

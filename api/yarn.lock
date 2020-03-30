@@ -28,10 +28,10 @@
   resolved "https://registry.yarnpkg.com/@mapbox/eslint-config-geocoding/-/eslint-config-geocoding-2.0.2.tgz#0dab7b9cc7827f4426dcff707e06e6b7be134136"
   integrity sha512-SZRaSgVLYJuTMQ/N2bb+4gdsQcuP5p6zboiIAi55l0d82LMMx3YL1RUqxOSRkJVU7Y4oO1+AYkJMLLcSbYgXAQ==
 
-"@mapbox/tilebelt@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@mapbox/tilebelt/-/tilebelt-1.0.1.tgz#d57a1c4a5445e928dad720a828389a0a69db8818"
-  integrity sha1-1XocSlRF6Sja1yCoKDiaCmnbiBg=
+"@mapbox/sphericalmercator@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mapbox/sphericalmercator/-/sphericalmercator-1.1.0.tgz#f3b1af042620716a1289fc41e1e97f610823aefe"
+  integrity sha512-pEsfZyG4OMThlfFQbCte4gegvHUjxXCjz0KZ4Xk8NdOYTQBLflj6U8PL05RPAiuRAMAQNUUKJuL6qYZ5Y4kAWA==
 
 "@octokit/auth-app@^2.4.4":
   version "2.4.4"

@@ -1,9 +1,9 @@
 'use strict';
 
 const split = require('split');
+const SM = require('@mapbox/sphericalmercator');
 const { pipeline } = require('stream');
 const transform = require('parallel-transform');
-const tb = require('@mapbox/tilebelt');
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const Q = require('d3-queue').queue;
@@ -11,6 +11,10 @@ const Q = require('d3-queue').queue;
 const Err = require('./error');
 
 const MAP_LAYERS = ['district.geojson'];
+
+var sm = new SM({
+    size: 256
+});
 
 class Bin {
     static map() {
@@ -21,18 +25,20 @@ class Bin {
 
     static async tile(pool, z, x, y) {
         try {
-            const bbox = tb.tileToBBOX([x, y, z]);
+            console.error(x, y, z);
+            const bbox = sm.bbox(x, y, z);
 
+            console.error(bbox);
             const pgres = await pool.query(`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
                 FROM (
                     SELECT
-                        id,
-                        props,
+                        code,
+                        layers,
                         ST_AsMVTGeom(geom, ST_Transform(ST_MakeEnvelope($1, $2, $3, $4, 3857), 4326), 4096, 256, false) AS geom
                     FROM
-                        geo
+                        map
                     WHERE
                         ST_Intersects(geom, ST_Transform(ST_MakeEnvelope($1, $2, $3, $4, 3857), 4326))
                 ) q

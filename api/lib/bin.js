@@ -45,7 +45,28 @@ class Bin {
 
             return pgres.rows[0].mvt;
         } catch (err) {
-            return new Err(500, err, 'Failed to generate tile');
+            throw new Err(500, err, 'Failed to generate tile');
+        }
+    }
+
+    static async get_feature(pool, code) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    *
+                FROM
+                    map
+                WHERE
+                    code = $1
+            `, [
+                code
+            ]);
+
+            if (!pgres.rows.length) throw new Err(400, null, 'Feature not found');
+
+            return pgres.rows[0];
+        } catch (err) {
+            throw new Err(500, err, 'Failed to update map');
         }
     }
 
@@ -56,19 +77,19 @@ class Bin {
                     SET
                         layers = (
                             SELECT Array_Agg(DISTINCT e)
-                            FROM Unnest(layers || '{$2}') e
+                            FROM Unnest(layers || $2::TEXT[]) e
                         )
                 WHERE
-                    NOT layers @> '{$2}'
+                    NOT layers @> '{$2}'::TEXT[]
                     AND code = $1
             `, [
                 code,
-                layer
+                [layer]
             ]);
 
             return true;
         } catch (err) {
-            return new Err(500, err, 'Failed to update map');
+            throw new Err(500, err, 'Failed to update map');
         }
     }
 
@@ -95,11 +116,13 @@ class Bin {
                             INSERT INTO map (
                                 name,
                                 code,
-                                geom
+                                geom,
+                                layers
                             ) VALUES (
                                 $1,
                                 $2,
-                                ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
+                                ST_SetSRID(ST_GeomFromGeoJSON($3), 4326),
+                                '{}'
                             );
                         `, [
                             feat.properties.name,

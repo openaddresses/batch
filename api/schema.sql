@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS map (
     name        TEXT,                       -- Common Name
     code        TEXT,                       -- ISO Country/Region Code
     geom        GEOMETRY(GEOMETRY, 4326),   -- Geometry
-    layers      JSONB                       -- ["layer", ... ]
+    layers      TEXT[]                      -- ["layer", ... ]
 );
 
 -- Store the latest known good data for a given source

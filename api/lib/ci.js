@@ -3,10 +3,11 @@
 const Run = require('./run');
 
 class GH {
-    constructor(url, ref, sha) {
+    constructor(url, ref, sha, check) {
         this.url = url;
         this.ref = ref;
         this.sha = sha;
+        this.check = check;
 
         this.jobs = [];
     }
@@ -19,7 +20,8 @@ class GH {
         return {
             url: this.url,
             ref: this.ref,
-            sha: this.sha
+            sha: this.sha,
+            check: this.check
         };
     }
 }
@@ -31,22 +33,25 @@ class CI {
 
     async push(pool, event) {
         try {
-            const gh = new GH(
-                event.head_commit.url,
-                event.ref,
-                event.after
-            );
-
-            await this.config.okta.checks.create({
+            const check = await this.config.okta.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
                 name: 'openaddresses/data-pls',
                 head_sha: event.after
             });
+
+            const gh = new GH(
+                event.head_commit.url,
+                event.ref,
+                event.after,
+                check.id
+            );
+
             console.error(`ok - GH:Push:${event.after}: Added Check`);
 
             const files = [].concat(event.head_commit.added, event.head_commit.modified);
 
+            console.error(JSON.stringify(files));
             const jobs = files.filter((file) => {
                 if (
                     !/sources\//.test(file)
@@ -59,14 +64,24 @@ class CI {
             }).forEach(gh.add_job);
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
-            const run = await Run.generate(pool, {
-                live: false, // TODO if ref is master - live should be true
-                github: gh.json()
-            });
-            console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);
+            if (!gh.jobs.length) {
+                await this.config.okta.checks.create({
+                    owner: 'openaddresses',
+                    repo: 'openaddresses',
+                    check_run_id: gh.check,
+                    conclusion: 'No data sources to run'
+                });
+                console.error(`ok - GH:Push:${event.after}: Closed Check - No Jobs`);
+            } else {
+                const run = await Run.generate(pool, {
+                    live: false, // TODO if ref is master - live should be true
+                    github: gh.json()
+                });
+                console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);
 
-            await Run.populate(pool, run.id, gh.jobs);
-            console.error(`ok - GH:Push:${event.after}: Run Populated`);
+                await Run.populate(pool, run.id, gh.jobs);
+                console.error(`ok - GH:Push:${event.after}: Run Populated`);
+            }
         } catch (err) {
             throw new Error(err);
         }

@@ -33,7 +33,7 @@ class Bin {
                 FROM (
                     SELECT
                         code,
-                        layers,
+                        JSON_object(ARRAY_AGG(k)::TEXT[], ARRAY_AGG(v)::TEXT[]) AS layers,
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857), 
                             ST_SetSRID(ST_MakeBox2D(
@@ -44,8 +44,14 @@ class Bin {
                             256,
                             false
                         ) AS geom
-                    FROM
-                        map
+                    FROM (
+                        SELECT
+                            code,
+                            geom,
+                            unnest(layers) AS k,
+                            true AS v
+                        FROM map
+                    ) n
                     WHERE
                         ST_Intersects(
                             geom,
@@ -54,6 +60,9 @@ class Bin {
                                 ST_MakePoint($3, $4)
                             ), 3857), 4326)
                         )
+                    GROUP BY
+                        n.code,
+                        n.geom
                 ) q
             `, [
                 bbox[0],

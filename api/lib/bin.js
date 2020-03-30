@@ -13,9 +13,9 @@ const Err = require('./error');
 const MAP_LAYERS = ['district.geojson'];
 
 class Bin {
-    static mvt() {
+    static map() {
         return {
-            token: process.env.MAPBOX_TOKEN
+            token: process.env.MapboxToken
         };
     }
 

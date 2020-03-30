@@ -22,6 +22,9 @@
   },
   "eslintConfig": {
     "root": true,
+    "globals": {
+      "mapboxgl": true
+    },
     "env": {
       "node": true
     },

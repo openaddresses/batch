@@ -33,6 +33,10 @@
                 </template>
             </div>
 
+            <div class='col col--12 pb12'>
+                <Coverage/>
+            </div>
+
             <div class='col col--5'>
                 Source
             </div>
@@ -67,6 +71,9 @@
 </template>
 
 <script>
+
+import Coverage from './Coverage.vue';
+
 export default {
     name: 'Data',
     data: function() {
@@ -117,6 +124,9 @@ export default {
                 this.loading = false;
             });
         }
+    },
+    components: {
+        Coverage
     }
 }
 </script>

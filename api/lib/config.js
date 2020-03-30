@@ -41,6 +41,10 @@ class Config {
                 process.env.Bucket = 'v2.openaddresses.io';
             }
 
+            if (!process.env.MapboxToken) {
+                throw new Error('not ok - MapboxToken env var required');
+            }
+
             if (!process.env.GithubSecret) {
                 console.error('ok - set env GithubSecret: no-secret');
                 process.env.GithubSecret = 'no-secret';

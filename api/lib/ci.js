@@ -60,7 +60,7 @@ class CI {
                 }
 
                 return false;
-            }).forEach(gh.add_job);
+            }).forEach((file) => gh.add_job(file));
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             if (!gh.jobs.length) {

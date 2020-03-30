@@ -25,10 +25,8 @@ class Bin {
 
     static async tile(pool, z, x, y) {
         try {
-            console.error(x, y, z);
-            const bbox = sm.bbox(x, y, z);
+            const bbox = sm.bbox(x, y, z, false, '900913');
 
-            console.error(bbox);
             const pgres = await pool.query(`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
@@ -36,11 +34,26 @@ class Bin {
                     SELECT
                         code,
                         layers,
-                        ST_AsMVTGeom(geom, ST_Transform(ST_MakeEnvelope($1, $2, $3, $4, 3857), 4326), 4096, 256, false) AS geom
+                        ST_AsMVTGeom(
+                            ST_Transform(geom, 3857), 
+                            ST_SetSRID(ST_MakeBox2D(
+                                ST_MakePoint($1, $2),
+                                ST_MakePoint($3, $4)
+                            ), 3857),
+                            4096,
+                            256,
+                            false
+                        ) AS geom
                     FROM
                         map
                     WHERE
-                        ST_Intersects(geom, ST_Transform(ST_MakeEnvelope($1, $2, $3, $4, 3857), 4326))
+                        ST_Intersects(
+                            geom,
+                            ST_Transform(ST_SetSRID(ST_MakeBox2D(
+                                ST_MakePoint($1, $2),
+                                ST_MakePoint($3, $4)
+                            ), 3857), 4326)
+                        )
                 ) q
             `, [
                 bbox[0],

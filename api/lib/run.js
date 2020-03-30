@@ -79,7 +79,7 @@ class Run {
                 try {
                     jobs = jobs.concat(await util.explode(job));
                 } catch (err) {
-                    throw new Err(400, err, 'job must reference github.com');
+                    throw new Err(400, err, 'Job is not valid');
                 }
             } else {
                 throw new Err(400, null, 'job must be string or job object');

@@ -27,6 +27,15 @@ function explode(url) {
 
             const jobs = [];
 
+            if (
+                !source.schema
+                || source.schema !== 2
+            ) {
+                return reject(new Error('Job is not schema v2'));
+            } else if (!source.layers) {
+                return reject(new Error('Job does not have layers array'));
+            }
+
             const layers = Object.keys(source.layers);
             for (const layer of layers) {
                 for (const j of source.layers[layer]) {

@@ -1,12 +1,13 @@
 FROM alpine:3.11
 
-RUN apk add nodejs yarn git python3 py3-pip \
-    py3-gdal gdal gdal-dev \
-    postgresql-libs gcc musl-dev postgresql-dev
+RUN apk add nodejs yarn git python3 python3-dev py3-pip \
+    py3-gdal gdal gdal-dev make bash sqlite-dev \
+    postgresql-libs gcc g++ musl-dev postgresql-dev
 
 # Install Machine Process One Script
 RUN git clone --depth 1 https://github.com/openaddresses/machine.git \
     && pip3 install 'honcho == 1.0.1' 'virtualenv == 15.1.0' \
+    && pip3 install psycopg2 \
     && pip3 install -U ./machine/
 
 # Download and install Tippecanoe

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     username    TEXT UNIQUE NOT NULL,
     email       TEXT UNIQUE NOT NULL,
     password    TEXT NOT NULL
-)
+);
 
 -- Store coverage map
 CREATE TABLE IF NOT EXISTS map (

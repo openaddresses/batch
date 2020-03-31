@@ -20,8 +20,12 @@ jobs:
 
             - name: Docker Load Cache
               run: |
+                ls ~/ghcache
                 if [[ -e ~/ghcache/docker-cache.tar.gz ]]; then
+                    echo "ok - restoring cache"
                     < ~/ghcache/docker-cache.tar.gz | gunzip | docker load
+                else
+                    echo "ok - no cache found"
                 fi
 
             - name: Docker Build API

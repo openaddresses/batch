@@ -20,7 +20,7 @@ jobs:
 
             - name: Docker Load Cache
               run: |
-                if [[ -z ~/ghcache/docker-cache.tar.gz ]]; then
+                if [[ -e ~/ghcache/docker-cache.tar.gz ]]; then
                     < ~/ghcache/docker-cache.tar.gz | gunzip | docker load
                 fi
 

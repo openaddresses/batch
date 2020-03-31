@@ -22,7 +22,9 @@
                     />
                 </template>
                 <template v-else-if='mode === "runs"'>
-                    <Runs/>
+                    <Runs
+                        v-on:run='emitrun($event)'
+                    />
                 </template>
                 <template v-else-if='mode === "jobs"'>
                     <Jobs
@@ -43,6 +45,13 @@
                         v-on:log='emitlog($event)'
                     />
                 </template>
+                <template v-else-if='mode === "run"'>
+                    <Run
+                        :runid='runid'
+                        v-on:job='emitjob($event)'
+                        v-on:close='mode = "runs"'
+                    />
+                </template>
             </div>
         </div>
     </div>
@@ -54,6 +63,7 @@ import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
 import Jobs from './components/Jobs.vue';
 import Job from './components/Job.vue';
+import Run from './components/Run.vue';
 import Log from './components/Log.vue';
 
 export default {
@@ -61,6 +71,7 @@ export default {
     data: function() {
         return {
             mode: false,
+            runid: false,
             jobid: false
         };
     },
@@ -80,7 +91,12 @@ export default {
                     this.mode = 'jobs';
                 }
             } else if (mode[0] === 'runs') {
-                this.mode = 'runs';
+                if (mode.length >= 2) {
+                    this.runid = parseInt(mode[1]);
+                    this.mode = 'run';
+                } else {
+                    this.mode = 'runs';
+                }
             } else if (mode[0] === 'login') {
                 this.mode = 'login';
             } else if (mode[0] === 'data') {
@@ -107,6 +123,10 @@ export default {
             this.jobid = jobid;
             this.mode = 'log';
         },
+        emitrun: function(runid) {
+            this.runid = runid;
+            this.mode = 'run';
+        },
         emitjob: function(jobid) {
             this.jobid = jobid;
             this.mode = 'job';
@@ -117,6 +137,7 @@ export default {
         Data,
         Runs,
         Jobs,
+        Run,
         Log,
         Job
     }

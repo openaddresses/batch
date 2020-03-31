@@ -45,29 +45,65 @@ class Job {
         };
     }
 
-    static list(pool) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
-                SELECT
-                    *
-                FROM
-                    job
-                ORDER BY
-                    created DESC
-                LIMIT 100
-            `, (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to load jobs'));
+    static async list(pool, query) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
 
-                if (!pgres.rows.length) {
-                    return reject(new Err(404, null, 'no job by that id'));
-                }
+        let where = [];
 
-                return resolve(pgres.rows.map((job) => {
-                    job.id = parseInt(job.id);
+        if (!query.run) {
+            query.run = false;
+        } else {
+            query.run = parseInt(query.run);
 
-                    return job;
-                }));
-            });
+            if (isNaN(query.run)) {
+                throw new Err(400, err, 'run param must be integer');
+            }
+
+            where.push(`run = ${query.run}`);
+        }
+
+        let pgres;
+        try {
+            if (!where.length) {
+                pgres = await pool.query(`
+                    SELECT
+                        *
+                    FROM
+                        job
+                    ORDER BY
+                        created DESC
+                    LIMIT $1
+                `, [
+                    query.limit
+                ]);
+            } else {
+                pgres = await pool.query(`
+                    SELECT
+                        *
+                    FROM
+                        job
+                    WHERE
+                        ${where.join(' AND ')}
+                    ORDER BY
+                        created DESC
+                    LIMIT $1
+                `, [
+                    query.limit
+                ]);
+            }
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load jobs');
+        }
+
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'no job by that id');
+        }
+
+        return pgres.rows.map((job) => {
+            job.id = parseInt(job.id);
+            job.run = parseInt(job.run);
+            return job;
         });
     }
 

@@ -28,7 +28,7 @@
             </div>
         </template>
         <template v-else>
-            <div :key='run.id' v-for='run in runs' class='col col--12 grid'>
+            <div @click='emitrun(run.id)' :key='run.id' v-for='run in runs' class='col col--12 grid'>
                 <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <template v-if='run.status === "Pending"'>
@@ -68,6 +68,9 @@ export default {
     methods: {
         refresh: function() {
             this.getRuns();
+        },
+        emitrun: function(run_id) {
+            this.$emit('run', run_id);
         },
         getRuns: function() {
             this.loading = true;

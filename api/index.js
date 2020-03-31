@@ -249,7 +249,7 @@ async function server(args, config, cb) {
      */
     router.get('/job', async (req, res) => {
         try {
-            return res.json(await Job.list(pool));
+            return res.json(await Job.list(pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -7,6 +7,8 @@ const Err = require('./error');
  */
 class Data {
     static list(pool, query) {
+        if (!query) query = {};
+
         if (!query.source) query.source = '';
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';

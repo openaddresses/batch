@@ -17,7 +17,7 @@ test('Job#compress', async (t) => {
         fs.writeFileSync(path.resolve(job.tmp, 'out.geojson'), 'test-string');
 
         t.ok(await job.compress());
-    } catch(err) {
+    } catch (err) {
         t.error(err);
     }
 

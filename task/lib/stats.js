@@ -1,6 +1,8 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
-const {pipeline} = require('stream');
+const { pipeline } = require('stream');
 const transform = require('parallel-transform');
 
 class Stats {
@@ -19,7 +21,7 @@ class Stats {
                         this.count++;
 
                         return cb(null, '');
-                    } catch(err) {
+                    } catch (err) {
                         return reject(err);
                     }
                 }),
@@ -31,7 +33,7 @@ class Stats {
                         count: this.count
                     });
                 }
-            )
+            );
         });
     }
 

@@ -185,7 +185,9 @@ class Job {
             `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
-                await this.success(pool, Run, Data);
+                if (status === 'Success') {
+                    await this.success(pool, Run, Data);
+                }
 
                 return resolve(this);
             });

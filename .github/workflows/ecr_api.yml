@@ -18,7 +18,7 @@ jobs:
                   restore-keys: |
                       docker-cache.tar.gz
 
-            - name: Docker Restore Cache
+            - name: Docker Load Cache
               run: |
                 if [[ -z ~/ghcache/docker-cache.tar.gz ]]; then
                     < ~/ghcache/docker-cache.tar.gz | gunzip | docker load

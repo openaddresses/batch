@@ -92,6 +92,10 @@ class CI {
         return true;
     }
 
+    async issue(pool, event) {
+
+    }
+
     async pull(pool, event) {
         console.error('PULL', JSON.stringify(event));
         return true;

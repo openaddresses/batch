@@ -2,7 +2,8 @@ FROM alpine:3.11
 
 RUN apk add nodejs yarn git python3 python3-dev py3-pip \
     py3-gdal gdal gdal-dev make bash sqlite-dev zlib-dev \
-    postgresql-libs gcc g++ musl-dev postgresql-dev cairo
+    postgresql-libs gcc g++ musl-dev postgresql-dev cairo \
+    py3-cairo
 
 # Install Machine Process One Script
 RUN git clone --depth 1 https://github.com/openaddresses/machine.git \

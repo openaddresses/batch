@@ -289,6 +289,15 @@ class Job {
         });
     }
 
+    /**
+     * If a job is successful, and it is part of a live run
+     * - Add/update the Data entry
+     * - Add/update the Bin entry
+     *
+     * @param {Pool} pool PG Pool Instance
+     * @param {Run} Run Run class to use
+     * @param {Data} Data class to use
+     */
     async success(pool, Run, Data) {
         try {
             const run = await Run.from(pool, this.run);

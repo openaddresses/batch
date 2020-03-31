@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const Bin = require('./bin');
 
 /**
  * @class Data
@@ -56,6 +57,8 @@ class Data {
             layer: job.layer,
             name: job.name
         });
+
+        await Bin.covered(job);
 
         return new Promise((resolve, reject) => {
             if (data.length > 1) {

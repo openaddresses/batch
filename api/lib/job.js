@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const request = require('request');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');
 
@@ -22,6 +23,28 @@ class Job {
 
         // Attributes which are allowed to be patched
         this.attrs = ['output', 'loglink', 'status', 'version'];
+
+        this.raw = false;
+    }
+
+    async get_raw() {
+        return new Promise((resolve, reject) => {
+            if (!this.raw) {
+                request({
+                    url: this.source,
+                    method: 'GET',
+                    json: true
+                }, (err, res) => {
+                    if (err) return reject(err);
+
+                    this.raw = res.body;
+
+                    return resolve(this.raw);
+                });
+            } else {
+                return resolve(this.raw);
+            }
+        });
     }
 
     fullname() {
@@ -49,7 +72,7 @@ class Job {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
 
-        let where = [];
+        const where = [];
 
         if (!query.run) {
             query.run = false;
@@ -57,7 +80,7 @@ class Job {
             query.run = parseInt(query.run);
 
             if (isNaN(query.run)) {
-                throw new Err(400, err, 'run param must be integer');
+                throw new Err(400, null, 'run param must be integer');
             }
 
             where.push(`run = ${query.run}`);
@@ -185,7 +208,7 @@ class Job {
             `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
-                if (status === 'Success') {
+                if (this.status === 'Success') {
                     await this.success(pool, Run, Data);
                 }
 

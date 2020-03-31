@@ -4,10 +4,7 @@ const Bin = require('../lib/bin');
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
-const srv = require('../index.js');
 const test = require('tape');
-const request = require('request');
-let app;
 
 test('start', async (t) => {
     let pool = new Pool({
@@ -60,7 +57,7 @@ test('Bin#covered', async (t) => {
             name: 'United States',
             code: 'us',
             geom: null,
-            layers: [ 'addresses' ]
+            layers: ['addresses']
         }, 'addresses layer added');
 
         await Bin.covered(pool, 'us', 'addresses');
@@ -68,7 +65,7 @@ test('Bin#covered', async (t) => {
             name: 'United States',
             code: 'us',
             geom: null,
-            layers: [ 'addresses' ]
+            layers: ['addresses']
         }, 'addresses layer not duplicated');
 
         await Bin.covered(pool, 'us', 'buildings');
@@ -76,7 +73,7 @@ test('Bin#covered', async (t) => {
             name: 'United States',
             code: 'us',
             geom: null,
-            layers: [ 'addresses', 'buildings' ]
+            layers: ['addresses', 'buildings']
         }, 'additions retain array');
     } catch (err) {
         t.error(err);

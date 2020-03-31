@@ -12,7 +12,7 @@ const Err = require('./error');
 
 const MAP_LAYERS = ['district.geojson'];
 
-var sm = new SM({
+const sm = new SM({
     size: 256
 });
 
@@ -35,7 +35,7 @@ class Bin {
                         code,
                         JSON_object(ARRAY_AGG(k)::TEXT[], ARRAY_AGG(v)::TEXT[]) AS layers,
                         ST_AsMVTGeom(
-                            ST_Transform(geom, 3857), 
+                            ST_Transform(geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
                                 ST_MakePoint($1, $2),
                                 ST_MakePoint($3, $4)
@@ -100,7 +100,7 @@ class Bin {
 
     static async covered(pool, code, layer) {
         try {
-            const pgres = await pool.query(`
+            await pool.query(`
                 UPDATE map
                     SET
                         layers = (
@@ -119,6 +119,24 @@ class Bin {
         } catch (err) {
             throw new Err(500, err, 'Failed to update map');
         }
+    }
+
+    /**
+     * Given a job object, attempt to parse the .coverage object
+     * and match it with an existing geometry, or if a geometry is
+     * given, add it to the map if it does not exist
+     *
+     * @param {Pool} pool PG Pool Instance
+     * @param {Job} job Job to match
+     */
+    static async match(pool, job) {
+        const raw = await job.get_raw();
+
+        if (!raw.coverage) return true;
+
+        console.error(JSON.stringify(raw.coverage));
+
+        return true;
     }
 
     static async populate(pool) {

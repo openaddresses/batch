@@ -8,6 +8,22 @@ jobs:
         steps:
             - uses: actions/checkout@v1
 
+            - name: Docker Cache
+              run: mkdir ~/ghcache
+
+            - uses: actions/cache@v1
+              with:
+                  path: ~/ghcache
+                  key: docker-cache.tar.gz
+                  restore-keys: |
+                      docker-cache.tar.gz
+
+            - name: Docker Restore Cache
+              run: |
+                if [[ -z ~/ghcache/docker-cache.tar.gz ]]; then
+                    < ~/ghcache/docker-cache.tar.gz | gunzip | docker load
+                fi
+
             - name: Docker Build API
               run: docker build -t api api/
 
@@ -27,3 +43,8 @@ jobs:
 
             - name: Docker Push API
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${GITHUB_SHA}
+
+            - name: Docker Save API
+              run: |
+                mkdir ./ghcache
+                docker save ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${GITHUB_SHA} | gzip > ./ghcache/docker-cache.tar.gz

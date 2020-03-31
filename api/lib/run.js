@@ -77,7 +77,11 @@ class Run {
                 jobs.push(job);
             } else if (typeof job === 'string') {
                 try {
-                    jobs = jobs.concat(await util.explode(job));
+                    try {
+                        jobs = jobs.concat(await util.explode(job));
+                    } catch (err) {
+                        console.error(`not ok - skipping ${job} as invalid: ${err.message}`);
+                    }
                 } catch (err) {
                     throw new Err(400, err, 'Job is not valid');
                 }

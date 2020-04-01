@@ -98,7 +98,8 @@ class Bin {
         }
     }
 
-    static async covered(pool, code, layer) {
+    static async update(pool, code, layer) {
+        console.error(`ok - Updating Map: ${code}`);
         try {
             await pool.query(`
                 UPDATE map
@@ -134,7 +135,13 @@ class Bin {
 
         if (!raw.coverage) return true;
 
-        console.error(JSON.stringify(raw.coverage));
+        if ( // US Counties
+            raw.coverage['US Census']
+            && raw.coverage['US Census'].geoid
+            && raw.coverage['US Census'].geoid.length === 5
+        ) {
+            await Bin.update(pool, code, job.layer)
+        }
 
         return true;
     }

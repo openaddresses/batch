@@ -34,7 +34,7 @@ test('start', async (t) => {
     t.end();
 });
 
-test('Bin#covered', async (t) => {
+test('Bin#update', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
@@ -52,7 +52,7 @@ test('Bin#covered', async (t) => {
             );
         `);
 
-        await Bin.covered(pool, 'us', 'addresses');
+        await Bin.update(pool, 'us', 'addresses');
         t.deepEquals(await Bin.get_feature(pool, 'us'), {
             name: 'United States',
             code: 'us',
@@ -60,7 +60,7 @@ test('Bin#covered', async (t) => {
             layers: ['addresses']
         }, 'addresses layer added');
 
-        await Bin.covered(pool, 'us', 'addresses');
+        await Bin.update(pool, 'us', 'addresses');
         t.deepEquals(await Bin.get_feature(pool, 'us'), {
             name: 'United States',
             code: 'us',
@@ -68,7 +68,7 @@ test('Bin#covered', async (t) => {
             layers: ['addresses']
         }, 'addresses layer not duplicated');
 
-        await Bin.covered(pool, 'us', 'buildings');
+        await Bin.update(pool, 'us', 'buildings');
         t.deepEquals(await Bin.get_feature(pool, 'us'), {
             name: 'United States',
             code: 'us',

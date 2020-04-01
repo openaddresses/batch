@@ -30,7 +30,7 @@ class Run {
                     runs,
                     job
                 WHERE
-                    job.id = runs.id
+                    job.run = runs.id
                 GROUP BY
                     runs.id,
                     runs.live,

@@ -23,7 +23,7 @@ class Config {
 
             github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
 
-            this.okta = new Octokit({
+            this.octo = new Octokit({
                 type: 'app',
                 userAgent: `OpenAddresses v${pkg.version}`,
                 authStrategy: createAppAuth,
@@ -35,6 +35,11 @@ class Config {
                     clientSecret: secrets.GitHubClientSecret
                 }
             });
+
+            if (!process.env.BaseUrl) {
+                console.error('ok - set env BaseUrl: http://staging.openaddresses.io');
+                process.env.BaseUrl = 'http://staging.openaddresses.io';
+            }
 
             if (!process.env.Bucket) {
                 console.error('ok - set env Bucket: v2.openaddresses.io');

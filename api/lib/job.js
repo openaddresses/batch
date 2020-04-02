@@ -68,6 +68,14 @@ class Job {
         };
     }
 
+    /**
+     * List & Filter Jobs
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} query - Query object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.run=false] - Only show jobs associated with a given run
+     */
     static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
@@ -194,7 +202,7 @@ class Job {
         return s3.stream(res);
     }
 
-    commit(pool, Run, Data) {
+    commit(pool, Run, Data, ci) {
         return new Promise((resolve, reject) => {
             pool.query(`
                 UPDATE job
@@ -207,6 +215,8 @@ class Job {
                         id = $5
             `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
+
+                Run.ping(pool, ci, job.run);
 
                 if (this.status === 'Success') {
                     await this.success(pool, Run, Data);

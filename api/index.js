@@ -307,7 +307,7 @@ async function server(args, config, cb) {
 
             job.patch(req.body);
 
-            await job.commit(pool, Run, Data);
+            await job.commit(pool, Run, Data, ci);
 
             return res.json(job.json());
         } catch (err) {

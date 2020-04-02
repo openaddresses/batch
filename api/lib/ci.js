@@ -2,6 +2,9 @@
 
 const Run = require('./run');
 
+/**
+ * @class GH
+ */
 class GH {
     constructor(url, ref, sha, check) {
         this.url = url;
@@ -26,14 +29,44 @@ class GH {
     }
 }
 
+/**
+ * @class CI
+ */
 class CI {
+    /**
+     * @constructor
+     */
     constructor(config) {
         this.config = config;
     }
 
+    /**
+     * Once a run is finished, update the corresponding check
+     *
+     * @param {string} run_status Run status (Sucess/Fail) - Pending should never call this function
+     */
+    async check(run_status) {
+        if (!['Sucess', 'Fail'].contains(run_status)) {
+            throw new Err(400, null, 'Githu check can only report Success/Fail');
+        }
+
+        try {
+            const conclusion = run_status === 'Success' ? 'success' : 'failure';
+
+            await this.config.octo.checks.update({
+                owner: 'openaddresses',
+                repo: 'openaddresses',
+                check_run_id: run.github.check,
+                conclusion: conclusion
+            });
+        } catch (err) {
+            throw new Error(err);
+        }
+    }
+
     async push(pool, event) {
         try {
-            const check = await this.config.okta.checks.create({
+            const check = await this.config.octo.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
                 name: 'openaddresses/data-pls',
@@ -68,11 +101,11 @@ class CI {
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             if (!gh.jobs.length) {
-                await this.config.okta.checks.update({
+                await this.config.octo.checks.update({
                     owner: 'openaddresses',
                     repo: 'openaddresses',
                     check_run_id: gh.check,
-                    conclusion: 'No data sources to run'
+                    conclusion: 'success'
                 });
                 console.error(`ok - GH:Push:${event.after}: Closed Check - No Jobs`);
             } else {
@@ -84,6 +117,13 @@ class CI {
 
                 await Run.populate(pool, run.id, gh.jobs);
                 console.error(`ok - GH:Push:${event.after}: Run Populated`);
+
+                await this.config.octo.checks.update({
+                    owner: 'openaddresses',
+                    repo: 'openaddresses',
+                    check_run_id: gh.check,
+                    details_url: process.env.BaseUrl + `/#runs:${run.id}`
+                });
             }
         } catch (err) {
             throw new Error(err);

@@ -15,32 +15,111 @@ class Run {
         this.attrs = ['github', 'closed', 'live'];
     }
 
-    static async list(pool) {
+    /**
+     * Anytime a job is completed, a ping is sent to the run module
+     * to determine if the run is finished
+     *
+     * @param {Pool} pool Postgres Pool instance
+     * @param {CI} ci Instantiated CI instance
+     * @param {Number} runid ID of run to update
+     */
+    static async ping(pool, ci, runid) {
         try {
-            const pgres = await pool.query(`
-                SELECT
-                    runs.id,
-                    runs.live,
-                    runs.created,
-                    runs.github,
-                    runs.closed,
-                    ARRAY_AGG(job.status) AS status,
-                    COUNT(job.*) AS jobs
-                FROM
-                    runs,
-                    job
-                WHERE
-                    job.run = runs.id
-                GROUP BY
-                    runs.id,
-                    runs.live,
-                    runs.created,
-                    runs.github,
-                    runs.closed
-                ORDER BY
-                    created DESC
-                LIMIT 100
-            `);
+            await Run.list(pool, {
+                run: runid
+            });
+
+            if (run.status === 'Success' || run.status === 'Fail') {
+                await check(run.status);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    /**
+     * List & Filter Runs
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} query - Query object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.run=false] - Only show run associated with a id (Normally use Run.from unless you need additional job information)
+     */
+    static async list(pool, query) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+
+        const where = [];
+
+        if (!query.run) {
+            query.run = false;
+        } else {
+             query.run = parseInt(query.run);
+             if (isNaN(query.run)) {
+                 throw new Err(400, null, 'run param must be integer');
+             }
+
+             where.push(`run = ${query.run}`);
+        }
+
+        let pgres;
+        try {
+            if (!where.length) {
+                pgres = await pool.query(`
+                    SELECT
+                        runs.id,
+                        runs.live,
+                        runs.created,
+                        runs.github,
+                        runs.closed,
+                        ARRAY_AGG(job.status) AS status,
+                        COUNT(job.*) AS jobs
+                    FROM
+                        runs,
+                        job
+                    WHERE
+                        job.run = runs.id
+                    GROUP BY
+                        runs.id,
+                        runs.live,
+                        runs.created,
+                        runs.github,
+                        runs.closed
+                    ORDER BY
+                        created DESC
+                    LIMIT $1
+                `, [
+                    query.limit
+                ]);
+            } else {
+                pgres = await pool.query(`
+                    SELECT
+                        runs.id,
+                        runs.live,
+                        runs.created,
+                        runs.github,
+                        runs.closed,
+                        ARRAY_AGG(job.status) AS status,
+                        COUNT(job.*) AS jobs
+                    FROM
+                        runs,
+                        job
+                    WHERE
+                        job.run = runs.id
+                        AND ${where.join(' AND ')}
+                    GROUP BY
+                        runs.id,
+                        runs.live,
+                        runs.created,
+                        runs.github,
+                        runs.closed
+                    ORDER BY
+                        created DESC
+                    LIMIT $1
+                `, [
+                    query.limit
+                ]);
+            }
 
             return pgres.rows.map((run) => {
                 run.id = parseInt(run.id);

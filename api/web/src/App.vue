@@ -13,10 +13,13 @@
             <div class='flex-child wmax600 col col--12'>
                 <template v-if='mode === "login"'>
                     <Login
-                        v-on:job='emitlogin($event)'
+                        v-on:register='mode = "register"'
                     />
                 </template>
-                <template v-if='mode === "data"'>
+                <template v-else-if='mode === "register"'>
+                    <Register/>
+                </template>
+                <template v-else-if='mode === "data"'>
                     <Data
                         v-on:job='emitjob($event)'
                     />
@@ -58,6 +61,7 @@
 </template>
 
 <script>
+import Register from './components/Register.vue';
 import Login from './components/Login.vue';
 import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
@@ -77,7 +81,7 @@ export default {
     },
     mounted: function() {
         const mode = window.location.hash.replace('#', '').split(':');
-        if (mode.length && ['data', 'runs', 'jobs'].includes(mode[0])) {
+        if (mode.length && ['data', 'runs', 'jobs', 'login', 'register'].includes(mode[0])) {
             if (mode[0] === 'jobs') {
                 if (mode.length >= 2) {
                     this.jobid = parseInt(mode[1]);
@@ -99,6 +103,8 @@ export default {
                 }
             } else if (mode[0] === 'login') {
                 this.mode = 'login';
+            } else if (mode[0] === 'register') {
+                this.mode = 'register';
             } else if (mode[0] === 'data') {
                 this.mode = 'data';
             } else {
@@ -133,6 +139,7 @@ export default {
         }
     },
     components: {
+        Register,
         Login,
         Data,
         Runs,

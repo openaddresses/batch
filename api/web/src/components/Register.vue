@@ -7,20 +7,21 @@
         </template>
         <template v-else>
             <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6'>Login</h3>
+                <h3 class='flex-child txt-h4 py6'>Register</h3>
             </div>
 
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12'>Username:</label>
-                    <input type='text' class='input'/>
+                    <input v-model='username' type='text' class='input'/>
+
+                    <label class='mt12'>Email:</label>
+                    <input v-model='email' type='text' class='input'/>
 
                     <label class='mt12'>Password:</label>
-                    <input type='password' class='input'/>
+                    <input v-model='password' type='password' class='input'/>
 
-                    <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
-
-                    <div @click='register' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
+                    <button @click='register' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Register</button>
                 </div>
             </div>
 
@@ -30,7 +31,7 @@
 
 <script>
 export default {
-    name: 'Login',
+    name: 'Register',
     props: [],
     data: function() {
         return {
@@ -40,23 +41,21 @@ export default {
         }
     },
     mounted: function() {
-        window.location.hash = `login`
+        window.location.hash = `register`
     },
     methods: {
         register: function() {
-            this.$emit('register');
-        },
-        login: function() {
             this.loading = true;
 
-            fetch(window.location.origin + `/api/login`, {
-                method: 'post',
+            fetch(window.location.origin + `/api/user`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
                     username: this.username,
+                    email: this.email,
                     password: this.password
                 })
             }).then(() => {

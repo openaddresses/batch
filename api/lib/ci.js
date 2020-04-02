@@ -64,6 +64,22 @@ class CI {
         }
     }
 
+    async filediff(event) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: 'https://api.github.com/repos/openaddresses/openaddresses/compare/master...v2-test',
+                json: true,
+                method: 'GET'
+            }, (err, res) => {
+                if (err) return reject(err);
+
+                return res.body.files.map((file) => {
+                    return file.filename;
+                });
+            });
+        });
+    }
+
     async push(pool, event) {
         try {
             const check = await this.config.octo.checks.create({
@@ -82,7 +98,12 @@ class CI {
 
             console.error(`ok - GH:Push:${event.after}: Added Check`);
 
-            const files = [].concat(event.head_commit.added, event.head_commit.modified);
+            let files = [];
+            if (event.ref === 'refs/heads/master') {
+                files = [].concat(event.head_commit.added, event.head_commit.modified);
+            } else {
+                files = await this.filediff(event.ref.replace(/refs\/heads\//, ''))
+            }
 
             files.filter((file) => {
                 if (

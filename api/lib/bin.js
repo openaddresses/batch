@@ -140,7 +140,7 @@ class Bin {
             && raw.coverage['US Census'].geoid
             && raw.coverage['US Census'].geoid.length === 5
         ) {
-            await Bin.update(pool, raw.coverage['US Census'].geoid, job.layer)
+            await Bin.update(pool, raw.coverage['US Census'].geoid, job.layer);
         }
 
         return true;

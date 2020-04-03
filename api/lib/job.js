@@ -216,7 +216,7 @@ class Job {
             `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
-                Run.ping(pool, ci, job.run);
+                Run.ping(pool, ci, this.run);
 
                 if (this.status === 'Success') {
                     await this.success(pool, Run, Data);

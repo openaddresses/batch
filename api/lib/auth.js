@@ -30,8 +30,8 @@ class Auth {
                 `, [
                     user.username,
                     user.email,
-                    user.password
-                ], (err, pgres) => {
+                    hash
+                ], (err) => {
                     if (err) return reject(new Err(500, err, 'Failed to create user'));
 
                     return resolve({

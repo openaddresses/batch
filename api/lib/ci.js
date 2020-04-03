@@ -1,6 +1,8 @@
 'use strict';
 
 const Run = require('./run');
+const request = require('request');
+const Err = require('./error');
 
 /**
  * @class GH
@@ -35,6 +37,8 @@ class GH {
 class CI {
     /**
      * @constructor
+     *
+     * @param {Config} config Server config
      */
     constructor(config) {
         this.config = config;
@@ -43,15 +47,15 @@ class CI {
     /**
      * Once a run is finished, update the corresponding check
      *
-     * @param {string} run_status Run status (Sucess/Fail) - Pending should never call this function
+     * @param {Run} run object to update GH status with
      */
-    async check(run_status) {
-        if (!['Sucess', 'Fail'].contains(run_status)) {
+    async check(run) {
+        if (!['Sucess', 'Fail'].contains(run.status)) {
             throw new Err(400, null, 'Githu check can only report Success/Fail');
         }
 
         try {
-            const conclusion = run_status === 'Success' ? 'success' : 'failure';
+            const conclusion = run.status === 'Success' ? 'success' : 'failure';
 
             await this.config.octo.checks.update({
                 owner: 'openaddresses',
@@ -64,10 +68,10 @@ class CI {
         }
     }
 
-    async filediff(event) {
+    async filediff(ref) {
         return new Promise((resolve, reject) => {
             request({
-                url: 'https://api.github.com/repos/openaddresses/openaddresses/compare/master...v2-test',
+                url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
                 json: true,
                 method: 'GET'
             }, (err, res) => {
@@ -102,7 +106,7 @@ class CI {
             if (event.ref === 'refs/heads/master') {
                 files = [].concat(event.head_commit.added, event.head_commit.modified);
             } else {
-                files = await this.filediff(event.ref.replace(/refs\/heads\//, ''))
+                files = await this.filediff(event.ref.replace(/refs\/heads\//, ''));
             }
 
             files.filter((file) => {

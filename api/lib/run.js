@@ -25,12 +25,16 @@ class Run {
      */
     static async ping(pool, ci, runid) {
         try {
-            await Run.list(pool, {
+            const runs = await Run.list(pool, {
                 run: runid
             });
 
-            if (run.status === 'Success' || run.status === 'Fail') {
-                await check(run.status);
+            if (runs.length !== 1) {
+                throw new Error('Run#ping should always produce a single run');
+            }
+
+            if (runs[0].status === 'Success' || runs[0].status === 'Fail') {
+                await ci.check(runs[0]);
             }
         } catch (err) {
             console.error(err);
@@ -54,12 +58,12 @@ class Run {
         if (!query.run) {
             query.run = false;
         } else {
-             query.run = parseInt(query.run);
-             if (isNaN(query.run)) {
-                 throw new Err(400, null, 'run param must be integer');
-             }
+            query.run = parseInt(query.run);
+            if (isNaN(query.run)) {
+                throw new Err(400, null, 'run param must be integer');
+            }
 
-             where.push(`run = ${query.run}`);
+            where.push(`run = ${query.run}`);
         }
 
         let pgres;

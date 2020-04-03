@@ -98,12 +98,21 @@ async function server(args, config, cb) {
     });
 
     router.post('/user', async (req, res) => {
-        auth.register(req.body);
+        try {
+            await auth.register(req.body);
+
+            return res.json({
+                status: 200,
+                message: 'User Created'
+            });
+        }  catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     router.post('/login', async (req, res) => {
         try {
-            const user = await Auth.login(pool, req.body);
+            const user = await auth.login(pool, req.body);
 
             return res.json(user);
         } catch (err) {

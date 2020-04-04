@@ -69,6 +69,7 @@ class Job {
             source: this.source,
             layer: this.layer,
             name: this.name,
+            fullname: this.fullname(),
             output: this.output,
             loglink: this.loglink,
             status: this.status,
@@ -142,6 +143,11 @@ class Job {
         return pgres.rows.map((job) => {
             job.id = parseInt(job.id);
             job.run = parseInt(job.run);
+
+            job.fullname = job.source
+                .replace(/.*sources\//, '')
+                .replace(/\.json/, '');
+
             return job;
         });
     }
@@ -162,13 +168,19 @@ class Job {
                     return reject(new Err(404, null, 'no job by that id'));
                 }
 
-                const job = new Job();
+                pgres.rows[0].id = parseInt(pgres.rows[0].id);
+                pgres.rows[0].run = parseInt(pgres.rows[0].run);
+
+                const job = new Job(
+                    pgres.rows[0].run,
+                    pgres.rows[0].source,
+                    pgres.rows[0].layer,
+                    pgres.rows[0].name
+                );
 
                 for (const key of Object.keys(pgres.rows[0])) {
                     job[key] = pgres.rows[0][key];
                 }
-
-                job.id = parseInt(job.id);
 
                 return resolve(job);
             });

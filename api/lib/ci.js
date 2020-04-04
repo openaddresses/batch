@@ -50,7 +50,7 @@ class CI {
      * @param {Run} run object to update GH status with
      */
     async check(run) {
-        if (!['Sucess', 'Fail'].contains(run.status)) {
+        if (!['Sucess', 'Fail'].includes(run.status)) {
             throw new Err(400, null, 'Github check can only report Success/Fail');
         }
 

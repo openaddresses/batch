@@ -77,6 +77,8 @@ class CI {
             }, (err, res) => {
                 if (err) return reject(err);
 
+                console.error(res.status, res.body);
+
                 return res.body.files.map((file) => {
                     return file.filename;
                 });

@@ -1,3 +1,5 @@
+'use strict';
+
 const Job = require('../lib/job');
 const pkg = require('../package.json');
 const test = require('tape');
@@ -56,7 +58,7 @@ test('Job#get_raw', (t) => {
         .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
         .reply(200, {
             schema: 2
-        })
+        });
 
     const job = new Job(
         1,
@@ -69,7 +71,7 @@ test('Job#get_raw', (t) => {
         job.get_raw().then((raw) =>{
             q.deepEquals(raw, {
                 schema: 2
-            }, 'job.raw: { <job> }')
+            }, 'job.raw: { <job> }');
 
             q.end();
         }).catch((err) => {
@@ -81,7 +83,7 @@ test('Job#get_raw', (t) => {
         job.get_raw().then((raw) =>{
             q.deepEquals(raw, {
                 schema: 2
-            }, 'job.raw: { <job> }')
+            }, 'job.raw: { <job> }');
 
             q.end();
         }).catch((err) => {

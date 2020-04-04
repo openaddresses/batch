@@ -5,6 +5,7 @@
     "license": "MIT",
     "private": true,
     "scripts": {
+        "test": "tape test/*.test.js",
         "lint": "eslint task.js lib/**.js test/**.js"
     },
     "dependencies": {

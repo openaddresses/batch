@@ -51,7 +51,7 @@ class CI {
      */
     async check(run) {
         if (!['Sucess', 'Fail'].contains(run.status)) {
-            throw new Err(400, null, 'Githu check can only report Success/Fail');
+            throw new Err(400, null, 'Github check can only report Success/Fail');
         }
 
         try {

@@ -125,7 +125,7 @@ function process_job(job, source_path) {
             '--layer', job.layer,
             '--layersource', job.name,
             '--render-preview',
-            '--mapbox-key', process.env.MapboxToken,
+            '--mapbox-key', process.env.MAPBOX_TOKEN,
             '--verbose'
         ],{
             env: process.env

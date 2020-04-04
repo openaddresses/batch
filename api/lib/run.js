@@ -33,6 +33,13 @@ class Run {
                 throw new Error('Run#ping should always produce a single run');
             }
 
+            const run = runs[0];
+
+            if (!run.github || !run.github.check) {
+                console.error(`ok - run ${run.id} has no github check`);
+                return true;
+            }
+
             if (runs[0].status === 'Success' || runs[0].status === 'Fail') {
                 await ci.check(runs[0]);
             }
@@ -240,6 +247,10 @@ class Run {
             `, [id]);
 
             const run = new Run();
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'no run by that id');
+            }
 
             for (const key of Object.keys(pgres.rows[0])) {
                 run[key] = pgres.rows[0][key];

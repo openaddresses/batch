@@ -46,8 +46,8 @@ class Config {
                 process.env.Bucket = 'v2.openaddresses.io';
             }
 
-            if (!process.env.MapboxToken) {
-                throw new Error('not ok - MapboxToken env var required');
+            if (!process.env.MAPBOX_TOKEN) {
+                throw new Error('not ok - MAPBOX_TOKEN env var required');
             }
 
             if (!process.env.GithubSecret) {

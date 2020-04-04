@@ -119,7 +119,7 @@ const stack = {
                 ContainerProperties: {
                     Command: ['./task.js'],
                     Environment: [{
-                        Name: 'MapboxToken',
+                        Name: 'MAPBOX_TOKEN',
                         Value: cf.ref('MapboxToken')
                     },{
                         Name: 'SharedSecret',

@@ -6,13 +6,11 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
-        services:
-            postgres:
-                image: postgis/postgis:12-master
-                ports: ["5432:5432"]
-
         steps:
             - uses: actions/checkout@v1
+
+            - name: Postgres
+              run: apt-get install install postgresql postgresql-contrib postgresql-postgis
 
             - uses: actions/setup-node@v1
               with:

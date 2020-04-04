@@ -164,7 +164,3 @@ test('Job#generate', (t) => {
 test('Job#batch', (t) => {
     t.end();
 });
-
-test('Job#success', (t) => {
-    t.end();
-});

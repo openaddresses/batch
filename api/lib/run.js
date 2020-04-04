@@ -2,6 +2,7 @@
 
 const Err = require('./error');
 const Job = require('./job');
+const Data = require('./data');
 const util = require('./util');
 
 class Run {
@@ -21,12 +22,12 @@ class Run {
      *
      * @param {Pool} pool Postgres Pool instance
      * @param {CI} ci Instantiated CI instance
-     * @param {Number} runid ID of run to update
+     * @param {Job} job job object that caused the run
      */
-    static async ping(pool, ci, runid) {
+    static async ping(pool, ci, job) {
         try {
             const runs = await Run.list(pool, {
-                run: runid
+                run: job.run
             });
 
             if (runs.length !== 1) {
@@ -34,6 +35,10 @@ class Run {
             }
 
             const run = runs[0];
+
+            if (run.live && job.status === 'Success') {
+                await Data.update(pool, job);
+            }
 
             if (!run.github || !run.github.check) {
                 console.error(`ok - run ${run.id} has no github check`);

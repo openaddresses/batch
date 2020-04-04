@@ -210,7 +210,7 @@ class Job {
         return s3.stream(res);
     }
 
-    commit(pool, Run, Data, ci) {
+    commit(pool) {
         return new Promise((resolve, reject) => {
             pool.query(`
                 UPDATE job
@@ -223,12 +223,6 @@ class Job {
                         id = $5
             `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
-
-                await Run.ping(pool, ci, this.run);
-
-                if (this.status === 'Success') {
-                    await this.success(pool, Run, Data);
-                }
 
                 return resolve(this);
             });
@@ -328,29 +322,6 @@ class Job {
                 });
             }
         });
-    }
-
-    /**
-     * If a job is successful, and it is part of a live run
-     * - Add/update the Data entry
-     * - Add/update the Bin entry
-     *
-     * @param {Pool} pool PG Pool Instance
-     * @param {Run} Run Run class to use
-     * @param {Data} Data class to use
-     */
-    async success(pool, Run, Data) {
-        try {
-            const run = await Run.from(pool, this.run);
-
-            if (run.live) {
-                return await Data.update(pool, this);
-            }  else {
-                return false;
-            }
-        } catch (err) {
-            throw new Err(500, err, 'Failed to mark job success');
-        }
     }
 }
 

@@ -318,6 +318,8 @@ async function server(args, config, cb) {
 
             await job.commit(pool, Run, Data, ci);
 
+            await Run.ping(pool, ci, job.run);
+
             return res.json(job.json());
         } catch (err) {
             return Err.respond(err, res);

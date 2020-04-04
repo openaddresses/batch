@@ -30,12 +30,8 @@
         "tape": "^4.13.0"
     },
     "devDependencies": {
-        "@mapbox/eslint-config-geocoding": "^2.0.2",
         "eslint": "^6.8.0",
         "eslint-plugin-node": "^11.0.0",
         "nock": "^12.0.3"
-    },
-    "eslintConfig": {
-        "extends": "@mapbox/eslint-config-geocoding"
     }
 }

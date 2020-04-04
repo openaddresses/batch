@@ -13,7 +13,7 @@ jobs:
                 node-version: '12.x'
 
             - name: Yarn Install
-              run: yarn install
+              run: yarn install --production=false
               working-directory: ./api/
 
             - name: Yarn Lint

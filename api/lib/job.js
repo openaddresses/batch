@@ -4,12 +4,18 @@ const Err = require('./error');
 const request = require('request');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');
+const pkg  = require('../package.json');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
 
 class Job {
     constructor(run, source, layer, name) {
+        if (typeof run !== 'number') throw new Error('Job.run must be numeric');
+        if (typeof source !== 'string') throw new Error('Job.source must be a string');
+        if (typeof layer !== 'string') throw new Error('Job.layer must be a string');
+        if (typeof name !== 'string') throw new Error('Job.name must be a string');
+
         this.id = false,
         this.run = run;
         this.created = false;
@@ -19,7 +25,7 @@ class Job {
         this.output = false;
         this.loglink = false;
         this.status = 'Pending';
-        this.version = '0.0.0';
+        this.version = pkg.version,
         this.stats = {};
         this.bounds = false;
 
@@ -29,7 +35,7 @@ class Job {
         this.raw = false;
     }
 
-    async get_raw() {
+    get_raw() {
         return new Promise((resolve, reject) => {
             if (!this.raw) {
                 request({

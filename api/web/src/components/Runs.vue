@@ -45,6 +45,7 @@
                         Run <span v-text='run.id'/>
                     </div>
                     <div class='col col--7 pr12'>
+                        <span @click='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
                     </div>
                 </div>
             </div>
@@ -68,6 +69,12 @@ export default {
     methods: {
         refresh: function() {
             this.getRuns();
+        },
+        github: function(run) {
+            this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
+        },
+        external: function(url) {
+            window.open(url, "_blank");
         },
         emitrun: function(run_id) {
             this.$emit('run', run_id);

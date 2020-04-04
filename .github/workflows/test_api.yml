@@ -13,10 +13,10 @@ jobs:
                 node-version: '12.x'
 
             - name: Yarn Install
-              run: yarn install --cwd ./api
+              run: cd ./api && yarn install
 
             - name: Yarn Lint
-              run: yarn lint --cwd ./api
+              run: cd ./api && yarn lint
 
             - name: Yarn Test
-              run: yarn test --cwd ./api
+              run: cd ./api  && yarn test

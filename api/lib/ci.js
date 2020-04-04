@@ -3,6 +3,7 @@
 const Run = require('./run');
 const request = require('request');
 const Err = require('./error');
+const pkg = require('../package.json');
 
 /**
  * @class GH
@@ -73,6 +74,9 @@ class CI {
             request({
                 url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
                 json: true,
+                headers: {
+                    'User-Agent': `OpenAddresses v${pkg.version}`
+                },
                 method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);

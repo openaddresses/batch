@@ -20,6 +20,8 @@ class Job {
         this.loglink = false;
         this.status = 'Pending';
         this.version = '0.0.0';
+        this.stats = {};
+        this.bounds = false;
 
         // Attributes which are allowed to be patched
         this.attrs = ['output', 'loglink', 'status', 'version'];

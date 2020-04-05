@@ -69,6 +69,24 @@ class CI {
         }
     }
 
+    /**
+     * Accept git repo relative file paths and convert them into github.com paths
+     *
+     * @param {string[]} files List of files to prep
+     * @param {string} sha GitSha of files to prep
+     *
+     * @returns {string[]} Deduped list of github.com file paths
+     */
+    static fileprep(files, sha) {
+        return Array.from(new Set(files.filter((file) => {
+            if (!/sources\//.test(file) || !/\.json$/.test(file)) return false;
+            return true;
+        }).map((file) => {
+            file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/${file}`;
+            return file;
+        }))).sort();
+    }
+
     async filediff(ref) {
         return new Promise((resolve, reject) => {
             request({
@@ -113,21 +131,11 @@ class CI {
                 files = await this.filediff(event.ref.replace(/refs\/heads\//, ''));
             }
 
-            Array.from(new Set(files.filter((file) => {
-                if (
-                    !/sources\//.test(file)
-                    || !/\.json$\//.test(file)
-                ) {
-                    return true;
-                }
-
-                return false;
-            }))).forEach((file) => {
-                file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${gh.sha}/${file}`;
-
-
+            CI.fileprep(files, gh.sha).forEach((file) => {
+                console.error(`ok - GH GH:Push:${event.after}: Job: ${file}`);
                 gh.add_job(file);
             });
+
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             if (!gh.jobs.length) {

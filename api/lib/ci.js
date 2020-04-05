@@ -113,7 +113,7 @@ class CI {
                 files = await this.filediff(event.ref.replace(/refs\/heads\//, ''));
             }
 
-            files.filter((file) => {
+            Array.from(new Set(files.filter((file) => {
                 if (
                     !/sources\//.test(file)
                     || !/\.json$\//.test(file)
@@ -122,8 +122,9 @@ class CI {
                 }
 
                 return false;
-            }).forEach((file) => {
+            }))).forEach((file) => {
                 file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${gh.sha}/${file}`;
+
 
                 gh.add_job(file);
             });

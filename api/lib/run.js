@@ -342,6 +342,7 @@ class Run {
 
                 const run = new Run();
 
+                console.error(pgres.rows[0]);
                 pgres.rows[0] = parseInt(pgres.rows[0].id);
                 for (const key of Object.keys(pgres.rows[0])) {
                     run[key] = pgres.rows[0][key];

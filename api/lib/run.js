@@ -30,6 +30,7 @@ class Run {
                 run: job.run
             });
 
+            console.error(JSON.stringify(runs));
             if (runs.length !== 1) {
                 throw new Error('Run#ping should always produce a single run');
             }

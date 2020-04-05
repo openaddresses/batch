@@ -114,6 +114,7 @@ class CI {
                 name: 'openaddresses/data-pls',
                 head_sha: event.after
             });
+            console.error(JSON.stringify(check));
 
             const gh = new GH(
                 event.head_commit.url,
@@ -121,6 +122,7 @@ class CI {
                 event.after,
                 check.id
             );
+            console.error('github', gh);
 
             console.error(`ok - GH:Push:${event.after}: Added Check`);
 
@@ -156,7 +158,6 @@ class CI {
                 await Run.populate(pool, run.id, gh.jobs);
                 console.error(`ok - GH:Push:${event.after}: Run Populated`);
 
-                console.error(gh.check, process.env.BaseUrl + `/#runs:${run.id}`);
                 await this.config.octo.checks.update({
                     owner: 'openaddresses',
                     repo: 'openaddresses',

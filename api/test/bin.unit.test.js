@@ -10,7 +10,7 @@ const test = require('tape');
 test('start', async (t) => {
     let pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/postgres'
-    });
+    }); 
 
     try {
         await pool.query('DROP DATABASE IF EXISTS openaddresses_test');
@@ -22,15 +22,13 @@ test('start', async (t) => {
 
     pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
+    }); 
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, '../schema.sql'))));
     } catch (err) {
         t.error(err);
     }
-
-    pool.end();
 
     t.end();
 });

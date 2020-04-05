@@ -156,12 +156,14 @@ class CI {
                 await Run.populate(pool, run.id, gh.jobs);
                 console.error(`ok - GH:Push:${event.after}: Run Populated`);
 
+                console.error(gh.check, process.env.BaseUrl + `/#runs:${run.id}`);
                 await this.config.octo.checks.update({
                     owner: 'openaddresses',
                     repo: 'openaddresses',
                     check_run_id: gh.check,
                     details_url: process.env.BaseUrl + `/#runs:${run.id}`
                 });
+                console.error(`ok - GH:Push:${event.after}: Check Updated`);
             }
         } catch (err) {
             throw new Error(err);

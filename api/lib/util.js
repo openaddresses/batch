@@ -1,6 +1,7 @@
 'use strict';
 
 const request = require('request');
+const pkg = require('../package.json');
 
 class Param {
     static int(req, res, name) {
@@ -18,6 +19,9 @@ function explode(url) {
     return new Promise((resolve, reject) => {
         request({
             url: url,
+            headers: {
+                'User-Agent': `OpenAddresses v${pkg.version}`
+            },
             method: 'GET',
             json: true
         }, (err, res) => {

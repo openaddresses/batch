@@ -19,7 +19,7 @@ const sm = new SM({
 class Bin {
     static map() {
         return {
-            token: process.env.MapboxToken
+            token: process.env.MAPBOX_TOKEN
         };
     }
 

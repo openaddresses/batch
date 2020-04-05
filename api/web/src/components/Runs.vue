@@ -12,11 +12,14 @@
                 <div class='col col--1'>
                     Status
                 </div>
-                <div class='col col--4'>
+                <div class='col col--2'>
                     Run ID
                 </div>
+                <div class='col col--2'>
+                    Created
+                </div>
                 <div class='col col--7'>
-                    Attributes
+                    <span class='fr'>Attributes</span>
                 </div>
             </div>
 
@@ -41,8 +44,11 @@
                             <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
                         </template>
                     </div>
-                    <div class='col col--4'>
+                    <div class='col col--2'>
                         Run <span v-text='run.id'/>
+                    </div>
+                    <div class='col col--2'>
+                        <span v-text='run.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                     </div>
                     <div class='col col--7 pr12'>
                         <span @click='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>

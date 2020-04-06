@@ -69,7 +69,7 @@ test('Run#populate', async (t) => {
 
         t.deepEquals(pop, {
             run: 1,
-            jobs: [ 1 ]
+            jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {
         t.error(err, 'no error');
@@ -84,7 +84,7 @@ test('Run#populate', async (t) => {
 
         t.deepEquals(pop, {
             run: 2,
-            jobs: [ 2 ]
+            jobs: [2]
         }, 'Run 2 populated');
     } catch (err) {
         t.error(err, 'no error');

@@ -14,27 +14,31 @@ class Config {
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
-            const secrets = await Config.secret('Batch');
+            if (process.env.StackName === 'test') {
+                this.octo = false;
+            } else {
+                const secrets = await Config.secret('Batch');
 
-            let github = secrets.GitHubKey
-                .replace('-----BEGIN RSA PRIVATE KEY-----', '')
-                .replace('-----END RSA PRIVATE KEY-----', '')
-                .replace(/ /g, '\n');
+                let github = secrets.GitHubKey
+                    .replace('-----BEGIN RSA PRIVATE KEY-----', '')
+                    .replace('-----END RSA PRIVATE KEY-----', '')
+                    .replace(/ /g, '\n');
 
-            github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
+                github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
 
-            this.octo = new Octokit({
-                type: 'app',
-                userAgent: `OpenAddresses v${pkg.version}`,
-                authStrategy: createAppAuth,
-                auth: {
-                    id: 56179,
-                    privateKey: github,
-                    installationId: 7214840,
-                    clientId: secrets.GitHubClientID,
-                    clientSecret: secrets.GitHubClientSecret
-                }
-            });
+                this.octo = new Octokit({
+                    type: 'app',
+                    userAgent: `OpenAddresses v${pkg.version}`,
+                    authStrategy: createAppAuth,
+                    auth: {
+                        id: 56179,
+                        privateKey: github,
+                        installationId: 7214840,
+                        clientId: secrets.GitHubClientID,
+                        clientSecret: secrets.GitHubClientSecret
+                    }
+                });
+            }
 
             if (!process.env.BaseUrl) {
                 console.error('ok - set env BaseUrl: http://staging.openaddresses.io');

@@ -7,7 +7,7 @@ const path = require('path');
 const { Pool } = require('pg');
 
 function init(test) {
-    test('start', async (t) => {
+    test('start: database', async (t) => {
         let pool = new Pool({
             connectionString: 'postgres://postgres@localhost:5432/postgres'
         });

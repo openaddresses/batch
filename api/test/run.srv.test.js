@@ -1,36 +1,18 @@
 'use strict';
 
 const fs = require('fs');
+const pkg = require('../package.json');
 const path = require('path');
 const { Pool } = require('pg');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
+const init = require('./init');
 let app;
 
-test('start', async (t) => {
-    let pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/postgres'
-    });
+init(test);
 
-    try {
-        await pool.query('DROP DATABASE IF EXISTS openaddresses_test');
-        await pool.query('CREATE DATABASE openaddresses_test');
-        await pool.end();
-    } catch (err) {
-        t.error(err);
-    }
-
-    pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
-    try {
-        await pool.query(String(fs.readFileSync(path.resolve(__dirname, '../schema.sql'))));
-    } catch (err) {
-        t.error(err);
-    }
-
+test('start: server', async (t) => {
     srv({
         postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
     }, (a) => {
@@ -48,12 +30,12 @@ test('POST: api/run', (t) => {
             live: true
         }
     }, (err, res) => {
-        t.error(err);
+        t.error(err, 'no error');
 
-        t.equals(res.body.id, 1);
-        t.ok(res.body.created);
-        t.deepEquals(res.body.github, {});
-        t.deepEquals(res.body.closed, false);
+        t.equals(res.body.id, 1, 'run.id: 1');
+        t.ok(res.body.created, 'run.created: <truthy>');
+        t.deepEquals(res.body.github, {}, 'run.github: {}');
+        t.deepEquals(res.body.closed, false, 'run.closed: false');
 
         t.end();
     });
@@ -65,10 +47,10 @@ test('GET: api/run', (t) => {
         method: 'GET',
         json: true
     }, (err, res) => {
-        t.error(err);
+        t.error(err, 'no error');
 
         // Run will not return as it has not yet been populated
-        t.equals(res.body.length, 0);
+        t.equals(res.body.length, 0, 'run.length: 0');
 
         t.end();
     });
@@ -85,12 +67,12 @@ test('POST: api/run/:run/jobs', (t) => {
             ]
         }
     }, (err, res) => {
-        t.error(err);
+        t.error(err, 'no error');
 
         t.deepEquals(res.body, {
             run: 1,
             jobs: [1]
-        });
+        }, 'Run 1 populated');
         t.end();
     });
 });
@@ -101,9 +83,9 @@ test('GET: api/data', (t) => {
         method: 'GET',
         json: true
     }, (err, res) => {
-        t.error(err);
+        t.error(err, 'no error');
 
-        t.deepEquals(res.body, []);
+        t.deepEquals(res.body, [], 'run.length: 0');
         t.end();
     });
 });
@@ -117,22 +99,22 @@ test('PATCH: api/job/:job', (t) => {
             status: 'Success'
         }
     }, (err, res) => {
-        t.error(err);
+        t.error(err, 'no error');
 
-        t.equals(res.body.id, 1);
-        t.equals(res.body.run, 1);
-        t.ok(res.body.created);
-        t.equals(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json');
-        t.equals(res.body.layer, 'addresses');
-        t.equals(res.body.name, 'dcgis');
+        t.equals(res.body.id, 1, 'job.id: 1');
+        t.equals(res.body.run, 1, 'job.run: 1');
+        t.ok(res.body.created, 'job.created: <truthy>');
+        t.equals(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json', 'job.source: <url>');
+        t.equals(res.body.layer, 'addresses', 'job.layer: addresses');
+        t.equals(res.body.name, 'dcgis', 'job.name: dcgis');
         t.deepEquals(res.body.output, {
             cache: false,
             output: false,
             preview: false
-        });
-        t.equals(res.body.loglink, null);
-        t.equals(res.body.status, 'Success');
-        t.equals(res.body.version, '0.0.0');
+        }, 'job.output: { ... }');
+        t.equals(res.body.loglink, null, 'job.loglink: null');
+        t.equals(res.body.status, 'Success', 'job.status: Success');
+        t.equals(res.body.version, pkg.version, 'job.version: <semver>'); 
         t.end();
     });
 });
@@ -143,9 +125,9 @@ test('GET: api/data', (t) => {
         method: 'GET',
         json: true
     }, (err, res) => {
-        t.error(err);
+        t.error(err, 'no error');
 
-        t.ok(res.body[0].updated);
+        t.ok(res.body[0].updated, 'data.updated: <truthy>');
         delete res.body[0].updated;
 
         t.deepEquals(res.body, [{
@@ -158,7 +140,7 @@ test('GET: api/data', (t) => {
                 output: false,
                 preview: false
             }
-        }]);
+        }], 'data: { ... }');
         t.end();
     });
 });

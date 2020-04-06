@@ -113,13 +113,15 @@ class CI {
                 repo: 'openaddresses',
                 name: 'openaddresses/data-pls',
                 head_sha: event.after
-            }).data;
+            });
+
+            console.error(JSON.stringify(check));
 
             const gh = new GH(
                 event.head_commit.url,
                 event.ref,
                 event.after,
-                check.id
+                check.data.id
             );
             console.error('github', gh);
 

@@ -113,8 +113,7 @@ class CI {
                 repo: 'openaddresses',
                 name: 'openaddresses/data-pls',
                 head_sha: event.after
-            });
-            console.error(JSON.stringify(check));
+            }).data;
 
             const gh = new GH(
                 event.head_commit.url,

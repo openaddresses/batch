@@ -2,8 +2,6 @@
 
 const Bin = require('../lib/bin');
 const Job = require('../lib/job');
-const fs = require('fs');
-const path = require('path');
 const { Pool } = require('pg');
 const test = require('tape');
 const init = require('./init');

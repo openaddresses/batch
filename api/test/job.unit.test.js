@@ -165,3 +165,8 @@ test('Job#generate', (t) => {
 test('Job#batch', (t) => {
     t.end();
 });
+
+test('close', (t) => {
+    nock.cleanAll()
+    t.end();
+});

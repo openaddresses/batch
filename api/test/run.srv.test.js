@@ -1,22 +1,20 @@
 'use strict';
 
-const fs = require('fs');
 const pkg = require('../package.json');
-const path = require('path');
-const { Pool } = require('pg');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
 const init = require('./init');
-let app;
+let app, pool;
 
 init(test);
 
 test('start: server', async (t) => {
     srv({
         postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-    }, (a) => {
+    }, (a, p) => {
         app = a;
+        pool = p;
         t.end();
     });
 });
@@ -31,6 +29,8 @@ test('POST: api/run', (t) => {
         }
     }, (err, res) => {
         t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, 'http: 200');
 
         t.equals(res.body.id, 1, 'run.id: 1');
         t.ok(res.body.created, 'run.created: <truthy>');
@@ -48,6 +48,8 @@ test('GET: api/run', (t) => {
         json: true
     }, (err, res) => {
         t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, 'http: 200');
 
         // Run will not return as it has not yet been populated
         t.equals(res.body.length, 0, 'run.length: 0');
@@ -69,6 +71,8 @@ test('POST: api/run/:run/jobs', (t) => {
     }, (err, res) => {
         t.error(err, 'no error');
 
+        t.equals(res.statusCode, 200, 'http: 200');
+
         t.deepEquals(res.body, {
             run: 1,
             jobs: [1]
@@ -84,6 +88,8 @@ test('GET: api/data', (t) => {
         json: true
     }, (err, res) => {
         t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, 'http: 200');
 
         t.deepEquals(res.body, [], 'run.length: 0');
         t.end();
@@ -101,6 +107,8 @@ test('PATCH: api/job/:job', (t) => {
     }, (err, res) => {
         t.error(err, 'no error');
 
+        t.equals(res.statusCode, 200, 'http: 200');
+
         t.equals(res.body.id, 1, 'job.id: 1');
         t.equals(res.body.run, 1, 'job.run: 1');
         t.ok(res.body.created, 'job.created: <truthy>');
@@ -114,7 +122,7 @@ test('PATCH: api/job/:job', (t) => {
         }, 'job.output: { ... }');
         t.equals(res.body.loglink, null, 'job.loglink: null');
         t.equals(res.body.status, 'Success', 'job.status: Success');
-        t.equals(res.body.version, pkg.version, 'job.version: <semver>'); 
+        t.equals(res.body.version, pkg.version, 'job.version: <semver>');
         t.end();
     });
 });
@@ -126,6 +134,8 @@ test('GET: api/data', (t) => {
         json: true
     }, (err, res) => {
         t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, 'http: 200');
 
         t.ok(res.body[0].updated, 'data.updated: <truthy>');
         delete res.body[0].updated;
@@ -146,6 +156,7 @@ test('GET: api/data', (t) => {
 });
 
 test('stop', (t) => {
+    pool.end();
     app.close();
     t.end();
 });

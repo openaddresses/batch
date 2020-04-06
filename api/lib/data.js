@@ -7,7 +7,7 @@ const Bin = require('./bin');
  * @class Data
  */
 class Data {
-    static list(pool, query) {
+    static async list(pool, query) {
         if (!query) query = {};
 
         if (!query.source) query.source = '';
@@ -18,8 +18,8 @@ class Data {
         query.layer = query.layer + '%';
         query.name = query.name + '%';
 
-        return new Promise((resolve, reject) => {
-            pool.query(`
+        try {
+            const pgres = await pool.query(`
                 SELECT
                     results.source,
                     results.updated,
@@ -39,16 +39,16 @@ class Data {
                 query.source,
                 query.layer,
                 query.name
-            ], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to load data'));
+            ]);
 
-                return resolve(pgres.rows.map((res) => {
-                    res.job = parseInt(res.job);
+            return pgres.rows.map((res) => {
+                res.job = parseInt(res.job);
 
-                    return res;
-                }));
+                return res;
             });
-        });
+        } catch (err) {
+            throw new Err(500, err, 'failed to load data');
+        }
     }
 
     static async update(pool, job) {
@@ -58,7 +58,7 @@ class Data {
             name: job.name
         });
 
-        await Bin.covered(job);
+        await Bin.match(pool, job);
 
         return new Promise((resolve, reject) => {
             if (data.length > 1) {

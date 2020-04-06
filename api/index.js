@@ -318,7 +318,7 @@ async function server(args, config, cb) {
 
             await job.commit(pool, Run, Data, ci);
 
-            await Run.ping(pool, ci, job.run);
+            await Run.ping(pool, ci, job);
 
             return res.json(job.json());
         } catch (err) {
@@ -361,7 +361,7 @@ async function server(args, config, cb) {
     const srv = app.listen(5000, (err) => {
         if (err) return err;
 
-        if (cb) return cb(srv);
+        if (cb) return cb(srv, pool);
 
         console.log('ok - http://localhost:5000');
     });

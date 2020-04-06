@@ -103,7 +103,7 @@ class Run {
                         runs.github,
                         runs.closed
                     ORDER BY
-                        created DESC
+                        runs.id DESC
                     LIMIT $1
                 `, [
                     query.limit
@@ -131,7 +131,7 @@ class Run {
                         runs.github,
                         runs.closed
                     ORDER BY
-                        created DESC
+                        runs.id DESC
                     LIMIT $1
                 `, [
                     query.limit
@@ -159,6 +159,9 @@ class Run {
 
     static async populate(pool, run_id, rawjobs) {
         let jobs = [];
+
+        const run = await Run.from(pool, run_id);
+        if (run.closed) throw new Err(400, null, 'Run is already closed');
 
         for (const job of rawjobs) {
             if (!job) {

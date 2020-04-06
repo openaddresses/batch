@@ -1,5 +1,7 @@
 'use strict';
 
+process.env.StackName = 'test';
+
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
@@ -27,6 +29,9 @@ function init(test) {
         } catch (err) {
             t.error(err);
         }
+
+        pool.end();
+        t.end();
     });
 }
 

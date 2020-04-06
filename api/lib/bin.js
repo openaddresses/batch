@@ -10,7 +10,11 @@ const Q = require('d3-queue').queue;
 
 const Err = require('./error');
 
-const MAP_LAYERS = ['district.geojson'];
+const MAP_LAYERS = [
+    'district.geojson',
+    'region.geojson',
+    'country.geojson'
+];
 
 const sm = new SM({
     size: 256

@@ -167,6 +167,6 @@ test('Job#batch', (t) => {
 });
 
 test('close', (t) => {
-    nock.cleanAll()
+    nock.cleanAll();
     t.end();
 });

@@ -51,7 +51,7 @@ class CI {
      * @param {Run} run object to update GH status with
      */
     async check(run) {
-        if (!['Sucess', 'Fail'].includes(run.status)) {
+        if (!['Success', 'Fail'].includes(run.status)) {
             throw new Err(400, null, `Github check can only report Success/Fail, given: ${run.status}`);
         }
 
@@ -115,15 +115,12 @@ class CI {
                 head_sha: event.after
             });
 
-            console.error(JSON.stringify(check));
-
             const gh = new GH(
                 event.head_commit.url,
                 event.ref,
                 event.after,
                 check.data.id
             );
-            console.error('github', gh);
 
             console.error(`ok - GH:Push:${event.after}: Added Check`);
 

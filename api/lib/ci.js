@@ -52,7 +52,7 @@ class CI {
      */
     async check(run) {
         if (!['Sucess', 'Fail'].includes(run.status)) {
-            throw new Err(400, null, 'Github check can only report Success/Fail');
+            throw new Err(400, null, `Github check can only report Success/Fail, given: ${run.status}`);
         }
 
         try {
@@ -135,7 +135,7 @@ class CI {
             }
 
             CI.fileprep(files, gh.sha).forEach((file) => {
-                console.error(`ok - GH GH:Push:${event.after}: Job: ${file}`);
+                console.error(`ok - GH:Push:${event.after}: Job: ${file}`);
                 gh.add_job(file);
             });
 

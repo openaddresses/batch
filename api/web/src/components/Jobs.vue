@@ -46,7 +46,7 @@
                         Job <span v-text='job.id'/>
                     </div>
                     <div class='col col--4'>
-                        <span v-text='`${job.fullname} - ${job.layer} - ${job.name}`'/>
+                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--5 pr12'>
                         <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>

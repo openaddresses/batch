@@ -67,7 +67,7 @@
                             Job <span v-text='job.id'/>
                         </div>
                         <div class='col col--7'>
-                            <span v-text='job.layer + "-" + job.name'/>
+                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
                         </div>
                     </div>
                 </div>

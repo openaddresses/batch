@@ -35,7 +35,7 @@
         </template>
         <template v-else>
             <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6' v-text='`${job.fullname} - ${job.layer} - ${job.name}`'></h3>
+                <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
 
             <template v-if='job.output.preview'>

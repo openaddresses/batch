@@ -20,6 +20,7 @@ class Job {
         this.run = run;
         this.created = false;
         this.source = source;
+        this.source_name = this.fullname();
         this.layer = layer;
         this.name = name;
         this.output = false;
@@ -66,10 +67,10 @@ class Job {
             id: parseInt(this.id),
             run: parseInt(this.run),
             created: this.created,
+            source_name: this.source_name,
             source: this.source,
             layer: this.layer,
             name: this.name,
-            fullname: this.fullname(),
             output: this.output,
             loglink: this.loglink,
             status: this.status,
@@ -143,10 +144,6 @@ class Job {
         return pgres.rows.map((job) => {
             job.id = parseInt(job.id);
             job.run = parseInt(job.run);
-
-            job.fullname = job.source
-                .replace(/.*sources\//, '')
-                .replace(/\.json/, '');
 
             return job;
         });
@@ -275,6 +272,7 @@ class Job {
                 INSERT INTO job (
                     run,
                     created,
+                    source_name,
                     source,
                     layer,
                     name,
@@ -287,12 +285,14 @@ class Job {
                     $2,
                     $3,
                     $4,
-                    'Pending',
                     $5,
-                    $6
+                    'Pending',
+                    $6,
+                    $7
                 ) RETURNING *
             `, [
                 this.run,
+                this.source_name,
                 this.source,
                 this.layer,
                 this.name,

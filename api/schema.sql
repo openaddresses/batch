@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS job (
     run         BIGINT,     -- run id
     created     TIMESTAMP,
     source      TEXT,       -- URL to Source JSON
+    source_name TEXT,       -- Name of source (us/ca/statewide)
     layer       TEXT,       -- Data Layer to process
     name        TEXT,       -- Data provider to process
     output      JSONB,      -- Final S3 Location (geojson.gz)

@@ -2,6 +2,7 @@
 
 const Err = require('./error');
 const Bin = require('./bin');
+const Job = require('./job');
 
 /**
  * @class Data
@@ -47,24 +48,61 @@ class Data {
                 return res;
             });
         } catch (err) {
-            throw new Err(500, err, 'failed to load data');
+            throw new Err(500, err, 'Failed to load data');
+        }
+    }
+
+    static async history(pool, job_id) {
+        const job = await Job.from(pool, job_id);
+
+        try {
+            await pool.query(`
+                SELECT
+                    job.id,
+                    job.created,
+                    job.status,
+                    job.run
+                FROM
+                    job,
+                    runs
+                WHERE
+                    job.run = runs.id
+                    AND runs.live = true
+                    AND job.source_name = $1
+                    AND job.layer = $2
+                    AND job.name = $3
+            `, [
+                job.source_name,
+                job.layer,
+                job.name
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get data history');
         }
     }
 
     static async update(pool, job) {
-        const data = await Data.list(pool, {
-            source: job.fullname(),
-            layer: job.layer,
-            name: job.name
-        });
+        try {
+            const data = await Data.list(pool, {
+                source: job.source_name,
+                layer: job.layer,
+                name: job.name
+            });
+        } catch (err) {
+            throw new Err(500, err, 'Failed to fetch data');
+        }
 
-        await Bin.match(pool, job);
+        try {
+            await Bin.match(pool, job);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to match coverage');
+        }
 
-        return new Promise((resolve, reject) => {
-            if (data.length > 1) {
-                throw Err(500, null, 'More than 1 source matches job');
-            } else if (data.length === 0) {
-                pool.query(`
+        if (data.length > 1) {
+            throw new Err(500, null, 'More than 1 source matches job');
+        } else if (data.length === 0) {
+            try {
+                await pool.query(`
                     INSERT INTO results (
                         source,
                         layer,
@@ -79,17 +117,19 @@ class Data {
                         NOW()
                     )
                 `, [
-                    job.fullname(),
+                    job.source_name,
                     job.layer,
                     job.name,
                     job.id
-                ], (err) => {
-                    if (err) return reject(new Err(500, err, 'Failed to update data'));
+                ]);
 
-                    return resolve(true);
-                });
-            } else {
-                pool.query(`
+                return true;
+            } catch (err) {
+                throw new Err(500, err, 'Failed to update data');
+            }
+        } else {
+            try {
+                await pool.query(`
                     UPDATE results
                         SET
                             source = $1,
@@ -102,17 +142,17 @@ class Data {
                             AND layer = $2
                             AND name = $3
                 `, [
-                    job.fullname(),
+                    job.source_name,
                     job.layer,
                     job.name,
                     job.id
-                ], (err) => {
-                    if (err) return reject(new Err(500, err, 'Failed to update data'));
+                ]);
 
-                    return resolve(true);
-                });
+                return true;
+            } catch (err) {
+                throw new Err(500, err, 'Failed to update data');
             }
-        });
+        }
     }
 }
 

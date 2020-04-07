@@ -148,6 +148,26 @@ async function server(args, config, cb) {
         }
     });
 
+    router.get('/data/:data', async (req, res) => {
+        try {
+            const data = await Data.from(pool, req.params.data);
+
+            return res.json(data);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    router.get('/data/:data/history', async (req, res) => {
+        try {
+            const history = await Data.history(pool, req.params.data);
+
+            return res.json(history);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     /**
      * Search for runs by various criteria
      */

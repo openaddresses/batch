@@ -21,6 +21,14 @@
                 </template>
                 <template v-else-if='mode === "data"'>
                     <Data
+                        v-on:history='emithistory($event)'
+                        v-on:job='emitjob($event)'
+                    />
+                </template>
+                <template v-else-if='mode === "history"'>
+                    <History
+                        :dataid='dataid'
+                        v-on:close='mode = "data"'
                         v-on:job='emitjob($event)'
                     />
                 </template>
@@ -63,6 +71,7 @@
 <script>
 import Register from './components/Register.vue';
 import Login from './components/Login.vue';
+import History from './components/History.vue';
 import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
 import Jobs from './components/Jobs.vue';
@@ -76,7 +85,8 @@ export default {
         return {
             mode: false,
             runid: false,
-            jobid: false
+            jobid: false,
+            dataid: false
         };
     },
     mounted: function() {
@@ -106,7 +116,12 @@ export default {
             } else if (mode[0] === 'register') {
                 this.mode = 'register';
             } else if (mode[0] === 'data') {
-                this.mode = 'data';
+                if (mode.length >= 2) {
+                    this.dataid = parseInt(mode[1]);
+                    this.mode = 'history';
+                } else {
+                    this.mode = 'data';
+                }
             } else {
                 this.mode = 'data';
             }
@@ -133,6 +148,10 @@ export default {
             this.runid = runid;
             this.mode = 'run';
         },
+        emithistory: function(dataid) {
+            this.dataid = dataid;
+            this.mode = 'history';
+        },
         emitjob: function(jobid) {
             this.jobid = jobid;
             this.mode = 'job';
@@ -140,6 +159,7 @@ export default {
     },
     components: {
         Register,
+        History,
         Login,
         Data,
         Runs,

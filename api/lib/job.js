@@ -138,7 +138,7 @@ class Job {
         }
 
         if (!pgres.rows.length) {
-            throw new Err(404, null, 'no job by that id');
+            throw new Err(404, null, 'No job by that id');
         }
 
         return pgres.rows.map((job) => {

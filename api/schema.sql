@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS map (
 
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (
+    id          BIGSERIAL,  -- Data Entry ID
     source      TEXT,       -- text name of the source "us/ca/orange"
     updated     TIMESTAMP,  -- timestamp as to when the data was last successfully updated
     layer       TEXT,       -- name of the layer "addresses"

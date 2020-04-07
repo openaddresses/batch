@@ -2,7 +2,6 @@
 
 const Err = require('./error');
 const Bin = require('./bin');
-const Job = require('./job');
 
 /**
  * @class Data
@@ -22,6 +21,7 @@ class Data {
         try {
             const pgres = await pool.query(`
                 SELECT
+                    results.id,
                     results.source,
                     results.updated,
                     results.layer,
@@ -43,6 +43,7 @@ class Data {
             ]);
 
             return pgres.rows.map((res) => {
+                res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
 
                 return res;
@@ -52,11 +53,9 @@ class Data {
         }
     }
 
-    static async history(pool, job_id) {
-        const job = await Job.from(pool, job_id);
-
+    static async history(pool, data_id) {
         try {
-            await pool.query(`
+            const pgres = await pool.query(`
                 SELECT
                     job.id,
                     job.created,
@@ -64,26 +63,75 @@ class Data {
                     job.run
                 FROM
                     job,
-                    runs
+                    runs,
+                    results
                 WHERE
                     job.run = runs.id
                     AND runs.live = true
-                    AND job.source_name = $1
-                    AND job.layer = $2
-                    AND job.name = $3
+                    AND job.source_name = results.source
+                    AND job.layer = results.layer
+                    AND job.name = results.name
+                    AND results.id = $1
             `, [
-                job.source_name,
-                job.layer,
-                job.name
+                data_id
             ]);
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'No data by that id');
+            }
+
+            return {
+                id: parseInt(data_id),
+                jobs: pgres.rows.map((res) => {
+                    res.id = parseInt(res.id);
+                    res.run = parseInt(res.run);
+                    return res;
+                })
+            };
         } catch (err) {
             throw new Err(500, err, 'Failed to get data history');
         }
     }
 
-    static async update(pool, job) {
+    static async from(pool, data_id) {
         try {
-            const data = await Data.list(pool, {
+            const pgres = await pool.query(`
+                SELECT
+                    results.id,
+                    results.source,
+                    results.updated,
+                    results.layer,
+                    results.name,
+                    results.job,
+                    job.output
+                FROM
+                    results,
+                    job
+                WHERE
+                    results.job = job.id
+                    AND results.id = $1
+            `, [
+                data_id
+            ]);
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'No data by that id');
+            }
+
+            return pgres.rows.map((res) => {
+                res.id = parseInt(res.id);
+                res.job = parseInt(res.job);
+                return res;
+            })[0];
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load data');
+        }
+    }
+
+    static async update(pool, job) {
+        let data;
+        try {
+            data = await Data.list(pool, {
                 source: job.source_name,
                 layer: job.layer,
                 name: job.name

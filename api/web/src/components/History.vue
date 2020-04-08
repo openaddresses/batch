@@ -35,7 +35,7 @@
         </template>
         <template v-else>
             <div :key='job.id' v-for='job in history.jobs' class='col col--12 grid'>
-                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                <div @click='$emit("job", job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <template v-if='job.status === "Pending"'>
                             <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>

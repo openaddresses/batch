@@ -51,7 +51,7 @@
                         <span v-text='run.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                     </div>
                     <div class='col col--7 pr12'>
-                        <span @click='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
+                        <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
                     </div>
                 </div>
             </div>

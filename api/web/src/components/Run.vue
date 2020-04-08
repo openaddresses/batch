@@ -21,6 +21,9 @@
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
+
+                <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
+
             </div>
         </div>
 
@@ -109,6 +112,9 @@ export default {
         },
         emitjob: function(jobid) {
             this.$emit('job', jobid);
+        },
+        github: function(run) {
+            this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
         },
         getRun: function() {
             this.loading.run = true;

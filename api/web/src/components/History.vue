@@ -21,11 +21,14 @@
         <div class='col col--1'>
             Status
         </div>
-        <div class='col col--4'>
+        <div class='col col--3'>
             Job ID
         </div>
-        <div class='col col--7'>
+        <div class='col col--5'>
             Updated
+        </div>
+        <div class='col col--3'>
+            <span class='fr'>Attributes</span>
         </div>
 
         <template v-if='loading'>
@@ -47,11 +50,14 @@
                             <svg class='icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
                         </template>
                     </div>
-                    <div class='col col--4'>
+                    <div class='col col--3'>
                         Job <span v-text='job.id'/>
                     </div>
-                    <div class='col col--7'>
+                    <div class='col col--5'>
                         <span v-text='job.created'></span>
+                    </div>
+                    <div class='col col--3'>
+                        <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
                     </div>
                 </div>
             </div>
@@ -82,6 +88,12 @@ export default {
         },
         refresh: function() {
             this.getHistory();
+        },
+        datapls: function(id) {
+            this.external(`${window.location.origin}/api/job/${id}/output/source.geojson.gz`);
+        },
+        external: function(url) {
+            window.open(url, "_blank");
         },
         getHistory: function() {
             this.loading = true;

@@ -60,6 +60,7 @@ class Data {
                     job.id,
                     job.created,
                     job.status,
+                    job.output,
                     job.run
                 FROM
                     job,

@@ -62,8 +62,8 @@
                         <span v-text='d.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                     </div>
                     <div class='col col--5'>
-                        <span @click='datapls(d)' v-if='d.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
-                        <span @click='history(d)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
+                        <span v-on:click.stop.prevent='datapls(d)' v-if='d.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
+                        <span v-on:click.stop.prevent='history(d)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
                     </div>
                 </div>
             </div>

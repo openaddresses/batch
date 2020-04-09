@@ -201,13 +201,15 @@ class Job {
         return s3.stream(res);
     }
 
-    static data(job_id, res) {
+    static async data(pool, job_id, res) {
+        const job = await Job.from(pool, job_id);
+
         const s3 = new S3({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${job_id}/source.geojson.gz`
         });
 
-        return s3.stream(res);
+        return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}.geojson.gz`);
     }
 
     static cache(job_id, res) {

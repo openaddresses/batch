@@ -8,11 +8,13 @@ class S3 {
         this.params = params;
     }
 
-    stream(res) {
+    stream(res, name) {
         const s3request = s3.getObject(this.params);
         const s3stream = s3request.createReadStream();
 
         s3request.on('httpHeaders', (statusCode, headers) => {
+            headers['Content-disposition'] = `inline; filename="${name}"`
+
             res.writeHead(statusCode, headers);
         });
 

@@ -118,7 +118,7 @@ test('Job#json', (t) => {
         id: NaN,
         run: 1,
         created: false,
-        fullname: 'us/pa/bucks',
+        source_name: 'us/pa/bucks',
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
         layer: 'addresses',
         name: 'city',

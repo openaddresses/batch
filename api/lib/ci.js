@@ -160,7 +160,7 @@ class CI {
                     owner: 'openaddresses',
                     repo: 'openaddresses',
                     check_run_id: gh.check,
-                    details_url: process.env.BaseUrl + `/#runs:${run.id}`
+                    details_url: process.env.BaseUrl + `/runs/${run.id}`
                 });
                 console.error(`ok - GH:Push:${event.after}: Check Updated`);
             }

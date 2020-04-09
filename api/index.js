@@ -72,13 +72,6 @@ async function server(args, config, cb) {
     app.use(minify());
     app.use(express.static('web/dist'));
 
-    app.use('/api', router);
-    app.use('/*', express.static('web/dist'));
-
-    router.use(bodyparser.urlencoded({ extended: true }));
-    router.use(morgan('combined'));
-    router.use(bodyparser.json());
-
     /**
      * Return basic data about the API
      */
@@ -97,6 +90,13 @@ async function server(args, config, cb) {
             message: 'I work all day, I work all night to get the data I have to serve!'
         });
     });
+
+    app.use('/api', router);
+    app.use('/*', express.static('web/dist'));
+
+    router.use(bodyparser.urlencoded({ extended: true }));
+    router.use(morgan('combined'));
+    router.use(bodyparser.json());
 
     router.post('/user', async (req, res) => {
         try {

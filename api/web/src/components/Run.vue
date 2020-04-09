@@ -2,7 +2,7 @@
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <button @click='close' class='btn round btn--stroke fl color-gray'>
+                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
@@ -86,7 +86,8 @@ export default {
     data: function() {
         return {
             run: {
-                status: ''
+                status: '',
+                github: {}
             },
             jobs: [],
             loading: {
@@ -96,13 +97,9 @@ export default {
         };
     },
     mounted: function() {
-        window.location.hash = `runs:${this.runid}`
         this.refresh();
     },
     methods: {
-        close: function() {
-            this.$emit('close');
-        },
         external: function(url) {
             window.open(url, "_blank");
         },
@@ -111,7 +108,7 @@ export default {
             this.getJobs();
         },
         emitjob: function(jobid) {
-            this.$emit('job', jobid);
+            this.$router.push({ path: `/job/${jobid}` });
         },
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);

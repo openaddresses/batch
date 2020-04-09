@@ -73,6 +73,7 @@ async function server(args, config, cb) {
     app.use(express.static('web/dist'));
 
     app.use('/api', router);
+    app.use('/*', express.static('web/dist'));
 
     router.use(bodyparser.urlencoded({ extended: true }));
     router.use(morgan('combined'));

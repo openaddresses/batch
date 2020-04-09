@@ -20,7 +20,7 @@
 
                     <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
 
-                    <div @click='register' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
+                    <div @click='emitregister' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
                 </div>
             </div>
 
@@ -39,12 +39,9 @@ export default {
             password: ''
         }
     },
-    mounted: function() {
-        window.location.hash = `login`
-    },
     methods: {
-        register: function() {
-            this.$emit('register');
+        emitregister: function() {
+            this.$router.push({ path: '/register' });
         },
         login: function() {
             this.loading = true;

@@ -2,7 +2,7 @@
     <div class='col col--12 pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <button @click='close' class='btn round btn--stroke fl color-gray'>
+                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
                 <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/>: Log:</h2>
@@ -35,13 +35,9 @@ export default {
         };
     },
     mounted: function() {
-        window.location.hash = `jobs:${this.jobid}:log`
         this.refresh();
     },
     methods: {
-        close: function() {
-            this.$emit('close');
-        },
         refresh: function() {
             this.getLog();
         },

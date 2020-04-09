@@ -2,7 +2,7 @@
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <button @click='close' class='btn round btn--stroke fl color-gray'>
+                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
@@ -22,9 +22,9 @@
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
 
-                <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
-                <span @click='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                <span @click='datapls' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                <span v-on:click.stop.prevent='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
+                <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
+                <span v-on:click.stop.prevent='datapls' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
             </div>
         </div>
 
@@ -74,14 +74,9 @@ export default {
         };
     },
     mounted: function() {
-        window.location.hash = `jobs:${this.jobid}`
-
         this.refresh();
     },
     methods: {
-        close: function() {
-            this.$emit('close');
-        },
         datapls: function() {
             this.external(`${window.location.origin}/api/job/${this.job.id}/output/source.geojson.gz`);
         },
@@ -89,10 +84,7 @@ export default {
             window.open(url, "_blank");
         },
         emitlog: function(jobid) {
-            this.$emit('log', jobid);
-        },
-        emitjob: function(jobid) {
-            this.$emit('job', jobid);
+            this.$router.push({ path: `/job/${jobid}/log` });
         },
         refresh: function() {
             this.getJob();

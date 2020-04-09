@@ -63,7 +63,6 @@
 export default {
     name: 'Runs',
     mounted: function() {
-        window.location.hash = 'runs';
         this.refresh();
     },
     data: function() {
@@ -83,7 +82,7 @@ export default {
             window.open(url, "_blank");
         },
         emitrun: function(run_id) {
-            this.$emit('run', run_id);
+            this.$router.push({ path: `/run/${run_id}` });
         },
         getRuns: function() {
             this.loading = true;

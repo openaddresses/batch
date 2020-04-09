@@ -2,7 +2,7 @@
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <button @click='close' class='btn round btn--stroke fl color-gray'>
+                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
@@ -38,7 +38,7 @@
         </template>
         <template v-else>
             <div :key='job.id' v-for='job in history.jobs' class='col col--12 grid'>
-                <div @click='$emit("job", job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <template v-if='job.status === "Pending"'>
                             <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
@@ -79,12 +79,10 @@ export default {
     },
     mounted: function() {
         this.refresh();
-
-        window.location.hash = `data:${this.dataid}`
     },
     methods: {
-        close: function() {
-            this.$emit('close');
+        emitjob: function(jobid) {
+            this.$router.push({ path: `/job/${jobid}`});
         },
         refresh: function() {
             this.getHistory();

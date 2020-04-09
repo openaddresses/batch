@@ -63,7 +63,7 @@
                     </div>
                     <div class='col col--5'>
                         <span v-on:click.stop.prevent='datapls(d)' v-if='d.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
-                        <span v-on:click.stop.prevent='history(d)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
+                        <span v-on:click.stop.prevent='emithistory(d)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
                     </div>
                 </div>
             </div>
@@ -89,7 +89,6 @@ export default {
         };
     },
     mounted: function() {
-        window.location.hash = 'data';
         this.refresh();
     },
     watch: {
@@ -105,10 +104,10 @@ export default {
             this.getData();
         },
         emitjob: function(jobid) {
-            this.$emit('job', jobid);
+            this.$router.push({ path: `/job/${jobid}` })
         },
-        history: function(d) {
-            this.$emit('history', d.id);
+        emithistory: function(d) {
+            this.$router.push({ path: `/data/${d.id}/history` })
         },
         datapls: function(d) {
             this.external(`${window.location.origin}/api/job/${d.job}/output/source.geojson.gz`);

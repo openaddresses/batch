@@ -49,9 +49,9 @@
                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--5 pr12'>
-                        <span @click='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
-                        <span @click='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                        <span @click='datapls(job)'  v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                        <span v-on:click.stop.prevent='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
+                        <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
+                        <span v-on:click.stop.prevent='datapls(job)'  v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
                     </div>
                 </div>
             </div>
@@ -63,8 +63,6 @@
 export default {
     name: 'Jobs',
     mounted: function() {
-        window.location.hash = 'jobs';
-
         this.refresh();
     },
     data: function() {
@@ -78,10 +76,10 @@ export default {
             window.open(url, "_blank");
         },
         emitlog: function(jobid) {
-            this.$emit('log', jobid);
+            this.$router.push({ path: `/job/${jobid}/log` });
         },
         emitjob: function(jobid) {
-            this.$emit('job', jobid);
+            this.$router.push({ path: `/job/${jobid}` });
         },
         refresh: function() {
             this.getJobs();

@@ -36,12 +36,10 @@ export default {
     data: function() {
         return {
             loading: false,
+            email: '',
             username: '',
             password: ''
         }
-    },
-    mounted: function() {
-        window.location.hash = `register`
     },
     methods: {
         register: function() {

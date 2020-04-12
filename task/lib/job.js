@@ -110,6 +110,10 @@ class Job {
                     delimiter: ','
                 }),
                 transform(100, (data, cb) => {
+                    if (data[2] === 'NUMBER' && data[3] === 'STREET') {
+                        return cb(null, '');
+                    }
+
                     return cb(null, JSON.stringify({
                         type: 'Feature',
                         properties: {
@@ -125,7 +129,7 @@ class Job {
                         },
                         geometry: {
                             type: 'Point',
-                            coordinates: [data[0], data[1]]
+                            coordinates: [Number(data[0]), Number(data[1])]
                         }
                     }) + '\n');
                 }),

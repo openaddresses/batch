@@ -56,19 +56,19 @@ class Stats {
         }
 
         if (bounds[0] < this.stats.bounds[0]) {
-            bounds[0] = this.stats.bounds[0];
+            this.stats.bounds[0] = bounds[0];
         }
 
         if (bounds[1] < this.stats.bounds[1]) {
-            bounds[1] = this.stats.bounds[1];
+            this.stats.bounds[1] = bounds[1];
         }
 
         if (bounds[2] > this.stats.bounds[2]) {
-            bounds[2] = this.stats.bounds[2];
+            this.stats.bounds[2] = bounds[2];
         }
 
         if (bounds[3] > this.stats.bounds[3]) {
-            bounds[2] = this.stats.bounds[3];
+            this.stats.bounds[3] = bounds[3];
         }
     }
 }

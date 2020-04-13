@@ -29,7 +29,8 @@ test('Stats#calc', async (t) => {
         t.error(err);
     }
 
-    t.deepEquals(stats.stats.bounds, []);
+    t.deepEquals(stats.stats.bounds, [ -74.9834588, 40.0546411, -74.9679742, 40.0614019 ], 'Stats.stats.bounds: [ ... ]');
+    t.equals(stats.stats.count, 100, 'stats.stats.count: 100');
 
     t.end();
 });

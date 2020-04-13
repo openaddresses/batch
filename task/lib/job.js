@@ -1,6 +1,7 @@
 'use strict';
 
 const Ajv = require('ajv');
+const turf = require('@turf/turf');
 const gzip = require('zlib').createGzip;
 const os = require('os');
 const fs = require('fs');
@@ -46,6 +47,9 @@ class Job {
         this.source = false;
         this.layer = layer;
         this.name = name;
+        this.bounds = [];
+        this.count = 0;
+        this.stats = {};
 
         this.assets = {
             cache: false,
@@ -98,10 +102,16 @@ class Job {
         });
     }
 
-    convert() {
-        return new Promise(async (resolve, reject) => {
-            const output = await Job.find('out.csv', this.tmp);
+    async convert() {
+        let output;
 
+        try {
+            output = await Job.find('out.csv', this.tmp);
+        } catch (err) {
+            throw new Error(err);
+        }
+
+        return new Promise((resolve, reject) => {
             if (output.length !== 1) return reject(new Error('out.csv not found'));
 
             pipeline(
@@ -129,13 +139,23 @@ class Job {
                         },
                         geometry: {
                             type: 'Point',
-                            coordinates: [Number(data[0]), Number(data[1])]
+                            coordinates: [
+                                Number(data[0]),
+                                Number(data[1])
+                            ]
                         }
                     }) + '\n');
                 }),
                 fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),
-                (err) => {
+                async (err) => {
                     if (err) return reject(err);
+
+                    const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
+                    await stats.calc();
+
+                    this.bounds = turf.bboxPolygon(stats.stats.bounds);
+                    this.count = stats.stats.count;
+                    this.stats = stats.stats[stats.layer];
 
                     return resolve(path.resolve(this.tmp, 'out.geojson'));
                 }

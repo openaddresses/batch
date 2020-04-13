@@ -141,6 +141,7 @@ test('GET: api/data', (t) => {
         delete res.body[0].updated;
 
         t.deepEquals(res.body, [{
+            id: 1,
             source: 'us/dc/statewide',
             layer: 'addresses',
             name: 'dcgis',

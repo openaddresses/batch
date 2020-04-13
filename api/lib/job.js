@@ -28,10 +28,19 @@ class Job {
         this.status = 'Pending';
         this.version = pkg.version,
         this.stats = {};
+        this.count = 0;
         this.bounds = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = ['output', 'loglink', 'status', 'version'];
+        this.attrs = [
+            'output',
+            'loglink',
+            'status',
+            'version',
+            'stats',
+            'count',
+            'bounds'
+        ];
 
         this.raw = false;
     }
@@ -56,12 +65,22 @@ class Job {
         });
     }
 
+    /**
+     * Return the source_name of the source given the source url
+     *
+     * @returns {String} source_name
+     */
     fullname() {
         return this.source
             .replace(/.*sources\//, '')
             .replace(/\.json/, '');
     }
 
+    /**
+     * Return a JSON representation of the job
+     *
+     * @returns {Object} JSON representation of object
+     */
     json() {
         return {
             id: parseInt(this.id),
@@ -74,7 +93,10 @@ class Job {
             output: this.output,
             loglink: this.loglink,
             status: this.status,
-            version: this.version
+            version: this.version,
+            count: this.count,
+            bounds: this.bounds,
+            stats: this.stats
         };
     }
 

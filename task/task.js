@@ -73,7 +73,10 @@ async function flow(api, job) {
         await job.upload();
         await job.update(api, {
             status: 'Success',
-            output: job.assets
+            output: job.assets,
+            count: job.count,
+            bounds: job.bounds,
+            stats: job.stats
         });
 
     } catch (err) {

@@ -41,13 +41,15 @@ test('Job()', (t) => {
     t.equals(job.created, false, 'job.created: false');
     t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
     t.equals(job.layer, 'addresses', 'job.layer: addresses');
+    t.equals(job.count, 0, 'job.count: 0');
+    t.equals(job.bounds, false, 'job.bounds: false');
+    t.deepEquals(job.stats, {}, 'job.stats: {}');
     t.equals(job.name, 'city', 'job.name: city');
     t.equals(job.output, false, 'job.output: false');
     t.equals(job.loglink, false, 'job.loglink: false');
     t.equals(job.status, 'Pending', 'job.status: Pending');
     t.equals(job.version, require('../package.json').version, 'job.version: <version>');
     t.deepEquals(job.stats, {}, 'job.stats: {}');
-    t.equals(job.bounds, false, 'job.bounds: false');
     t.equals(job.raw, false, 'job.raw: false');
 
     t.end();
@@ -125,7 +127,10 @@ test('Job#json', (t) => {
         output: false,
         loglink: false,
         status: 'Pending',
-        version: pkg.version
+        version: pkg.version,
+        bounds: false,
+        count: 0,
+        stats: {}
     });
     t.end();
 });

@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS job (
     output      JSONB,      -- Final S3 Location (geojson.gz)
     loglink     TEXT,       -- LogLink to CloudWatch (expires)
     status      TEXT,       -- Pending, Success, Fail
-    stats       JSONB,
-    bounds      GEOMETRY(POLYGON, 4326),
+    stats       JSONB,      -- Layer specific stats
+    count       BIGINT,     -- Number of processed features
+    bounds      GEOMETRY(POLYGON, 4326), -- Polygon of bounds
     version     TEXT        -- Version of Batch to run the job
 );
 

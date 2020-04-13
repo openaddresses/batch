@@ -251,10 +251,22 @@ class Job {
                         output = $1,
                         loglink = $2,
                         status = $3,
-                        version = $4
+                        version = $4,
+                        count = $5,
+                        stats = $6,
+                        bounds = ST_SetSRID(ST_GeomFromGeoJSON($7), 4326)
                     WHERE
-                        id = $5
-            `, [this.output, this.loglink, this.status, this.version, this.id], async (err) => {
+                        id = $8
+            `, [
+                this.output,
+                this.loglink,
+                this.status,
+                this.version,
+                this.count,
+                this.stats,
+                this.bounds,
+                this.id
+            ], async (err) => {
                 if (err) return reject(new Err(500, err, 'failed to save job'));
 
                 return resolve(this);

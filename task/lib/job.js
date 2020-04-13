@@ -153,7 +153,7 @@ class Job {
                     const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
                     await stats.calc();
 
-                    this.bounds = turf.bboxPolygon(stats.stats.bounds);
+                    this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
                     this.count = stats.stats.count;
                     this.stats = stats.stats[stats.layer];
 

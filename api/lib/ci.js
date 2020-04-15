@@ -107,6 +107,11 @@ class CI {
     }
 
     async push(pool, event) {
+        // The push event was to merge/delete a given branch/pr
+        if (event.after === '0000000000000000000000000000000000000000') {
+            return true;
+        }
+
         try {
             const check = await this.config.octo.checks.create({
                 owner: 'openaddresses',
@@ -153,16 +158,27 @@ class CI {
                 });
                 console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);
 
-                await Run.populate(pool, run.id, gh.jobs);
+                const jobs = await Run.populate(pool, run.id, gh.jobs);
                 console.error(`ok - GH:Push:${event.after}: Run Populated`);
 
-                await this.config.octo.checks.update({
-                    owner: 'openaddresses',
-                    repo: 'openaddresses',
-                    check_run_id: gh.check,
-                    details_url: process.env.BaseUrl + `/run/${run.id}`
-                });
-                console.error(`ok - GH:Push:${event.after}: Check Updated`);
+                if (jobs.jobs.length === 0) {
+                    await this.config.octo.checks.update({
+                        owner: 'openaddresses',
+                        repo: 'openaddresses',
+                        check_run_id: gh.check,
+                        conclusion: 'success'
+                    });
+
+                    console.error(`ok - GH:Push:${event.after}: Check Closed - No Run Jobs Populated`);
+                } else {
+                    await this.config.octo.checks.update({
+                        owner: 'openaddresses',
+                        repo: 'openaddresses',
+                        check_run_id: gh.check,
+                        details_url: process.env.BaseUrl + `/run/${run.id}`
+                    });
+                    console.error(`ok - GH:Push:${event.after}: Check Updated`);
+                }
             }
         } catch (err) {
             throw new Error(err);

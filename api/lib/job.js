@@ -169,7 +169,7 @@ class Job {
         return pgres.rows.map((job) => {
             job.id = parseInt(job.id);
             job.run = parseInt(job.run);
-            job.map = parseInt(job.map);
+            job.map = job.map ? parseInt(job.map) : null;
 
             return job;
         });
@@ -193,7 +193,7 @@ class Job {
 
                 pgres.rows[0].id = parseInt(pgres.rows[0].id);
                 pgres.rows[0].run = parseInt(pgres.rows[0].run);
-                pgres.rows[0].map = parseInt(pgres.rows[0].map);
+                pgres.rows[0].map = pgres.rows[0].map ? parseInt(pgres.rows[0].map) : null;
 
                 const job = new Job(
                     pgres.rows[0].run,

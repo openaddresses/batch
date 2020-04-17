@@ -125,7 +125,7 @@ class Bin {
 
             if (!pgres.rows.length) throw new Err(400, null, 'Feature not found');
 
-            pgres.rows[0].id = parseInt(pgres.rows[0].id)
+            pgres.rows[0].id = parseInt(pgres.rows[0].id);
             pgres.rows[0].layers = pgres.rows[0].layers.filter((layer) => !!layer);
 
             return pgres.rows[0];

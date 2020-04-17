@@ -52,6 +52,15 @@
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
+        <template v-else-if='!datas.length'>
+            <div class='flex-parent flex-parent--center-main'>
+                <div class='flex-child py24'>
+                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                </div>
+            </div>
+            <div class='w-full align-center txt-bold'>No Data Found</div>
+            <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
+        </template>
         <template v-else>
             <div :key='d.id' v-for='d in datas' class='col col--12 grid'>
                 <div @click='emitjob(d.job)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>

@@ -58,7 +58,7 @@ class Bin {
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
                 FROM (
                     SELECT
-                        code,
+                        n.code,
                         JSON_object(ARRAY_AGG(k)::TEXT[], ARRAY_AGG(v)::TEXT[]) AS layers,
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857),
@@ -72,20 +72,23 @@ class Bin {
                         ) AS geom
                     FROM (
                         SELECT
-                            code,
-                            geom,
-                            unnest(layers) AS k,
+                            map.id,
+                            map.name,
+                            map.code,
+                            map.geom,
+                            job.layer AS k,
                             true AS v
-                        FROM map
-                    ) n
-                    WHERE
-                        ST_Intersects(
-                            geom,
-                            ST_Transform(ST_SetSRID(ST_MakeBox2D(
-                                ST_MakePoint($1, $2),
-                                ST_MakePoint($3, $4)
-                            ), 3857), 4326)
+                        FROM
+                            map INNER JOIN job ON map.id = job.map
+                        WHERE
+                            ST_Intersects(
+                                map.geom,
+                                ST_Transform(ST_SetSRID(ST_MakeBox2D(
+                                    ST_MakePoint($1, $2),
+                                    ST_MakePoint($3, $4)
+                                ), 3857), 4326)
                         )
+                    ) n
                     GROUP BY
                         n.code,
                         n.geom

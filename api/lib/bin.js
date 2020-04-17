@@ -27,6 +27,28 @@ class Bin {
         };
     }
 
+    static async from(pool, code) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    id
+                FROM
+                    map
+                WHERE
+                    code = $1
+                LIMIT 1
+            `, [
+                code
+            ]);
+
+            if (pgres.rows.length === 0) return false;
+
+            return pgres.rows[0].id;
+        } catch (err) {
+            throw new Err(500, err, 'Failed to fetch map id');
+        }
+    }
+
     static async tile(pool, z, x, y) {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');
@@ -85,9 +107,13 @@ class Bin {
         try {
             const pgres = await pool.query(`
                 SELECT
-                    *
+                    MAX(map.id) AS id,
+                    MAX(map.name) AS name,
+                    MAX(map.code) AS code,
+                    MAX(map.geom) AS geom,
+                    ARRAY_AGG(DISTINCT job.layer) AS layers
                 FROM
-                    map
+                    map LEFT JOIN job ON map.id = job.map
                 WHERE
                     code = $1
             `, [
@@ -96,31 +122,10 @@ class Bin {
 
             if (!pgres.rows.length) throw new Err(400, null, 'Feature not found');
 
+            pgres.rows[0].id = parseInt(pgres.rows[0].id)
+            pgres.rows[0].layers = pgres.rows[0].layers.filter((layer) => !!layer);
+
             return pgres.rows[0];
-        } catch (err) {
-            throw new Err(500, err, 'Failed to update map');
-        }
-    }
-
-    static async update(pool, code, layer) {
-        console.error(`ok - Updating Map: ${code}`);
-        try {
-            await pool.query(`
-                UPDATE map
-                    SET
-                        layers = (
-                            SELECT Array_Agg(DISTINCT e)
-                            FROM Unnest(layers || $2::TEXT[]) e
-                        )
-                WHERE
-                    NOT layers @> '{$2}'::TEXT[]
-                    AND code = $1
-            `, [
-                code,
-                [layer]
-            ]);
-
-            return true;
         } catch (err) {
             throw new Err(500, err, 'Failed to update map');
         }
@@ -144,7 +149,13 @@ class Bin {
             && raw.coverage['US Census'].geoid
             && raw.coverage['US Census'].geoid.length === 5
         ) {
-            await Bin.update(pool, raw.coverage['US Census'].geoid, job.layer);
+            const bin_id = await Bin.from(pool, raw.coverage['US Census'].geoid);
+
+            if (bin_id) {
+                job.map = bin_id;
+
+                await job.commit(pool);
+            }
         }
 
         return true;

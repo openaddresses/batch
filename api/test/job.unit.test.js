@@ -38,6 +38,7 @@ test('Job()', (t) => {
 
     t.equals(job.id, false, 'job.id: false');
     t.equals(job.run, 1, 'job.run: 1');
+    t.equals(job.map, null, 'job.map: null');
     t.equals(job.created, false, 'job.created: false');
     t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
     t.equals(job.layer, 'addresses', 'job.layer: addresses');
@@ -119,6 +120,7 @@ test('Job#json', (t) => {
     t.deepEquals(job.json(), {
         id: NaN,
         run: 1,
+        map: null,
         created: false,
         source_name: 'us/pa/bucks',
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',

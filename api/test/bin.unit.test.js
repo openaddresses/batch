@@ -8,7 +8,7 @@ const init = require('./init');
 
 init(test);
 
-test('Bin#update', async (t) => {
+test('Bin#get_feature - country', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
@@ -17,38 +17,72 @@ test('Bin#update', async (t) => {
         await pool.query(`
             INSERT INTO map (
                 name,
-                code,
-                layers
+                code
             ) VALUES (
                 'United States',
-                'us',
-                '{}'
+                'us'
             );
         `);
 
-        await Bin.update(pool, 'us', 'addresses');
-        t.deepEquals(await Bin.get_feature(pool, 'us'), {
-            name: 'United States',
-            code: 'us',
-            geom: null,
-            layers: ['addresses']
-        }, 'addresses layer added');
+        {
+            const job = new Job(
+                1,
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+                'addresses',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 1;
+            await job.commit(pool);
 
-        await Bin.update(pool, 'us', 'addresses');
-        t.deepEquals(await Bin.get_feature(pool, 'us'), {
-            name: 'United States',
-            code: 'us',
-            geom: null,
-            layers: ['addresses']
-        }, 'addresses layer not duplicated');
+            t.deepEquals(await Bin.get_feature(pool, 'us'), {
+                id: 1,
+                name: 'United States',
+                code: 'us',
+                geom: null,
+                layers: ['addresses']
+            }, 'addresses layer added');
+        }
 
-        await Bin.update(pool, 'us', 'buildings');
-        t.deepEquals(await Bin.get_feature(pool, 'us'), {
-            name: 'United States',
-            code: 'us',
-            geom: null,
-            layers: ['addresses', 'buildings']
-        }, 'additions retain array');
+        {
+            const job = new Job(
+                1,
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+                'addresses',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 1;
+            await job.commit(pool);
+
+            t.deepEquals(await Bin.get_feature(pool, 'us'), {
+                id: 1,
+                name: 'United States',
+                code: 'us',
+                geom: null,
+                layers: ['addresses']
+            }, 'addresses layer not duplicated');
+        }
+
+        {
+            const job = new Job(
+                1,
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+                'buildings',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 1;
+            await job.commit(pool);
+
+            t.deepEquals(await Bin.get_feature(pool, 'us'), {
+                id: 1,
+                name: 'United States',
+                code: 'us',
+                geom: null,
+                layers: ['addresses', 'buildings']
+            }, 'additions retain array');
+        }
     } catch (err) {
         t.error(err);
     }
@@ -57,7 +91,7 @@ test('Bin#update', async (t) => {
     t.end();
 });
 
-test('Bin#update', async (t) => {
+test('Bin#match - county', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
@@ -66,36 +100,62 @@ test('Bin#update', async (t) => {
         await pool.query(`
             INSERT INTO map (
                 name,
-                code,
-                layers
+                code
             ) VALUES (
                 'Bucks County',
-                '42017',
-                '{}'
+                '42017'
             );
         `);
 
         t.deepEquals(await Bin.get_feature(pool, '42017'), {
+            id: 2,
             name: 'Bucks County',
             code: '42017',
             geom: null,
             layers: []
         }, 'no addresses layer');
 
-        const job = new Job(
-            1,
-            'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
-            'addresses',
-            'city'
-        );
+        {
+            const job = new Job(
+                1,
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+                'addresses',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 2;
+            await job.commit(pool);
 
-        await Bin.match(pool, job);
-        t.deepEquals(await Bin.get_feature(pool, '42017'), {
-            name: 'Bucks County',
-            code: '42017',
-            geom: null,
-            layers: ['addresses']
-        }, 'addresses layer added');
+            await Bin.match(pool, job);
+            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+                id: 2,
+                name: 'Bucks County',
+                code: '42017',
+                geom: null,
+                layers: ['addresses']
+            }, 'addresses layer added');
+        }
+
+        {
+            const job = new Job(
+                1,
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+                'buildings',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 2;
+            await job.commit(pool);
+
+            await Bin.match(pool, job);
+            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+                id: 2,
+                name: 'Bucks County',
+                code: '42017',
+                geom: null,
+                layers: ['addresses', 'buildings']
+            }, 'buildings layer added');
+        }
     } catch (err) {
         t.error(err);
     }

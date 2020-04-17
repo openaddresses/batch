@@ -9,10 +9,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Store coverage map
 CREATE TABLE IF NOT EXISTS map (
+    id          BIGSERIAL,                  -- Map ID
     name        TEXT,                       -- Common Name
     code        TEXT,                       -- ISO Country/Region Code
-    geom        GEOMETRY(GEOMETRY, 4326),   -- Geometry
-    layers      TEXT[]                      -- ["layer", ... ]
+    geom        GEOMETRY(GEOMETRY, 4326)    -- Geometry
 );
 
 -- Store the latest known good data for a given source
@@ -29,8 +29,9 @@ CREATE TABLE IF NOT EXISTS results (
 -- Each batch task processes a single name, of a single layer, from a single source
 CREATE TABLE IF NOT EXISTS job (
     id          BIGSERIAL PRIMARY KEY,
-    run         BIGINT,     -- run id
-    created     TIMESTAMP,
+    run         BIGINT,     -- run ID
+    map         BIGINT,     -- Map coverage ID
+    created     TIMESTAMP,  -- Job submission timestamp
     source      TEXT,       -- URL to Source JSON
     source_name TEXT,       -- Name of source (us/ca/statewide)
     layer       TEXT,       -- Data Layer to process

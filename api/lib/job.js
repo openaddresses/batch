@@ -18,6 +18,7 @@ class Job {
 
         this.id = false,
         this.run = run;
+        this.map = null;
         this.created = false;
         this.source = source;
         this.source_name = this.fullname();
@@ -33,6 +34,7 @@ class Job {
 
         // Attributes which are allowed to be patched
         this.attrs = [
+            'map',
             'output',
             'loglink',
             'status',
@@ -85,6 +87,7 @@ class Job {
         return {
             id: parseInt(this.id),
             run: parseInt(this.run),
+            map: this.map ? parseInt(this.map) : null,
             created: this.created,
             source_name: this.source_name,
             source: this.source,
@@ -166,6 +169,7 @@ class Job {
         return pgres.rows.map((job) => {
             job.id = parseInt(job.id);
             job.run = parseInt(job.run);
+            job.map = parseInt(job.map);
 
             return job;
         });
@@ -189,6 +193,7 @@ class Job {
 
                 pgres.rows[0].id = parseInt(pgres.rows[0].id);
                 pgres.rows[0].run = parseInt(pgres.rows[0].run);
+                pgres.rows[0].map = parseInt(pgres.rows[0].map);
 
                 const job = new Job(
                     pgres.rows[0].run,
@@ -243,9 +248,9 @@ class Job {
         return s3.stream(res);
     }
 
-    commit(pool) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    async commit(pool) {
+        try {
+            await pool.query(`
                 UPDATE job
                     SET
                         output = $1,
@@ -254,9 +259,10 @@ class Job {
                         version = $4,
                         count = $5,
                         stats = $6,
-                        bounds = ST_SetSRID(ST_GeomFromGeoJSON($7), 4326)
+                        bounds = ST_SetSRID(ST_GeomFromGeoJSON($7), 4326),
+                        map = $8
                     WHERE
-                        id = $8
+                        id = $9
             `, [
                 this.output,
                 this.loglink,
@@ -265,13 +271,14 @@ class Job {
                 this.count,
                 this.stats,
                 this.bounds,
+                this.map,
                 this.id
-            ], async (err) => {
-                if (err) return reject(new Err(500, err, 'failed to save job'));
+            ]);
 
-                return resolve(this);
-            });
-        });
+            return this;
+        } catch (err) {
+            throw new Err(500, err, 'failed to save job');
+        }
     }
 
     log() {
@@ -297,14 +304,14 @@ class Job {
         });
     }
 
-    generate(pool) {
-        return new Promise((resolve, reject) => {
-            if (!this.run) return reject(new Err(400, null, 'Cannot generate a job without a run'));
-            if (!this.source) return reject(new Err(400, null, 'Cannot generate a job without a source'));
-            if (!this.layer) return reject(new Err(400, null, 'Cannot generate a job without a layer'));
-            if (!this.name) return reject(new Err(400, null, 'Cannot generate a job without a name'));
+    async generate(pool) {
+        if (!this.run) throw new Err(400, null, 'Cannot generate a job without a run');
+        if (!this.source) throw new Err(400, null, 'Cannot generate a job without a source');
+        if (!this.layer) throw new Err(400, null, 'Cannot generate a job without a layer');
+        if (!this.name) throw new Err(400, null, 'Cannot generate a job without a name');
 
-            pool.query(`
+        try {
+            const pgres = await pool.query(`
                 INSERT INTO job (
                     run,
                     created,
@@ -334,16 +341,16 @@ class Job {
                 this.name,
                 this.version,
                 { cache: false, output: false, preview: false }
-            ], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to generate job'));
+            ]);
 
-                for (const key of Object.keys(pgres.rows[0])) {
-                    this[key] = pgres.rows[0][key];
-                }
+            for (const key of Object.keys(pgres.rows[0])) {
+                this[key] = pgres.rows[0][key];
+            }
 
-                return resolve(this);
-            });
-        });
+            return this;
+        } catch (err) {
+            throw new Err(500, err, 'failed to generate job');
+        }
     }
 
     batch() {

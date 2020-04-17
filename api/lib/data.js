@@ -14,6 +14,18 @@ class Data {
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';
 
+        if (!query.point) {
+            query.point = '';
+        } else {
+            query.point = query.point.split(',');
+
+            if (query.point.length !== 2) {
+                throw new Err(404, null, 'invalid point query');
+            }
+
+            query.point = `POINT(${query.point.join(' ')})`;
+        }
+
         query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
         query.name = query.name + '%';
@@ -29,17 +41,24 @@ class Data {
                     results.job,
                     job.output
                 FROM
-                    results,
-                    job
+                    results
+                        INNER JOIN
+                            job LEFT JOIN map
+                                ON job.map = map.id
+                            ON results.job = job.id
                 WHERE
-                    results.job = job.id
-                    AND results.source ilike $1
+                    results.source ilike $1
                     AND results.layer ilike $2
                     AND results.name ilike $3
+                    AND (
+                        char_length($4) = 0
+                        OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 0.01)
+                    )
             `, [
                 query.source,
                 query.layer,
-                query.name
+                query.name,
+                query.point
             ]);
 
             return pgres.rows.map((res) => {

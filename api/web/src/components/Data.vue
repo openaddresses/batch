@@ -5,14 +5,17 @@
                 <h2 class='txt-h4 pb12 fl'>Data:</h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
+                    <svg class='icon'><use href='#icon-refresh'/></svg>
                 </button>
                 <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
-                    <svg class='icon'><use xlink:href='#icon-search'/></svg>
+                    <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
+                    <svg v-else class='icon'><use href='#icon-close'/></svg>
                 </button>
 
                 <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round mb12'>
+                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
+                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
+
                         <div class='col col--8 px6'>
                             <label>Source</label>
                             <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
@@ -101,6 +104,10 @@ export default {
         this.refresh();
     },
     watch: {
+        showFilter: function() {
+            this.filter.source = '';
+            this.filter.layer = 'all';
+        },
         'filter.layer': function() {
             this.refresh();
         },

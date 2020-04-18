@@ -4,6 +4,7 @@ const cf = require('@mapbox/cloudfriend');
 const api = require('./api');
 const batch = require('./batch');
 const db = require('./db');
+const schedule = require('./schedule');
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -28,5 +29,6 @@ module.exports = cf.merge(
     stack,
     db,
     api,
-    batch
+    batch,
+    schedule
 );

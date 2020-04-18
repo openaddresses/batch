@@ -6,15 +6,7 @@
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
-                <template v-if='job.status === "Pending"'>
-                    <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                </template>
-                <template v-else-if='job.status === "Success"'>
-                    <svg class='fl icon ml12 color-green opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                </template>
-                <template v-else-if='job.status === "Fail"'>
-                    <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                </template>
+                <Status :status='job.status'/>
 
                 <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
 
@@ -57,6 +49,9 @@
 </template>
 
 <script>
+
+import Status from './Status.vue';
+
 export default {
     name: 'Job',
     props: ['jobid'],
@@ -75,6 +70,9 @@ export default {
     },
     mounted: function() {
         this.refresh();
+    },
+    components: {
+        Status
     },
     methods: {
         datapls: function() {

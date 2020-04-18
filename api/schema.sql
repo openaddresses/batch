@@ -7,6 +7,12 @@ CREATE TABLE IF NOT EXISTS users (
     password    TEXT NOT NULL
 );
 
+-- Store recent live job errors (reset on every scheduled run)
+CREATE TABLE IF NOT EXISTS job_errors (
+    job         BIGINT UNIQUE NOT NULL, -- Job ID reference
+    message     TEXT NOT NULL           -- Human readable failure message
+);
+
 -- Store coverage map
 CREATE TABLE IF NOT EXISTS map (
     id          BIGSERIAL,                  -- Map ID

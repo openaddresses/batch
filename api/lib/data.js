@@ -7,6 +7,16 @@ const Bin = require('./bin');
  * @class Data
  */
 class Data {
+    /**
+     * Return the last sucessful state for all data runs
+     *
+     * @param {Pool} pool - Postgres Pool Instance
+     * @param {Object} query - Query object
+     * @param {String} [query.source=Null] - Filter results by source
+     * @param {String} [query.layer=Null] - Filter results by source layer
+     * @param {String} [query.name=Null] - Filter results by source layer name
+     * @param {String} [query.point=false] - Filter results by geographic point
+     */
     static async list(pool, query) {
         if (!query) query = {};
 
@@ -72,6 +82,13 @@ class Data {
         }
     }
 
+    /**
+     * Return a complete job history for a given data source
+     * (jobs part of live run & in any status)
+     *
+     * @param {Pool} pool - Postgres Pool Instance
+     * @param {Numeric} data_id - ID of data row
+     */
     static async history(pool, data_id) {
         try {
             const pgres = await pool.query(`
@@ -82,15 +99,15 @@ class Data {
                     job.output,
                     job.run
                 FROM
-                    job,
-                    runs,
-                    results
+                    results INNER JOIN job
+                        ON
+                            job.source_name = results.source
+                            AND job.layer = results.layer
+                            AND job.name = results.name
+                        INNER JOIN runs
+                            ON job.run = runs.id
                 WHERE
-                    job.run = runs.id
-                    AND runs.live = true
-                    AND job.source_name = results.source
-                    AND job.layer = results.layer
-                    AND job.name = results.name
+                    runs.live = true
                     AND results.id = $1
             `, [
                 data_id

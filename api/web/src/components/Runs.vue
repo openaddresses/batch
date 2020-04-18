@@ -2,7 +2,7 @@
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <h2 class='txt-h4 pb12 fl'>Runs</h2>
+                <h2 class='txt-h4 pb12 fl'>Runs:</h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
@@ -34,15 +34,7 @@
             <div @click='emitrun(run.id)' :key='run.id' v-for='run in runs' class='col col--12 grid'>
                 <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
-                        <template v-if='run.status === "Pending"'>
-                            <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                        </template>
-                        <template v-else-if='run.status === "Success"'>
-                            <svg class='fl icon ml12 color-green opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                        </template>
-                        <template v-else-if='run.status === "Fail"'>
-                            <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                        </template>
+                        <Status :status='run.status'/>
                     </div>
                     <div class='col col--2'>
                         Run <span v-text='run.id'/>
@@ -60,6 +52,8 @@
 </template>
 
 <script>
+import Status from './Status.vue';
+
 export default {
     name: 'Runs',
     mounted: function() {
@@ -97,6 +91,7 @@ export default {
         }
     },
     components: {
+        Status
     }
 }
 </script>

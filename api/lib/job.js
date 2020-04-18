@@ -112,7 +112,6 @@ class Job {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.run=false] - Only show jobs associated with a given run
      * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
-     * @param {boolean} [query.live=false] - Only show jobs with a run type of "live"
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -138,34 +137,13 @@ class Job {
             where.push(`run = ${query.run}`);
         }
 
-        if (query.live) {
-            where.push('runs.live IS true');
-        }
-
         let pgres;
         try {
             pgres = await pool.query(`
                 SELECT
-                    job.id,
-                    job.run,
-                    job.created,
-                    job.source,
-                    job.layer,
-                    job.name,
-                    job.output,
-                    job.loglink,
-                    job.status,
-                    job.version,
-                    job.stats,
-                    job.bounds,
-                    job.source_name,
-                    job.count,
-                    job.map,
-                    runs.live
+                    *
                 FROM
                     job
-                        INNER JOIN runs
-                            ON job.run = runs.id
                 WHERE
                     '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
                     ${where.length ? 'AND ' + where.join(' AND ') : ''}

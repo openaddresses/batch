@@ -43,6 +43,7 @@ async function server(args, config, cb) {
     const Run = require('./lib/run');
     const Job = require('./lib/job');
     const Data = require('./lib/data');
+    const Schedule = require('./lib/schedule');
 
     let postgres = process.env.POSTGRES;
 
@@ -121,6 +122,16 @@ async function server(args, config, cb) {
         }
     });
 
+    router.post('/schedule', async (req, res) => {
+        try {
+            await Schedule.event(pool);
+
+            return res.json(true);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     router.get('/map', (req, res) => {
         return res.json(Bin.map());
     });
@@ -142,6 +153,17 @@ async function server(args, config, cb) {
     router.get('/data', async (req, res) => {
         try {
             const data = await Data.list(pool, req.query);
+
+            return res.json(data);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    router.get('/data/history', async (req, res) => {
+        try {
+            if (req.query.status) req.query.status = req.query.status.split(',');
+            const data = await Data.list_history(pool, req.query);
 
             return res.json(data);
         } catch (err) {

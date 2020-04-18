@@ -51,9 +51,8 @@ export default {
             this.getProblems();
         },
         getProblems: function() {
-            const url = new URL(`${window.location.origin}/api/job`);
-            url.searchParams.set('status', ['warn', 'fail']);
-            url.searchParams.set('live', true);
+            const url = new URL(`${window.location.origin}/api/data/history`);
+            url.searchParams.set('status', ['Warn', 'Fail']);
 
             fetch(url, {
                 method: 'Get'

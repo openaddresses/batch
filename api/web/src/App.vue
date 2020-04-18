@@ -5,6 +5,7 @@
             <router-link to='/data'><button class='btn btn--stroke btn--s btn--gray round mr12'>Data</button></router-link>
             <router-link to='/run'><button class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button></router-link>
             <router-link to='/job'><button class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button></router-link>
+            <router-link to='/admin'><button class='btn btn--stroke btn--s btn--gray round mr12'>Admin</button></router-link>
 
             <router-link to='/login'><button class='fr btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
         </div>

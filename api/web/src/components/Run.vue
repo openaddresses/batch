@@ -6,15 +6,7 @@
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
-                <template v-if='run.status === "Pending"'>
-                    <svg class='fl icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                </template>
-                <template v-else-if='run.status === "Success"'>
-                    <svg class='fl icon ml12 color-green opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                </template>
-                <template v-else-if='run.status === "Fail"'>
-                    <svg class='fl icon ml12 color-red opacity50' style='height: 16px; margin-top: 4px;'><use xlink:href='#icon-circle'/></svg>
-                </template>
+                <Status :status='run.status'/>
 
                 <h2 class='txt-h4 ml12 pb12 fl'>Run #<span v-text='runid'/></h2>
 
@@ -56,15 +48,7 @@
                 <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
                     <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                         <div class='col col--1'>
-                            <template v-if='job.status === "Pending"'>
-                                <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                            </template>
-                            <template v-else-if='job.status === "Success"'>
-                                <svg class='icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                            </template>
-                            <template v-else-if='job.status === "Fail"'>
-                                <svg class='icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                            </template>
+                            <Status :status='job.status'/>
                         </div>
                         <div class='col col--4'>
                             Job <span v-text='job.id'/>
@@ -80,6 +64,8 @@
 </template>
 
 <script>
+import Status from './Status.vue';
+
 export default {
     name: 'Run',
     props: ['runid'],
@@ -98,6 +84,9 @@ export default {
     },
     mounted: function() {
         this.refresh();
+    },
+    components: {
+        Status
     },
     methods: {
         external: function(url) {

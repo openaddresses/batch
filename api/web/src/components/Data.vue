@@ -37,7 +37,9 @@
             </div>
 
             <div class='col col--12 pb12'>
-                <Coverage/>
+                <Coverage
+                    v-on:point='filter.point = $event'
+                />
             </div>
 
             <div class='col col--5'>
@@ -94,6 +96,7 @@ export default {
             loading: false,
             showFilter: false,
             filter: {
+                point: false,
                 source: '',
                 layer: 'all'
             },
@@ -105,8 +108,12 @@ export default {
     },
     watch: {
         showFilter: function() {
+            this.filter.point = false;
             this.filter.source = '';
             this.filter.layer = 'all';
+        },
+        'filter.point': function() {
+            this.refresh();
         },
         'filter.layer': function() {
             this.refresh();
@@ -133,7 +140,12 @@ export default {
         },
         getData: function() {
             this.loading = true;
-            fetch(window.location.origin + `/api/data?source=${this.filter.source}&layer=${this.filter.layer}`, {
+            const url = new URL(`${window.location.origin}/api/data`);
+            url.searchParams.set('source', this.filter.source);
+            url.searchParams.set('layer', this.filter.layer);
+            if (this.filter.point) url.searchParams.set('point', this.filter.point.join(','));
+
+            fetch(url, {
                 method: 'GET'
             }).then((res) => {
                 return res.json();

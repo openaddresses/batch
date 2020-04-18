@@ -43,6 +43,12 @@ export default {
                         maxzoom: 16
                     });
 
+                    this.map.on('click', (e) => {
+                        const point = [ e.lngLat.lng, e.lngLat.lat ]
+
+                        this.$emit('point', point);
+                    });
+
                     this.map.addLayer({
                         id: 'mapillary',
                         type: 'fill',

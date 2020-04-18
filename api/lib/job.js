@@ -5,6 +5,7 @@ const request = require('request');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');
 const pkg  = require('../package.json');
+const { Status } = require('./util');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
@@ -110,12 +111,20 @@ class Job {
      * @param {Object} query - Query object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.run=false] - Only show jobs associated with a given run
+     * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
+     * @param {boolean} [query.live=false] - Only show jobs with a run type of "live"
      */
     static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
 
         const where = [];
+
+        if (!query.status) {
+            query.status = Status.list();
+        } else {
+            Status.verify(query.status);
+        }
 
         if (!query.run) {
             query.run = false;
@@ -129,41 +138,49 @@ class Job {
             where.push(`run = ${query.run}`);
         }
 
+        if (query.live) {
+            where.push('runs.live IS true');
+        }
+
         let pgres;
         try {
-            if (!where.length) {
-                pgres = await pool.query(`
-                    SELECT
-                        *
-                    FROM
-                        job
-                    ORDER BY
-                        created DESC
-                    LIMIT $1
-                `, [
-                    query.limit
-                ]);
-            } else {
-                pgres = await pool.query(`
-                    SELECT
-                        *
-                    FROM
-                        job
-                    WHERE
-                        ${where.join(' AND ')}
-                    ORDER BY
-                        created DESC
-                    LIMIT $1
-                `, [
-                    query.limit
-                ]);
-            }
+            pgres = await pool.query(`
+                SELECT
+                    job.id,
+                    job.run,
+                    job.created,
+                    job.source,
+                    job.layer,
+                    job.name,
+                    job.output,
+                    job.loglink,
+                    job.status,
+                    job.version,
+                    job.stats,
+                    job.bounds,
+                    job.source_name,
+                    job.count,
+                    job.map,
+                    runs.live
+                FROM
+                    job
+                        INNER JOIN runs
+                            ON job.run = runs.id
+                WHERE
+                    '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
+                    ${where.length ? 'AND ' + where.join(' AND ') : ''}
+                ORDER BY
+                    created DESC
+                LIMIT $1
+            `, [
+                query.limit
+            ]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load jobs');
         }
 
         if (!pgres.rows.length) {
-            throw new Err(404, null, 'No job by that id');
+            throw new Err(404, null, 'No job found');
         }
 
         return pgres.rows.map((job) => {

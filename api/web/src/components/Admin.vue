@@ -18,15 +18,8 @@
         <template v-else>
             <div :key='job.id' v-for='job in problems' class='col col--12 grid'>
                 <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--5'>
-                        <span class='ml12' v-text='job.source'/>
-                    </div>
-                    <div class='col col--2'>
-                        <span v-text='job.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
-                    </div>
-                    <div class='col col--5'>
-                        <span v-on:click.stop.prevent='datapls(job)' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
-                        <span v-on:click.stop.prevent='emithistory(job)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
+                    <div class='col col--1'>
+                        <Status :status='job.status'/>
                     </div>
                 </div>
             </div>
@@ -36,6 +29,8 @@
 </template>
 
 <script>
+import Status from './Status.vue';
+
 export default {
     name: 'Admin',
     props: [ ],
@@ -48,12 +43,17 @@ export default {
     mounted: function() {
         this.refresh();
     },
+    components: {
+        Status
+    },
     methods: {
         refresh: function() {
             this.getProblems();
         },
         getProblems: function() {
             const url = new URL(`${window.location.origin}/api/job`);
+            url.searchParams.set('status', ['warn', 'fail']);
+            url.searchParams.set('live', true);
 
             fetch(url, {
                 method: 'Get'

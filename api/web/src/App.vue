@@ -9,8 +9,8 @@
             <router-link to='/login'><button class='fr btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
         </div>
 
-        <div class='col col--12 flex-parent flex-parent--center-main'>
-            <div class='flex-child wmax600 col col--12'>
+        <div class='col col--12 flex-parent flex-parent--center-main relative'>
+            <div class='flex-child col col--12 wmax600'>
                   <router-view></router-view>
             </div>
         </div>

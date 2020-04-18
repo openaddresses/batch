@@ -15,6 +15,7 @@ class Data {
      * @param {String} [query.source=Null] - Filter results by source
      * @param {String} [query.layer=Null] - Filter results by source layer
      * @param {String} [query.name=Null] - Filter results by source layer name
+     * @param {String} [query.point=false] - Filter results by geographic point
      */
     static async list(pool, query) {
         if (!query) query = {};

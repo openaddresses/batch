@@ -32,6 +32,21 @@ export default {
     },
     watch: {
         point: function() {
+            if (!this.point) {
+                this.map.getSource('click').setData({
+                    type: 'FeatureCollection',
+                    features: []
+                });
+            } else {
+                this.map.getSource('click').setData({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Point',
+                        coordinates: this.point
+                    }
+                });
+            }
             this.$emit('point', this.point);
         }
     },
@@ -84,6 +99,23 @@ export default {
                         'paint': {
                             'fill-color': '#ff0000',
                             'fill-opacity': 0.8
+                        }
+                    });
+
+                    this.map.addSource('click', {
+                        type: 'geojson',
+                        data: {
+                            type: 'FeatureCollection',
+                            features: []
+                        }
+                    });
+
+                    this.map.addLayer({
+                        id: 'click',
+                        type: 'symbol',
+                        source: 'click',
+                        layout: {
+                            'icon-image': 'circle-15'
                         }
                     });
                 });

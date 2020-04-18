@@ -108,7 +108,6 @@ export default {
     },
     watch: {
         showFilter: function() {
-            this.filter.point = false;
             this.filter.source = '';
             this.filter.layer = 'all';
         },

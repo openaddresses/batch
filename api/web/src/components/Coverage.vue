@@ -1,6 +1,15 @@
 <template>
-    <div class='col col--12'>
-        <div id="map" class='w-full h300'></div>
+    <div class='col col--12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
+        <div class='col col--12 relative'>
+            <div class='absolute top right z5'>
+                <button @click='setFull' class='btn round btn--stroke fr color-gray bg-white my12 mx12'>
+                    <svg v-if='!fullscreen' class='icon'><use href='#icon-fullscreen'/></svg>
+                    <svg v-else class='icon'><use href='#icon-shrink'/></svg>
+                </button>
+            </div>
+
+            <div id="map" class='w-full h300'></div>
+        </div>
     </div>
 </template>
 
@@ -10,6 +19,7 @@ export default {
     props: [],
     data: function() {
         return {
+            fullscreen: false,
             map: ''
         }
     },
@@ -17,6 +27,10 @@ export default {
         this.init();
     },
     methods: {
+        setFull: function() {
+            this.fullscreen = !this.fullscreen;
+            this.map.resize();
+        },
         init: function() {
             fetch(`${window.location.origin}/api/map`, {
                 method: 'GET'

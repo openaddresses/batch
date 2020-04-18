@@ -36,7 +36,7 @@
                 </template>
             </div>
 
-            <div class='col col--12 pb12'>
+            <div class='col col--12 mb12 h300'>
                 <Coverage
                     v-on:point='filter.point = $event'
                 />

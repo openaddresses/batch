@@ -29,7 +29,9 @@ export default {
     methods: {
         setFull: function() {
             this.fullscreen = !this.fullscreen;
-            this.map.resize();
+            this.$nextTick(() => {
+                this.map.resize();
+            });
         },
         init: function() {
             fetch(`${window.location.origin}/api/map`, {

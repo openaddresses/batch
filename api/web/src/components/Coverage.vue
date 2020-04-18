@@ -8,6 +8,12 @@
                 </button>
             </div>
 
+            <div v-if='point' class='absolute top left z5'>
+                <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
+                    <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
+                </button>
+            </div>
+
             <div id="map" class='w-full h300'></div>
         </div>
     </div>
@@ -20,7 +26,13 @@ export default {
     data: function() {
         return {
             fullscreen: false,
+            point: false,
             map: ''
+        }
+    },
+    watch: {
+        point: function() {
+            this.$emit('point', this.point);
         }
     },
     mounted: function() {
@@ -60,9 +72,7 @@ export default {
                     });
 
                     this.map.on('click', (e) => {
-                        const point = [ e.lngLat.lng, e.lngLat.lat ]
-
-                        this.$emit('point', point);
+                        this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 
                     this.map.addLayer({

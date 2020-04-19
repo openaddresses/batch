@@ -163,3 +163,77 @@ test('Bin#match - county', async (t) => {
     pool.end();
     t.end();
 });
+
+test('Bin#match - country', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        await pool.query(`
+            INSERT INTO map (
+                name,
+                code
+            ) VALUES (
+                'Canada',
+                'ca'
+            );
+        `);
+
+        t.deepEquals(await Bin.get_feature(pool, 'ca'), {
+            id: 3,
+            name: 'Canada',
+            code: '42017',
+            geom: null,
+            layers: []
+        }, 'no addresses layer');
+
+        {
+            const job = new Job(
+                1,
+                '',
+                'addresses',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 2;
+            await job.commit(pool);
+
+            await Bin.match(pool, job);
+            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+                id: 2,
+                name: 'Bucks County',
+                code: '42017',
+                geom: null,
+                layers: ['addresses']
+            }, 'addresses layer added');
+        }
+
+        {
+            const job = new Job(
+                1,
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+                'buildings',
+                'city'
+            );
+            await job.generate(pool);
+            job.map = 2;
+            await job.commit(pool);
+
+            await Bin.match(pool, job);
+            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+                id: 2,
+                name: 'Bucks County',
+                code: '42017',
+                geom: null,
+                layers: ['addresses', 'buildings']
+            }, 'buildings layer added');
+        }
+    } catch (err) {
+        t.error(err);
+    }
+
+    pool.end();
+    t.end();
+});
+

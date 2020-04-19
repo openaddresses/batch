@@ -42,7 +42,7 @@ async function server(args, config, cb) {
     const Err = require('./lib/error');
     const Run = require('./lib/run');
     const Job = require('./lib/job');
-    const JobError = require('./lib/joberror');
+    // const JobError = require('./lib/joberror');
     const Data = require('./lib/data');
     const Schedule = require('./lib/schedule');
 
@@ -113,7 +113,7 @@ async function server(args, config, cb) {
     });
 
     app.use('/api', router);
-    app.use('/doc', express.static('./doc'));
+    app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
 
     router.use(bodyparser.urlencoded({ extended: true }));

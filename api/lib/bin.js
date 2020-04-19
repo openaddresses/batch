@@ -1,5 +1,6 @@
 'use strict';
 
+const hash = require('object-hash');
 const split = require('split');
 const SM = require('@mapbox/sphericalmercator');
 const { pipeline } = require('stream');
@@ -147,19 +148,48 @@ class Bin {
 
         if (!raw.coverage) return true;
 
+        const keys = Object.keys(raw.coverage).filter((key) => {
+            return !['iso 3166', 'us census'].includes(key.toLowerCase());
+        });
+
+        let code = false;
+
         if ( // US Counties
             raw.coverage['US Census']
             && raw.coverage['US Census'].geoid
             && raw.coverage['US Census'].geoid.length === 5
         ) {
-            const bin_id = await Bin.from(pool, raw.coverage['US Census'].geoid);
-
-            if (bin_id) {
-                job.map = bin_id;
-
-                await job.commit(pool);
-            }
+            code = raw.coverage['US Census'].geoid;
+        } else if (raw.coverage.geometry) {
+            code = hash(raw.coverage.geometry.coordinates);
+        } else if (eq(keys, ['country'])) {
+            code = raw.coverage.country.toLowerCase();
+        } else if (eq(keys, ['country', 'state'])) {
+            const country = raw.coverage.country.toLowerCase();
+            const state = raw.coverage.state.toLowerCase();
+            code = `${country}-${state}`;
         }
+
+        // Currently unhandled
+        // Get List:
+        //   jq -rc '.coverage | keys' sources/**/*.json | sort | uniq | vim -
+        // Find specific:
+        //   jq -rc '{ "keys": .coverage | keys, "file": input_filename } ' sources/**/*.json | vim -
+        //
+        // ["city","country"]
+        // ["city","country","state"]
+        // ["country","county","state"]
+        // ["country","state","town"]
+
+
+        if (!code) return false;
+
+        const bin_id = await Bin.from(pool, code);
+        if (!bin_id) return false;
+
+        job.map = bin_id;
+
+        await job.commit(pool);
 
         return true;
     }
@@ -218,6 +248,21 @@ class Bin {
             });
         });
     }
+}
+
+function eq(a, b) {
+    a.sort();
+    b.sort();
+
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+
+    for (let i = 0; i < a.length; ++i) {
+        if (a[i] !== b[i]) return false;
+    }
+
+    return true;
 }
 
 module.exports = Bin;

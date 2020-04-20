@@ -20,18 +20,28 @@
         <div class='col col--12 flex-parent flex-parent--center-main relative'>
             <div class='flex-child col col--12 wmax600'>
                 <router-view
-                    @auth='auth = $event' 
+                    @auth='auth = $event'
+                    @err='err = $event'
                 />
             </div>
         </div>
+
+        <Error
+            v-if='err'
+            :err='err'
+            @err='err = $event'
+        />
     </div>
 </template>
 
 <script>
+import Error from './components/Error.vue'
+
 export default {
     name: 'OpenAddresses',
     data: function() {
         return {
+            err: false,
             auth: {
                 username: false
             },
@@ -48,6 +58,9 @@ export default {
                 window.open(url, "_blank");
             }
         }
+    },
+    components: {
+        Error
     }
 }
 </script>

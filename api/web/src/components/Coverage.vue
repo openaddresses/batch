@@ -1,14 +1,14 @@
 <template>
     <div class='col col--12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
         <div class='col col--12 relative'>
-            <div class='absolute top right z5'>
+            <div class='absolute top right z1'>
                 <button @click='setFull' class='btn round btn--stroke fr color-gray bg-white my12 mx12'>
                     <svg v-if='!fullscreen' class='icon'><use href='#icon-fullscreen'/></svg>
                     <svg v-else class='icon'><use href='#icon-shrink'/></svg>
                 </button>
             </div>
 
-            <div v-if='point' class='absolute top left z5'>
+            <div v-if='point' class='absolute top left z1'>
                 <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
                     <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
                 </button>

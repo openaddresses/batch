@@ -66,16 +66,14 @@ export default {
                     password: this.password
                 })
             }).then((res) => {
+                this.loading = false;
+                if (res.status !== 200) throw new Error('Incorrect username or password');
                 return res.json();
             }).then((res) => {
-                this.loading = false;
-                // TODO STATUS CHECK - must be 200
-
                 this.$emit('auth', res);
                 this.$router.push('/data')
             }).catch((err) => {
-                // TODO HANDLE THIS IN UI
-                console.error(err);
+                this.$emit('err', err);
             });
         }
     }

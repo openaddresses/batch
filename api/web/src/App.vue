@@ -9,13 +9,19 @@
 
             <span class='fr'>
                 <button @click='external("/docs", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
-                <router-link to='/login'><button class='btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
+
+                <router-link v-if='!auth.username' to='/login'><button class='btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
+                <router-link v-else to='/profile'><button class='btn btn--stroke btn--s btn--gray round mr12'>
+                    <svg class='inline pt3 icon'><use xlink:href='#icon-user'/></svg><span v-text='auth.username'/>
+                </button></router-link>
             </span>
         </div>
 
         <div class='col col--12 flex-parent flex-parent--center-main relative'>
             <div class='flex-child col col--12 wmax600'>
-                  <router-view></router-view>
+                <router-view
+                    @auth='auth = $event' 
+                />
             </div>
         </div>
     </div>
@@ -26,6 +32,9 @@ export default {
     name: 'OpenAddresses',
     data: function() {
         return {
+            auth: {
+                username: false
+            },
             runid: false,
             jobid: false,
             dataid: false

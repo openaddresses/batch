@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const session = require('express-session');
 const ghverify = require('@octokit/webhooks/verify');
 const path = require('path');
 const morgan = require('morgan');
@@ -13,6 +14,8 @@ const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate'],
     string: ['postgres']
 });
+
+const pgSession = require('connect-pg-simple')(session);
 
 const Param = util.Param;
 const router = express.Router();
@@ -116,6 +119,23 @@ async function server(args, config, cb) {
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
 
+    router.use(session({
+        name: args.prod ? '__Host-session' : 'session',
+        proxy: args.prod,
+        resave: false,
+        store: new pgSession({
+            pool: pool,
+            tableName : 'session'
+        }),
+        cookie: {
+            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
+            sameSite: true,
+            secure: args.prod
+        },
+        saveUninitialized: true,
+        secret: config.CookieSecret
+    }));
+
     router.use(bodyparser.urlencoded({ extended: true }));
     router.use(morgan('combined'));
     router.use(bodyparser.json());
@@ -147,9 +167,16 @@ async function server(args, config, cb) {
      */
     router.post('/login', async (req, res) => {
         try {
-            const user = await auth.login(pool, req.body);
+            const user = await auth.login({
+                username: req.body.username,
+                password: req.body.password
+            });
 
-            return res.json(user);
+            req.session.auth = user;
+
+            return res.json({
+                username: user.username
+            });
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -19,6 +19,9 @@ class Config {
             } else {
                 const secrets = await Config.secret('Batch');
 
+                this.GithubWebhookSecret = secrets.GithubWebhookSecret;
+                this.CookieSecret = secrets.CookieSecret;
+
                 let github = secrets.GitHubKey
                     .replace('-----BEGIN RSA PRIVATE KEY-----', '')
                     .replace('-----END RSA PRIVATE KEY-----', '')

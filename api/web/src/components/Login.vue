@@ -13,10 +13,14 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12'>Username:</label>
-                    <input type='text' class='input'/>
+                    <input :class='{
+                         "input--border-red": attempted && !username
+                    }' v-model='username' type='text' class='input'/>
 
                     <label class='mt12'>Password:</label>
-                    <input type='password' class='input'/>
+                    <input :class='{
+                         "input--border-red": attempted && !password
+                   } ' v-model='password' type='password' class='input'/>
 
                     <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
 
@@ -35,6 +39,7 @@ export default {
     data: function() {
         return {
             loading: false,
+            attempted: false,
             username: '',
             password: ''
         }
@@ -44,6 +49,10 @@ export default {
             this.$router.push({ path: '/register' });
         },
         login: function() {
+            this.attempted = true;
+
+            if (!this.username.length) return;
+            if (!this.password.length) return;
             this.loading = true;
 
             fetch(window.location.origin + `/api/login`, {
@@ -56,8 +65,17 @@ export default {
                     username: this.username,
                     password: this.password
                 })
-            }).then(() => {
+            }).then((res) => {
+                return res.json();
+            }).then((res) => {
                 this.loading = false;
+                // TODO STATUS CHECK - must be 200
+
+                this.$emit('auth', res);
+                this.$router.push('/data')
+            }).catch((err) => {
+                // TODO HANDLE THIS IN UI
+                console.error(err);
             });
         }
     }

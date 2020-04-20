@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const hash = require('object-hash');
 const split = require('split');
 const SM = require('@mapbox/sphericalmercator');
@@ -159,15 +160,19 @@ class Bin {
             && raw.coverage['US Census'].geoid
             && raw.coverage['US Census'].geoid.length === 5
         ) {
-            code = raw.coverage['US Census'].geoid;
+            code = 'us-' + raw.coverage['US Census'].geoid;
         } else if (raw.coverage.geometry) {
             code = hash(raw.coverage.geometry.coordinates);
         } else if (eq(keys, ['country'])) {
             code = raw.coverage.country.toLowerCase();
         } else if (eq(keys, ['country', 'state'])) {
-            const country = raw.coverage.country.toLowerCase();
-            const state = raw.coverage.state.toLowerCase();
-            code = `${country}-${state}`;
+            if (raw.coverage['ISO 3166'] && raw.coverage['ISO 3166'].alpha2) {
+                code = raw.coverage['ISO 3166'].alpha2.toLowerCase();
+            } else {
+                const country = raw.coverage.country.toLowerCase();
+                const state = raw.coverage.state.toLowerCase();
+                code = `${country}-${state}`;
+            }
         }
 
         // Currently unhandled
@@ -207,6 +212,8 @@ class Bin {
                     }).createReadStream(),
                     split(),
                     transform(100, (feat, cb) => {
+                        if (!feat || !feat.trim()) return cb(null, '');
+
                         try {
                             feat = JSON.parse(feat);
                         } catch (err) {
@@ -217,13 +224,11 @@ class Bin {
                             INSERT INTO map (
                                 name,
                                 code,
-                                geom,
-                                layers
+                                geom
                             ) VALUES (
                                 $1,
                                 $2,
-                                ST_SetSRID(ST_GeomFromGeoJSON($3), 4326),
-                                '{}'
+                                ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
                             );
                         `, [
                             feat.properties.name,
@@ -231,9 +236,10 @@ class Bin {
                             JSON.stringify(feat.geometry)
                         ], (err) => {
                             if (err) return cb(err);
-                            return cb();
+                            return cb(null, '');
                         });
                     }),
+                    fs.createWriteStream('/dev/null'),
                     done
                 );
             }, layer);

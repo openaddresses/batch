@@ -154,6 +154,7 @@ class Bin {
         });
 
         let code = false;
+        let geom = false;
 
         if ( // US Counties
             raw.coverage['US Census']
@@ -162,6 +163,7 @@ class Bin {
         ) {
             code = 'us-' + raw.coverage['US Census'].geoid;
         } else if (raw.coverage.geometry) {
+            geom = raw.coverage.geometry;
             code = hash(raw.coverage.geometry.coordinates);
         } else if (eq(keys, ['country'])) {
             code = raw.coverage.country.toLowerCase();
@@ -190,13 +192,44 @@ class Bin {
         if (!code) return false;
 
         const bin_id = await Bin.from(pool, code);
-        if (!bin_id) return false;
+
+        if (!bin_id && geom) {
+            try {
+                await Bin.add(pool, 'Custom Geom', code, geom);
+            } catch (err) {
+                console.error('not ok - failed to save new geom to map: ' + err);
+            }
+        } else if (!bin_id) {
+            return false;
+        }
 
         job.map = bin_id;
 
         await job.commit(pool);
 
         return true;
+    }
+
+    static async add(pool, name, code, geom) {
+        try {
+            await pool.query(`
+                INSERT INTO map (
+                    name,
+                    code,
+                    geom
+                ) VALUES (
+                    $1,
+                    $2,
+                    ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
+                )
+            `, [
+                name,
+                code,
+                JSON.stringify(geom)
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to add custom geojson to map');
+        }
     }
 
     static async populate(pool) {

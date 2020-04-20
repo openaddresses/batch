@@ -39,6 +39,9 @@ import Error from './components/Error.vue'
 
 export default {
     name: 'OpenAddresses',
+    mounted: function() {
+        this.getLogin();
+    },
     data: function() {
         return {
             err: false,
@@ -51,13 +54,23 @@ export default {
         };
     },
     methods: {
+        getLogin: function() {
+            fetch(`${window.location.origin}/api/login`, {
+                method: 'GET'
+            }).then((res) => {
+                if (res.status !== 200) throw new Error('Invalid Session');
+                return res.json();
+            }).then((res) => {
+                this.auth = res;
+            });
+        },
         external: function(url, tab) {
             if (!tab) {
                 window.location.href = url;
             } else {
                 window.open(url, "_blank");
             }
-        }
+        },
     },
     components: {
         Error

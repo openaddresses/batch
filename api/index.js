@@ -154,8 +154,27 @@ async function server(args, config, cb) {
                 status: 200,
                 message: 'User Created'
             });
-        }  catch (err) {
+        } catch (err) {
             return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/login If the user has an active session, reauthenticate the frontend
+     * @apiVersion 1.0.0
+     * @apiName get
+     * @apiGroup Login
+     */
+    router.get('/login', async (req, res) => {
+        if (req.session && req.session.auth && req.session.auth.username) {
+            return res.json({
+                username: req.session.auth.username
+            });
+        } else {
+            return res.status(401).json({
+                status: 401,
+                message: 'Invalid session'
+            });
         }
     });
 

@@ -209,7 +209,7 @@ async function server(args, config, cb) {
      */
     router.post('/schedule', async (req, res) => {
         try {
-            await Schedule.event(pool);
+            await Schedule.event(pool, req.body);
 
             return res.json(true);
         } catch (err) {

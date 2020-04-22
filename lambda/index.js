@@ -1,3 +1,5 @@
+'use strict';
+
 const AWS = require('aws-sdk');
 
 const batch = new AWS.Batch({
@@ -9,37 +11,53 @@ function trigger(event) {
     const jobQueue = process.env.JOB_QUEUE;
     const jobName = process.env.JOB_NAME;
 
-    const api = process.env.OA_API;
-
     if (typeof event !== 'object' || Array.isArray(event)) {
         throw new Error('event must be Key/Value pairs');
     }
 
-    if (!event.job) throw new Error('Job ID required');
-    if (!event.source) throw new Error('URL of source required');
-    if (!event.layer) throw new Error('Layer of source required');
-    if (!event.name) throw new Error('Name of source layer required');
+    if (!event.type) throw new Error('Event Type Required');
+    let params;
 
-    const params = {
-        jobDefinition: jobDefinition,
-        jobQueue: jobQueue,
-        jobName: jobName,
-        containerOverrides: {
-            environment: [{
-                name: 'OA_JOB',
-                value: event.job
-            },{
-                name: 'OA_SOURCE',
-                value: event.source
-            },{
-                name: 'OA_SOURCE_LAYER',
-                value: event.layer
-            },{
-                name: 'OA_SOURCE_LAYER_NAME',
-                value: event.name
-            }]
-        }
-    };
+    if (event.type === 'job') {
+        if (!event.job) throw new Error('Job ID required');
+        if (!event.source) throw new Error('URL of source required');
+        if (!event.layer) throw new Error('Layer of source required');
+        if (!event.name) throw new Error('Name of source layer required');
+
+        params = {
+            jobDefinition: jobDefinition,
+            jobQueue: jobQueue,
+            jobName: jobName,
+            containerOverrides: {
+                command: ['task.js'],
+                environment: [{
+                    name: 'OA_JOB',
+                    value: event.job
+                },{
+                    name: 'OA_SOURCE',
+                    value: event.source
+                },{
+                    name: 'OA_SOURCE_LAYER',
+                    value: event.layer
+                },{
+                    name: 'OA_SOURCE_LAYER_NAME',
+                    value: event.name
+                }]
+            }
+        };
+    } else if (event.type === 'collect') {
+        params = {
+            jobDefinition: jobDefinition,
+            jobQueue: jobQueue,
+            jobName: jobName,
+            containerOverrides: {
+                command: ['collect.js'],
+                environment: []
+            }
+        };
+    } else {
+        throw new Error('Unknown event type: ' + event.type);
+    }
 
     batch.submitJob(params, (err, res) => {
         if (err) throw err;

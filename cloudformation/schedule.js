@@ -24,9 +24,9 @@ const stack = {
                     Statement: [{
                         Effect: 'Allow',
                         Principal: {
-                            Service: [ 'lambda.amazonaws.com' ]
+                            Service: ['lambda.amazonaws.com']
                         },
-                        Action: [ 'sts:AssumeRole' ]
+                        Action: ['sts:AssumeRole']
                     }]
                 },
                 ManagedPolicyArns: [
@@ -74,7 +74,7 @@ const stack = {
                         }
 
                         module.exports.handler = handler;
-                    `,
+                    `
                 },
                 Handler: 'index.handler',
                 MemorySize: 128,

@@ -117,7 +117,6 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
-                    Command: ['./task.js'],
                     Environment: [{
                         Name: 'MAPBOX_TOKEN',
                         Value: cf.ref('MapboxToken')
@@ -222,9 +221,7 @@ const stack = {
                     Variables: {
                         JOB_DEFINITION: cf.ref('BatchJobDefinition'),
                         JOB_QUEUE: cf.ref('BatchJobQueue'),
-                        JOB_NAME: 'lambda-trigger-job',
-                        OA_API: cf.getAtt('APIELB', 'DNSName'),
-                        SharedSecret: cf.ref('SharedSecret')
+                        JOB_NAME: 'lambda-trigger-job'
                     }
                 },
                 Runtime: 'nodejs12.x',

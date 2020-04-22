@@ -360,6 +360,7 @@ class Job {
                     InvocationType: 'Event',
                     LogType: 'Tail',
                     Payload: JSON.stringify({
+                        type: 'job',
                         job: this.id,
                         source: this.source,
                         layer: this.layer,

@@ -103,8 +103,9 @@ async function fetch() {
 function upload_collection(file) {
     return new Promise((resolve, reject) => {
         s3.putObject({
+            Body: fs.createReadStream(file),
             Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/${file}`
+            Key: `${process.env.StackName}/collection-global.zip`
         }, (err) => {
             if (err) return reject(err);
 

@@ -29,7 +29,7 @@ function trigger(event) {
             jobQueue: jobQueue,
             jobName: jobName,
             containerOverrides: {
-                command: ['task.js'],
+                command: ['./task.js'],
                 environment: [{
                     name: 'OA_JOB',
                     value: event.job
@@ -51,7 +51,7 @@ function trigger(event) {
             jobQueue: jobQueue,
             jobName: jobName,
             containerOverrides: {
-                command: ['collect.js'],
+                command: ['./collect.js'],
                 environment: []
             }
         };

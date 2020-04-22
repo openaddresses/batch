@@ -326,6 +326,16 @@ define({ "api": [
     "groupTitle": "Job"
   },
   {
+    "type": "get",
+    "url": "/api/login",
+    "title": "If the user has an active session, reauthenticate the frontend",
+    "version": "1.0.0",
+    "name": "get",
+    "group": "Login",
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
     "type": "post",
     "url": "/api/login",
     "title": "Get auth cookies for a given session",

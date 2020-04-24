@@ -1,6 +1,16 @@
 [
   {
     "type": "get",
+    "url": "/api/collections",
+    "title": "List data collections",
+    "version": "1.0.0",
+    "name": "List",
+    "group": "Collections",
+    "filename": "./index.js",
+    "groupTitle": "Collections"
+  },
+  {
+    "type": "get",
     "url": "/api/data",
     "title": "Search for processed data",
     "version": "1.0.0",

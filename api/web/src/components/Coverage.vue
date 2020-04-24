@@ -91,7 +91,7 @@ export default {
                     });
 
                     this.map.addLayer({
-                        id: 'mapillary',
+                        id: 'coverage-poly',
                         type: 'fill',
                         source: 'coverage',
                         'source-layer': 'data',
@@ -99,6 +99,21 @@ export default {
                         'paint': {
                             'fill-color': '#ff0000',
                             'fill-opacity': 0.8
+                        }
+                    });
+
+                    this.map.addLayer({
+                        id: 'coverage-point',
+                        type: 'circle',
+                        source: 'coverage',
+                        'source-layer': 'data',
+                        layout: { },
+                        filter: ['==', ['geometry-type'], 'Point'],
+                        paint: {
+                            'circle-color': '#ff0000',
+                            'circle-opacity': 1.0,
+                            'circle-stroke-color': '#000000',
+                            'circle-stroke-width': 2
                         }
                     });
 

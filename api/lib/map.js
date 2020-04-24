@@ -191,11 +191,11 @@ class Map {
 
         if (!code) return false;
 
-        const bin_id = await Map.from(pool, code);
+        let bin_id = await Map.from(pool, code);
 
         if (!bin_id && geom) {
             try {
-                await Map.add(pool, 'Custom Geom', code, geom);
+                bin_id = await Map.add(pool, job.source_name, code, geom);
             } catch (err) {
                 console.error('not ok - failed to save new geom to map: ' + err);
             }
@@ -211,7 +211,7 @@ class Map {
 
     static async add(pool, name, code, geom) {
         try {
-            await pool.query(`
+            const pgres = await pool.query(`
                 INSERT INTO map (
                     name,
                     code,
@@ -221,11 +221,14 @@ class Map {
                     $2,
                     ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
                 )
+                RETURNING id
             `, [
                 name,
                 code,
                 JSON.stringify(geom)
             ]);
+
+            return pgres.rows[0].id;
         } catch (err) {
             throw new Err(500, err, 'Failed to add custom geojson to map');
         }

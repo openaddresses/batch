@@ -16,6 +16,7 @@ class Config {
 
             if (process.env.StackName === 'test') {
                 this.octo = false;
+                this.CookieSecret = '123';
             } else {
                 const secrets = await Config.secret('Batch');
 

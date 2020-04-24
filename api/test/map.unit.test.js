@@ -7,51 +7,55 @@ const test = require('tape');
 const init = require('./init');
 const nock = require('nock');
 
-nock.disableNetConnect();
+test('nocks', (t) => {
+    nock.disableNetConnect();
 
-nock('https://github.com')
-    .persist()
-    .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
-    .reply(200, {
-        'schema': 2,
-        'coverage': {
-            'US Census': {
-                'geoid': '42017',
-                'name': 'Bucks County',
-                'state': 'Pennsylvania'
-            },
-            'country': 'us',
-            'state': 'pa',
-            'county': 'Bucks'
-        }
-    })
-    .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json')
-    .reply(200, {
-        'schema': 2,
-        'coverage': {
-            'country': 'us'
-        }
-    })
-    .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json')
-    .reply(200, {
-        'schema': 2,
-        'coverage': {
-            'country': 'ca'
-        }
-    })
-    .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json')
-    .reply(200, {
-        'schema': 2,
-        'coverage': {
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [-135.087890625,60.73768583450925]
-            },
-            'country': 'ca',
-            'state': 'yk',
-            'town': 'whitehorse'
-        }
-    });
+    nock('https://github.com')
+        .persist()
+        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
+        .reply(200, {
+            'schema': 2,
+            'coverage': {
+                'US Census': {
+                    'geoid': '42017',
+                    'name': 'Bucks County',
+                    'state': 'Pennsylvania'
+                },
+                'country': 'us',
+                'state': 'pa',
+                'county': 'Bucks'
+            }
+        })
+        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json')
+        .reply(200, {
+            'schema': 2,
+            'coverage': {
+                'country': 'us'
+            }
+        })
+        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json')
+        .reply(200, {
+            'schema': 2,
+            'coverage': {
+                'country': 'ca'
+            }
+        })
+        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json')
+        .reply(200, {
+            'schema': 2,
+            'coverage': {
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-135.087890625,60.73768583450925]
+                },
+                'country': 'ca',
+                'state': 'yk',
+                'town': 'whitehorse'
+            }
+        });
+
+    t.end();
+});
 
 init(test);
 
@@ -335,5 +339,6 @@ test('Map#match - geom', async (t) => {
 
 test('end', (t) => {
     nock.cleanAll();
+    nock.enableNetConnect()
     t.end();
 });

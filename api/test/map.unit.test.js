@@ -339,6 +339,6 @@ test('Map#match - geom', async (t) => {
 
 test('end', (t) => {
     nock.cleanAll();
-    nock.enableNetConnect()
+    nock.enableNetConnect();
     t.end();
 });

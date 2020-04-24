@@ -48,6 +48,7 @@ async function server(args, config, cb) {
     // const JobError = require('./lib/joberror');
     const Data = require('./lib/data');
     const Schedule = require('./lib/schedule');
+    const Collections = require('./lib/collections');
 
     let postgres = process.env.POSTGRES;
 
@@ -212,6 +213,22 @@ async function server(args, config, cb) {
             await Schedule.event(pool, req.body);
 
             return res.json(true);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/collections List data collections
+     * @apiVersion 1.0.0
+     * @apiName List
+     * @apiGroup Collections
+     */
+    router.get('/collections', async (req, res) => {
+        try {
+            const collections = await Collections.list(pool);
+
+            return res.json(collections);
         } catch (err) {
             return Err.respond(err, res);
         }

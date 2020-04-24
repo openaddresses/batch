@@ -30,6 +30,12 @@ CREATE TABLE IF NOT EXISTS map (
     geom        GEOMETRY(GEOMETRY, 4326)    -- Geometry
 );
 
+CREATE TABLE IF NOT EXISTS collections (
+    id          BIGSERIAL,
+    name        TEXT,
+    created     TIMESTAMP
+);
+
 -- Store the latest known good data for a given source
 CREATE TABLE IF NOT EXISTS results (
     id          BIGSERIAL,  -- Data Entry ID

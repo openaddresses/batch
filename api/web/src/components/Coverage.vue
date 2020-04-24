@@ -111,9 +111,19 @@ export default {
                         filter: ['==', ['geometry-type'], 'Point'],
                         paint: {
                             'circle-color': '#ff0000',
+                            'circle-radius': [
+                                'interpolate',
+                                ['exponential', 0.5],
+                                ['zoom'],
+                                1, 1,
+                                10, 2,
+                                13, 10,
+                                15, 50,
+                                17, 100
+                            ],
                             'circle-opacity': 1.0,
-                            'circle-stroke-color': '#000000',
-                            'circle-stroke-width': 2
+                            'circle-stroke-color': '#ffffff',
+                            'circle-stroke-width': 1
                         }
                     });
 

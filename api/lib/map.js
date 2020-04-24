@@ -116,7 +116,7 @@ class Map {
                     MAX(map.name) AS name,
                     MAX(map.code) AS code,
                     MAX(map.geom) AS geom,
-                    ARRAY_AGG(DISTINCT job.layer) AS layers
+                    COALESCE(ARRAY_AGG(DISTINCT job.layer), '{}') AS layers
                 FROM
                     map LEFT JOIN job ON map.id = job.map
                 WHERE

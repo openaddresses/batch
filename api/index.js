@@ -40,7 +40,7 @@ function configure(args, cb) {
 
 async function server(args, config, cb) {
     // these must be run after lib/config
-    const Bin = require('./lib/bin');
+    const Map = require('./lib/map');
     const ci = new (require('./lib/ci'))(config);
     const Err = require('./lib/error');
     const Run = require('./lib/run');
@@ -66,7 +66,7 @@ async function server(args, config, cb) {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
 
         if (args.populate) {
-            await Bin.populate(pool);
+            await Map.populate(pool);
         }
     } catch (err) {
         throw new Error(err);
@@ -241,7 +241,7 @@ async function server(args, config, cb) {
      * @apiGroup Map
      */
     router.get('/map', (req, res) => {
-        return res.json(Bin.map());
+        return res.json(Map.map());
     });
 
     /**
@@ -256,7 +256,7 @@ async function server(args, config, cb) {
      */
     router.get('/map/:z/:x/:y.mvt', async (req, res) => {
         try {
-            const tile = await Bin.tile(pool, req.params.z, req.params.x, req.params.y);
+            const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
 
             res.type('application/vnd.mapbox-vector-tile');
             return res.send(tile);

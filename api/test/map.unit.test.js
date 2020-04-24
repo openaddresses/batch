@@ -1,6 +1,6 @@
 'use strict';
 
-const Bin = require('../lib/bin');
+const Map = require('../lib/map');
 const Job = require('../lib/job');
 const { Pool } = require('pg');
 const test = require('tape');
@@ -8,7 +8,7 @@ const init = require('./init');
 
 init(test);
 
-test('Bin#get_feature - country', async (t) => {
+test('Map#get_feature - country', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
@@ -35,7 +35,7 @@ test('Bin#get_feature - country', async (t) => {
             job.map = 1;
             await job.commit(pool);
 
-            t.deepEquals(await Bin.get_feature(pool, 'us'), {
+            t.deepEquals(await Map.get_feature(pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -55,7 +55,7 @@ test('Bin#get_feature - country', async (t) => {
             job.map = 1;
             await job.commit(pool);
 
-            t.deepEquals(await Bin.get_feature(pool, 'us'), {
+            t.deepEquals(await Map.get_feature(pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -75,7 +75,7 @@ test('Bin#get_feature - country', async (t) => {
             job.map = 1;
             await job.commit(pool);
 
-            t.deepEquals(await Bin.get_feature(pool, 'us'), {
+            t.deepEquals(await Map.get_feature(pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -91,7 +91,7 @@ test('Bin#get_feature - country', async (t) => {
     t.end();
 });
 
-test('Bin#match - county', async (t) => {
+test('Map#match - county', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
@@ -107,7 +107,7 @@ test('Bin#match - county', async (t) => {
             );
         `);
 
-        t.deepEquals(await Bin.get_feature(pool, '42017'), {
+        t.deepEquals(await Map.get_feature(pool, '42017'), {
             id: 2,
             name: 'Bucks County',
             code: '42017',
@@ -126,8 +126,8 @@ test('Bin#match - county', async (t) => {
             job.map = 2;
             await job.commit(pool);
 
-            await Bin.match(pool, job);
-            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+            await Map.match(pool, job);
+            t.deepEquals(await Map.get_feature(pool, '42017'), {
                 id: 2,
                 name: 'Bucks County',
                 code: '42017',
@@ -147,8 +147,8 @@ test('Bin#match - county', async (t) => {
             job.map = 2;
             await job.commit(pool);
 
-            await Bin.match(pool, job);
-            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+            await Map.match(pool, job);
+            t.deepEquals(await Map.get_feature(pool, '42017'), {
                 id: 2,
                 name: 'Bucks County',
                 code: '42017',
@@ -164,7 +164,7 @@ test('Bin#match - county', async (t) => {
     t.end();
 });
 
-test('Bin#match - country', async (t) => {
+test('Map#match - country', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
@@ -180,7 +180,7 @@ test('Bin#match - country', async (t) => {
             );
         `);
 
-        t.deepEquals(await Bin.get_feature(pool, 'ca'), {
+        t.deepEquals(await Map.get_feature(pool, 'ca'), {
             id: 3,
             name: 'Canada',
             code: '42017',
@@ -199,8 +199,8 @@ test('Bin#match - country', async (t) => {
             job.map = 2;
             await job.commit(pool);
 
-            await Bin.match(pool, job);
-            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+            await Map.match(pool, job);
+            t.deepEquals(await Map.get_feature(pool, '42017'), {
                 id: 2,
                 name: 'Bucks County',
                 code: '42017',
@@ -220,8 +220,8 @@ test('Bin#match - country', async (t) => {
             job.map = 2;
             await job.commit(pool);
 
-            await Bin.match(pool, job);
-            t.deepEquals(await Bin.get_feature(pool, '42017'), {
+            await Map.match(pool, job);
+            t.deepEquals(await Map.get_feature(pool, '42017'), {
                 id: 2,
                 name: 'Bucks County',
                 code: '42017',

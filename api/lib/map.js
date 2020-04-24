@@ -22,7 +22,7 @@ const sm = new SM({
     size: 256
 });
 
-class Bin {
+class Map {
     static map() {
         return {
             token: process.env.MAPBOX_TOKEN
@@ -191,11 +191,11 @@ class Bin {
 
         if (!code) return false;
 
-        const bin_id = await Bin.from(pool, code);
+        const bin_id = await Map.from(pool, code);
 
         if (!bin_id && geom) {
             try {
-                await Bin.add(pool, 'Custom Geom', code, geom);
+                await Map.add(pool, 'Custom Geom', code, geom);
             } catch (err) {
                 console.error('not ok - failed to save new geom to map: ' + err);
             }
@@ -204,7 +204,6 @@ class Bin {
         }
 
         job.map = bin_id;
-
         await job.commit(pool);
 
         return true;
@@ -304,4 +303,4 @@ function eq(a, b) {
     return true;
 }
 
-module.exports = Bin;
+module.exports = Map;

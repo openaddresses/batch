@@ -1,7 +1,7 @@
 'use strict';
 
 const Err = require('./error');
-const Bin = require('./bin');
+const Map = require('./map');
 
 /**
  * @class Data
@@ -178,7 +178,7 @@ class Data {
         }
 
         try {
-            await Bin.match(pool, job);
+            await Map.match(pool, job);
         } catch (err) {
             throw new Err(500, err, 'Failed to match coverage');
         }

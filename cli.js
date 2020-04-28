@@ -93,6 +93,11 @@ async function cli() {
             }
         });
 
+        if (run.statusCode !== 200) {
+            console.error(run.body.message)
+            process.exit(1);
+        }
+
         const job = await request({
             url: api + `/api/run/${run.body.id}/jobs`,
             method: 'POST',
@@ -105,6 +110,10 @@ async function cli() {
                 }]
             }
         });
+        if (run.statusCode !== 200) {
+            console.error(run.body.message)
+            process.exit(1);
+        }
 
         console.error(job.body);
     } catch (err) {

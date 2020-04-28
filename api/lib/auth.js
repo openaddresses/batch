@@ -21,6 +21,8 @@ class Auth {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.password) throw new Err(400, null, 'password required');
 
+        if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
+
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -63,6 +65,8 @@ class Auth {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.password) throw new Err(400, null, 'password required');
         if (!user.email) throw new Err(400, null, 'email required');
+
+        if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
         return new Promise((resolve, reject) => {
             bcrypt.hash(user.password, 10, (err, hash) => {

@@ -250,7 +250,10 @@ class Job {
                 url: `${api}/api/job/${this.job}`,
                 json: true,
                 method: 'PATCH',
-                body: body
+                body: body,
+                headers: {
+                    'shared-secret': process.env.SharedSecret
+                }
             }, (err, res) => {
                 if (err) return reject(err);
 

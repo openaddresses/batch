@@ -146,7 +146,10 @@ function fetch_datas() {
         request({
             url: `${process.env.OA_API}/api/data`,
             json: true,
-            method: 'GET'
+            method: 'GET',
+            headers: {
+                'shared-secret': process.env.SharedSecret
+            }
         }, (err, res) => {
             if (err) return reject(err);
 

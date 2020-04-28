@@ -145,8 +145,19 @@ async function server(args, config, cb) {
     router.use((req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
             req.auth = req.session.auth;
-        } else if (false) {
-            // TODO: Header API tokens here
+        } else if (req.headers['shared-secret']) {
+            if (req.headers['shared-secret'] !== config.SharedSecret) {
+                return res.status(401).json({
+                    status: 401,
+                    message: 'Invalid shared secret'
+                });
+            } else {
+                req.auth = {
+                    username: 'internal',
+                    access: 'admin',
+                    email: false
+                }
+            }
         } else {
             req.auth = false;
         }

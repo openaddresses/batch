@@ -4,8 +4,17 @@ const Err = require('./error');
 const bcrypt = require('bcrypt');
 
 class Auth {
-    constructor(pool) {
+    constructor(pool, config) {
         this.pool = pool;
+        this.config = config;
+    }
+
+    async is_admin(req) {
+        if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
+            throw new Err(401, null, 'Admin token required');
+        }
+
+        return true;
     }
 
     async login(user) {

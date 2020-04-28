@@ -14,14 +14,19 @@ class Config {
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
-            if (process.env.StackName === 'test') {
+            if (!process.env.StackName || process.env.StackName === 'test') {
+                console.error('ok - set env StackName: test');
+                process.env.StackName = 'test';
+
                 this.octo = false;
                 this.CookieSecret = '123';
+                this.SharedSecret = '123';
             } else {
                 const secrets = await Config.secret('Batch');
 
                 this.GithubWebhookSecret = secrets.GithubWebhookSecret;
                 this.CookieSecret = secrets.CookieSecret;
+                this.SharedSecret = process.env.SharedSecret;
 
                 let github = secrets.GitHubKey
                     .replace('-----BEGIN RSA PRIVATE KEY-----', '')
@@ -61,11 +66,6 @@ class Config {
             if (!process.env.GithubSecret) {
                 console.error('ok - set env GithubSecret: no-secret');
                 process.env.GithubSecret = 'no-secret';
-            }
-
-            if (!process.env.StackName) {
-                console.error('ok - set env StackName: test');
-                process.env.StackName = 'test';
             }
         } catch (err) {
             throw new Error(err);

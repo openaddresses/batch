@@ -72,7 +72,7 @@ async function server(args, config, cb) {
         throw new Error(err);
     }
 
-    const auth = new (require('./lib/auth'))(pool);
+    const auth = new (require('./lib/auth'))(pool, config);
 
     app.disable('x-powered-by');
     app.use(minify());
@@ -222,9 +222,9 @@ async function server(args, config, cb) {
      * @apiGroup Schedule
      */
     router.post('/schedule', async (req, res) => {
-        if (!req.auth) return new Err.
-
         try {
+            await auth.is_admin(req);
+
             await Schedule.event(pool, req.body);
 
             return res.json(true);
@@ -380,6 +380,8 @@ async function server(args, config, cb) {
      */
     router.post('/run', async (req, res) => {
         try {
+            await auth.is_admin(req);
+
             const run = await Run.generate(pool, req.body);
 
             return res.json(run.json());
@@ -420,6 +422,8 @@ async function server(args, config, cb) {
         Param.int(req, res, 'run');
 
         try {
+            await auth.is_admin(req);
+
             const run = await Run.from(pool, req.params.run);
 
             run.patch(req.body);
@@ -465,6 +469,8 @@ async function server(args, config, cb) {
         }
 
         try {
+            await auth.is_admin(req);
+
             const jobs = await Run.populate(pool, req.params.run, req.body.jobs);
 
             return res.json(jobs);
@@ -636,6 +642,8 @@ async function server(args, config, cb) {
         Param.int(req, res, 'job');
 
         try {
+            await auth.is_admin(req);
+
             const job = await Job.from(pool, req.params.job);
 
             job.patch(req.body);

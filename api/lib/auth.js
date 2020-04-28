@@ -5,9 +5,8 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
 class Auth {
-    constructor(pool, config) {
+    constructor(pool) {
         this.pool = pool;
-        this.config = config;
     }
 
     async is_auth(req) {
@@ -113,9 +112,8 @@ class Auth {
 }
 
 class AuthToken {
-    constructor(pool, config) {
+    constructor(pool) {
         this.pool = pool;
-        this.config = config;
     }
 
     async delete(auth, token_id) {
@@ -176,6 +174,10 @@ class AuthToken {
     }
 
     async list(auth) {
+        if (!auth.uid) {
+            throw new Err(500, null, 'Server could not determine user id');
+        }
+
         try {
             const pgres = await this.pool.query(`
                 SELECT
@@ -189,7 +191,11 @@ class AuthToken {
                 auth.uid
             ]);
 
-            return pgres.rows;
+            return pgres.rows.map((token) => {
+                token.id = parseInt(token.id);
+
+                return token;
+            });
         } catch (err) {
             throw new Err(500, err, 'Failed to list tokens');
         }
@@ -198,6 +204,8 @@ class AuthToken {
     async generate(auth) {
         if (auth.type !== 'session') {
             throw new Err(400, null, 'Only a user session can create a token');
+        } else if (!auth.uid) {
+            throw new Err(500, null, 'Server could not determine user id');
         }
 
         try {
@@ -213,11 +221,11 @@ class AuthToken {
                 ) RETURNING *
             `, [
                 'oa.' + crypto.randomBytes(32).toString('hex'),
-                auth.id
+                auth.uid
             ]);
 
             return {
-                id: pgres.rows[0].id,
+                id: parseInt(pgres.rows[0].id),
                 token: pgres.rows[0].token,
                 created: pgres.rows[0].created
             };

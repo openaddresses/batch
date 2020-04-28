@@ -27,6 +27,7 @@ class Config {
                 this.GithubWebhookSecret = secrets.GithubWebhookSecret;
                 this.CookieSecret = secrets.CookieSecret;
                 this.SharedSecret = process.env.SharedSecret;
+                this.MailGun = secrets.MailGun;
 
                 let github = secrets.GitHubKey
                     .replace('-----BEGIN RSA PRIVATE KEY-----', '')

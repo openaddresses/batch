@@ -621,7 +621,7 @@ define({ "api": [
   },
   {
     "version": "1.0.0",
-    "name": "CreateToken",
+    "name": "DeleteToken",
     "group": "Token",
     "type": "",
     "url": "",

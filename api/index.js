@@ -72,8 +72,8 @@ async function server(args, config, cb) {
         throw new Error(err);
     }
 
-    const auth = new (require('./lib/auth').Auth)(pool, config);
-    const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
+    const auth = new (require('./lib/auth').Auth)(pool);
+    const authtoken = new (require('./lib/auth').AuthToken)(pool);
 
     app.disable('x-powered-by');
     app.use(minify());

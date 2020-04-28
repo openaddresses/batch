@@ -251,6 +251,13 @@ async function server(args, config, cb) {
      * @apiGroup Token
      */
     router.get('/token', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            return res.json(await authtoken.list(req.auth));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -260,15 +267,31 @@ async function server(args, config, cb) {
      * @apiGroup Token
      */
     router.post('/token', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            return res.json(await authtoken.generate(req.auth));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
-     * {post} /api/token Delete an API token that is owned by the authenticated user
+     * {delete} /api/token Delete an API token that is owned by the authenticated user
      * @apiVersion 1.0.0
-     * @apiName CreateToken
+     * @apiName DeleteToken
      * @apiGroup Token
      */
     router.delete('/token/:id', async (req, res) => {
+        Param.int(req, res, 'id');
+
+        try {
+            await auth.is_auth(req);
+
+            return res.json(await authtoken.delete(req.auth, req.params.id));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -326,6 +349,10 @@ async function server(args, config, cb) {
      * @apiParam {Number} y Y coordinate
      */
     router.get('/map/:z/:x/:y.mvt', async (req, res) => {
+        Param.int(req, res, 'z');
+        Param.int(req, res, 'x');
+        Param.int(req, res, 'y');
+
         try {
             const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
 

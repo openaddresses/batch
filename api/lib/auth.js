@@ -10,6 +10,14 @@ class Auth {
         this.config = config;
     }
 
+    async is_auth(req) {
+        if (!req.auth || !req.auth.access || !['session', 'token'].includes(req.auth.type)) {
+            throw new Err(401, null, 'Authentication Required');
+        }
+
+        return true;
+    }
+
     async is_admin(req) {
         if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
             throw new Err(401, null, 'Admin token required');
@@ -108,6 +116,29 @@ class AuthToken {
     constructor(pool, config) {
         this.pool = pool;
         this.config = config;
+    }
+
+    async delete(auth, token_id) {
+        try {
+            await this.pool.query(`
+                DELETE FROM
+                    users_tokens
+                WHERE
+                    uid = $1
+                    AND id = $2
+            `, [
+                auth.uid,
+                token_id
+            ]);
+
+            return {
+                status: 200,
+                message: 'Token Deleted'
+            };
+
+        } catch (err) {
+            throw new Err(500, err, 'Failed to delete token');
+        }
     }
 
     async validate(token) {

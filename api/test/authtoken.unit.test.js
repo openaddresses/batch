@@ -94,7 +94,7 @@ test('AuthToken#list', async (t) => {
         });
 
         t.equals(tokens.length, 1, 'tokens.length: 1');
-        t.notOk(tokens[0].token, 'tokens[0].token: <undefined>')
+        t.notOk(tokens[0].token, 'tokens[0].token: <undefined>');
         t.equals(tokens[0].id, 1, 'tokens[0].id: 1');
         t.ok(tokens[0].created, 'tokens[0].created: <date>');
     } catch (err) {

@@ -8,6 +8,7 @@ Vue.use(VueRouter);
 // === Components ===
 
 import Register from './components/Register.vue';
+import Profile from './components/Profile.vue';
 import Admin from './components/Admin.vue';
 import Login from './components/Login.vue';
 import History from './components/History.vue';
@@ -38,6 +39,7 @@ const router = new VueRouter({
         { path: '/data/:dataid/history', component: History, props: true },
 
         { path: '/login', component: Login },
+        { path: '/profile', component: Profile },
         { path: '/register', component: Register },
     ]
 })

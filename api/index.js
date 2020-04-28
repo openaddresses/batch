@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const session = require('express-session');
-const ghverify = require('@octokit/webhooks/verify');
+const WebhooksApi = require('@octokit/webhooks');
 const path = require('path');
 const morgan = require('morgan');
 const util = require('./lib/util');
@@ -145,8 +145,10 @@ async function server(args, config, cb) {
     // Unified Auth
     router.use(async (req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
-            req.auth.type = 'session';
-            req.auth = req.session.auth;
+            req.auth = {
+                type: 'session',
+                auth: req.session.auth
+            };
         } else if (req.header('shared-secret')) {
             if (req.header('shared-secret') !== config.SharedSecret) {
                 return res.status(401).json({
@@ -750,11 +752,11 @@ async function server(args, config, cb) {
     router.post('/github/event', async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
-        if (!ghverify(
-            process.env.GithubSecret,
-            req.body,
-            req.headers['x-hub-signature']
-        )) {
+        const ghverify = new WebhooksApi({
+            secret: process.env.GithubSecret
+        });
+
+        if (!ghverify(req.body, req.headers['x-hub-signature'])) {
             res.status(400).send('Invalid X-Hub-Signature');
         }
 

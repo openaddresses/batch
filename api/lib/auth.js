@@ -117,6 +117,10 @@ class AuthToken {
     }
 
     async delete(auth, token_id) {
+        if (!auth.uid) {
+            throw new Err(500, null, 'Server could not determine user id');
+        }
+
         try {
             await this.pool.query(`
                 DELETE FROM
@@ -140,37 +144,42 @@ class AuthToken {
     }
 
     async validate(token) {
-        try {
-            if (token.split('.').length !== 2 || token.split('.')[0] !== 'oa') {
-                throw new Err(401, null, 'Invalid token');
-            }
+        if (token.split('.').length !== 2 || token.split('.')[0] !== 'oa' || token.length !== 67) {
+            throw new Err(401, null, 'Invalid token');
+        }
 
-            const pgres = await this.pool.query(`
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
                 SELECT
                     users.id AS uid,
                     users.username,
                     users.access,
                     users.email
                 FROM
-                    users INNER JOIN users_tokens
-                        ON users_tokens.uid = users.id
+                    users_tokens INNER JOIN users
+                        ON users.id = users_tokens.uid
                 WHERE
                     users_tokens.token = $1
             `, [
                 token
             ]);
-
-            if (!pgres.rows.length) {
-                throw new Err(401, null, 'Invalid token');
-            } else if (pgres.rows.length > 1) {
-                throw new Err(401, null, 'Token collision');
-            }
-
-            return pgres.rows[0];
-
         } catch (err) {
             throw new Err(500, err, 'Failed to validate token');
         }
+
+        if (!pgres.rows.length) {
+            throw new Err(401, null, 'Invalid token');
+        } else if (pgres.rows.length > 1) {
+            throw new Err(401, null, 'Token collision');
+        }
+
+        return {
+            uid: parseInt(pgres.rows[0].uid),
+            username: pgres.rows[0].username,
+            access: pgres.rows[0].access,
+            email: pgres.rows[0].email
+        };
     }
 
     async list(auth) {

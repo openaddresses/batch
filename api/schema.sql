@@ -6,11 +6,11 @@ CREATE TABLE IF NOT EXISTS session (
     expire      TIMESTAMP(6) NOT NULL,
     UNIQUE (sid) NOT DEFERRABLE INITIALLY IMMEDIATE
 ) WITH (OIDS=FALSE);
-
 CREATE INDEX IF NOT EXISTS idx_session_expire ON session ("expire");
 
 CREATE TABLE IF NOT EXISTS users (
     id          BIGSERIAL PRIMARY KEY,
+    access      TEXT NOT NULL,
     username    TEXT UNIQUE NOT NULL,
     email       TEXT UNIQUE NOT NULL,
     password    TEXT NOT NULL

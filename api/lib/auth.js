@@ -17,6 +17,7 @@ class Auth {
             pgres = await this.pool.query(`
                 SELECT
                     username,
+                    access,
                     email,
                     password
                 FROM
@@ -42,6 +43,7 @@ class Auth {
 
                 return resolve({
                     username: pgres.rows[0].username,
+                    access: pgres.rows[0].access,
                     email: pgres.rows[0].email
                 });
             });
@@ -61,11 +63,13 @@ class Auth {
                     INSERT INTO users (
                         username,
                         email,
-                        password
+                        password,
+                        access
                     ) VALUES (
                         $1,
                         $2,
-                        $3
+                        $3,
+                        'user'
                     )
                 `, [
                     user.username,

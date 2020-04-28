@@ -141,6 +141,19 @@ async function server(args, config, cb) {
     router.use(morgan('combined'));
     router.use(bodyparser.json());
 
+    // Unified Auth
+    router.use((req, res, next) => {
+        if (req.session && req.session.auth && req.session.auth.username) {
+            req.auth = req.session.auth;
+        } else if (false) {
+            // TODO: Header API tokens here
+        } else {
+            req.auth = false;
+        }
+
+        return next();
+    });
+
     /**
      * @api {post} /api/health Create a new user
      * @apiVersion 1.0.0
@@ -209,6 +222,8 @@ async function server(args, config, cb) {
      * @apiGroup Schedule
      */
     router.post('/schedule', async (req, res) => {
+        if (!req.auth) return new Err.
+
         try {
             await Schedule.event(pool, req.body);
 

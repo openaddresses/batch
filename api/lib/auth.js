@@ -2,6 +2,7 @@
 
 const Err = require('./error');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 class Auth {
     constructor(pool, config) {
@@ -27,6 +28,7 @@ class Auth {
         try {
             pgres = await this.pool.query(`
                 SELECT
+                    id,
                     username,
                     access,
                     email,
@@ -53,6 +55,7 @@ class Auth {
                 if (!res) return reject(new Error(403, null, 'Invalid Username or Pass'));
 
                 return resolve({
+                    uid: pgres.rows[0].id,
                     username: pgres.rows[0].username,
                     access: pgres.rows[0].access,
                     email: pgres.rows[0].email
@@ -101,4 +104,99 @@ class Auth {
     }
 }
 
-module.exports = Auth;
+class AuthToken {
+    constructor(pool, config) {
+        this.pool = pool;
+        this.config = config;
+    }
+
+    async validate(token) {
+        try {
+            if (token.split('.').length !== 2 || token.split('.')[0] !== 'oa') {
+                throw new Err(401, null, 'Invalid token');
+            }
+
+            const pgres = await this.pool.query(`
+                SELECT
+                    users.id AS uid,
+                    users.username,
+                    users.access,
+                    users.email
+                FROM
+                    users INNER JOIN users_tokens
+                        ON users_tokens.uid = users.id
+                WHERE
+                    users_tokens.token = $1
+            `, [
+                token
+            ]);
+
+            if (!pgres.rows.length) {
+                throw new Err(401, null, 'Invalid token');
+            } else if (pgres.rows.length > 1) {
+                throw new Err(401, null, 'Token collision');
+            }
+
+            return pgres.rows[0];
+
+        } catch (err) {
+            throw new Err(500, err, 'Failed to validate token');
+        }
+    }
+
+    async list(auth) {
+        try {
+            const pgres = await this.pool.query(`
+                SELECT
+                    id,
+                    created
+                FROM
+                    users_tokens
+                WHERE
+                    uid = $1
+            `, [
+                auth.uid
+            ]);
+
+            return pgres.rows;
+        } catch (err) {
+            throw new Err(500, err, 'Failed to list tokens');
+        }
+    }
+
+    async generate(auth) {
+        if (auth.type !== 'session') {
+            throw new Err(400, null, 'Only a user session can create a token');
+        }
+
+        try {
+            const pgres = await this.pool.query(`
+                INSERT INTO users_tokens (
+                    token,
+                    created,
+                    uid
+                ) VALUES (
+                    $1,
+                    NOW(),
+                    $2
+                ) RETURNING *
+            `, [
+                'oa.' + crypto.randomBytes(32).toString('hex'),
+                auth.id
+            ]);
+
+            return {
+                id: pgres.rows[0].id,
+                token: pgres.rows[0].token,
+                created: pgres.rows[0].created
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to generate token');
+        }
+    }
+}
+
+module.exports = {
+    Auth,
+    AuthToken
+};

@@ -72,7 +72,8 @@ async function server(args, config, cb) {
         throw new Error(err);
     }
 
-    const auth = new (require('./lib/auth'))(pool, config);
+    const auth = new (require('./lib/auth').Auth)(pool, config);
+    const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
 
     app.disable('x-powered-by');
     app.use(minify());
@@ -142,21 +143,38 @@ async function server(args, config, cb) {
     router.use(bodyparser.json());
 
     // Unified Auth
-    router.use((req, res, next) => {
+    router.use(async (req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
+            req.auth.type = 'session';
             req.auth = req.session.auth;
-        } else if (req.headers['shared-secret']) {
-            if (req.headers['shared-secret'] !== config.SharedSecret) {
+        } else if (req.header('shared-secret')) {
+            if (req.header('shared-secret') !== config.SharedSecret) {
                 return res.status(401).json({
                     status: 401,
                     message: 'Invalid shared secret'
                 });
             } else {
                 req.auth = {
-                    username: 'internal',
+                    uid: false,
+                    type: 'secret',
+                    username: false,
                     access: 'admin',
                     email: false
-                }
+                };
+            }
+        } else if (req.header('authorization')) {
+            const authorization = req.header('authorization').split(' ');
+            if (authorization[0].toLowerCase() !== 'bearer') {
+                return res.status(401).json({
+                    status: 401,
+                    message: 'Only "Bearer" authorization header is allowed'
+                });
+            }
+
+            try {
+                req.auth = await authtoken.validate(authorization[1]);
+            } catch (err) {
+                return Err.respond(err, res);
             }
         } else {
             req.auth = false;
@@ -224,6 +242,33 @@ async function server(args, config, cb) {
         } catch (err) {
             return Err.respond(err, res);
         }
+    });
+
+    /**
+     * {get} /api/token List API Tokens for the authenticated user
+     * @apiVersion 1.0.0
+     * @apiName ListTokens
+     * @apiGroup Token
+     */
+    router.get('/token', async (req, res) => {
+    });
+
+    /**
+     * {post} /api/token Create an API token for the authenticated user
+     * @apiVersion 1.0.0
+     * @apiName CreateToken
+     * @apiGroup Token
+     */
+    router.post('/token', async (req, res) => {
+    });
+
+    /**
+     * {post} /api/token Delete an API token that is owned by the authenticated user
+     * @apiVersion 1.0.0
+     * @apiName CreateToken
+     * @apiGroup Token
+     */
+    router.delete('/token/:id', async (req, res) => {
     });
 
     /**

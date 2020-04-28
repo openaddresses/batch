@@ -16,6 +16,13 @@ CREATE TABLE IF NOT EXISTS users (
     password    TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS users_tokens (
+    id          BIGSERIAL,
+    token       TEXT PRIMARY KEY,
+    created     TIMESTAMP,
+    uid         BIGINT
+);
+
 -- Store recent live job errors (reset on every scheduled run)
 CREATE TABLE IF NOT EXISTS job_errors (
     job         BIGINT UNIQUE NOT NULL, -- Job ID reference

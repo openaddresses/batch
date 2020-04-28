@@ -611,6 +611,33 @@
     "groupTitle": "Server"
   },
   {
+    "version": "1.0.0",
+    "name": "CreateToken",
+    "group": "Token",
+    "type": "",
+    "url": "",
+    "filename": "./index.js",
+    "groupTitle": "Token"
+  },
+  {
+    "version": "1.0.0",
+    "name": "CreateToken",
+    "group": "Token",
+    "type": "",
+    "url": "",
+    "filename": "./index.js",
+    "groupTitle": "Token"
+  },
+  {
+    "version": "1.0.0",
+    "name": "ListTokens",
+    "group": "Token",
+    "type": "",
+    "url": "",
+    "filename": "./index.js",
+    "groupTitle": "Token"
+  },
+  {
     "type": "post",
     "url": "/api/health",
     "title": "Create a new user",

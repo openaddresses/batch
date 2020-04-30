@@ -145,10 +145,8 @@ async function server(args, config, cb) {
     // Unified Auth
     router.use(async (req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
-            req.auth = {
-                type: 'session',
-                auth: req.session.auth
-            };
+            req.auth = req.session.auth;
+            req.auth.type = 'session';
         } else if (req.header('shared-secret')) {
             if (req.header('shared-secret') !== config.SharedSecret) {
                 return res.status(401).json({
@@ -205,6 +203,23 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/user/me If the user has an active session, return metadata about the user
+     * @apiVersion 1.0.0
+     * @apiName self
+     * @apiGroup User
+     */
+    router.get('/user/me', async (req, res) => {
+        if (req.session && req.session.auth && req.session.auth.uid) {
+            return res.json(await auth.user(req.session.auth.uid));
+        } else {
+            return res.status(401).json({
+                status: 401,
+                message: 'Invalid session'
+            });
+        }
+    });
+
+    /**
      * @api {get} /api/login If the user has an active session, reauthenticate the frontend
      * @apiVersion 1.0.0
      * @apiName get
@@ -213,7 +228,8 @@ async function server(args, config, cb) {
     router.get('/login', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.username) {
             return res.json({
-                username: req.session.auth.username
+                username: req.session.auth.username,
+                email: req.session.auth.email
             });
         } else {
             return res.status(401).json({
@@ -272,7 +288,7 @@ async function server(args, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.generate(req.auth));
+            return res.json(await authtoken.generate(req.auth, req.body.name));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -779,6 +795,13 @@ async function server(args, config, cb) {
         } catch (err) {
             return Err.respond(err, res);
         }
+    });
+
+    router.all('*', (req, res) => {
+        return res.status(404).json({
+            status: 404,
+            message: 'API endpoint does not exist!'
+        });
     });
 
     const srv = app.listen(5000, (err) => {

@@ -25,6 +25,37 @@ class Auth {
         return true;
     }
 
+    async user(uid) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    id,
+                    username,
+                    access,
+                    email
+                FROM
+                    users
+                WHERE
+                    id = $1
+            `, [
+                uid
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        if (pgres.rows.length === 0) {
+            throw new Error(404, null, 'Failed to retrieve user');
+        }
+
+        return {
+            username: pgres.rows[0].username,
+            email: pgres.rows[0].email,
+            access: pgres.rows[0].access
+        };
+    }
+
     async login(user) {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.password) throw new Err(400, null, 'password required');
@@ -62,7 +93,7 @@ class Auth {
                 if (!res) return reject(new Error(403, null, 'Invalid Username or Pass'));
 
                 return resolve({
-                    uid: pgres.rows[0].id,
+                    uid: parseInt(pgres.rows[0].id),
                     username: pgres.rows[0].username,
                     access: pgres.rows[0].access,
                     email: pgres.rows[0].email
@@ -191,7 +222,8 @@ class AuthToken {
             const pgres = await this.pool.query(`
                 SELECT
                     id,
-                    created
+                    created,
+                    name
                 FROM
                     users_tokens
                 WHERE
@@ -210,11 +242,13 @@ class AuthToken {
         }
     }
 
-    async generate(auth) {
+    async generate(auth, name) {
         if (auth.type !== 'session') {
             throw new Err(400, null, 'Only a user session can create a token');
         } else if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
+        } else if (!name || !name.trim()) {
+            throw new Err(400, null, 'Token name required');
         }
 
         try {
@@ -222,19 +256,23 @@ class AuthToken {
                 INSERT INTO users_tokens (
                     token,
                     created,
-                    uid
+                    uid,
+                    name
                 ) VALUES (
                     $1,
                     NOW(),
-                    $2
+                    $2,
+                    $3
                 ) RETURNING *
             `, [
                 'oa.' + crypto.randomBytes(32).toString('hex'),
-                auth.uid
+                auth.uid,
+                name
             ]);
 
             return {
                 id: parseInt(pgres.rows[0].id),
+                name: pgres.rows[0].name,
                 token: pgres.rows[0].token,
                 created: pgres.rows[0].created
             };

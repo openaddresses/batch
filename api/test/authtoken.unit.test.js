@@ -43,6 +43,20 @@ test('AuthToken#generate', async (t) => {
     }
 
     try {
+        await authtoken.generate({
+            uid: 1,
+            type: 'session'
+        });
+        t.fail('token.generate should fail');
+    } catch (err) {
+        t.deepEquals(err, {
+            status: 400,
+            err: null,
+            safe: 'Token name required'
+        }, 'Token name required');
+    }
+
+    try {
         const auth = new Auth(pool);
         await auth.register({
             username: 'test',
@@ -53,9 +67,10 @@ test('AuthToken#generate', async (t) => {
         const token = await authtoken.generate({
             uid: 1,
             type: 'session'
-        });
+        }, 'New Token');
 
         TOKEN = token.token;
+        t.deepEquals(Object.keys(token).sort(), ['created', 'id', 'name', 'token'], 'token: <keys>');
         t.equals(token.token.length, 67, 'token.token: <67 chars>');
         t.equals(token.id, 1, 'token.id: 1');
         t.ok(token.created, 'token.created: <date>');
@@ -94,6 +109,7 @@ test('AuthToken#list', async (t) => {
         });
 
         t.equals(tokens.length, 1, 'tokens.length: 1');
+        t.deepEquals(Object.keys(tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
         t.notOk(tokens[0].token, 'tokens[0].token: <undefined>');
         t.equals(tokens[0].id, 1, 'tokens[0].id: 1');
         t.ok(tokens[0].created, 'tokens[0].created: <date>');

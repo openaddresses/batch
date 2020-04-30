@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS users_tokens (
     id          BIGSERIAL,
+    name        TEXT,
     token       TEXT PRIMARY KEY,
     created     TIMESTAMP,
     uid         BIGINT

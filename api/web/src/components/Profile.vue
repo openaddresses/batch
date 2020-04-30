@@ -26,42 +26,19 @@
                     <input v-model='profile.email' class='input' placeholder='Username'/>
                 </div>
                 <div class='col col--12 clearfix pt12'>
-                    <button class='btn btn--stroke btn--gray btn--s round fr'>Update</button>
+                    <button disabled class='btn btn--stroke btn--gray btn--s round fr'>Update</button>
                 </div>
             </div>
         </template>
 
-        <div class='col col--12 grid border-b border--gray-light pt24'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>API Tokens:</h2>
+        <ProfileTokens @err='$emit("err", $event)'/>
 
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-            </div>
-        </div>
-
-        <template v-if='loading.tokens'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
-            </div>
-        </template>
-        <template v-else-if='!tokens.length'>
-            <div class='col col--12'>
-                <div class='flex-parent flex-parent--center-main'>
-                    <div class='flex-child py24'>
-                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                    </div>
-                </div>
-                <div class='w-full align-center'>You haven't created any API tokens yet</div>
-            </div>
-        </template>
-        <template v-else>
-        </template>
     </div>
 </template>
 
 <script>
+import ProfileTokens from './ProfileTokens.vue'
+
 export default {
     name: 'Profile',
     props: [ ],
@@ -69,8 +46,8 @@ export default {
         return {
             profile: {
                 username: '',
-                email: '',
-                password: ''
+                access: '',
+                email: ''
             },
             tokens: [],
             loading: {
@@ -84,20 +61,29 @@ export default {
     },
     methods: {
         refresh: function() {
-            //this.getUser();
+            this.getUser();
         },
         getUser: function() {
-            const url = new URL(`${window.location.origin}/api/data/history`);
-            url.searchParams.set('status', ['Warn', 'Fail']);
+            const url = new URL(`${window.location.origin}/api/user/me`);
 
             fetch(url, {
                 method: 'Get'
             }).then((res) => {
+                if (res.status !== 200 && res.status !== 304 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200 && status !== 304) {
+                    throw new Error('Failed to load profile');
+                }
                 return res.json();
             }).then((res) => {
-                this.problems = res;
+                this.profile = res;
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         }
+    },
+    components: {
+        ProfileTokens
     }
 }
 </script>

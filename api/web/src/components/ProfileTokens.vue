@@ -66,7 +66,7 @@
                         </div>
 
                         <div class='col col--12'>
-                            <pre v-text='newToken.token'/>
+                            <pre class='pre txt--s' v-text='newToken.token'/>
                         </div>
                     </div>
                 </div>
@@ -103,6 +103,10 @@ export default {
     },
     methods: {
         refresh: function() {
+            this.newToken.show = false;
+            this.newToken.name = '';
+            this.newToken.token = false;
+
             this.getTokens();
         },
         setToken: function() {

@@ -8,7 +8,7 @@ const request = promisify(require('request'));
 
 const args = require('minimist')(process.argv, {
     boolean: ['help'],
-    string: ['api', 'url', 'layer', 'name']
+    string: ['api', 'url', 'layer', 'name', 'token']
 });
 
 cli();
@@ -87,6 +87,9 @@ async function cli() {
         const run = await request({
             url: api + '/api/run',
             method: 'POST',
+            headers: {
+                Authorization: `Bearer ${args.token}`
+            },
             json: true,
             body: {
                 live: true
@@ -101,6 +104,9 @@ async function cli() {
         const job = await request({
             url: api + `/api/run/${run.body.id}/jobs`,
             method: 'POST',
+            headers: {
+                Authorization: `Bearer ${args.token}`
+            },
             json: true,
             body: {
                 jobs: [{

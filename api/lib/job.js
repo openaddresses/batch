@@ -25,7 +25,11 @@ class Job {
         this.source_name = this.fullname();
         this.layer = layer;
         this.name = name;
-        this.output = false;
+        this.output = {
+            cache: false,
+            output: false,
+            preview: false
+        };
         this.loglink = false;
         this.status = 'Pending';
         this.version = pkg.version,
@@ -310,6 +314,7 @@ class Job {
                 INSERT INTO job (
                     run,
                     created,
+                    stats,
                     source_name,
                     source,
                     layer,
@@ -320,6 +325,7 @@ class Job {
                 ) VALUES (
                     $1,
                     NOW(),
+                    '{}'::JSONB,
                     $2,
                     $3,
                     $4,
@@ -335,9 +341,11 @@ class Job {
                 this.layer,
                 this.name,
                 this.version,
-                { cache: false, output: false, preview: false }
+                this.output
             ]);
 
+            pgres.rows[0].id = parseInt(pgres.rows[0].id);
+            pgres.rows[0].run = parseInt(pgres.rows[0].run);
             for (const key of Object.keys(pgres.rows[0])) {
                 this[key] = pgres.rows[0][key];
             }

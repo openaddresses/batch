@@ -1,9 +1,13 @@
 'use strict';
 
+const {Pool} = require('pg');
 const Job = require('../lib/job');
 const pkg = require('../package.json');
 const test = require('tape');
 const nock = require('nock');
+const init = require('./init');
+
+init(test);
 
 test('Job()', (t) => {
     t.throws(() => {
@@ -46,7 +50,11 @@ test('Job()', (t) => {
     t.equals(job.bounds, false, 'job.bounds: false');
     t.deepEquals(job.stats, {}, 'job.stats: {}');
     t.equals(job.name, 'city', 'job.name: city');
-    t.equals(job.output, false, 'job.output: false');
+    t.deepEquals(job.output, {
+        cache: false,
+        output: false,
+        preview: false
+    }, 'job.output: <obj>');
     t.equals(job.loglink, false, 'job.loglink: false');
     t.equals(job.status, 'Pending', 'job.status: Pending');
     t.equals(job.version, require('../package.json').version, 'job.version: <version>');
@@ -126,7 +134,11 @@ test('Job#json', (t) => {
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
         layer: 'addresses',
         name: 'city',
-        output: false,
+        output: {
+            cache: false,
+            output: false,
+            preview: false
+        },
         loglink: false,
         status: 'Pending',
         version: pkg.version,
@@ -137,7 +149,176 @@ test('Job#json', (t) => {
     t.end();
 });
 
-test('Job#from', (t) => {
+test('Job#generate', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        const job = new Job(
+            1,
+            'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            'addresses',
+            'city'
+        );
+
+        job.run = null
+        await job.generate(pool);
+
+        t.fail('job.generate should fail');
+    } catch (err) {
+        t.deepEquals(err, {
+            status: 400,
+            err: null,
+            safe: 'Cannot generate a job without a run'
+        }, 'Cannot generate a job without a run');
+    }
+
+    try {
+        const job = new Job(
+            1,
+            'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            'addresses',
+            'city'
+        );
+
+        job.source = null
+        await job.generate(pool);
+
+        t.fail('job.generate should fail');
+    } catch (err) {
+        t.deepEquals(err, {
+            status: 400,
+            err: null,
+            safe: 'Cannot generate a job without a source'
+        }, 'Cannot generate a job without a source');
+    }
+
+    try {
+        const job = new Job(
+            1,
+            'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            'addresses',
+            'city'
+        );
+
+        job.layer = null
+        await job.generate(pool);
+
+        t.fail('job.generate should fail');
+    } catch (err) {
+        t.deepEquals(err, {
+            status: 400,
+            err: null,
+            safe: 'Cannot generate a job without a layer'
+        }, 'Cannot generate a job without a layer');
+    }
+
+    try {
+        const job = new Job(
+            1,
+            'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            'addresses',
+            'city'
+        );
+
+        job.name = null
+        await job.generate(pool);
+
+        t.fail('job.generate should fail');
+    } catch (err) {
+        t.deepEquals(err, {
+            status: 400,
+            err: null,
+            safe: 'Cannot generate a job without a name'
+        }, 'Cannot generate a job without a name');
+    }
+
+    try {
+        const job = new Job(
+            1,
+            'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            'addresses',
+            'city'
+        );
+
+        await job.generate(pool);
+
+        t.equals(job.id, 1, 'job.id: 1');
+        t.equals(job.run, 1, 'job.run: 1');
+        t.equals(job.map, null, 'job.map: null');
+        t.ok(job.created, false, 'job.created: <date>');
+        t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+        t.equals(job.layer, 'addresses', 'job.layer: addresses');
+        t.equals(job.count, null, 'job.count: null');
+        t.equals(job.bounds, null, 'job.bounds: null');
+        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.equals(job.name, 'city', 'job.name: city');
+        t.deepEquals(job.output, {
+            cache: false,
+            output: false,
+            preview: false
+        }, 'job.output: false');
+        t.equals(job.loglink, null, 'job.loglink: <obj>');
+        t.equals(job.status, 'Pending', 'job.status: Pending');
+        t.equals(job.version, require('../package.json').version, 'job.version: <version>');
+        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.equals(job.raw, false, 'job.raw: false');
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+
+    pool.end();
+    t.end();
+});
+
+test('Job#from', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        await Job.from(pool, 2);
+        t.fail('Job#from should fail');
+    } catch (err) {
+        t.deepEquals(err, {
+            status: 404,
+            err: null,
+            safe: 'no job by that id'
+        });
+    }
+
+    try {
+        const job = await Job.from(pool, 1);
+
+        t.equals(job.id, 1, 'job.id: 1');
+        t.equals(job.run, 1, 'job.run: 1');
+        t.equals(job.map, null, 'job.map: null');
+        t.ok(job.created, false, 'job.created: <date>');
+        t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+        t.equals(job.layer, 'addresses', 'job.layer: addresses');
+        t.equals(job.count, null, 'job.count: null');
+        t.equals(job.bounds, null, 'job.bounds: null');
+        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.equals(job.name, 'city', 'job.name: city');
+        t.deepEquals(job.output, {
+            cache: false,
+            output: false,
+            preview: false
+        }, 'job.output: false');
+        t.equals(job.loglink, null, 'job.loglink: <obj>');
+        t.equals(job.status, 'Pending', 'job.status: Pending');
+        t.equals(job.version, require('../package.json').version, 'job.version: <version>');
+        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.equals(job.raw, false, 'job.raw: false');
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    pool.end();
     t.end();
 });
 
@@ -162,10 +343,6 @@ test('Job#commit', (t) => {
 });
 
 test('Job#log', (t) => {
-    t.end();
-});
-
-test('Job#generate', (t) => {
     t.end();
 });
 

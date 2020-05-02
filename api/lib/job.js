@@ -98,7 +98,7 @@ class Job {
             loglink: this.loglink,
             status: this.status,
             version: this.version,
-            count: this.count,
+            count: parseInt(this.count),
             bounds: this.bounds,
             stats: this.stats
         };

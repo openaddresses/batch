@@ -44,6 +44,8 @@
                     </div>
                 </div>
             </template>
+
+            <JobStats :job='job'/>
         </template>
     </div>
 </template>
@@ -51,6 +53,7 @@
 <script>
 
 import Status from './Status.vue';
+import JobStats from './JobStats.vue';
 
 export default {
     name: 'Job',
@@ -64,6 +67,9 @@ export default {
                     cache: false,
                     output: false,
                     preview: false
+                },
+                stats: {
+
                 }
             }
         };
@@ -72,6 +78,7 @@ export default {
         this.refresh();
     },
     components: {
+        JobStats,
         Status
     },
     methods: {

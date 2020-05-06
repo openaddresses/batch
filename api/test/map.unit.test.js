@@ -4,7 +4,7 @@ const Map = require('../lib/map');
 const Job = require('../lib/job');
 const { Pool } = require('pg');
 const test = require('tape');
-const init = require('./init');
+const {init} = require('./init');
 const nock = require('nock');
 
 test('nocks', (t) => {

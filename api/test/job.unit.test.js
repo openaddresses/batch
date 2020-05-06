@@ -5,7 +5,7 @@ const Job = require('../lib/job');
 const pkg = require('../package.json');
 const test = require('tape');
 const nock = require('nock');
-const init = require('./init');
+const {init} = require('./init');
 
 init(test);
 

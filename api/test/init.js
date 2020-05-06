@@ -4,8 +4,14 @@ process.env.StackName = 'test';
 
 const fs = require('fs');
 const path = require('path');
+const request = require('request');
 const { Pool } = require('pg');
 
+/**
+ * Clear and restore an empty database schema
+ *
+ * @param {Tape} test Tape test instance
+ */
 function init(test) {
     test('start: database', async (t) => {
         let pool = new Pool({
@@ -35,4 +41,40 @@ function init(test) {
     });
 }
 
-module.exports = init;
+async function token() {
+    return new Promise((resolve, reject) => {
+        request({
+            url: 'http://localhost:5000/api/user',
+            json: true,
+            method: 'POST',
+            body: {
+                username: 'test',
+                password: 'test',
+                email: 'test@openaddresses.io'
+            }
+        }, (err, res) => {
+            if (err) return reject(err);
+            if (res.statusCode !== 200) return reject(res.body);
+
+            request({
+                url: 'http://localhost:5000/api/login',
+                json: true,
+                method: 'POST',
+                body: {
+                    username: 'test',
+                    password: 'test',
+                }
+            }, (err, res) => {
+                if (err) return reject(err);
+                if (res.statusCode !== 200) return reject(res.body);
+
+                console.error(res.headers);
+            });
+        });
+    });
+}
+
+module.exports = {
+    init,
+    token
+};

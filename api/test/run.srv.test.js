@@ -4,7 +4,7 @@ const pkg = require('../package.json');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
-const init = require('./init');
+const {init, token} = require('./init');
 let app, pool;
 
 init(test);
@@ -19,7 +19,9 @@ test('start: server', async (t) => {
     });
 });
 
-test('POST: api/run', (t) => {
+test('POST: api/run', async (t) => {
+    const tk = await token();
+
     request({
         url: 'http://localhost:5000/api/run',
         method: 'POST',

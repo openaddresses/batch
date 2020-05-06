@@ -3,7 +3,7 @@
 const { Auth, AuthToken } = require('../lib/auth');
 const test = require('tape');
 const { Pool } = require('pg');
-const init = require('./init');
+const {init} = require('./init');
 
 init(test);
 

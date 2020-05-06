@@ -93,9 +93,9 @@ astral-regex@^1.0.0:
   integrity sha512-+Ryf6g3BKoRc7jfp7ad8tM4TtMiaWvbF/1/sQcZPkkS7ag3D5nMBCe2UfOTONtAkaG0tO0ij3C5Lwmf1EiyjHg==
 
 aws-sdk@^2.209.0:
-  version "2.664.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.664.0.tgz#d0abfc446cb4aa2dafe5d1febb73469c4cb30849"
-  integrity sha512-Lkez6O9Y7WuN2pjd/5eCtZejZTgB7zAPBFXjmu6yJQwb6V+iR9UclFjYkcMgTnrhw+eNOQdV60X5EdKl64A45Q==
+  version "2.671.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.671.0.tgz#2c6e164a0f540d6fc428c123f2994ac081663ff5"
+  integrity sha512-i83+/TIOLlhAxvV2xVLz5+XGtNqJgQJwP/e8J49rzDkyMV6OE2FgxU8utujGrComrSJFpITqMFqug+ZfdHoLIQ==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -929,9 +929,9 @@ tmp@^0.0.33:
     os-tmpdir "~1.0.2"
 
 tslib@^1.9.0:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
-  integrity sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
+  version "1.11.2"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.2.tgz#9c79d83272c9a7aaf166f73915c9667ecdde3cc9"
+  integrity sha512-tTSkux6IGPnUGUd1XAZHcpu85MOkIl5zX49pO+jfsie3eP0B6pyhOlLXm3cAC6T7s+euSDDUUV+Acop5WmtkVg==
 
 type-check@~0.3.2:
   version "0.3.2"

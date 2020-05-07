@@ -71,7 +71,6 @@ export default {
             if (!this.email.length) return;
             this.loading = true;
 
-            let status;
             fetch(window.location.origin + `/api/user`, {
                 method: 'POST',
                 headers: {
@@ -84,13 +83,11 @@ export default {
                     password: this.password
                 })
             }).then((res) => {
-                status = res.status;
-                return res.json();
-            }).then((res) => {
                 this.loading = false;
-                if (status !== 200 && res.message) {
+
+                if (res.status !== 200 && res.message) {
                     throw new Error(res.message);
-                } else if (status !== 200) {
+                } else if (res.status !== 200) {
                     throw new Error('Failed to register user');
                 }
 

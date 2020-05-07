@@ -83,10 +83,18 @@ export default {
             fetch(window.location.origin + '/api/run', {
                 method: 'GET'
             }).then((res) => {
+                this.loading = false;
+
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to get runs');
+                }
                 return res.json();
             }).then((res) => {
                 this.runs = res;
-                this.loading = false;
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         }
     },

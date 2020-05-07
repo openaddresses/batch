@@ -38,6 +38,7 @@
 
             <div class='col col--12 mb12 h300'>
                 <Coverage
+                    @err='$emit("err", $event)'
                     v-on:point='filter.point = $event'
                 />
             </div>
@@ -147,11 +148,19 @@ export default {
             fetch(url, {
                 method: 'GET'
             }).then((res) => {
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to get data');
+                }
+
                 return res.json();
             }).then((res) => {
                 this.datas = res;
 
                 this.loading = false;
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         }
     },

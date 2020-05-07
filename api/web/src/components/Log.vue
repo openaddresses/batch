@@ -49,7 +49,16 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.loading = false;
+
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to get logs');
+                }
+
                 this.lines = res;
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         },
         linenum: function(line) {

@@ -64,6 +64,12 @@ export default {
             fetch(`${window.location.origin}/api/map`, {
                 method: 'GET'
             }).then((res) => {
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to fetch map data');
+                }
+
                 return res.json();
             }).then((res) => {
                 mapboxgl.accessToken = res.token;
@@ -144,6 +150,8 @@ export default {
                         }
                     });
                 });
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         }
     }

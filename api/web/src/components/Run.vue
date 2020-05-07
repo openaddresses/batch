@@ -107,29 +107,40 @@ export default {
             fetch(window.location.origin + `/api/run/${this.runid}`, {
                 method: 'GET'
             }).then((res) => {
+                this.loading.run = false;
+
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to register user');
+                }
+
                 return res.json();
             }).then((res) => {
                 this.run = res;
-                this.loading.run = false;
-            });
+            }).catch((err) => {
+                this.$emit('err', err);
+            })
         },
         getJobs: function() {
             this.loading.run = true;
             fetch(window.location.origin + `/api/job?run=${this.runid}`, {
                 method: 'GET'
             }).then((res) => {
+                this.loading.jobs = false;
+
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to register user');
+                }
+
                 return res.json();
             }).then((res) => {
                 this.jobs = res;
-
-                /*
-                this.name = this.job.source
-                    .replace(/.*sources\//, '')
-                    .replace(/\.json/, '');
-                */
-
-                this.loading.jobs = false;
-            });
+            }).catch((err) => {
+                this.$emit('err', err);
+            })
         }
     }
 }

@@ -62,6 +62,8 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.auth = res;
+            }).catch((err) => {
+                this.err = err;
             });
         },
         external: function(url, tab) {

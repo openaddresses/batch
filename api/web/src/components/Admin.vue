@@ -55,11 +55,19 @@ export default {
             url.searchParams.set('status', ['Warn', 'Fail']);
 
             fetch(url, {
-                method: 'Get'
+                method: 'GET'
             }).then((res) => {
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to get admin source problems');
+                }
+
                 return res.json();
             }).then((res) => {
                 this.problems = res;
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         }
     }

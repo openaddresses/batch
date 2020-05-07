@@ -9,6 +9,7 @@ Vue.use(VueRouter);
 
 import Register from './components/Register.vue';
 import Profile from './components/Profile.vue';
+import Upload from './components/Upload.vue';
 import Admin from './components/Admin.vue';
 import Login from './components/Login.vue';
 import History from './components/History.vue';
@@ -41,8 +42,10 @@ const router = new VueRouter({
         { path: '/login', component: Login },
         { path: '/profile', component: Profile },
         { path: '/register', component: Register },
+
+        { path: '/upload', component: Upload }
     ]
-})
+});
 
 new Vue({
     router: router,

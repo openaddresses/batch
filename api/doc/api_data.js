@@ -646,5 +646,15 @@ define({ "api": [
     "group": "User",
     "filename": "./index.js",
     "groupTitle": "User"
+  },
+  {
+    "type": "get",
+    "url": "/api/user/me",
+    "title": "If the user has an active session, return metadata about the user",
+    "version": "1.0.0",
+    "name": "self",
+    "group": "User",
+    "filename": "./index.js",
+    "groupTitle": "User"
   }
 ] });

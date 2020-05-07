@@ -8,6 +8,8 @@
             <router-link to='/admin'><button class='btn btn--stroke btn--s btn--gray round mr12'>Admin</button></router-link>
 
             <span class='fr'>
+                <router-link to='/upload'><button class='btn btn--stroke btn--s btn--gray round mr12 h24'>Contribute</button></router-link>
+
                 <button @click='external("/docs", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
 
                 <router-link v-if='!auth.username' to='/login'><button class='btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>

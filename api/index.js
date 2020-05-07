@@ -772,7 +772,7 @@ async function server(args, config, cb) {
             secret: process.env.GithubSecret
         });
 
-        if (!ghverify(req.body, req.headers['x-hub-signature'])) {
+        if (!ghverify.verify(req.body, req.headers['x-hub-signature'])) {
             res.status(400).send('Invalid X-Hub-Signature');
         }
 

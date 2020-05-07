@@ -11,6 +11,9 @@ function trigger(event) {
     const jobQueue = process.env.JOB_QUEUE;
     const jobName = process.env.JOB_NAME;
 
+    console.error('EVENT: ', JSON.stringify(event));
+
+
     if (typeof event !== 'object' || Array.isArray(event)) {
         throw new Error('event must be Key/Value pairs');
     }
@@ -32,7 +35,7 @@ function trigger(event) {
                 command: ['./task.js'],
                 environment: [{
                     name: 'OA_JOB',
-                    value: event.job
+                    value: String(event.job)
                 },{
                     name: 'OA_SOURCE',
                     value: event.source

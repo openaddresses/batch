@@ -4,7 +4,7 @@ const pkg = require('../package.json');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
-const {init, token} = require('./init');
+const { init, token } = require('./init');
 let app, pool;
 
 init(test);

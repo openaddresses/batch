@@ -7,6 +7,11 @@ const crypto = require('crypto');
 class Auth {
     constructor(pool) {
         this.pool = pool;
+
+        this.attrs = [
+            'flags',
+            'access'
+        ];
     }
 
     async is_auth(req) {
@@ -25,6 +30,74 @@ class Auth {
         return true;
     }
 
+    async patch(uid, patch) {
+        const user = await this.user(uid);
+
+        for (const attr of this.attrs) {
+            if (patch[attr] !== undefined) {
+                user[attr] = patch[attr];
+            }
+        }
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                UPDATE users
+                    SET
+                        flags = $2,
+                        access = $3
+
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                uid,
+                user.flags,
+                user.access
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        const row = pgres.rows[0];
+
+        return {
+            id: parseInt(row.id),
+            username: row.username,
+            email: row.email,
+            access: row.access,
+            flags: row.flags
+        }
+    }
+
+    async list() {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    id,
+                    username,
+                    access,
+                    email,
+                    flags
+                FROM
+                    users
+            `, []);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        return pgres.rows.map((row) => {
+            return {
+                id: parseInt(row.id),
+                username: row.username,
+                email: row.email,
+                access: row.access,
+                flags: row.flags
+            };
+        });
+    }
+
     async user(uid) {
         let pgres;
         try {
@@ -33,7 +106,8 @@ class Auth {
                     id,
                     username,
                     access,
-                    email
+                    email,
+                    flags
                 FROM
                     users
                 WHERE
@@ -52,7 +126,8 @@ class Auth {
         return {
             username: pgres.rows[0].username,
             email: pgres.rows[0].email,
-            access: pgres.rows[0].access
+            access: pgres.rows[0].access,
+            flags: pgres.rows[0].flags
         };
     }
 
@@ -70,7 +145,8 @@ class Auth {
                     username,
                     access,
                     email,
-                    password
+                    password,
+                    flags
                 FROM
                     users
                 WHERE
@@ -118,12 +194,14 @@ class Auth {
                         username,
                         email,
                         password,
-                        access
+                        access,
+                        flags
                     ) VALUES (
                         $1,
                         $2,
                         $3,
-                        'user'
+                        'user',
+                        '{}'::JSONB
                     )
                 `, [
                     user.username,
@@ -186,7 +264,8 @@ class AuthToken {
                     users.id AS uid,
                     users.username,
                     users.access,
-                    users.email
+                    users.email,
+                    users.flags,
                 FROM
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid

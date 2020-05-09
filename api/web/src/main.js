@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 import Register from './components/Register.vue';
 import Profile from './components/Profile.vue';
 import Upload from './components/Upload.vue';
-import Admin from './components/Admin.vue';
+import Errors from './components/Errors.vue';
 import Login from './components/Login.vue';
 import History from './components/History.vue';
 import Data from './components/Data.vue';
@@ -27,7 +27,7 @@ const router = new VueRouter({
     routes: [
         { path: '/', redirect: '/data' },
 
-        { path: '/admin', component: Admin },
+        { path: '/errors', component: Errors },
 
         { path: '/run', component: Runs },
         { path: '/run/:runid', component: Run, props: true },

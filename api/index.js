@@ -184,6 +184,24 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/user Return a list of all active users
+     * @apiVersion 1.0.0
+     * @apiName list
+     * @apiGroup User
+     */
+    router.get('/user', async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            const users = await auth.list();
+
+            return res.json(users);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/health Create a new user
      * @apiVersion 1.0.0
      * @apiName Create
@@ -216,6 +234,26 @@ async function server(args, config, cb) {
                 status: 401,
                 message: 'Invalid session'
             });
+        }
+    });
+
+    /**
+     * @api {patch} /api/user/:id Update a user with the given body
+     * @apiVersion 1.0.0
+     * @apiName self
+     * @apiGroup User
+     *
+     * @apiParam {Number} id The UID of the user to update
+     */
+    router.patch('/user/:id', async (req, res) => {
+        Param.int(req, res, 'id');
+
+        try {
+            await auth.is_admin(req);
+
+            res.json(await auth.patch(req.params.id, req.body));
+        } catch (err) {
+            return Err.respond(err, res);
         }
     });
 
@@ -295,7 +333,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {delete} /api/token Delete an API token that is owned by the authenticated user
+     * {delete} /api/token/:id Delete an API token that is owned by the authenticated user
      * @apiVersion 1.0.0
      * @apiName DeleteToken
      * @apiGroup Token
@@ -432,7 +470,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/data/:data Return full job history for a given data ID
+     * @api {get} /api/data/:data/history Return full job history for a given data ID
      * @apiVersion 1.0.0
      * @apiName SingleHistory
      * @apiGroup Data

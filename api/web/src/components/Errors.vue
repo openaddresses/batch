@@ -2,7 +2,7 @@
     <div class='col col--12 grid pt12'>
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>Administration:</h2>
+                <h2 class='txt-h4 ml12 pb12 fl'>Source Errors:</h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
@@ -32,7 +32,7 @@
 import Status from './Status.vue';
 
 export default {
-    name: 'Admin',
+    name: 'Errors',
     props: [ ],
     data: function() {
         return {
@@ -60,7 +60,7 @@ export default {
                 if (res.status !== 200 && res.message) {
                     throw new Error(res.message);
                 } else if (res.status !== 200) {
-                    throw new Error('Failed to get admin source problems');
+                    throw new Error('Failed to get error sources');
                 }
 
                 return res.json();

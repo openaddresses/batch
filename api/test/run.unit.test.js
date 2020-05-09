@@ -2,7 +2,7 @@
 
 const Run = require('../lib/run');
 const test = require('tape');
-const {init} = require('./init');
+const { init } = require('./init');
 const { Pool } = require('pg');
 
 init(test);

@@ -33,10 +33,12 @@
 
         <ProfileTokens @err='$emit("err", $event)'/>
 
+        <ProfileAdmin v-if='profile.access === "admin"' @err='$emit("err", $event)'/>
     </div>
 </template>
 
 <script>
+import ProfileAdmin from './ProfileAdmin.vue'
 import ProfileTokens from './ProfileTokens.vue'
 
 export default {
@@ -67,7 +69,7 @@ export default {
             const url = new URL(`${window.location.origin}/api/user/me`);
 
             fetch(url, {
-                method: 'Get'
+                method: 'GET'
             }).then((res) => {
                 if (res.status !== 200 && res.status !== 304 && res.message) {
                     throw new Error(res.message);
@@ -83,6 +85,7 @@ export default {
         }
     },
     components: {
+        ProfileAdmin,
         ProfileTokens
     }
 }

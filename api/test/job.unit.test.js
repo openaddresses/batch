@@ -1,11 +1,11 @@
 'use strict';
 
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 const Job = require('../lib/job');
 const pkg = require('../package.json');
 const test = require('tape');
 const nock = require('nock');
-const {init} = require('./init');
+const { init } = require('./init');
 
 init(test);
 
@@ -162,7 +162,7 @@ test('Job#generate', async (t) => {
             'city'
         );
 
-        job.run = null
+        job.run = null;
         await job.generate(pool);
 
         t.fail('job.generate should fail');
@@ -182,7 +182,7 @@ test('Job#generate', async (t) => {
             'city'
         );
 
-        job.source = null
+        job.source = null;
         await job.generate(pool);
 
         t.fail('job.generate should fail');
@@ -202,7 +202,7 @@ test('Job#generate', async (t) => {
             'city'
         );
 
-        job.layer = null
+        job.layer = null;
         await job.generate(pool);
 
         t.fail('job.generate should fail');
@@ -222,7 +222,7 @@ test('Job#generate', async (t) => {
             'city'
         );
 
-        job.name = null
+        job.name = null;
         await job.generate(pool);
 
         t.fail('job.generate should fail');

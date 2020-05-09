@@ -62,7 +62,7 @@ async function token() {
                 method: 'POST',
                 body: {
                     username: 'test',
-                    password: 'test',
+                    password: 'test'
                 }
             }, (err, res) => {
                 if (err) return reject(err);

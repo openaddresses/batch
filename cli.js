@@ -97,7 +97,7 @@ async function cli() {
         });
 
         if (run.statusCode !== 200) {
-            console.error(run.body.message)
+            console.error(run.body.message);
             process.exit(1);
         }
 
@@ -117,7 +117,7 @@ async function cli() {
             }
         });
         if (run.statusCode !== 200) {
-            console.error(run.body.message)
+            console.error(run.body.message);
             process.exit(1);
         }
 

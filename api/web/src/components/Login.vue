@@ -13,12 +13,12 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12'>Username:</label>
-                    <input :class='{
+                    <input v-on:keyup.enter='login' :class='{
                          "input--border-red": attempted && !username
                     }' v-model='username' type='text' class='input'/>
 
                     <label class='mt12'>Password:</label>
-                    <input :class='{
+                    <input v-on:keyup.enter='login' :class='{
                          "input--border-red": attempted && !password
                    } ' v-model='password' type='password' class='input'/>
 

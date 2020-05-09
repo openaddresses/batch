@@ -68,9 +68,8 @@ export default {
             }).then((res) => {
                 this.loading = false;
                 if (res.status !== 200) throw new Error('Incorrect username or password');
-                return res.json();
-            }).then((res) => {
-                this.$emit('auth', res);
+
+                this.$emit('auth');
                 this.$router.push('/data')
             }).catch((err) => {
                 this.$emit('err', err);

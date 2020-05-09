@@ -172,7 +172,8 @@ class Auth {
                     uid: parseInt(pgres.rows[0].id),
                     username: pgres.rows[0].username,
                     access: pgres.rows[0].access,
-                    email: pgres.rows[0].email
+                    email: pgres.rows[0].email,
+                    flags: pgres.rows[0].flags
                 });
             });
         });

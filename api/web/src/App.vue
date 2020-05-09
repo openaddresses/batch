@@ -22,7 +22,8 @@
         <div class='col col--12 flex-parent flex-parent--center-main relative'>
             <div class='flex-child col col--12 wmax600'>
                 <router-view
-                    @auth='auth = $event'
+                    :auth='auth'
+                    @auth='getLogin'
                     @err='err = $event'
                 />
             </div>
@@ -48,7 +49,10 @@ export default {
         return {
             err: false,
             auth: {
-                username: false
+                username: false,
+                email: false,
+                access: false,
+                flags: {}
             },
             runid: false,
             jobid: false,

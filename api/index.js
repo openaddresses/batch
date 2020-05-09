@@ -159,7 +159,8 @@ async function server(args, config, cb) {
                     type: 'secret',
                     username: false,
                     access: 'admin',
-                    email: false
+                    email: false,
+                    flags: {}
                 };
             }
         } else if (req.header('authorization')) {
@@ -267,7 +268,9 @@ async function server(args, config, cb) {
         if (req.session && req.session.auth && req.session.auth.username) {
             return res.json({
                 username: req.session.auth.username,
-                email: req.session.auth.email
+                email: req.session.auth.email,
+                access: req.session.auth.access,
+                flags: req.session.auth.flags
             });
         } else {
             return res.status(401).json({

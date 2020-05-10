@@ -100,7 +100,7 @@
   },
   {
     "type": "get",
-    "url": "/api/data/:data",
+    "url": "/api/data/:data/history",
     "title": "Return full job history for a given data ID",
     "version": "1.0.0",
     "name": "SingleHistory",
@@ -639,10 +639,30 @@
   },
   {
     "type": "post",
+    "url": "/api/upload",
+    "title": "Allow a user to upload a manually maintained data source",
+    "version": "1.0.0",
+    "name": "upload",
+    "group": "Upload",
+    "filename": "./index.js",
+    "groupTitle": "Upload"
+  },
+  {
+    "type": "post",
     "url": "/api/health",
     "title": "Create a new user",
     "version": "1.0.0",
     "name": "Create",
+    "group": "User",
+    "filename": "./index.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "get",
+    "url": "/api/user",
+    "title": "Return a list of all active users",
+    "version": "1.0.0",
+    "name": "list",
     "group": "User",
     "filename": "./index.js",
     "groupTitle": "User"
@@ -654,6 +674,29 @@
     "version": "1.0.0",
     "name": "self",
     "group": "User",
+    "filename": "./index.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "patch",
+    "url": "/api/user/:id",
+    "title": "Update a user with the given body",
+    "version": "1.0.0",
+    "name": "self",
+    "group": "User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The UID of the user to update</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "User"
   }

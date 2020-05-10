@@ -5,7 +5,7 @@
             <div class='col col--12' :class='{ "none": progress !== 0 }'>
                 <div class='pb6'>Select a file to upload</div>
                 <form>
-                    <input type='file' id='file' name='file' accept='*' @change='upload' />
+                    <input ref='fileInput' type='file' id='file' name='file' accept='*' @change='upload' />
                 </form>
             </div>
 
@@ -26,7 +26,7 @@
                     UPLOAD FILE
                 </div>
                 <div class='col col--12 clearfix pt12'>
-                    <button class='btn round btn--stroke fr btn--gray'>
+                    <button @click='refresh' class='btn round btn--stroke fr btn--gray'>
                         <svg class='fl icon' style='margin-top: 6px;'><use href='#icon-refresh'/></svg>Upload
                     </button>
                 </div>
@@ -47,6 +47,13 @@ export default {
         }
     },
     methods: {
+        refresh: function() {
+            this.name = '';
+            this.progress = 0;
+            const input = this.$refs.fileInput;
+            input.type = 'text';
+            input.type = 'file';
+        },
         upload: function(event) {
             const file = event.target.files[0];
             this.name = file.name;

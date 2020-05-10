@@ -64,6 +64,11 @@ s3://v2.openaddresses.io/<stack>/job/<job_id>/source.geojson
 s3://v2.openaddresses.io/<stack>/job/<job_id>/cache.zip
 ```
 
+Manual sources (sources that are cached to s3 via the upload tool), are in the following format
+```
+s3://v2.openaddresses.io/<stack>/upload/<user_id>/<file_name>
+```
+
 ## API
 
 API documentation is availiable [here](http://staging.openaddresses.io/docs/)

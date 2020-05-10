@@ -8,6 +8,7 @@
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
+        "@mapbox/assembly": "^0.24.1-0",
         "core-js": "^3.6.4",
         "mapbox-gl": "^1.10.0",
         "vue": "^2.6.11",

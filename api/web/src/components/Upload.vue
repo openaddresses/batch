@@ -29,17 +29,20 @@
 </template>
 
 <script>
-    import UploadFile from './UploadFile.vue';
+import UploadFile from './UploadFile.vue';
 
-    export default {
-        name: 'Upload',
-        props: ['auth'],
-        mounted: function() {
-            console.error(JSON.stringify(this.auth, null, 4));
-            this.$emit('auth');
-        },
-        components: {
-            UploadFile
-        }
+export default {
+    name: 'Upload',
+    props: ['auth'],
+    data: function() {
+        return {};
+    },
+    mounted: function() {
+        console.error(JSON.stringify(this.auth, null, 4));
+        this.$emit('auth');
+    },
+    components: {
+        UploadFile
     }
+}
 </script>

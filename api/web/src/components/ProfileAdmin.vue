@@ -70,9 +70,9 @@ export default {
             }).then((res) => {
                 this.loading = false;
 
-                if (res.status !== 200) {
+                if (res.status !== 200 && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && status !== 304) {
+                } else if (res.status !== 200 && res.status !== 304) {
                     throw new Error('Failed to load users');
                 }
                 return res.json();
@@ -97,9 +97,9 @@ export default {
                     flags: user.flags
                 })
             }).then((res) => {
-                if (res.status !== 200) {
+                if (res.status !== 200 && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && status !== 304) {
+                } else if (res.status !== 200 && res.status !== 304) {
                     throw new Error('Failed to update user');
                 }
                 return res.json();

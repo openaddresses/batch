@@ -47,6 +47,7 @@ async function server(args, config, cb) {
     const Job = require('./lib/job');
     // const JobError = require('./lib/joberror');
     const Data = require('./lib/data');
+    const Upload = require('./lib/upload');
     const Schedule = require('./lib/schedule');
     const Collections = require('./lib/collections');
 
@@ -182,6 +183,24 @@ async function server(args, config, cb) {
         }
 
         return next();
+    });
+
+    /**
+     * @api {post} /api/upload Allow a user to upload a manually maintained data source
+     * @apiVersion 1.0.0
+     * @apiName upload
+     * @apiGroup Upload
+     */
+    router.get('/upload', async (req, res) => {
+        try {
+            //TODO admin or flag
+
+            await auth.list();
+
+            return res.json(users);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**

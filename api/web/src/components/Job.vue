@@ -59,7 +59,7 @@
 <script>
 
 import Status from './Status.vue';
-import JobStats from './JobStats.vue';
+import JobStats from './job/JobStats.vue';
 
 export default {
     name: 'Job',

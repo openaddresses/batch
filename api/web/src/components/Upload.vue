@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import UploadFile from './UploadFile.vue';
+import UploadFile from './upload/UploadFile.vue';
 
 export default {
     name: 'Upload',
@@ -38,7 +38,6 @@ export default {
         return {};
     },
     mounted: function() {
-        console.error(JSON.stringify(this.auth, null, 4));
         this.$emit('auth');
     },
     components: {

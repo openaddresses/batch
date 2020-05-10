@@ -38,8 +38,8 @@
 </template>
 
 <script>
-import ProfileAdmin from './ProfileAdmin.vue'
-import ProfileTokens from './ProfileTokens.vue'
+import ProfileAdmin from './profile/ProfileAdmin.vue'
+import ProfileTokens from './profile/ProfileTokens.vue'
 
 export default {
     name: 'Profile',

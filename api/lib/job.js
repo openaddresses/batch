@@ -145,7 +145,17 @@ class Job {
         try {
             pgres = await pool.query(`
                 SELECT
-                    *
+                    id,
+                    run,
+                    map,
+                    created,
+                    source,
+                    source_name,
+                    layer,
+                    name,
+                    output,
+                    loglink,
+                    status
                 FROM
                     job
                 WHERE
@@ -178,7 +188,21 @@ class Job {
         return new Promise((resolve, reject) => {
             pool.query(`
                 SELECT
-                    *
+                    id,
+                    run,
+                    map,
+                    created,
+                    source,
+                    source_name,
+                    layer,
+                    name,
+                    output,
+                    loglink,
+                    status,
+                    stats,
+                    count,
+                    ST_AsGeoJSON(bounds) AS bounds,
+                    version
                 FROM
                     job
                 WHERE

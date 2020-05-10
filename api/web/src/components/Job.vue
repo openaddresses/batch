@@ -29,6 +29,9 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
+            <div class='col col--12'>
+                <h3 class='txt-h4 py6'>Source Preview:</h3>
+            </div>
 
             <template v-if='job.output.preview'>
                 <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
@@ -71,8 +74,9 @@ export default {
                     output: false,
                     preview: false
                 },
+                count: 0,
                 stats: {
-
+                    counts: {}
                 }
             }
         };

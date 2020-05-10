@@ -201,7 +201,7 @@ class Job {
                     status,
                     stats,
                     count,
-                    ST_AsGeoJSON(bounds) AS bounds,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds,
                     version
                 FROM
                     job

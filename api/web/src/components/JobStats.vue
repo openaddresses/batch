@@ -20,37 +20,42 @@
                 </table>
             </template>
             <template v-else-if='mode === "map"'>
-
+                <JobStatsMap :job='job' @err='$emit("err", $event)'/>
             </template>
         </div>
     </div>
 </template>
 
 <script>
-    export default {
-        name: 'JobStats',
-        props: ['job'],
-        data: function() {
-            return {
-                mode: 'numeric',
-                flat: {}
-            }
-        },
-        mounted: function() {
-            this.calcTable();
-        },
-        methods: {
-            calcTable() {
-                for (const key of Object.keys(this.job.stats)) {
-                    if (typeof this.job.stats[key] === 'object') {
-                        for (const key_i of Object.keys(this.job.stats[key])) {
-                            this.$set(this.flat, `${key}::${key_i}`, this.job.stats[key][key_i]);
-                        }
-                    } else {
-                        this.$set(this.flat, key, this.job.stats[key]);
+import JobStatsMap from './JobStatsMap.vue';
+
+export default {
+    name: 'JobStats',
+    props: ['job'],
+    data: function() {
+        return {
+            mode: 'numeric',
+            flat: {}
+        }
+    },
+    mounted: function() {
+        this.calcTable();
+    },
+    methods: {
+        calcTable() {
+            for (const key of Object.keys(this.job.stats)) {
+                if (typeof this.job.stats[key] === 'object') {
+                    for (const key_i of Object.keys(this.job.stats[key])) {
+                        this.$set(this.flat, `${key}::${key_i}`, this.job.stats[key][key_i]);
                     }
+                } else {
+                    this.$set(this.flat, key, this.job.stats[key]);
                 }
             }
         }
+    },
+    components: {
+        JobStatsMap
     }
+}
 </script>

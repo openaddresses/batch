@@ -23,7 +23,7 @@
 
 <script>
 export default {
-    name: 'Error',
+    name: 'Err',
     props: ['err']
 }
 </script>

@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <Error
+        <Err
             v-if='err'
             :err='err'
             @err='err = $event'
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import Error from './components/Error.vue'
+import Err from './components/Err.vue'
 
 export default {
     name: 'OpenAddresses',
@@ -64,11 +64,11 @@ export default {
             fetch(`${window.location.origin}/api/login`, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200) throw new Error('Invalid Session');
                 return res.json();
             }).then((res) => {
                 this.auth = res;
             }).catch((err) => {
+                console.error(err);
                 this.err = err;
             });
         },
@@ -81,7 +81,7 @@ export default {
         },
     },
     components: {
-        Error
+        Err
     }
 }
 </script>

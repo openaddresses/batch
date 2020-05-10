@@ -9,18 +9,19 @@ const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
  */
 class Upload {
     static async put(uid, name, stream) {
+        const key = `${process.env.stackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`;
         return new Promise((resolve, reject) => {
             console.error(`${process.env.stackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`);
             s3.upload({
                 Bucket: process.env.Bucket,
                 ACL: 'public-read',
-                Key: `${process.env.stackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`,
+                Key: key,
                 Body: stream
             }, (err, res) => {
                 if (err) return reject(new Err(500, err, 'Failed to upload file'));
 
                 return resolve({
-                    url: `${process.env.stackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`
+                    url: ` https://s3.amazonaws.com/${process.env.Bucket}/${key}`
                 });
             });
         });

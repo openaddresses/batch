@@ -9,21 +9,23 @@
                 </form>
             </div>
 
-            <div v-if='progress && progress < 100' class='col col--12'>
-                <div class='col col--12'>
-                    <span class='txt-truncate inline' v-text='name'/>
+            <div v-if='progress && progress < 101' class='col col--12'>
+                <div class='flex-parent flex-parent--center-main w-full'>
+                    <div class='flex-child loading py24'></div>
                 </div>
+
+                <div class='align-center txt-truncate' v-text='name'></div>
 
                 <div class='col col--12 border border--gray-light round h12 my12'>
                     <div :style='{ "width": progress + "%" }' class='h-full bg-gray-light'></div>
                 </div>
             </div>
-            <div v-else-if='progress === 100'>
-                <div class='col col--12'>
-                    <span class='txt-truncate inline' v-text='name'/>
-                </div>
+            <div v-else-if='progress === 101'>
+                <div class='align-center txt-truncate' v-text='name'></div>
                 <div class='col col--12 pre'>
-                    UPLOAD FILE
+                    <div :key='u.url' v-for='u in url'>
+                        <span v-text='u.url'/>
+                    </div>
                 </div>
                 <div class='col col--12 clearfix pt12'>
                     <button @click='refresh' class='btn round btn--stroke fr btn--gray'>
@@ -43,13 +45,15 @@ export default {
     data: function() {
         return {
             name: '',
-            progress: 0
+            progress: 0,
+            url: []
         }
     },
     methods: {
         refresh: function() {
             this.name = '';
             this.progress = 0;
+            this.url = [];
             const input = this.$refs.fileInput;
             input.type = 'text';
             input.type = 'file';
@@ -73,6 +77,9 @@ export default {
                 } else if (xhr.readyState == 4 && xhr.status != 200) {
                     this.$emit('erro', 'Failed to upload file');
                 }
+
+                this.url = JSON.parse(xhr.responseText);
+                this.progress = 101;
             });
 
             formData.append('file', file)

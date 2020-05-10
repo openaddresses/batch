@@ -2,7 +2,9 @@
 
 const fs = require('fs');
 const session = require('express-session');
+const {pipeline} = require('stream');
 const WebhooksApi = require('@octokit/webhooks');
+const Busboy = require('busboy');
 const path = require('path');
 const morgan = require('morgan');
 const util = require('./lib/util');
@@ -191,16 +193,26 @@ async function server(args, config, cb) {
      * @apiName upload
      * @apiGroup Upload
      */
-    router.get('/upload', async (req, res) => {
-        try {
-            //TODO admin or flag
+    router.post('/upload', async (req, res) => {
+        // TODO ADD AUTH
 
-            await auth.list();
+        const busboy = new Busboy({ headers: req.headers });
 
-            return res.json(users);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
+        const files = [];
+
+        busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+            files.push(Upload.put(req.auth.uid, filename, file));
+        });
+
+        busboy.on('finish', async () => {
+            try {
+                res.json(await Promise.all(files));
+            } catch (err) {
+                Err.respond(res, err);
+            }
+        });
+
+        return req.pipe(busboy);
     });
 
     /**

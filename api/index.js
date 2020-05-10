@@ -194,7 +194,11 @@ async function server(args, config, cb) {
      * @apiGroup Upload
      */
     router.post('/upload', async (req, res) => {
-        // TODO ADD AUTH
+        try {
+            await auth.is_flag(req, 'upload');
+        } catch (err) {
+            return Err.respond(err, res);
+        }
 
         const busboy = new Busboy({ headers: req.headers });
 

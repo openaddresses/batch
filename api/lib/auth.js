@@ -22,6 +22,16 @@ class Auth {
         return true;
     }
 
+    async is_flag(req, flag) {
+        await this.is_auth(req);
+
+        if (!req.auth.flags || !req.auth.flags[flag]) {
+            throw new Err(401, null, `${flag} flag required`);
+        }
+
+        return true;
+    }
+
     async is_admin(req) {
         if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
             throw new Err(401, null, 'Admin token required');

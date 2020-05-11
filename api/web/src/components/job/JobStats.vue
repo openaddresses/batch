@@ -1,14 +1,27 @@
 <template>
     <div class='col col--12'>
-        <table class='table'>
-            <thead><tr><th>Stat</th><th>Value</th></tr></thead>
-            <tbody>
-                <tr :key='key' v-for='(value, key) in flat'>
-                    <td v-text='key'></td>
-                    <td v-text='value'></td>
-                </tr>
-            </tbody>
-        </table>
+        <template v-if='!job.stats'>
+            <div class='col col--12 border border--gray-light round'>
+                <div class='flex-parent flex-parent--center-main pt36'>
+                    <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
+                </div>
+
+                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                    <h1 class='flex-child txt-h4 cursor-default'>Job does not have stats</h1>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <table class='table'>
+                <thead><tr><th>Stat</th><th>Value</th></tr></thead>
+                <tbody>
+                    <tr :key='key' v-for='(value, key) in flat'>
+                        <td v-text='key'></td>
+                        <td v-text='value'></td>
+                    </tr>
+                </tbody>
+            </table>
+        </template>
     </div>
 </template>
 

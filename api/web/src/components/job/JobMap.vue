@@ -25,7 +25,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default {
     name: 'JobMap',
-    props: ['job'],
+    props: ['job', 'delta'],
     data: function() {
         return {
             map: false

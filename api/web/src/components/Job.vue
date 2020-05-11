@@ -63,12 +63,14 @@
                 <JobStats
                     @err='$emit("err", $event)'
                     :job='job'
+                    :delta='delta'
                 />
             </template>
             <template v-else-if='mode === "bounds"'>
                 <JobMap
                     @err='$emit("err", $event)'
                     :job='job'
+                    :delta='delta'
                 />
             </template>
         </template>
@@ -89,6 +91,11 @@ export default {
             mode: 'preview',
             loading: false,
             name: '',
+            delta: {
+                compare: false,
+                master: false,
+                delta: false
+            },
             job: {
                 output: {
                     cache: false,
@@ -122,6 +129,26 @@ export default {
         },
         refresh: function() {
             this.getJob();
+            this.getDelta();
+        },
+        getDelta: function() {
+            fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
+                method: 'GET'
+            }).then((res) => {
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200) {
+                    throw new Error('Failed to get job delta');
+                }
+
+                return res.json();
+            }).then((res) => {
+                this.delta.master = res.master;
+                this.delta.compare = res.compare;
+                this.delta.delta = res.delta;
+            }).catch(() => {
+                this.delta = false;
+            });
         },
         getJob: function() {
             this.loading = true;

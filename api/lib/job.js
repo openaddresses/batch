@@ -1,8 +1,10 @@
 'use strict';
 
 const Err = require('./error');
+const turf = require('@turf/turf');
 const request = require('request');
 const AWS = require('aws-sdk');
+const Data = require('./data');
 const S3 = require('./s3');
 const pkg  = require('../package.json');
 const { Status } = require('./util');
@@ -70,6 +72,80 @@ class Job {
                 return resolve(this.raw);
             }
         });
+    }
+
+    /**
+     * Return a comparison of a given job id and the current live data job
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Number} compare_id - Id of the job to comapre against live job
+     *
+     * @returns {Object} Delta comparison
+     */
+    static async delta(pool, compare_id) {
+        const compare = await Job.from(pool, compare_id);
+        if (compare.status !== 'Success') throw new Err(400, null, `Job is not in Success state`);
+
+        const datas = await Data.list(pool, {
+            source: compare.source_name,
+            layer: compare.layer,
+            name: compare.name
+        });
+
+        let master;
+        if (datas.length > 1) {
+            throw new Err(400, null, 'Job matches multiple live jobs');
+        } else if (datas.length === 0) {
+            throw new Err(400, null, 'Job does not match a live job');
+        } else {
+            master = await Job.from(pool, datas[0].job);
+        }
+
+        const stats = JSON.parse(JSON.stringify(compare.stats));
+        for (const key of Object.keys(compare.stats)) {
+            if (typeof compare.stats[key] === 'object') {
+                for (const key_i of Object.keys(compare.stats[key])) {
+                    if (master.stats[key]) {
+                        stats[key][key_i] = compare.stats[key][key_i] - (master.stats[key][key_i] !== undefined ? master.stats[key][key_i] : 0);
+                    } else {
+                        stats[key][key_i] = compare.stats[key][key_i] - 0;
+                    }
+                }
+            } else {
+                stats[key] = compare.stats[key] - (master.stats[key] !== undefined ? master.stats[key] : 0);
+            }
+        }
+
+        const geom = turf.difference(master.bounds, compare.bounds);
+        return {
+            compare: {
+                id: compare.id,
+                count: compare.count,
+                stats: compare.stats,
+                bounds: {
+                    area: turf.area(compare.bounds),
+                    geom: compare.bounds,
+                }
+            },
+            master: {
+                id: master.id,
+                count: master.count,
+                stats: master.stats,
+                bounds: {
+                    area: turf.area(master.bounds),
+                    geom: master.bounds
+                }
+            },
+            delta: {
+                count: master.count - compare.count,
+                stats: stats,
+                bounds: {
+                    area: turf.area(master.bounds) - turf.area(compare.bounds),
+                    diff_area: geom ? geom : 0,
+                    geom: geom
+                }
+            },
+        };
     }
 
     /**
@@ -217,6 +293,7 @@ class Job {
                 pgres.rows[0].id = parseInt(pgres.rows[0].id);
                 pgres.rows[0].run = parseInt(pgres.rows[0].run);
                 pgres.rows[0].map = pgres.rows[0].map ? parseInt(pgres.rows[0].map) : null;
+                pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count)
 
                 const job = new Job(
                     pgres.rows[0].run,

@@ -142,6 +142,29 @@ define({ "api": [
     "groupTitle": "Job"
   },
   {
+    "type": "patch",
+    "url": "/api/job/:job",
+    "title": "Update a given job",
+    "version": "1.0.0",
+    "name": "JobPatch",
+    "group": "Job",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "job",
+            "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
     "type": "get",
     "url": "/api/job",
     "title": "Search for job runs",
@@ -222,10 +245,10 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/job/:job/log",
-    "title": "Get the log file for a given job",
+    "url": "/api/job/:job/delta",
+    "title": "Job Stats Comparison",
     "version": "1.0.0",
-    "name": "SingleLog",
+    "name": "SingleDelta",
     "group": "Job",
     "parameter": {
       "fields": {
@@ -240,13 +263,14 @@ define({ "api": [
         ]
       }
     },
+    "description": "<p>Compare the stats of the given job against the current live data job</p>",
     "filename": "./index.js",
     "groupTitle": "Job"
   },
   {
-    "type": "patch",
-    "url": "/api/job/:job",
-    "title": "Update a given job",
+    "type": "get",
+    "url": "/api/job/:job/log",
+    "title": "Get the log file for a given job",
     "version": "1.0.0",
     "name": "SingleLog",
     "group": "Job",

@@ -22,7 +22,7 @@ test('AuthToken#generate', async (t) => {
         });
         t.fail('token.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 400,
             err: null,
             safe: 'Only a user session can create a token'
@@ -35,7 +35,7 @@ test('AuthToken#generate', async (t) => {
         });
         t.fail('token.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 500,
             err: null,
             safe: 'Server could not determine user id'
@@ -49,7 +49,7 @@ test('AuthToken#generate', async (t) => {
         });
         t.fail('token.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 400,
             err: null,
             safe: 'Token name required'
@@ -70,7 +70,7 @@ test('AuthToken#generate', async (t) => {
         }, 'New Token');
 
         TOKEN = token.token;
-        t.deepEquals(Object.keys(token).sort(), ['created', 'id', 'name', 'token'], 'token: <keys>');
+        t.deepLooseEqual(Object.keys(token).sort(), ['created', 'id', 'name', 'token'], 'token: <keys>');
         t.equals(token.token.length, 67, 'token.token: <67 chars>');
         t.equals(token.id, 1, 'token.id: 1');
         t.ok(token.created, 'token.created: <date>');
@@ -95,7 +95,7 @@ test('AuthToken#list', async (t) => {
         });
         t.fail('token.list should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 500,
             err: null,
             safe: 'Server could not determine user id'
@@ -109,7 +109,7 @@ test('AuthToken#list', async (t) => {
         });
 
         t.equals(tokens.length, 1, 'tokens.length: 1');
-        t.deepEquals(Object.keys(tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
+        t.deepLooseEqual(Object.keys(tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
         t.notOk(tokens[0].token, 'tokens[0].token: <undefined>');
         t.equals(tokens[0].id, 1, 'tokens[0].id: 1');
         t.ok(tokens[0].created, 'tokens[0].created: <date>');
@@ -133,7 +133,7 @@ test('AuthToken#validate', async (t) => {
 
         t.fail('token.validate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 401,
             err: null,
             safe: 'Invalid token'
@@ -146,7 +146,7 @@ test('AuthToken#validate', async (t) => {
 
         t.fail('token.validate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 401,
             err: null,
             safe: 'Invalid token'
@@ -181,7 +181,7 @@ test('AuthToken#delete', async (t) => {
         });
         t.fail('token.delete should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 500,
             err: null,
             safe: 'Server could not determine user id'
@@ -189,7 +189,7 @@ test('AuthToken#delete', async (t) => {
     }
 
     try {
-        t.deepEquals(await authtoken.delete({
+        t.deepLooseEqual(await authtoken.delete({
             uid: 1,
             type: 'session'
         }, 1), {

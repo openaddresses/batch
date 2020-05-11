@@ -48,9 +48,9 @@ test('Job()', (t) => {
     t.equals(job.layer, 'addresses', 'job.layer: addresses');
     t.equals(job.count, 0, 'job.count: 0');
     t.equals(job.bounds, false, 'job.bounds: false');
-    t.deepEquals(job.stats, {}, 'job.stats: {}');
+    t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
     t.equals(job.name, 'city', 'job.name: city');
-    t.deepEquals(job.output, {
+    t.deepLooseEqual(job.output, {
         cache: false,
         output: false,
         preview: false
@@ -58,7 +58,7 @@ test('Job()', (t) => {
     t.equals(job.loglink, false, 'job.loglink: false');
     t.equals(job.status, 'Pending', 'job.status: Pending');
     t.equals(job.version, require('../package.json').version, 'job.version: <version>');
-    t.deepEquals(job.stats, {}, 'job.stats: {}');
+    t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
     t.equals(job.raw, false, 'job.raw: false');
 
     t.end();
@@ -80,7 +80,7 @@ test('Job#get_raw', (t) => {
 
     t.test('Job.get_raw - 1st call', (q) => {
         job.get_raw().then((raw) =>{
-            q.deepEquals(raw, {
+            q.deepLooseEqual(raw, {
                 schema: 2
             }, 'job.raw: { <job> }');
 
@@ -92,7 +92,7 @@ test('Job#get_raw', (t) => {
 
     t.test('Job.get_raw - 2nd call', (q) => {
         job.get_raw().then((raw) =>{
-            q.deepEquals(raw, {
+            q.deepLooseEqual(raw, {
                 schema: 2
             }, 'job.raw: { <job> }');
 
@@ -125,7 +125,7 @@ test('Job#json', (t) => {
         'city'
     );
 
-    t.deepEquals(job.json(), {
+    t.deepLooseEqual(job.json(), {
         id: NaN,
         run: 1,
         map: null,
@@ -142,8 +142,8 @@ test('Job#json', (t) => {
         loglink: false,
         status: 'Pending',
         version: pkg.version,
-        bounds: false,
         count: 0,
+        bounds: false,
         stats: {}
     });
     t.end();
@@ -167,7 +167,7 @@ test('Job#generate', async (t) => {
 
         t.fail('job.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a run'
@@ -187,7 +187,7 @@ test('Job#generate', async (t) => {
 
         t.fail('job.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a source'
@@ -207,7 +207,7 @@ test('Job#generate', async (t) => {
 
         t.fail('job.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a layer'
@@ -227,7 +227,7 @@ test('Job#generate', async (t) => {
 
         t.fail('job.generate should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a name'
@@ -252,9 +252,9 @@ test('Job#generate', async (t) => {
         t.equals(job.layer, 'addresses', 'job.layer: addresses');
         t.equals(job.count, null, 'job.count: null');
         t.equals(job.bounds, null, 'job.bounds: null');
-        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
         t.equals(job.name, 'city', 'job.name: city');
-        t.deepEquals(job.output, {
+        t.deepLooseEqual(job.output, {
             cache: false,
             output: false,
             preview: false
@@ -262,7 +262,7 @@ test('Job#generate', async (t) => {
         t.equals(job.loglink, null, 'job.loglink: <obj>');
         t.equals(job.status, 'Pending', 'job.status: Pending');
         t.equals(job.version, require('../package.json').version, 'job.version: <version>');
-        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
         t.equals(job.raw, false, 'job.raw: false');
 
     } catch (err) {
@@ -283,7 +283,7 @@ test('Job#from', async (t) => {
         await Job.from(pool, 2);
         t.fail('Job#from should fail');
     } catch (err) {
-        t.deepEquals(err, {
+        t.deepLooseEqual(err, {
             status: 404,
             err: null,
             safe: 'no job by that id'
@@ -301,9 +301,9 @@ test('Job#from', async (t) => {
         t.equals(job.layer, 'addresses', 'job.layer: addresses');
         t.equals(job.count, null, 'job.count: null');
         t.equals(job.bounds, null, 'job.bounds: null');
-        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
         t.equals(job.name, 'city', 'job.name: city');
-        t.deepEquals(job.output, {
+        t.deepLooseEqual(job.output, {
             cache: false,
             output: false,
             preview: false
@@ -311,7 +311,7 @@ test('Job#from', async (t) => {
         t.equals(job.loglink, null, 'job.loglink: <obj>');
         t.equals(job.status, 'Pending', 'job.status: Pending');
         t.equals(job.version, require('../package.json').version, 'job.version: <version>');
-        t.deepEquals(job.stats, {}, 'job.stats: {}');
+        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
         t.equals(job.raw, false, 'job.raw: false');
 
     } catch (err) {

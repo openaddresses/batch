@@ -276,7 +276,7 @@ class AuthToken {
                     users.username,
                     users.access,
                     users.email,
-                    users.flags,
+                    users.flags
                 FROM
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid

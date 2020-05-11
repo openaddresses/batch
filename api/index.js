@@ -745,6 +745,29 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/job/:job/delta Job Stats Comparison
+     * @apiVersion 1.0.0
+     * @apiName SingleDelta
+     * @apiGroup Job
+     *
+     * @apiParam {Number} job Job ID
+     * @apiDescription
+     *   Compare the stats of the given job against the current live data job
+     *
+     */
+    router.get('/job/:job/delta', async (req, res) => {
+        Param.int(req, res, 'job');
+
+        try {
+            const delta = await Job.delta(pool, req.params.job);
+
+            return res.json(delta);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/job/:job/output/source.png Get the preview image for a given job
      * @apiVersion 1.0.0
      * @apiName SingleOutputPreview
@@ -810,7 +833,7 @@ async function server(args, config, cb) {
     /**
      * @api {patch} /api/job/:job Update a given job
      * @apiVersion 1.0.0
-     * @apiName SingleLog
+     * @apiName JobPatch
      * @apiGroup Job
      *
      * @apiParam {Number} job Job ID

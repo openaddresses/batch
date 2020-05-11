@@ -29,29 +29,48 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
-            <div class='col col--12'>
-                <h3 class='txt-h4 py6'>Source Preview:</h3>
+            <div class='col col--12 py12'>
+                <h3 class='fl txt-h4 py6'>
+                    <span v-if='mode === "preview"'>Job Preview:</span>
+                    <span v-if='mode === "numeric"'>Job Stats:</span>
+                    <span v-if='mode === "bounds"'>Job Bounds:</span>
+                </h3>
+
+                <div class='flex-parent-inline fr'>
+                    <button @click='mode = "preview"' :class='{ "btn--stroke": mode !== "preview" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Preview</button>
+                    <button @click='mode = "numeric"' :class='{ "btn--stroke": mode !== "numeric" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Numeric</button>
+                    <button @click='mode = "bounds"' :class='{ "btn--stroke": mode !== "bounds" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Map</button>
+                </div>
             </div>
 
-            <template v-if='job.output.preview'>
-                <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
-            </template>
-            <template v-else>
-                <div class='col col--12 border border--gray-light round'>
-                    <div class='flex-parent flex-parent--center-main pt36'>
-                        <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
-                    </div>
+            <template v-if='mode === "preview"'>
+                <template v-if='job.output.preview'>
+                    <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
+                </template>
+                <template v-else>
+                    <div class='col col--12 border border--gray-light round'>
+                        <div class='flex-parent flex-parent--center-main pt36'>
+                            <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
+                        </div>
 
-                    <div class='flex-parent flex-parent--center-main pt12 pb36'>
-                        <h1 class='flex-child txt-h4 cursor-default'>No Preview Image Found</h1>
+                        <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                            <h1 class='flex-child txt-h4 cursor-default'>No Preview Image Found</h1>
+                        </div>
                     </div>
-                </div>
+                </template>
             </template>
-
-            <JobStats
-                @err='$emit("err", $event)'
-                :job='job'
-            />
+            <template v-else-if='mode === "numeric"'>
+                <JobStats
+                    @err='$emit("err", $event)'
+                    :job='job'
+                />
+            </template>
+            <template v-else-if='mode === "bounds"'>
+                <JobMap
+                    @err='$emit("err", $event)'
+                    :job='job'
+                />
+            </template>
         </template>
     </div>
 </template>
@@ -60,12 +79,14 @@
 
 import Status from './Status.vue';
 import JobStats from './job/JobStats.vue';
+import JobMap from './job/JobMap.vue';
 
 export default {
     name: 'Job',
     props: ['jobid'],
     data: function() {
         return {
+            mode: 'preview',
             loading: false,
             name: '',
             job: {
@@ -85,6 +106,7 @@ export default {
         this.refresh();
     },
     components: {
+        JobMap,
         JobStats,
         Status
     },

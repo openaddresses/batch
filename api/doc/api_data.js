@@ -6,6 +6,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "List",
     "group": "Collections",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Collections"
   },
@@ -16,6 +23,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "List",
     "group": "Data",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -82,6 +96,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Single",
     "group": "Data",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -105,6 +126,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleHistory",
     "group": "Data",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -128,6 +156,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Event",
     "group": "Github",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Github"
   },
@@ -138,6 +173,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "ErrorsList",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -148,6 +190,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "JobPatch",
     "group": "Job",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -171,6 +220,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "List",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -227,6 +283,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Single",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -250,6 +313,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleDelta",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -274,6 +344,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleLog",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -297,6 +374,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleOutputCache",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -320,6 +404,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleOutputData",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -343,6 +434,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleOutputPreview",
     "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -366,6 +464,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "get",
     "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Login"
   },
@@ -376,6 +481,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "login",
     "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Login"
   },
@@ -386,6 +498,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "TileJSON",
     "group": "Map",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Map"
   },
@@ -396,6 +515,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "VectorTile",
     "group": "Map",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -433,6 +559,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Create",
     "group": "Run",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Run"
   },
@@ -443,6 +576,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "List",
     "group": "Run",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -486,6 +626,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Single",
     "group": "Run",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -509,6 +656,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Single",
     "group": "Run",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -532,6 +686,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleJobs",
     "group": "Run",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -555,6 +716,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "SingleJobsCreate",
     "group": "Run",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "description": "<p>Given an array sources, explode it into multiple jobs and submit to batch or pass in a predefined list of sources/layer/names</p> <pre><code>Note: once jobs are attached to a run, the run is &quot;closed&quot; and subsequent jobs cannot be attached to it</code></pre>",
     "parameter": {
       "fields": {
@@ -593,6 +761,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Schedule",
     "group": "Schedule",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Schedule"
   },
@@ -603,6 +778,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Health",
     "group": "Server",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "success": {
       "examples": [
         {
@@ -622,6 +804,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Meta",
     "group": "Server",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "success": {
       "examples": [
         {
@@ -638,6 +827,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "CreateToken",
     "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "type": "",
     "url": "",
     "filename": "./index.js",
@@ -647,6 +843,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "DeleteToken",
     "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "type": "",
     "url": "",
     "filename": "./index.js",
@@ -656,6 +859,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "ListTokens",
     "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "type": "",
     "url": "",
     "filename": "./index.js",
@@ -668,6 +878,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "upload",
     "group": "Upload",
+    "permission": [
+      {
+        "name": "upload",
+        "title": "Upload",
+        "description": "<p>The user must be an admin or have the &quot;upload&quot; flag enabled on their account</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "Upload"
   },
@@ -678,6 +895,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "Create",
     "group": "User",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "User"
   },
@@ -688,6 +912,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "list",
     "group": "User",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "User"
   },
@@ -698,6 +929,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "self",
     "group": "User",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "filename": "./index.js",
     "groupTitle": "User"
   },
@@ -708,6 +946,13 @@ define({ "api": [
     "version": "1.0.0",
     "name": "self",
     "group": "User",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [

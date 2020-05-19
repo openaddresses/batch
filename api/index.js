@@ -39,6 +39,23 @@ function configure(args, cb) {
     });
 }
 
+/**
+ * @apiDefine admin Admin
+ *   The user must be an admin to use this endpoint
+ */
+ /**
+ * @apiDefine upload Upload
+ *   The user must be an admin or have the "upload" flag enabled on their account
+ */
+ /**
+ * @apiDefine user User
+ *   A user must be logged in to use this endpoint
+ */
+ /**
+ * @apiDefine public Public
+ *   This API endpoint does not require authentication
+ */
+
 
 async function server(args, config, cb) {
     // these must be run after lib/config
@@ -87,6 +104,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Meta
      * @apiGroup Server
+     * @apiPermission public
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -105,6 +123,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Health
      * @apiGroup Server
+     * @apiPermission public
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -192,6 +211,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName upload
      * @apiGroup Upload
+     * @apiPermission upload
      */
     router.post('/upload', async (req, res) => {
         try {
@@ -224,6 +244,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName list
      * @apiGroup User
+     * @apiPermission admin
      */
     router.get('/user', async (req, res) => {
         try {
@@ -242,6 +263,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Create
      * @apiGroup User
+     * @apiPermission public
      */
     router.post('/user', async (req, res) => {
         try {
@@ -261,6 +283,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName self
      * @apiGroup User
+     * @apiPermission user
      */
     router.get('/user/me', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.uid) {
@@ -278,6 +301,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName self
      * @apiGroup User
+     * @apiPermission admin
      *
      * @apiParam {Number} id The UID of the user to update
      */
@@ -298,6 +322,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName get
      * @apiGroup Login
+     * @apiPermission user
      */
     router.get('/login', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.username) {
@@ -320,6 +345,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName login
      * @apiGroup Login
+     * @apiPermission user
      */
     router.post('/login', async (req, res) => {
         try {
@@ -343,6 +369,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName ListTokens
      * @apiGroup Token
+     * @apiPermission user
      */
     router.get('/token', async (req, res) => {
         try {
@@ -359,6 +386,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName CreateToken
      * @apiGroup Token
+     * @apiPermission user
      */
     router.post('/token', async (req, res) => {
         try {
@@ -375,6 +403,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName DeleteToken
      * @apiGroup Token
+     * @apiPermission user
      */
     router.delete('/token/:id', async (req, res) => {
         Param.int(req, res, 'id');
@@ -393,6 +422,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Schedule
      * @apiGroup Schedule
+     * @apiPermission admin
      */
     router.post('/schedule', async (req, res) => {
         try {
@@ -411,6 +441,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Collections
+     * @apiPermission public
      */
     router.get('/collections', async (req, res) => {
         try {
@@ -427,6 +458,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName TileJSON
      * @apiGroup Map
+     * @apiPermission public
      */
     router.get('/map', (req, res) => {
         return res.json(Map.map());
@@ -437,6 +469,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName VectorTile
      * @apiGroup Map
+     * @apiPermission public
      *
      * @apiParam {Number} z Z coordinate
      * @apiParam {Number} x X coordinate
@@ -462,6 +495,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Data
+     * @apiPermission public
      *
      * @apiParam {String} [source] Filter results by source name
      * @apiParamExample {String} ?source
@@ -494,6 +528,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Data
+     * @apiPermission public
      *
      * @apiParam {Number} data Data ID
      */
@@ -512,6 +547,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleHistory
      * @apiGroup Data
+     * @apiPermission public
      *
      * @apiParam {Number} data Data ID
      */
@@ -530,6 +566,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Run
+     * @apiPermission public
      *
      * @apiParam {Number} [limit=100] Limit number of returned runs
      * @apiParamExample {String} ?limit
@@ -554,6 +591,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Create
      * @apiGroup Run
+     * @apiPermission admin
      */
     router.post('/run', async (req, res) => {
         try {
@@ -572,6 +610,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Run
+     * @apiPermission public
      *
      * @apiParam {Number} run Run ID
      */
@@ -592,6 +631,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Run
+     * @apiPermission public
      *
      * @apiParam {Number} run Run ID
      */
@@ -618,6 +658,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleJobsCreate
      * @apiGroup Run
+     * @apiPermission admin
      *
      * @apiDescription
      *     Given an array sources, explode it into multiple jobs and submit to batch
@@ -661,6 +702,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleJobs
      * @apiGroup Run
+     * @apiPermission public
      *
      * @apiParam {Number} run Run ID
      */
@@ -684,6 +726,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} [limit=100] Limit number of returned jobs
      * @apiParamExample {String} ?limit
@@ -714,6 +757,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName ErrorsList
      * @apiGroup Job
+     * @apiPermission public
      */
     router.get('/job/errors', async (req, res) => {
         try {
@@ -729,6 +773,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} job Job ID
      */
@@ -749,6 +794,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleDelta
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} job Job ID
      * @apiDescription
@@ -772,6 +818,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleOutputPreview
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} job Job ID
      */
@@ -785,6 +832,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleOutputData
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} job Job ID
      */
@@ -802,6 +850,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleOutputCache
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} job Job ID
      */
@@ -815,6 +864,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName SingleLog
      * @apiGroup Job
+     * @apiPermission public
      *
      * @apiParam {Number} job Job ID
      */
@@ -835,6 +885,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName JobPatch
      * @apiGroup Job
+     * @apiPermission admin
      *
      * @apiParam {Number} job Job ID
      */
@@ -863,6 +914,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Event
      * @apiGroup Github
+     * @apiPermission admin
      */
     router.post('/github/event', async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');

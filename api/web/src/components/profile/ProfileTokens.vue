@@ -5,7 +5,7 @@
                 <h2 class='txt-h4 ml12 pb12 fl'>API Tokens:</h2>
 
                 <div class='fr'>
-                    <button @click='newToken.show = true' class='btn round btn--stroke color-gray mx3'>
+                    <button @click='newToken.show = true' class='btn round btn--stroke color-gray color-green-on-hover mx3'>
                         <svg class='icon'><use xlink:href='#icon-plus'/></svg>
                     </button>
                     <button @click='refresh' class='btn round btn--stroke color-gray mx3'>

@@ -12,7 +12,8 @@ class Collections {
                 SELECT
                     id,
                     name,
-                    created
+                    created,
+                    sources
                 FROM
                     collections
             `);

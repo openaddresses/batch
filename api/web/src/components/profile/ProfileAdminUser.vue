@@ -45,7 +45,7 @@
 
 <script>
 export default {
-    name: 'ProfileAdmin',
+    name: 'ProfileAdminUser',
     props: [ ],
     data: function() {
         return {

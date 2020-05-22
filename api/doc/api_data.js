@@ -1,5 +1,22 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "/api/collections",
+    "title": "Create Collection",
+    "version": "1.0.0",
+    "name": "Create",
+    "group": "Collections",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Collections"
+  },
+  {
     "type": "get",
     "url": "/api/collections",
     "title": "List data collections",
@@ -11,6 +28,23 @@ define({ "api": [
         "name": "public",
         "title": "Public",
         "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Collections"
+  },
+  {
+    "type": "patch",
+    "url": "/api/collections/:collection",
+    "title": "Update Collection",
+    "version": "1.0.0",
+    "name": "Update",
+    "group": "Collections",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "filename": "./index.js",

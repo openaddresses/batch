@@ -67,7 +67,7 @@ async function server(args, config, cb) {
     const Data = require('./lib/data');
     const Upload = require('./lib/upload');
     const Schedule = require('./lib/schedule');
-    const Collections = require('./lib/collections');
+    const Collection = require('./lib/collections');
 
     let postgres = process.env.POSTGRES;
 
@@ -444,9 +444,52 @@ async function server(args, config, cb) {
      */
     router.get('/collections', async (req, res) => {
         try {
-            const collections = await Collections.list(pool);
+            const collections = await Collection.list(pool);
 
             return res.json(collections);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/collections Create Collection
+     * @apiVersion 1.0.0
+     * @apiName Create
+     * @apiGroup Collections
+     * @apiPermission admin
+     */
+    router.post('/collections', async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            const collection = new Collection(req.body.name, req.body.sources);
+            return res.json(collection.generate(pool));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {patch} /api/collections/:collection Update Collection
+     * @apiVersion 1.0.0
+     * @apiName Update
+     * @apiGroup Collections
+     * @apiPermission admin
+     */
+    router.post('/collections/:collection', async (req, res) => {
+        Param.int(req, res, 'run');
+
+        try {
+            await auth.is_admin(req);
+
+            const collection = await Collection.from(pool, req.params.collection);
+
+            collection.patch(req.body);
+
+            await collection.commit(pool);
+
+            return res.json(collection.json());
         } catch (err) {
             return Err.respond(err, res);
         }

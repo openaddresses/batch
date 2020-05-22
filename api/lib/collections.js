@@ -26,6 +26,15 @@ class Collection {
         ];
     }
 
+    json() {
+        return {
+            id: parseInt(this.id),
+            name: this.name,
+            sources: this.sources,
+            created: this.created
+        };
+    }
+
     patch(patch) {
         for (const attr of this.attrs) {
             if (patch[attr] !== undefined) {

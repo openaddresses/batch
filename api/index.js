@@ -453,6 +453,27 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {delete} /api/collections/:collection Delete Collection
+     * @apiVersion 1.0.0
+     * @apiName Delete
+     * @apiGroup Collections
+     * @apiPermission admin
+     */
+    router.delete('/collections/:collection', async (req, res) => {
+        Param.int(req, res, 'collection');
+
+        try {
+            await auth.is_admin(req);
+
+            await Collection.delete(pool, req.params.collection);
+
+            return res.json(true);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/collections Create Collection
      * @apiVersion 1.0.0
      * @apiName Create
@@ -464,8 +485,11 @@ async function server(args, config, cb) {
             await auth.is_admin(req);
 
             const collection = new Collection(req.body.name, req.body.sources);
-            return res.json(collection.generate(pool));
+            await collection.generate(pool);
+
+            return res.json(collection.json());
         } catch (err) {
+            console.error('ERROR');
             return Err.respond(err, res);
         }
     });
@@ -477,8 +501,8 @@ async function server(args, config, cb) {
      * @apiGroup Collections
      * @apiPermission admin
      */
-    router.post('/collections/:collection', async (req, res) => {
-        Param.int(req, res, 'run');
+    router.patch('/collections/:collection', async (req, res) => {
+        Param.int(req, res, 'collection');
 
         try {
             await auth.is_admin(req);

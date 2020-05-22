@@ -39,15 +39,29 @@
                             <input v-model='newCollection.name' type='text' class='input' placeholder='Collection Name'/>
                         </div>
 
-                        <div :key='source' v-for='source in newCollection.sources' class='col col--12'>
-                            <label>Source Regex</label>
-                            <input v-model='newCollection.name' type='text' class='input' placeholder='Collection Name'/>
+                        <div class='col col--10 py12'>
+                            <input v-on:keyup.enter='addGlob' v-model='newCollection.source' type='text' class='input' placeholder='New Source'/>
+                        </div>
+
+                        <div class='col col--2 py12'>
+                            <button @click='addGlob' class='btn btn--stroke round btn--gray w-full'>
+                                <svg class='fl icon mt6'><use href='#icon-plus'/></svg> Glob
+                            </button>
+                        </div>
+
+                        <div :key='source' v-for='(source, i) in newCollection.sources' class='col col--12'>
+                            <div class='pre'>
+                                <span v-text='source'/>
+                                <svg @click='newCollection.sources.splice(i, 1)' class='cursor-pointer fr icon color-gray-light color-red-on-hover'><use href='#icon-trash'/></svg>
+                            </div>
                         </div>
 
                         <div class='col col--12 clearfix'>
-                            <button @click='setCollection' class='my12 fr btn btn--stroke round color-gray color-green-on-hover'>
-                                <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
-                            </button>
+                            <div class='col col--2 fr'>
+                                <button :disabled='newCollection.sources === 0' @click='setCollection' class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'>
+                                    <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -78,7 +92,8 @@ export default {
             newCollection: {
                 show: false,
                 name: '',
-                sources: []
+                sources: [],
+                source: ''
             }
         };
     },
@@ -90,8 +105,13 @@ export default {
             this.newCollection.show = false;
             this.newCollection.name = '';
             this.newCollection.sources = [];
+            this.newCollection.source = '';
 
             this.getCollections();
+        },
+        addGlob: function() {
+            this.newCollection.sources.splice(0, 0, this.newCollection.source);
+            this.newCollection.source = '';
         },
         getCollections: function() {
             this.loading = true;
@@ -120,12 +140,25 @@ export default {
             });
         },
         setCollection: function() {
+            this.newCollection.name = this.newCollection.name.toLowerCase();
+
+            if (!/^[a-z0-9-]+$/.test(this.newCollection.name)) {
+                return this.$emit('err', new Error('Collection names may only contain a-z 0-9 and -'));
+            }
+
             this.loading = true;
 
             const url = new URL(`${window.location.origin}/api/collections`);
 
             fetch(url, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: this.newCollection.name,
+                    sources: this.newCollection.sources
+                })
             }).then((res) => {
                 if (res.status !== 200 && res.message) {
                     throw new Error(res.message);
@@ -133,8 +166,9 @@ export default {
                     throw new Error('Failed to save collection');
                 }
 
-                return res.json();
+                this.refresh();
             }).catch((err) => {
+                this.loading = false;
                 this.$emit('err', err);
             });
         }

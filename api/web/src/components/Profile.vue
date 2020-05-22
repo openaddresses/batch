@@ -41,9 +41,15 @@
             <ProfileTokens @err='$emit("err", $event)'/>
         </template>
         <template v-else-if='mode === "admin"'>
-            <ProfileAdminUser v-if='profile.access === "admin"' @err='$emit("err", $event)'/>
+            <ProfileAdminUser
+                v-if='profile.access === "admin"'
+                @err='$emit("err", $event)'
+            />
 
-            <ProfileAdminCollections v-if='profile.access === "admin"' @err='$emit("err", $event)'/>
+            <ProfileAdminCollections
+                v-if='profile.access === "admin"'
+                @err='$emit("err", $event)'
+            />
         </template>
     </div>
 </template>

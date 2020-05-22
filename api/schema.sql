@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS map (
 
 CREATE TABLE IF NOT EXISTS collections (
     id          BIGSERIAL,
-    name        TEXT,
+    name        TEXT UNIQUE NOT NULL,
     sources     JSONB,
     created     TIMESTAMP
 );

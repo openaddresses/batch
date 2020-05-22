@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const session = require('express-session');
-const {pipeline} = require('stream');
 const WebhooksApi = require('@octokit/webhooks');
 const Busboy = require('busboy');
 const path = require('path');
@@ -43,15 +42,15 @@ function configure(args, cb) {
  * @apiDefine admin Admin
  *   The user must be an admin to use this endpoint
  */
- /**
+/**
  * @apiDefine upload Upload
  *   The user must be an admin or have the "upload" flag enabled on their account
  */
- /**
+/**
  * @apiDefine user User
  *   A user must be logged in to use this endpoint
  */
- /**
+/**
  * @apiDefine public Public
  *   This API endpoint does not require authentication
  */
@@ -224,7 +223,7 @@ async function server(args, config, cb) {
 
         const files = [];
 
-        busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+        busboy.on('file', (fieldname, file, filename) => {
             files.push(Upload.put(req.auth.uid, filename, file));
         });
 

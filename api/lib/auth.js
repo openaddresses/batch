@@ -77,7 +77,7 @@ class Auth {
             email: row.email,
             access: row.access,
             flags: row.flags
-        }
+        };
     }
 
     async list() {

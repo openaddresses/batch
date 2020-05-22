@@ -17,7 +17,7 @@ class Upload {
                 ACL: 'public-read',
                 Key: key,
                 Body: stream
-            }, (err, res) => {
+            }, (err) => {
                 if (err) return reject(new Err(500, err, 'Failed to upload file'));
 
                 return resolve({

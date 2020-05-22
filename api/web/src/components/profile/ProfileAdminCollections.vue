@@ -120,7 +120,23 @@ export default {
             });
         },
         setCollection: function() {
+            this.loading = true;
 
+            const url = new URL(`${window.location.origin}/api/collections`);
+
+            fetch(url, {
+                method: 'POST'
+            }).then((res) => {
+                if (res.status !== 200 && res.message) {
+                    throw new Error(res.message);
+                } else if (res.status !== 200 && res.status !== 304) {
+                    throw new Error('Failed to save collection');
+                }
+
+                return res.json();
+            }).catch((err) => {
+                this.$emit('err', err);
+            });
         }
     }
 }

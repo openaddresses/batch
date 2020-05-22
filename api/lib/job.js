@@ -84,7 +84,7 @@ class Job {
      */
     static async delta(pool, compare_id) {
         const compare = await Job.from(pool, compare_id);
-        if (compare.status !== 'Success') throw new Err(400, null, `Job is not in Success state`);
+        if (compare.status !== 'Success') throw new Err(400, null, 'Job is not in Success state');
 
         const datas = await Data.list(pool, {
             source: compare.source_name,
@@ -124,7 +124,7 @@ class Job {
                 stats: compare.stats,
                 bounds: {
                     area: turf.area(compare.bounds),
-                    geom: compare.bounds,
+                    geom: compare.bounds
                 }
             },
             master: {
@@ -144,7 +144,7 @@ class Job {
                     diff_area: geom ? geom : 0,
                     geom: geom
                 }
-            },
+            }
         };
     }
 
@@ -293,7 +293,7 @@ class Job {
                 pgres.rows[0].id = parseInt(pgres.rows[0].id);
                 pgres.rows[0].run = parseInt(pgres.rows[0].run);
                 pgres.rows[0].map = pgres.rows[0].map ? parseInt(pgres.rows[0].map) : null;
-                pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count)
+                pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count);
 
                 const job = new Job(
                     pgres.rows[0].run,
@@ -349,6 +349,8 @@ class Job {
     }
 
     async commit(pool) {
+        if (this.id === false) throw new Err(500, null, 'Job.id must be populated');
+
         try {
             await pool.query(`
                 UPDATE job

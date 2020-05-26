@@ -38,6 +38,7 @@ async function fetch() {
     const tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
     fs.mkdirSync(tmp);
 
+    const collections = await fetch_collections();
     const datas = await fetch_datas();
 
     const q = new Q();
@@ -138,6 +139,20 @@ function zip_datas(tmp) {
         archive.directory(tmp + '/sources/', false);
 
         archive.finalize();
+    });
+}
+
+function fetch_collections() {
+    return new Promise((resolve, reject) => {
+        request({
+            url: `${process.env.OA_API}/api/collections`,
+            json: true,
+            method: 'GET'
+        }, (err, res) => {
+            if (err) return reject(err);
+
+            return resolve(res.body);
+        });
     });
 }
 

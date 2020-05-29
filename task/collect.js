@@ -2,6 +2,7 @@
 
 'use strict';
 const Q = require('d3-queue').queue;
+const glob = require('glob');
 const os = require('os');
 const {Unzip} = require('zlib');
 const split = require('split');
@@ -39,8 +40,45 @@ async function fetch() {
     fs.mkdirSync(tmp);
 
     const collections = await fetch_collections();
+    console.error('ok - got collections list');
     const datas = await fetch_datas();
+    console.error('ok - got data list');
 
+
+    const stats = await sources(tmp, datas);
+
+    for (const collection of collections) {
+        await collect(tmp, collection);
+    }
+
+}
+
+function collect(tmp, collection) {
+    console.error(collection);
+    let collection_data = [];
+
+    for (const source of collection.sources) {
+        collection_data = collection_data.concat(glob.sync(source, {
+            nodir: true,
+            cwd: path.resolve(tmp, 'sources')
+        }));
+    }
+
+    console.error(collection_data);
+
+    try {
+
+
+        //const zip = await zip_datas(tmp);
+        //console.error('ok - global archive created');
+        //await upload_collection(zip);
+        //console.error('ok - global archive uploaded');
+    } catch (err) {
+        return reject(err);
+    }
+}
+
+function sources(tmp, datas) {
     const q = new Q();
 
     const stats = {
@@ -56,6 +94,7 @@ async function fetch() {
 
                 mkdirp(path.resolve(tmp, 'sources', dir));
 
+                console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
                 pipeline(
                     s3.getObject({
                         Bucket: process.env.Bucket,
@@ -78,7 +117,6 @@ async function fetch() {
 
                         return done(err);
                     }
-
                 );
             }, data);
         }
@@ -87,18 +125,11 @@ async function fetch() {
             if (err) return reject(err);
 
             console.error('ok - all sources fetched');
-            try {
-                const zip = await zip_datas(tmp);
 
-                console.error('ok - global archive created');
-                await upload_collection(zip);
-
-                console.error('ok - global archive uploaded');
-            } catch (err) {
-                return reject(err);
-            }
+            return resolve(stats);
         });
     });
+
 }
 
 function upload_collection(file) {
@@ -161,10 +192,7 @@ function fetch_datas() {
         request({
             url: `${process.env.OA_API}/api/data`,
             json: true,
-            method: 'GET',
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            }
+            method: 'GET'
         }, (err, res) => {
             if (err) return reject(err);
 

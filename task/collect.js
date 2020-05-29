@@ -53,7 +53,7 @@ async function fetch() {
 
 }
 
-function collect(tmp, collection) {
+async function collect(tmp, collection) {
     console.error(collection);
     let collection_data = [];
 
@@ -67,12 +67,11 @@ function collect(tmp, collection) {
     console.error(collection_data);
 
     try {
+        const zip = await zip_datas(tmp, collection_data, collection.name);
 
-
-        //const zip = await zip_datas(tmp);
-        //console.error('ok - global archive created');
-        //await upload_collection(zip);
-        //console.error('ok - global archive uploaded');
+        console.error(`ok - zip created: ${zip}`);
+        await upload_collection(zip, collection.name);
+        console.error('ok - global archive uploaded');
     } catch (err) {
         return reject(err);
     }
@@ -132,12 +131,12 @@ function sources(tmp, datas) {
 
 }
 
-function upload_collection(file) {
+function upload_collection(file, name) {
     return new Promise((resolve, reject) => {
         s3.putObject({
             Body: fs.createReadStream(file),
             Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/collection-global.zip`
+            Key: `${process.env.StackName}/collection-${name}.zip`
         }, (err) => {
             if (err) return reject(err);
 
@@ -146,14 +145,14 @@ function upload_collection(file) {
     });
 }
 
-function zip_datas(tmp) {
+function zip_datas(tmp, datas, name) {
     return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(path.resolve(tmp, 'global.zip'))
+        const output = fs.createWriteStream(path.resolve(tmp, `${name}.zip`))
             .on('error', (err) => {
                 console.error('not ok - ' + err.message);
                 return reject(err)
             }).on('close', () => {
-                return resolve(path.resolve(tmp, 'global.zip'));
+                return resolve(path.resolve(tmp, `${name}.zip`));
             });
 
         const archive = archiver('zip', {
@@ -167,9 +166,15 @@ function zip_datas(tmp) {
 
         archive.pipe(output);
 
-        archive.directory(tmp + '/sources/', false);
+        for (const data of datas) {
+            archive.file(path.resolve(tmp, 'sources', data), {
+                name: data
+            });
+        }
 
         archive.finalize();
+
+        return resolve(path.resolve(tmp, `${name}.zip`));
     });
 }
 

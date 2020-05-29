@@ -25,6 +25,7 @@ class Collection {
 
         // Attributes which are allowed to be patched
         this.attrs = [
+            'created',
             'sources'
         ];
     }

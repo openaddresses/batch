@@ -54,7 +54,6 @@ async function fetch() {
 }
 
 async function collect(tmp, collection) {
-    console.error(collection);
     let collection_data = [];
 
     for (const source of collection.sources) {
@@ -64,14 +63,14 @@ async function collect(tmp, collection) {
         }));
     }
 
-    console.error(collection_data);
-
     try {
         const zip = await zip_datas(tmp, collection_data, collection.name);
 
         console.error(`ok - zip created: ${zip}`);
         await upload_collection(zip, collection.name);
         console.error('ok - global archive uploaded');
+
+        await update_collection(collection);
     } catch (err) {
         return reject(err);
     }
@@ -145,6 +144,29 @@ function upload_collection(file, name) {
     });
 }
 
+function update_collection(collection) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: `${process.env.OA_API}/api/collections/${collection.id}`,
+            method: 'PATCH',
+            json: true,
+            headers: {
+                'shared-secret': process.env.SharedSecret
+            },
+            body: {
+                created: new Date().toISOString()
+            }
+        }, (err, res) => {
+            if (err) return reject(err);
+
+            console.error(res.body);
+            if (res.statusCode !== 200) throw new Error(res.body);
+
+            return resolve(res.body);
+        });
+    });
+}
+
 function zip_datas(tmp, datas, name) {
     return new Promise((resolve, reject) => {
         const output = fs.createWriteStream(path.resolve(tmp, `${name}.zip`))
@@ -186,6 +208,8 @@ function fetch_collections() {
             method: 'GET'
         }, (err, res) => {
             if (err) return reject(err);
+
+            if (res.statusCode !== 200) throw new Error(res.body);
 
             return resolve(res.body);
         });

@@ -58,7 +58,7 @@ const stack = {
                             const http = require('http');
 
                             const req = http.request({
-                                hostname: process.env.OA_API,
+                                hostname: new URL(process.env.OA_API).hostname,
                                 port: 80,
                                 path: '/api/schedule',
                                 method: 'POST'

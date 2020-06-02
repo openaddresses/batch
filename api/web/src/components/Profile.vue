@@ -11,7 +11,6 @@
                         <button @click='mode = "profile"' :class='{ "btn--stroke": mode !== "profile" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Profile</button>
                         <button @click='mode = "admin"' :class='{ "btn--stroke": mode !== "admin" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Admin</button>
                     </div>
-
                 </div>
             </div>
         </div>

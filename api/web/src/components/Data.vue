@@ -174,7 +174,7 @@ export default {
             this.external(`${window.location.origin}/api/job/${d.job}/output/source.geojson.gz`);
         },
         collectionpls: function(c) {
-            this.external(`${window.location.origin}/api/job/${c}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/collections/${c.id}/data`);
         },
         external: function(url) {
             window.open(url, "_blank");

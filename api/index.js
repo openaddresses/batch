@@ -453,6 +453,22 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/collections/:collection/data Get data for a given collection
+     * @apiVersion 1.0.0
+     * @apiName Data
+     * @apiGroup Collections
+     * @apiPermission public
+     */
+    router.get('/collections/:collection/data', async (req, res) => {
+        Param.int(req, res, 'collection');
+        try {
+            Collection.data(pool, req.params.collection, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {delete} /api/collections/:collection Delete Collection
      * @apiVersion 1.0.0
      * @apiName Delete
@@ -904,6 +920,7 @@ async function server(args, config, cb) {
      */
     router.get('/job/:job/output/source.geojson.gz', async (req, res) => {
         Param.int(req, res, 'job');
+
         try {
             await Job.data(pool, req.params.job, res);
         } catch (err) {
@@ -922,7 +939,7 @@ async function server(args, config, cb) {
      */
     router.get('/job/:job/output/cache.zip', async (req, res) => {
         Param.int(req, res, 'job');
-        Job.data(req.params.job, res);
+        Job.cache(req.params.job, res);
     });
 
     /**

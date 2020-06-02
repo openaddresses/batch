@@ -17,6 +17,23 @@ define({ "api": [
     "groupTitle": "Collections"
   },
   {
+    "type": "get",
+    "url": "/api/collections/:collection/data",
+    "title": "Get data for a given collection",
+    "version": "1.0.0",
+    "name": "Data",
+    "group": "Collections",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Collections"
+  },
+  {
     "type": "delete",
     "url": "/api/collections/:collection",
     "title": "Delete Collection",

@@ -1,5 +1,6 @@
 'use strict';
 const Err = require('./error');
+const S3 = require('./s3');
 
 /**
  * @class Collections
@@ -47,7 +48,18 @@ class Collection {
         }
     }
 
-    static async from (pool, id) {
+    static async data(pool, collection_id, res) {
+        const collection = await Collection.from(pool, collection_id);
+
+        const s3 = new S3({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/collection-${collection.name}.zip`
+        });
+
+        return s3.stream(res, `openaddresses-${collection.name}.zip`);
+    }
+
+    static async from(pool, id) {
         try {
             const pgres = await pool.query(`
                 SELECT

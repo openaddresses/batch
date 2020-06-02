@@ -21,6 +21,7 @@ if (!process.env.AWS_DEFAULT_REGION) {
 
 if (require.main == module) {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
+    if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
 
@@ -132,11 +133,12 @@ function sources(tmp, datas) {
 
 function upload_collection(file, name) {
     return new Promise((resolve, reject) => {
-        s3.putObject({
+        s3.upload({
             Body: fs.createReadStream(file),
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/collection-${name}.zip`
         }, (err) => {
+            console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
             if (err) return reject(err);
 
             return resolve(true);
@@ -159,9 +161,7 @@ function update_collection(collection) {
         }, (err, res) => {
             if (err) return reject(err);
 
-            console.error(res.body);
             if (res.statusCode !== 200) throw new Error(res.body);
-
             return resolve(res.body);
         });
     });
@@ -194,9 +194,11 @@ function zip_datas(tmp, datas, name) {
             });
         }
 
-        archive.finalize();
+        archive.on('finish', () => {
+            resolve(path.resolve(tmp, `${name}.zip`));
+        });
 
-        return resolve(path.resolve(tmp, `${name}.zip`));
+        archive.finalize();
     });
 }
 

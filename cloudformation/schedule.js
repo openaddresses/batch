@@ -49,7 +49,8 @@ const stack = {
                 Description: 'Biweekly Scheduled Runs',
                 Environment: {
                     Variables: {
-                        OA_API: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
+                        OA_API: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]),
+                        SharedSecret: cf.ref('SharedSecret')
                     }
                 },
                 Code: {
@@ -61,7 +62,11 @@ const stack = {
                                 hostname: new URL(process.env.OA_API).hostname,
                                 port: 80,
                                 path: '/api/schedule',
-                                method: 'POST'
+                                method: 'POST',
+                                headers: {
+                                    'shared-secret': process.env.SharedSecret,
+                                    'content-type': 'application/json'
+                                },
                             }, (res) => {
                                   console.log('ok - status: ' + res.statusCode)
                             });
@@ -69,6 +74,10 @@ const stack = {
                             req.on('error', (err) => {
                                 throw err;
                             });
+
+                            req.write(JSON.stringify({
+                                type: 'collect'
+                            }));
 
                             req.end();
                         }

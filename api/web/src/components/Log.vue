@@ -50,9 +50,9 @@ export default {
             }).then((res) => {
                 this.loading = false;
 
-                if (res.status !== 200 && res.message) {
+                if (res.status !== 200 && res.status !== 304 && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (res.status !== 200 && res.status !== 304) {
                     throw new Error('Failed to get logs');
                 }
 

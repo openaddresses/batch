@@ -42,6 +42,11 @@ export default {
     },
     components: {
         UploadFile
+    },
+    methods: {
+        external: function(url) {
+            window.open(url, "_blank");
+        }
     }
 }
 </script>

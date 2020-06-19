@@ -46,8 +46,6 @@ export default {
             fetch(`${window.location.origin}/api/job/${this.jobid}/log`, {
                 method: 'GET'
             }).then((res) => {
-                return res.json();
-            }).then((res) => {
                 this.loading = false;
 
                 if (res.status !== 200 && res.status !== 304 && res.message) {
@@ -55,6 +53,9 @@ export default {
                 } else if (res.status !== 200 && res.status !== 304) {
                     throw new Error('Failed to get logs');
                 }
+
+                return res.json();
+            }).then((res) => {
 
                 this.lines = res;
             }).catch((err) => {

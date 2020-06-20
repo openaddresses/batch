@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const moment = require('moment');
 const turf = require('@turf/turf');
 const request = require('request');
 const AWS = require('aws-sdk');
@@ -191,6 +192,9 @@ class Job {
      * @param {Object} query - Query object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.run=false] - Only show jobs associated with a given run
+     * @param {String} [query.live=undefined] - Only show jobs that are part of live runs
+     * @param {String} [query.before=undefined] - Only show jobs before the given date
+     * @param {String} [query.after=undefined] - Only show jobs after the given date
      * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
      */
     static async list(pool, query) {
@@ -214,31 +218,58 @@ class Job {
                 throw new Err(400, null, 'run param must be integer');
             }
 
-            where.push(`run = ${query.run}`);
+            where.push(`job.run = ${query.run}`);
+        }
+
+        if (query.live !== undefined && !['true', 'false'].includes(query.live)) {
+            throw new Err(400, null, 'live param must be true or false');
+        } else if (query.live === 'true') {
+            where.push(`runs.live = true`);
+        } else if (query.live === 'false') {
+            where.push(`runs.live = false`);
+        }
+
+        if (query.after) {
+            try {
+                const after = moment(query.after);
+                where.push(`job.created > '${after.toDate().toISOString()}'::TIMESTAMP`);
+            } catch (err) {
+                throw new Err(400, null, 'after param is not recognized as a valid date');
+            }
+        }
+
+        if (query.before) {
+            try {
+                const before = moment(query.before);
+                where.push(`job.created < '${before.toDate().toISOString()}'::TIMESTAMP`);
+            } catch (err) {
+                throw new Err(400, null, 'before param is not recognized as a valid date');
+            }
         }
 
         let pgres;
         try {
             pgres = await pool.query(`
                 SELECT
-                    id,
-                    run,
-                    map,
-                    created,
-                    source,
-                    source_name,
-                    layer,
-                    name,
-                    output,
-                    loglink,
-                    status
+                    job.id,
+                    job.run,
+                    job.map,
+                    job.created,
+                    job.source,
+                    job.source_name,
+                    job.layer,
+                    job.name,
+                    job.output,
+                    job.loglink,
+                    job.status
                 FROM
-                    job
+                    job INNER JOIN runs
+                        ON job.run = runs.id
                 WHERE
                     '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
                     ${where.length ? 'AND ' + where.join(' AND ') : ''}
                 ORDER BY
-                    created DESC
+                    job.created DESC
                 LIMIT $1
             `, [
                 query.limit

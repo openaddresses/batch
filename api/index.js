@@ -823,6 +823,21 @@ async function server(args, config, cb) {
      *     ?status=Warn
      *     ?status=Warn,Pending
      *     ?status=Success,Fail,Pending,Warn
+     *
+     * @apiParam {String} [live="All"] Only show jobs associated with a live run
+     * @apiParamExample {String} ?env
+     *     ?env=true
+     *     ?env=false
+     *
+     * @apiParam {String} [before=] Only show jobs before the given date
+     * @apiParamExample {String} ?before
+     *     ?before=2020-01-01
+     *     ?before=2020-12-01
+     *
+     * @apiParam {String} [after=] Only show jobs after the given date
+     * @apiParamExample {String} ?after
+     *     ?after=2020-01-01
+     *     ?after=2020-12-01
      */
     router.get('/job', async (req, res) => {
         try {

@@ -27,6 +27,7 @@
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
         "minimist": "^1.2.2",
+        "moment": "^2.27.0",
         "morgan": "^1.9.1",
         "object-hash": "^2.0.3",
         "parallel-transform": "^1.2.0",

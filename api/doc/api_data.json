@@ -320,6 +320,30 @@
             "field": "status",
             "defaultValue": "Success,Fail,Pending,Warn",
             "description": "<p>Only show job with one of the given statuses</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "live",
+            "defaultValue": "All",
+            "description": "<p>Only show jobs associated with a live run</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "defaultValue": "",
+            "description": "<p>Only show jobs before the given date</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "defaultValue": "",
+            "description": "<p>Only show jobs after the given date</p>"
           }
         ]
       },
@@ -337,6 +361,21 @@
         {
           "title": "?status",
           "content": "?status=Warn\n?status=Warn,Pending\n?status=Success,Fail,Pending,Warn",
+          "type": "String"
+        },
+        {
+          "title": "?env",
+          "content": "?env=true\n?env=false",
+          "type": "String"
+        },
+        {
+          "title": "?before",
+          "content": "?before=2020-01-01\n?before=2020-12-01",
+          "type": "String"
+        },
+        {
+          "title": "?after",
+          "content": "?after=2020-01-01\n?after=2020-12-01",
           "type": "String"
         }
       ]

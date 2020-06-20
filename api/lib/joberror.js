@@ -2,6 +2,7 @@
 
 const Err = require('./error');
 const Job = require('./job');
+const Run = require('./run');
 
 /**
  * @class JobError
@@ -74,22 +75,30 @@ class JobError {
         };
     }
 
-    static async moderate(pool, job_id, params) {
+    static async moderate(pool, ci, job_id, params) {
         if (!params.moderate) throw new Err(400, null, 'moderate key must be provided');
         if (!['confirm', 'reject'].includes(params.moderate)) throw new Err(400, null, 'moderate key must be "confirm" or "reject"');
 
+        const job = await Job.from(pool, job_id);
+
+        if (job.status === 'Fail' && params.moderate === 'confirm') {
+            // Jobs that fail are added to the list solely to notify a mod that they failed
+            // They can not be forcibly marked as a pass as this would break the data page
+            throw new Err(400, null, 'Failed jobs can only be suppressed');
+        }
+
         if (params.moderate === 'confirm') {
-
+            job.status = 'Success';
+            await job.commit(pool);
         } else if (params.moderate === 'reject') {
-            const job = await Job.from(pool, job_id);
-
             if (job.status !== 'Fail') {
                 job.status = 'Fail';
                 await job.commit(pool);
             }
-
-            await JobError.delete(pool, job_id);
         }
+
+        await JobError.delete(pool, job_id);
+        Run.ping(pool, ci, job);
 
         return {
             job: job_id,

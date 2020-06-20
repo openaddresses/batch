@@ -900,7 +900,7 @@ async function server(args, config, cb) {
         try {
             await auth.is_flag(req, 'moderator');
 
-            res.json(JobError.moderate(pool, req.params.job, req.body));
+            res.json(JobError.moderate(pool, ci, req.params.job, req.body));
         } catch (err) {
             return Err.respond(err, res);
         }

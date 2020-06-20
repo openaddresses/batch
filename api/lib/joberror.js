@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const Job = require('./job');
 
 /**
  * @class JobError
@@ -70,6 +71,29 @@ class JobError {
 
         return {
             job: job_id
+        };
+    }
+
+    static async moderate(pool, job_id, params) {
+        if (!params.moderate) throw new Err(400, null, 'moderate key must be provided');
+        if (!['confirm', 'reject'].includes(params.moderate)) throw new Err(400, null, 'moderate key must be "confirm" or "reject"');
+
+        if (params.moderate === 'confirm') {
+
+        } else if (params.moderate === 'reject') {
+            const job = await Job.from(pool, job_id);
+
+            if (job.status !== 'Fail') {
+                job.status = 'Fail';
+                await job.commit(pool);
+            }
+
+            await JobError.delete(pool, job_id);
+        }
+
+        return {
+            job: job_id,
+            moderate: params.moderate
         };
     }
 

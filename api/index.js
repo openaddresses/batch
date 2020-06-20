@@ -853,7 +853,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/errors Search for job runs with recent errors
+     * @api {get} /api/job/error Search for job runs with recent errors
      * @apiVersion 1.0.0
      * @apiName ErrorList
      * @apiGroup Job
@@ -868,7 +868,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/job/errors Create a new job error
+     * @api {post} /api/job/error Create a new job error
      * @apiVersion 1.0.0
      * @apiName ErrorCreate
      * @apiGroup Job
@@ -878,7 +878,7 @@ async function server(args, config, cb) {
         try {
             await auth.is_admin(req);
 
-            const joberror = new JobErrors(req.body.job, req.body.message);
+            const joberror = new JobError(req.body.job, req.body.message);
             return res.json(await joberror.generate(pool));
         } catch (err) {
             return Err.respond(err, res);
@@ -886,18 +886,21 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/job/errors Mark a specific job error as confirmed or rejected
+     * @api {post} /api/job/error/:job Mark a specific job error as confirmed or rejected
      * @apiVersion 1.0.0
      * @apiName ErrorManager
      * @apiGroup Job
      * @apiPermission admin
+     *
+     * @apiParam {Number} job Job ID
      */
     router.post('/job/error/:job', async (req, res) => {
+        Param.int(req, res, 'job');
+
         try {
             await auth.is_flag(req, 'moderator');
 
-            const joberror = new JobErrors(req.body.job, req.body.message);
-            return res.json(await joberror.generate(pool));
+            res.json(JobError.moderate(pool, req.params.job, req.body));
         } catch (err) {
             return Err.respond(err, res);
         }

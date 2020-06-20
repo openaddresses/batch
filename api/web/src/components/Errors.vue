@@ -86,8 +86,10 @@ export default {
                 if (!res.ok && res.message) {
                     throw new Error(res.message);
                 } else if (!res.ok) {
-                    throw new Error('Failed to get update error');
+                    throw new Error('Failed to get update job error');
                 }
+
+                this.refresh();
             }).catch((err) => {
                 this.$emit('err', err);
             });

@@ -25,7 +25,7 @@ class Auth {
     async is_flag(req, flag) {
         await this.is_auth(req);
 
-        if (!req.auth.flags || !req.auth.flags[flag]) {
+        if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin') {
             throw new Err(401, null, `${flag} flag required`);
         }
 

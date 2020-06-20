@@ -36,8 +36,8 @@
                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--4'>
-                        <button class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
-                        <button class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
+                        <button v-on:click.stop.prevent='mod(job.id, true)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
+                        <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
                     </div>
                     <div class='col col--12 py3'>
                         <div class='align-center w-full' v-text='job.message'></div>
@@ -71,8 +71,29 @@ export default {
         refresh: function() {
             this.getProblems();
         },
+        mod: function(job_id, confirm) {
+            const url = new URL(`${window.location.origin}/api/job/error/${job_id}`);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    moderate: confirm ? 'confirm' : 'reject'
+                })
+            }).then((res) => {
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to get update error');
+                }
+            }).catch((err) => {
+                this.$emit('err', err);
+            });
+        },
         getProblems: function() {
-            const url = new URL(`${window.location.origin}/api/job/errors`);
+            const url = new URL(`${window.location.origin}/api/job/error`);
 
             fetch(url, {
                 method: 'GET'

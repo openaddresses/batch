@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router';
+import VTooltip from 'v-tooltip';
 import App from './App.vue'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter);
+Vue.use(VTooltip);
 
 // === Components ===
 

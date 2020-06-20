@@ -38,7 +38,7 @@ class JobError {
         };
     }
 
-    static async list(pool) {
+    static async list(pool, query) {
         let pgres;
         try {
             pgres = await pool.query(`
@@ -52,7 +52,7 @@ class JobError {
                 FROM
                     job_errors INNER JOIN job
                         ON job_errors.job = job.id
-                ORDRE BY
+                ORDER BY
                     job.created DESC
             `);
         } catch (err) {

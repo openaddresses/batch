@@ -63,7 +63,7 @@ async function server(args, config, cb) {
     const Err = require('./lib/error');
     const Run = require('./lib/run');
     const Job = require('./lib/job');
-    // const JobError = require('./lib/joberror');
+    const JobError = require('./lib/joberror');
     const Data = require('./lib/data');
     const Upload = require('./lib/upload');
     const Schedule = require('./lib/schedule');
@@ -803,6 +803,8 @@ async function server(args, config, cb) {
         }
     });
 
+
+
     /**
      * @api {get} /api/job Search for job runs
      * @apiVersion 1.0.0
@@ -849,7 +851,6 @@ async function server(args, config, cb) {
     });
 
     /**
-     * //TODO
      * @api {get} /api/job/errors Search for job runs with recent errors
      * @apiVersion 1.0.0
      * @apiName ErrorsList
@@ -858,8 +859,7 @@ async function server(args, config, cb) {
      */
     router.get('/job/errors', async (req, res) => {
         try {
-            if (req.query.status) req.query.status = req.query.status.split(',');
-            return res.json(await Job.list(pool, req.query));
+            return res.json(await JobError.list(pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }

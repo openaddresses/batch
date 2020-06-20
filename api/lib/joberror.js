@@ -97,6 +97,8 @@ class JobError {
         if (pgres.rows.length === 0) {
             throw new Err(404, null, 'No job errors found');
         }
+
+        return pgres.rows;
     }
 }
 

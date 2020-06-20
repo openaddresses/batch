@@ -24,10 +24,23 @@
             <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
         </template>
         <template v-else>
-            <div :key='job.id' v-for='job in problems' class='col col--12 grid'>
+            <div @click='$router.push({ path: `/job/${job.id}` })' :key='job.id' v-for='job in problems' class='col col--12 grid'>
                 <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <Status :status='job.status'/>
+                    </div>
+                    <div class='col col--1'>
+                        Job <span v-text='job.id'/>
+                    </div>
+                    <div class='col col--6'>
+                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
+                    </div>
+                    <div class='col col--4'>
+                        <button class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
+                        <button class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
+                    </div>
+                    <div class='col col--12 py3'>
+                        <div class='align-center w-full' v-text='job.message'></div>
                     </div>
                 </div>
             </div>

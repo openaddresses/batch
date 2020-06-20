@@ -98,9 +98,9 @@ export default {
             fetch(window.location.origin + `/api/data/${this.dataid}/history`, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to get data history');
                 }
 

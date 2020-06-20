@@ -51,15 +51,14 @@ export default {
             this.getProblems();
         },
         getProblems: function() {
-            const url = new URL(`${window.location.origin}/api/data/history`);
-            url.searchParams.set('status', ['Warn', 'Fail']);
+            const url = new URL(`${window.location.origin}/api/job/errors`);
 
             fetch(url, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to get error sources');
                 }
 

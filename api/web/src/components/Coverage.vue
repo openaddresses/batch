@@ -67,9 +67,9 @@ export default {
             fetch(`${window.location.origin}/api/map`, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to fetch map data');
                 }
 

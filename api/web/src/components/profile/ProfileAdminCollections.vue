@@ -123,9 +123,9 @@ export default {
             }).then((res) => {
                 this.loading = false;
 
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && res.status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to load collections');
                 }
 
@@ -160,9 +160,9 @@ export default {
                     sources: this.newCollection.sources
                 })
             }).then((res) => {
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && res.status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to save collection');
                 }
 

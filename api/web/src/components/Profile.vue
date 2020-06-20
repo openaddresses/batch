@@ -89,9 +89,9 @@ export default {
             fetch(url, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200 && res.status !== 304 && res.message) {
+                if (!res.ok && res.status !== 304 && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to load profile');
                 }
                 return res.json();

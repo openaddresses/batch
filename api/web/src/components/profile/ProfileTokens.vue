@@ -120,9 +120,9 @@ export default {
                     name: this.newToken.name
                 })
             }).then((res) => {
-                if (res.status !== 200 && res.status !== 304 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to create token');
                 }
                 return res.json();
@@ -139,9 +139,9 @@ export default {
                 method: 'GET',
                 credentials: 'same-origin'
             }).then((res) => {
-                if (res.status !== 200 && res.status !== 304 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to load tokens');
                 }
                 return res.json();
@@ -157,9 +157,9 @@ export default {
                 method: 'DELETE',
                 credentials: 'same-origin'
             }).then((res) => {
-                if (res.status !== 200 && res.status !== 304 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to delete token');
                 }
 

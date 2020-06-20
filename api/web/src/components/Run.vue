@@ -109,9 +109,9 @@ export default {
             }).then((res) => {
                 this.loading.run = false;
 
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to register user');
                 }
 
@@ -129,9 +129,9 @@ export default {
             }).then((res) => {
                 this.loading.jobs = false;
 
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to register user');
                 }
 

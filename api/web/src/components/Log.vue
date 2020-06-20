@@ -48,9 +48,9 @@ export default {
             }).then((res) => {
                 this.loading = false;
 
-                if (res.status !== 200 && res.status !== 304 && res.message) {
+                if (!res.ok && res.status !== 304 && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200 && res.status !== 304) {
+                } else if (!res.ok) {
                     throw new Error('Failed to get logs');
                 }
 

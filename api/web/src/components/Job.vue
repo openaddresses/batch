@@ -135,9 +135,9 @@ export default {
             fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to get job delta');
                 }
 
@@ -155,9 +155,9 @@ export default {
             fetch(window.location.origin + `/api/job/${this.jobid}`, {
                 method: 'GET'
             }).then((res) => {
-                if (res.status !== 200 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
-                } else if (res.status !== 200) {
+                } else if (!res.ok) {
                     throw new Error('Failed to get job');
                 }
 

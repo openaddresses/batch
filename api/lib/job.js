@@ -13,6 +13,9 @@ const { Status } = require('./util');
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
 
+/**
+ * @class Job
+ */
 class Job {
     constructor(run, source, layer, name) {
         if (typeof run !== 'number') throw new Error('Job.run must be numeric');

@@ -4,6 +4,7 @@ const fs = require('fs');
 const session = require('express-session');
 const WebhooksApi = require('@octokit/webhooks');
 const Busboy = require('busboy');
+const Analytics = require('./lib/analytics');
 const path = require('path');
 const morgan = require('morgan');
 const util = require('./lib/util');
@@ -96,6 +97,25 @@ async function server(args, config, cb) {
 
     app.disable('x-powered-by');
     app.use(minify());
+
+    app.use(session({
+        name: args.prod ? '__Host-session' : 'session',
+        proxy: args.prod,
+        resave: false,
+        store: new pgSession({
+            pool: pool,
+            tableName : 'session'
+        }),
+        cookie: {
+            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
+            sameSite: true,
+            secure: args.prod
+        },
+        saveUninitialized: true,
+        secret: config.CookieSecret
+    }));
+
+    app.use(new Analytics(pool));
     app.use(express.static('web/dist'));
 
     /**
@@ -141,23 +161,6 @@ async function server(args, config, cb) {
     app.use('/api', router);
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
-
-    router.use(session({
-        name: args.prod ? '__Host-session' : 'session',
-        proxy: args.prod,
-        resave: false,
-        store: new pgSession({
-            pool: pool,
-            tableName : 'session'
-        }),
-        cookie: {
-            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: true,
-            secure: args.prod
-        },
-        saveUninitialized: true,
-        secret: config.CookieSecret
-    }));
 
     router.use(bodyparser.urlencoded({ extended: true }));
     router.use(morgan('combined'));

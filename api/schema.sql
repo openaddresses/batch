@@ -1,5 +1,14 @@
 CREATE EXTENSION IF NOT EXISTS POSTGIS;
 
+CREATE TABLE IF NOT EXISTS analytics (
+    ts          TIMESTAMP,
+    sid         TEXT,
+    ip          TEXT,
+    agent       TEXT,
+    method      TEXT,
+    url         TEXT
+);
+
 CREATE TABLE IF NOT EXISTS session (
     sid         VARCHAR NOT NULL COLLATE "default",
     sess        JSON NOT NULL,

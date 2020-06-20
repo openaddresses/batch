@@ -10,10 +10,7 @@ jobs:
                 name: "Add ubuntu-toolchain"
                 command: |
                   apt-get update -y \
-                  && apt-get install -y build-essential python software-properties-common git postgresql-client curl wget gnupg2 \
-                  && add-apt-repository --yes ppa:ubuntu-toolchain-r/test \
-                  && apt-get update -y \
-                  && apt-get -y install libstdc++-5-dev gcc-4.8 g++-4.8; export CXX=g++-4.8
+                  && apt-get install -y build-essential git postgresql-client curl wget gnupg2
 
             - checkout
 
@@ -29,7 +26,7 @@ jobs:
 
             - run:
                 name: "Yarn Install"
-                command: yarn build && yarn install
+                command: yarn install
             - run:
                 name: "Yarn Lint"
                 command: "yarn run lint"

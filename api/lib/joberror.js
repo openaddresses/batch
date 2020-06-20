@@ -21,7 +21,7 @@ class JobError {
         if (!this.message) throw new Err(400, null, 'Cannot generate a job error without a message');
 
         try {
-            const pgres = await pool.query(`
+            await pool.query(`
                 INSERT INTO job_errors (
                     job,
                     message
@@ -106,7 +106,7 @@ class JobError {
         };
     }
 
-    static async list(pool, query) {
+    static async list(pool) {
         let pgres;
         try {
             pgres = await pool.query(`

@@ -171,7 +171,7 @@ class Collection {
 
     static async delete(pool, id) {
         try {
-            const pgres = await pool.query(`
+            await pool.query(`
                 DELETE FROM
                     collections
                 WHERE

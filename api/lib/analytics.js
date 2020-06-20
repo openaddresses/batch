@@ -1,7 +1,5 @@
 'use strict';
 
-const Err = require('./error');
-
 /**
  * @class Analytics
  */
@@ -15,12 +13,12 @@ class Analytics {
                 ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown',
                 url: req.url,
                 method: req.method,
-                agent: req.headers['user-agent'] || 'unknown',
+                agent: req.headers['user-agent'] || 'unknown'
             };
 
             this.point(point);
             return next();
-        }
+        };
     }
 
     point(params) {

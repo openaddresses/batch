@@ -9,7 +9,7 @@ let app, pool;
 
 init(test);
 
-test('start: server', async (t) => {
+test('start: server', (t) => {
     srv({
         postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
     }, (a, p) => {
@@ -19,7 +19,7 @@ test('start: server', async (t) => {
     });
 });
 
-test('POST: api/run', async (t) => {
+test('POST: api/run', (t) => {
     request({
         url: 'http://localhost:5000/api/run',
         method: 'POST',

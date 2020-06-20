@@ -27,16 +27,27 @@
                     <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
                 </div>
 
-                <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6'>
-                    <h3 class='pb6'>User Flags</h3>
+                <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
+                    <h3 class='pb6 w-full'>User Flags</h3>
 
-                    <label class='checkbox-container'>
-                        <input @change='patchUser(user)' v-model='user.flags.upload' type='checkbox' />
-                        <div class='checkbox mr6'>
-                            <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                        </div>
-                        Source Upload
-                    </label>
+                    <div class='col col--6'>
+                        <label class='checkbox-container'>
+                            <input @change='patchUser(user)' v-model='user.flags.upload' type='checkbox' />
+                            <div class='checkbox mr6'>
+                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
+                            </div>
+                            Source Upload
+                        </label>
+                    </div>
+                    <div class='col col--6'>
+                        <label class='checkbox-container'>
+                            <input @change='patchUser(user)' v-model='user.flags.moderator' type='checkbox' />
+                            <div class='checkbox mr6'>
+                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
+                            </div>
+                            Source Moderator
+                        </label>
+                    </div>
                 </div>
             </div>
         </template>

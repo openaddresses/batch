@@ -224,9 +224,9 @@ class Job {
         if (query.live !== undefined && !['true', 'false'].includes(query.live)) {
             throw new Err(400, null, 'live param must be true or false');
         } else if (query.live === 'true') {
-            where.push(`runs.live = true`);
+            where.push('runs.live = true');
         } else if (query.live === 'false') {
-            where.push(`runs.live = false`);
+            where.push('runs.live = false');
         }
 
         if (query.after) {

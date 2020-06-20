@@ -5,11 +5,11 @@ const cf = require('@mapbox/cloudfriend');
 function schedule(type, cron) {
     const stack =  {
         Resources: { }
-   };
+    };
 
-   const title = toTitleCase(type);
+    const title = toTitleCase(type);
 
-   stack.Resources[`${title}LambdaScheduleRole`] = {
+    stack.Resources[`${title}LambdaScheduleRole`] = {
         Type: 'AWS::IAM::Role',
         Properties: {
             AssumeRolePolicyDocument: {

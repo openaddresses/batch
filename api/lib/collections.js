@@ -176,7 +176,7 @@ class Collection {
                     collections
                 WHERE
                     id = $1
-            `, [ id ]);
+            `, [id]);
         } catch (err) {
             throw new Err(500, err, 'Failed to delete collection');
         }

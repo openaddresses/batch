@@ -30,7 +30,7 @@ class Schedule {
                     type: 'collect'
                 })
             }, (err, data) => {
-                if (err) return reject(new Err(500, err, 'failed to submit job to batch'));
+                if (err) return reject(new Err(500, err, 'failed to submit collect job to batch'));
 
                 return resolve(data);
             });
@@ -39,6 +39,21 @@ class Schedule {
 
     static async sources(pool) {
         await JobError.clear(pool);
+
+        return new Promise((resolve, reject) => {
+            lambda.invoke({
+                FunctionName: `${process.env.StackName}-invoke`,
+                InvocationType: 'Event',
+                LogType: 'Tail',
+                Payload: JSON.stringify({
+                    type: 'sources'
+                })
+            }, (err, data) => {
+                if (err) return reject(new Err(500, err, 'failed to submit sources job to batch'));
+
+                return resolve(data);
+            });
+        });
     }
 }
 

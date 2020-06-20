@@ -422,6 +422,8 @@ async function server(args, config, cb) {
      * @apiName Schedule
      * @apiGroup Schedule
      * @apiPermission admin
+     *
+     * @apiParam {Number} Type of lambda scheduled event to respond to. One of "sources" or "collect"
      */
     router.post('/schedule', async (req, res) => {
         try {
@@ -860,6 +862,24 @@ async function server(args, config, cb) {
     router.get('/job/errors', async (req, res) => {
         try {
             return res.json(await JobError.list(pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/job/errors Create a new job error
+     * @apiVersion 1.0.0
+     * @apiName ErrorsCreate
+     * @apiGroup Job
+     * @apiPermission admin
+     */
+    router.post('/job/errors', async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            const joberror = new JobErrors(req.body.job, req.body.message);
+            return res.json(await joberror.generate(pool));
         } catch (err) {
             return Err.respond(err, res);
         }

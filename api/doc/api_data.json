@@ -875,6 +875,19 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "Type",
+            "description": "<p>of lambda scheduled event to respond to. One of &quot;sources&quot; or &quot;collect&quot;</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Schedule"
   },

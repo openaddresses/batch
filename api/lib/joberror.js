@@ -6,6 +6,41 @@ const Err = require('./error');
  * @class JobError
  */
 class JobError {
+    constructor(job, message) {
+        if (typeof job !== 'number') throw new Error('JobError.job must be numeric');
+        if (typeof message !== 'string') throw new Error('JobError.message must be a string');
+
+        this.job = job;
+        this.message = message;
+    }
+
+    async generate(pool) {
+        if (!this.job) throw new Err(400, null, 'Cannot generate a job error without a job');
+        if (!this.message) throw new Err(400, null, 'Cannot generate a job error without a message');
+
+        try {
+            const pgres = await pool.query(`
+                INSERT INTO job_errors (
+                    job,
+                    message
+                ) VALUES (
+                    $1,
+                    $2
+                ) RETURNING *
+            `, [
+                this.job,
+                this.message
+            ]);
+
+            return  {
+                job: this.job,
+                message: this.message
+            };
+        } catch (err) {
+            throw new Err(500, err, 'failed to generate job error');
+        }
+    }
+
     static async clear(pool) {
         try {
             await pool.query(`

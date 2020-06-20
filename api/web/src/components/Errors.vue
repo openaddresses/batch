@@ -36,8 +36,13 @@
                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--4'>
-                        <button v-on:click.stop.prevent='mod(job.id, true)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
-                        <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
+                        <template v-if='job.status === "Warn"'>
+                            <button v-on:click.stop.prevent='mod(job.id, true)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
+                            <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
+                        </template>
+                        <template v-else-if='job.status === "Fail"'>
+                            <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Suppress</button>
+                        </template>
                     </div>
                     <div class='col col--12 py3'>
                         <div class='align-center w-full' v-text='job.message'></div>

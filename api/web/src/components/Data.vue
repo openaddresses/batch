@@ -211,7 +211,9 @@ export default {
             fetch(url, {
                 method: 'GET'
             }).then((res) => {
-                if (!res.ok && res.message) {
+                if (res.status === 404) {
+                    this.datas = [];
+                } if (!res.ok && res.message) {
                     throw new Error(res.message);
                 } else if (!res.ok) {
                     throw new Error('Failed to get data');

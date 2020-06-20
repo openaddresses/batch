@@ -1,0 +1,40 @@
+version: 2
+
+jobs:
+    build:
+        docker:
+            - image: ubuntu:18.04
+            - image: mdillon/postgis:11
+        resource_class: xlarge
+        steps:
+            - run:
+                name: "Add ubuntu-toolchain"
+                command: |
+                  apt-get update -y \
+                  && apt-get install -y build-essential python software-properties-common git postgresql-client curl wget gnupg2 \
+                  && add-apt-repository --yes ppa:ubuntu-toolchain-r/test \
+                  && apt-get update -y \
+                  && apt-get -y install libstdc++-5-dev gcc-4.8 g++-4.8; export CXX=g++-4.8
+
+            - checkout
+
+            - run:
+                name: "Install NodeJS"
+                command: |
+                  curl 'https://nodejs.org/dist/v10.15.3/node-v10.15.3-linux-x64.tar.gz' | tar -xzv \
+                  && cp ./node-v10.15.3-linux-x64/bin/node /usr/bin/ \
+                  && ./node-v10.15.3-linux-x64/bin/npm install -g yarn \
+                  && ./node-v10.15.3-linux-x64/bin/npm install -g npm \
+                  && echo "export PATH=$(yarn global bin):$PATH" >> $BASH_ENV \
+                  yarn install
+
+            - run:
+                name: "Yarn Install"
+                command: yarn build && yarn install
+            - run:
+                name: "Yarn Lint"
+                command: "yarn run lint"
+            - run:
+                name: "Yarn Coverage"
+                command: "cd api && yarn run cov"
+                no_output_timeout: "12m"

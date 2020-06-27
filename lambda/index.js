@@ -58,6 +58,16 @@ function trigger(event) {
                 environment: []
             }
         };
+    } else if (event.type === 'schedule') {
+        params: {
+            jobDefinition: jobDefinition,
+            jobQueue: jobQueue,
+            jobName: jobName,
+            containerOverrides: {
+                command: ['./schedule.js'],
+                environment: []
+            }
+        }
     } else {
         throw new Error('Unknown event type: ' + event.type);
     }

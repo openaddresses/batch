@@ -82,6 +82,8 @@ async function server(args, config, cb) {
         connectionString: postgres
     });
 
+    const analytics = new Analytics(pool);
+
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
 
@@ -115,7 +117,7 @@ async function server(args, config, cb) {
         secret: config.CookieSecret
     }));
 
-    app.use(new Analytics(pool));
+    app.use(analytics.middleware());
     app.use(express.static('web/dist'));
 
     /**
@@ -1050,6 +1052,22 @@ async function server(args, config, cb) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {get} /api/dash/traffic Get daily session counts
+     * @apiVersion 1.0.0
+     * @apiName traffic
+     * @apiGroup Analytics
+     * @apiPermission public
+     */
+    router.get('/dash/traffic', async (req, res) => {
+        try {
+            res.json(await analytics.traffic());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
 
     /**
      * @api {post} /api/github/event Github APP event webhook

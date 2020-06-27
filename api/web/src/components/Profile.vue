@@ -4,11 +4,13 @@
             <div class='col col--12'>
 
                 <h2 v-if='mode === "profile"' class='txt-h4 ml12 pb12 fl'>Profile:</h2>
+                <h2 v-else-if='mode === "analytics"' class='txt-h4 ml12 pb12 fl'>Analytics:</h2>
                 <h2 v-else-if='mode === "admin"' class='txt-h4 ml12 pb12 fl'>Administration:</h2>
 
                 <div class='fr'>
                     <div v-if='profile.access === "admin"' class='flex-parent-inline'>
                         <button @click='mode = "profile"' :class='{ "btn--stroke": mode !== "profile" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Profile</button>
+                        <button @click='mode = "analytics"' :class='{ "btn--stroke": mode !== "analytics" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Analytics</button>
                         <button @click='mode = "admin"' :class='{ "btn--stroke": mode !== "admin" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Admin</button>
                     </div>
                 </div>
@@ -39,6 +41,12 @@
 
             <ProfileTokens @err='$emit("err", $event)'/>
         </template>
+        <template v-else-if='mode === "analytics"'>
+            <ProfileAnalytics
+                v-if='profile.access === "admin"'
+                @err='$emit("err", $event)'
+            />
+        </template>
         <template v-else-if='mode === "admin"'>
             <ProfileAdminUser
                 v-if='profile.access === "admin"'
@@ -54,6 +62,7 @@
 </template>
 
 <script>
+import ProfileAnalytics from './profile/ProfileAnalytics.vue'
 import ProfileAdminUser from './profile/ProfileAdminUser.vue'
 import ProfileAdminCollections from './profile/ProfileAdminCollections.vue'
 import ProfileTokens from './profile/ProfileTokens.vue'
@@ -89,7 +98,7 @@ export default {
             fetch(url, {
                 method: 'GET'
             }).then((res) => {
-                if (!res.ok && res.status !== 304 && res.message) {
+                if (!res.ok && res.message) {
                     throw new Error(res.message);
                 } else if (!res.ok) {
                     throw new Error('Failed to load profile');
@@ -103,6 +112,7 @@ export default {
         }
     },
     components: {
+        ProfileAnalytics,
         ProfileAdminUser,
         ProfileAdminCollections,
         ProfileTokens

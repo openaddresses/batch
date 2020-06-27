@@ -20,10 +20,14 @@
             </div>
         </template>
         <template v-else>
-            <LineChart class='w-full' :chartData='traffic' options='{
+            <LineChart class='w-full' style='height: 200px' :chartData='traffic' options='{
+                "maintainAspectRatio": false,
                 "scales": {
                     "xAxes": [{
                         "type": "time",
+                        "time": {
+                            "unit": "day"
+                        },
                         "distribution": "linear"
                     }],
                     "yAxes": [{
@@ -51,7 +55,7 @@ export default {
             loading: {
                 traffic: true,
             },
-            traffic: []
+            traffic: {}
         };
     },
     mounted: function() {
@@ -69,8 +73,6 @@ export default {
             fetch(url, {
                 method: 'GET'
             }).then((res) => {
-                this.loading.traffic = false;
-
                 if (!res.ok && res.message) {
                     throw new Error(res.message);
                 } else if (!res.ok) {
@@ -84,6 +86,7 @@ export default {
                 });
 
                 this.traffic = res;
+                this.loading.traffic = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });

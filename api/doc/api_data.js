@@ -1,5 +1,22 @@
 define({ "api": [
   {
+    "type": "get",
+    "url": "/api/dash/traffic",
+    "title": "Get daily session counts",
+    "version": "1.0.0",
+    "name": "traffic",
+    "group": "Analytics",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Analytics"
+  },
+  {
     "type": "post",
     "url": "/api/collections",
     "title": "Create Collection",
@@ -235,11 +252,28 @@ define({ "api": [
     "groupTitle": "Github"
   },
   {
+    "type": "post",
+    "url": "/api/job/error",
+    "title": "Create a new job error",
+    "version": "1.0.0",
+    "name": "ErrorCreate",
+    "group": "Job",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
     "type": "get",
-    "url": "/api/job/errors",
+    "url": "/api/job/error",
     "title": "Search for job runs with recent errors",
     "version": "1.0.0",
-    "name": "ErrorsList",
+    "name": "ErrorList",
     "group": "Job",
     "permission": [
       {
@@ -248,6 +282,36 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
+    "type": "post",
+    "url": "/api/job/error/:job",
+    "title": "Mark a specific job error as confirmed or rejected",
+    "version": "1.0.0",
+    "name": "ErrorManager",
+    "group": "Job",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "job",
+            "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -673,6 +737,54 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>If the job succeeds, should it replace the current data entry</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>If not live, information about the GitHub CI reference</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Run"
   },

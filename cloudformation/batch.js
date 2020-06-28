@@ -124,6 +124,9 @@ const stack = {
                         Name: 'SharedSecret',
                         Value: cf.ref('SharedSecret')
                     },{
+                        Name: 'OA_BRANCH',
+                        Value: cf.ref('Branch')
+                    },{
                         Name: 'OA_API' ,
                         Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
                     },{

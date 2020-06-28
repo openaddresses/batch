@@ -21,6 +21,11 @@ const stack = {
         Bucket: {
             Type: 'String',
             Description: 'S3 Asset Storage'
+        },
+        Branch: {
+            Type: 'String',
+            Description: 'Github branch to schedule source runs from',
+            Default: 'master'
         }
     }
 };

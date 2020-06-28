@@ -676,11 +676,20 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/run Create a new run for a set of jobs
+     * @api {post} /api/run Create a Run
      * @apiVersion 1.0.0
      * @apiName Create
      * @apiGroup Run
      * @apiPermission admin
+     *
+     * @apiParam {Boolean} live If the job succeeds, should it replace the current data entry
+     *
+     * @apiParam {Object} github If not live, information about the GitHub CI reference
+     * @apiParam {String} github.ref Git reference (branch) of the given run
+     * @apiParam {String} github.sha Git SHA of the given run
+     * @apiParam {String} github.url Github URL to the specific commit
+     * @apiParam {Number} github.check Github check ID to update
+     *
      */
     router.post('/run', async (req, res) => {
         try {

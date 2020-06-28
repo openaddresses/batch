@@ -58,13 +58,13 @@ function trigger(event) {
                 environment: []
             }
         };
-    } else if (event.type === 'schedule') {
+    } else if (event.type === 'sources') {
         params: {
             jobDefinition: jobDefinition,
             jobQueue: jobQueue,
             jobName: jobName,
             containerOverrides: {
-                command: ['./schedule.js'],
+                command: ['./sources.js'],
                 environment: []
             }
         }

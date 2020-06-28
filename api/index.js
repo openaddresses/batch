@@ -766,8 +766,8 @@ async function server(args, config, cb) {
      *     jobs cannot be attached to it
      *
      * @apiParam {Number} run Run ID
-     * @apiParam {json} body Jobs to attach to run
-     * @apiParamExample {json} body
+     * @apiParam {json} jobs Jobs to attach to run
+     * @apiParamExample {json} jobs
      *     ['https://github.com/path_to_source', {
      *         "source": "https://github/path_to_source",
      *         "layer": "addresses",

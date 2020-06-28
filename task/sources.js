@@ -25,7 +25,6 @@ if (require.main == module) {
     console.error(`ok - ${tmp}`);
     fs.mkdirSync(tmp);
 
-
     try {
         run(tmp);
     } catch (err) {
@@ -34,8 +33,21 @@ if (require.main == module) {
 }
 
 async function run(tmp) {
+    console.error('ok - fetching repo');
     await fetch(tmp);
-    const list = await sources(tmp)
+    console.error('ok - extracted repo');
+
+    console.error('ok - listing jobs');
+    const jobs = list(tmp)
+    console.error(`ok - ${jobs.length} jobs found`);
+
+    console.error('ok - creating run');
+    const r = await run_create();
+    console.error(`ok - run: ${run.id} created`);
+
+    console.error('ok - populating run');
+    const p = await run_pop(r.id, jobs);
+    console.error('ok - run populated')
 }
 
 async function fetch(tmp) {
@@ -45,7 +57,6 @@ async function fetch(tmp) {
             fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip')),
             (err) => {
                 if (err) return reject(err);
-                console.error('ok - downloaded repo');
 
                 pipeline(
                     fs.createReadStream(path.resolve(tmp, 'openaddresses.zip')),
@@ -62,9 +73,8 @@ async function fetch(tmp) {
     });
 }
 
-async function sources(tmp) {
+function list(tmp) {
     const dir = fs.readdirSync(path.resolve(tmp, `openaddresses`))[0];
-    console.error(dir)
     const globs = glob.sync(`**/*.json`, {
         nodir: true,
         cwd: path.resolve(tmp, `openaddresses`, dir, 'sources')
@@ -85,5 +95,49 @@ async function sources(tmp) {
             }
         }
     }
-    console.error(jobs);
+
+    return jobs;
+}
+
+async function run_create() {
+    return new Promise((resolve, reject) => {
+        request({
+            json: true,
+            url: `${process.env.OA_API}/api/run`,
+            method: 'POST',
+            headers: {
+                'shared-secret': process.env.SharedSecret
+            },
+            body: {
+                live: true
+            }
+
+        }, (err, res) => {
+            if (err) return reject(err);
+            if (res.statusCode !== 200 && res.body.error) return reject(new Error(res.body.error));
+            if (res.statusCode !== 200) return reject(new Error('Failed to create run'));
+            return resolve(res.body);
+        });
+    });
+}
+
+async function run_pop(run_id, jobs) {
+    return new Promise((resolve, reject) => {
+        request({
+            json: true,
+            url: `${process.env.OA_API}/api/run/${run_id}/jobs`,
+            method: 'POST',
+            headers: {
+                'shared-secret': process.env.SharedSecret
+            },
+            body: {
+                jobs: jobs
+            }
+        }, (err, res) => {
+            if (err) return reject(err);
+            if (res.statusCode !== 200 && res.body.error) return reject(new Error(res.body.error));
+            if (res.statusCode !== 200) return reject(new Error('Failed to populate run'));
+            return resolve(res.body);
+        });
+    });
 }

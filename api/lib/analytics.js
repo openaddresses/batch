@@ -52,6 +52,42 @@ class Analytics {
     }
 
     /**
+     * Get most popular collections
+     */
+    async collections() {
+        let pgres;
+        try {
+        console.error('HERE');
+            pgres = await this.pool.query(`
+                SELECT 
+                    a.count, 
+                    collections.name
+                FROM (
+                    SELECT
+                        Count(*),
+                        ((Regexp_Matches(url, '\d+'))[1])::BIGINT AS collection
+                    FROM
+                        analytics
+                    WHERE
+                        url iLIKE '%collections/%'
+                    GROUP BY
+                        url
+                    ORDER BY
+                        Count(*)
+                ) a INNER JOIN collections
+                    ON a.collection = collections.id
+            `, []);
+        } catch (err) {
+            throw new Err(500, err, 'failed to retrieve collections');
+        }
+
+        return pgres.rows.map((row) => {
+            console.error(row);
+            row.count = parseInt(row.count);
+        });
+    }
+
+    /**
      * Return daily unique visitors
      */
     async traffic() {

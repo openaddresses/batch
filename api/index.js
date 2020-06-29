@@ -1067,11 +1067,30 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName traffic
      * @apiGroup Analytics
-     * @apiPermission public
+     * @apiPermission admin
      */
     router.get('/dash/traffic', async (req, res) => {
         try {
+            await auth.is_admin(req);
+
             res.json(await analytics.traffic());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/dash/collections List collections by their download popularity
+     * @apiVersion 1.0.0
+     * @apiName collections
+     * @apiGroup Analytics
+     * @apiPermission admin
+     */
+    router.get('/dash/collections', async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            res.json(await analytics.collections());
         } catch (err) {
             return Err.respond(err, res);
         }

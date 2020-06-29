@@ -1,6 +1,23 @@
 define({ "api": [
   {
     "type": "get",
+    "url": "/api/dash/collections",
+    "title": "List collections by their download popularity",
+    "version": "1.0.0",
+    "name": "collections",
+    "group": "Analytics",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Analytics"
+  },
+  {
+    "type": "get",
     "url": "/api/dash/traffic",
     "title": "Get daily session counts",
     "version": "1.0.0",
@@ -8,9 +25,9 @@ define({ "api": [
     "group": "Analytics",
     "permission": [
       {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "filename": "./index.js",
@@ -726,7 +743,7 @@ define({ "api": [
   {
     "type": "post",
     "url": "/api/run",
-    "title": "Create a new run for a set of jobs",
+    "title": "Create a Run",
     "version": "1.0.0",
     "name": "Create",
     "group": "Run",
@@ -819,6 +836,30 @@ define({ "api": [
             "optional": true,
             "field": "run",
             "description": "<p>Only show run associated with a given ID</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "status",
+            "defaultValue": "Success,Fail,Pending,Warn",
+            "description": "<p>Only show runs with one of the given statuses</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "defaultValue": "",
+            "description": "<p>Only show runs before the given date</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "defaultValue": "",
+            "description": "<p>Only show runs after the given date</p>"
           }
         ]
       },
@@ -831,6 +872,21 @@ define({ "api": [
         {
           "title": "?run",
           "content": "?run=12",
+          "type": "String"
+        },
+        {
+          "title": "?status",
+          "content": "?status=Warn\n?status=Warn,Pending\n?status=Success,Fail,Pending,Warn",
+          "type": "String"
+        },
+        {
+          "title": "?before",
+          "content": "?before=2020-01-01\n?before=2020-12-01",
+          "type": "String"
+        },
+        {
+          "title": "?after",
+          "content": "?after=2020-01-01\n?after=2020-12-01",
           "type": "String"
         }
       ]
@@ -957,14 +1013,14 @@ define({ "api": [
             "group": "Parameter",
             "type": "json",
             "optional": false,
-            "field": "body",
+            "field": "jobs",
             "description": "<p>Jobs to attach to run</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "body",
+          "title": "jobs",
           "content": "['https://github.com/path_to_source', {\n    \"source\": \"https://github/path_to_source\",\n    \"layer\": \"addresses\",\n    \"name\": \"dcgis\"\n}]",
           "type": "json"
         }

@@ -664,6 +664,22 @@ async function server(args, config, cb) {
      * @apiParam {Number} [run] Only show run associated with a given ID
      * @apiParamExample {String} ?run
      *     ?run=12
+     *
+     * @apiParam {String} [status="Success,Fail,Pending,Warn"] Only show runs with one of the given statuses
+     * @apiParamExample {String} ?status
+     *     ?status=Warn
+     *     ?status=Warn,Pending
+     *     ?status=Success,Fail,Pending,Warn
+     *
+     * @apiParam {String} [before=] Only show runs before the given date
+     * @apiParamExample {String} ?before
+     *     ?before=2020-01-01
+     *     ?before=2020-12-01
+     *
+     * @apiParam {String} [after=] Only show runs after the given date
+     * @apiParamExample {String} ?after
+     *     ?after=2020-01-01
+     *     ?after=2020-12-01
      */
     router.get('/run', async (req, res) => {
         try {

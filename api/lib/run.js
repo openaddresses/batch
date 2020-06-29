@@ -4,6 +4,7 @@ const Err = require('./error');
 const Job = require('./job');
 const Data = require('./data');
 const util = require('./util');
+const { Status } = require('./util');
 
 class Run {
     constructor() {
@@ -60,12 +61,18 @@ class Run {
      * @param {Object} query - Query object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.run=false] - Only show run associated with a id (Normally use Run.from unless you need additional job information)
+     * @param {String} [query.before=undefined] - Only show runs before the given date
+     * @param {String} [query.after=undefined] - Only show jobs after the given date
+     * @param {Number} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show runs with a given status
      */
     static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
+        if (!query.status) query.status = Status.list();
 
         const where = [];
+
+        Status.verify(query.status);
 
         if (!query.run) {
             query.run = false;
@@ -76,6 +83,24 @@ class Run {
             }
 
             where.push(`run = ${query.run}`);
+        }
+
+        if (query.after) {
+            try {
+                const after = moment(query.after);
+                where.push(`run.created > '${after.toDate().toISOString()}'::TIMESTAMP`);
+            } catch (err) {
+                throw new Err(400, null, 'after param is not recognized as a valid date');
+            }
+        }
+
+        if (query.before) {
+            try {
+                const before = moment(query.before);
+                where.push(`run.created < '${before.toDate().toISOString()}'::TIMESTAMP`);
+            } catch (err) {
+                throw new Err(400, null, 'before param is not recognized as a valid date');
+            }
         }
 
         let pgres;
@@ -94,7 +119,8 @@ class Run {
                         runs,
                         job
                     WHERE
-                        job.run = runs.id
+                        '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
+                        AND job.run = runs.id
                     GROUP BY
                         runs.id,
                         runs.live,
@@ -121,7 +147,8 @@ class Run {
                         runs,
                         job
                     WHERE
-                        job.run = runs.id
+                        '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
+                        AND job.run = runs.id
                         AND ${where.join(' AND ')}
                     GROUP BY
                         runs.id,

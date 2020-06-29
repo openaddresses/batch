@@ -667,7 +667,8 @@ async function server(args, config, cb) {
      */
     router.get('/run', async (req, res) => {
         try {
-            const runs = await Run.list(pool);
+            if (req.query.status) req.query.status = req.query.status.split(',');
+            const runs = await Run.list(pool, req.query);
 
             return res.json(runs);
         } catch (err) {

@@ -203,14 +203,11 @@ class Job {
     static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
+        if (!query.status) query.status = Status.list();
 
         const where = [];
 
-        if (!query.status) {
-            query.status = Status.list();
-        } else {
-            Status.verify(query.status);
-        }
+        Status.verify(query.status);
 
         if (!query.run) {
             query.run = false;

@@ -171,7 +171,9 @@ class Run {
                 && !/https:\/\/raw\.githubusercontent\.com\//.test(job)
             ) {
                 throw new Err(400, null, 'job must reference github.com');
-            } else if (job.source) {
+            }
+
+            if (job.source) {
                 jobs.push(job);
             } else if (typeof job === 'string') {
                 try {
@@ -182,24 +184,24 @@ class Run {
             } else {
                 throw new Err(400, null, 'job must be string or job object');
             }
+        }
 
-            for (let i = 0; i < jobs.length; i++) {
-                jobs[i] = new Job(run_id, jobs[i].source, jobs[i].layer, jobs[i].name);
-
-                try {
-                    await jobs[i].generate(pool);
-                    await jobs[i].batch();
-                } catch (err) {
-                    // TODO return list of successful ids
-                    throw new Err(400, err, 'jobs only partially queued');
-                }
-            }
+        for (let i = 0; i < jobs.length; i++) {
+            jobs[i] = new Job(run_id, jobs[i].source, jobs[i].layer, jobs[i].name);
 
             try {
-                await Run.close(pool, run_id);
+                await jobs[i].generate(pool);
+                await jobs[i].batch();
             } catch (err) {
-                throw new Err(500, err, 'failed to close run');
+                // TODO return list of successful ids
+                throw new Err(400, err, 'jobs only partially queued');
             }
+        }
+
+        try {
+            await Run.close(pool, run_id);
+        } catch (err) {
+            throw new Err(500, err, 'failed to close run');
         }
 
         return {

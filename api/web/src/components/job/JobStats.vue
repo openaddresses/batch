@@ -1,6 +1,6 @@
 <template>
     <div class='col col--12'>
-        <template v-if='!job.stats'>
+        <template v-if='!job.stats || JSON.stringify(job.stats) === "{}"'>
             <div class='col col--12 border border--gray-light round'>
                 <div class='flex-parent flex-parent--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>

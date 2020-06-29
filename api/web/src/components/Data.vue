@@ -11,7 +11,7 @@
 
                 <div class='col col--5'>Name</div>
                 <div class='col col--2'>Updated</div>
-                <div class='col col--2'><span class='fr'>Attributes</span></div>
+                <div class='col col--5'><span class='fr'>Attributes</span></div>
             </div>
             <div v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='col col--12 grid pb6'>
                 <div class='col col--12 grid cursor-pointer bg-darken10-on-hover round'>

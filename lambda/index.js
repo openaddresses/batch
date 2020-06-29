@@ -59,7 +59,7 @@ function trigger(event) {
             }
         };
     } else if (event.type === 'sources') {
-        params: {
+        params = {
             jobDefinition: jobDefinition,
             jobQueue: jobQueue,
             jobName: jobName,
@@ -67,7 +67,7 @@ function trigger(event) {
                 command: ['./sources.js'],
                 environment: []
             }
-        }
+        };
     } else {
         throw new Error('Unknown event type: ' + event.type);
     }

@@ -88,7 +88,7 @@ function list(tmp) {
         for (const layer of Object.keys(source.layers)) {
             for (const name of source.layers[layer]) {
                 jobs.push({
-                    source: `https://github.com/openaddresses/openaddresses/blob/${process.env.OA_BRANCH}/sources/${glob}`,
+                    source: `https://raw.githubusercontent.com/openaddresses/openaddresses/${process.env.OA_BRANCH}/sources/${glob}`,
                     layer: layer,
                     name: name.name
                 });

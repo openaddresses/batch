@@ -39,10 +39,10 @@
                     <div class='col col--2'>
                         Run <span v-text='run.id'/>
                     </div>
-                    <div class='col col--2'>
-                        <span v-text='run.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                    <div class='col col--4'>
+                        <span v-text='fmt(run.created)'/>
                     </div>
-                    <div class='col col--7 pr12'>
+                    <div class='col col--5 pr12'>
                         <span v-if='run.live' class='fr mx6 bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Live</span>
                         <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
                     </div>
@@ -54,6 +54,7 @@
 
 <script>
 import Status from './Status.vue';
+import moment from 'moment-timezone';
 
 export default {
     name: 'Runs',
@@ -62,11 +63,15 @@ export default {
     },
     data: function() {
         return {
+            tz: moment.tz.guess(),
             loading: false,
             runs: []
         };
     },
     methods: {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+        },
         refresh: function() {
             this.getRuns();
         },

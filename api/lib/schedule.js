@@ -17,6 +17,12 @@ class Schedule {
             await Schedule.collect();
         } else if (event.type === 'sources') {
             await Schedule.sources(pool);
+        } else if (event.type === 'close') {
+            // TODO actuall close old jobs and runs
+            return {
+                status: 200,
+                message: "Closed old jobs/runs"
+            }
         }
     }
 

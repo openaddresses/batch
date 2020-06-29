@@ -37,4 +37,5 @@ module.exports = cf.merge(
     batch,
     schedule('sources', 'cron(0 12 ? * fri *)'),
     schedule('collect', 'cron(0 12 ? * sun *)')
+    schedule('close',   'cron(0 11 * * ? *)')
 );

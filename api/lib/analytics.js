@@ -57,7 +57,6 @@ class Analytics {
     async collections() {
         let pgres;
         try {
-        console.error('HERE');
             pgres = await this.pool.query(`
                 SELECT 
                     a.count, 
@@ -65,7 +64,7 @@ class Analytics {
                 FROM (
                     SELECT
                         Count(*),
-                        ((Regexp_Matches(url, '\d+'))[1])::BIGINT AS collection
+                        ((Regexp_Matches(url, '[0-9]+'))[1])::BIGINT AS collection
                     FROM
                         analytics
                     WHERE
@@ -82,8 +81,8 @@ class Analytics {
         }
 
         return pgres.rows.map((row) => {
-            console.error(row);
             row.count = parseInt(row.count);
+            return row;
         });
     }
 

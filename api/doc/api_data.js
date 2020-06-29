@@ -2,7 +2,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/dash/collections",
-    "title": "List collections by their download popularity",
+    "title": "Collection Counts",
     "version": "1.0.0",
     "name": "collections",
     "group": "Analytics",
@@ -19,7 +19,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/dash/traffic",
-    "title": "Get daily session counts",
+    "title": "Session Counts",
     "version": "1.0.0",
     "name": "traffic",
     "group": "Analytics",
@@ -53,7 +53,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/collections/:collection/data",
-    "title": "Get data for a given collection",
+    "title": "Get Collection Data",
     "version": "1.0.0",
     "name": "Data",
     "group": "Collections",
@@ -87,7 +87,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/collections",
-    "title": "List data collections",
+    "title": "List Collections",
     "version": "1.0.0",
     "name": "List",
     "group": "Collections",
@@ -121,7 +121,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/data",
-    "title": "Search for processed data",
+    "title": "List Data",
     "version": "1.0.0",
     "name": "List",
     "group": "Data",
@@ -194,7 +194,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/data/:data",
-    "title": "Get data by data ID",
+    "title": "Get Data",
     "version": "1.0.0",
     "name": "Single",
     "group": "Data",
@@ -224,7 +224,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/data/:data/history",
-    "title": "Return full job history for a given data ID",
+    "title": "Return Data History",
     "version": "1.0.0",
     "name": "SingleHistory",
     "group": "Data",
@@ -254,7 +254,7 @@ define({ "api": [
   {
     "type": "post",
     "url": "/api/github/event",
-    "title": "Github APP event webhook",
+    "title": "Github Webhook",
     "version": "1.0.0",
     "name": "Event",
     "group": "Github",
@@ -271,7 +271,7 @@ define({ "api": [
   {
     "type": "post",
     "url": "/api/job/error",
-    "title": "Create a new job error",
+    "title": "Create Job Error",
     "version": "1.0.0",
     "name": "ErrorCreate",
     "group": "Job",
@@ -335,7 +335,7 @@ define({ "api": [
   {
     "type": "patch",
     "url": "/api/job/:job",
-    "title": "Update a given job",
+    "title": "Update Job",
     "version": "1.0.0",
     "name": "JobPatch",
     "group": "Job",
@@ -365,7 +365,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job",
-    "title": "Search for job runs",
+    "title": "List Jobs",
     "version": "1.0.0",
     "name": "List",
     "group": "Job",
@@ -467,7 +467,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job/:job",
-    "title": "Get a given job by id",
+    "title": "Get Job",
     "version": "1.0.0",
     "name": "Single",
     "group": "Job",
@@ -528,7 +528,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job/:job/log",
-    "title": "Get the log file for a given job",
+    "title": "Get Job Log",
     "version": "1.0.0",
     "name": "SingleLog",
     "group": "Job",
@@ -558,7 +558,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job/:job/output/cache.zip",
-    "title": "Get the raw unprocessed data for a given job",
+    "title": "Get Job Cache",
     "version": "1.0.0",
     "name": "SingleOutputCache",
     "group": "Job",
@@ -588,7 +588,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job/:job/output/source.geojson.gz",
-    "title": "Get the raw data for a given job",
+    "title": "Get Job Data",
     "version": "1.0.0",
     "name": "SingleOutputData",
     "group": "Job",
@@ -618,7 +618,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job/:job/output/source.png",
-    "title": "Get the preview image for a given job",
+    "title": "Get Job Preview",
     "version": "1.0.0",
     "name": "SingleOutputPreview",
     "group": "Job",
@@ -682,7 +682,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/map",
-    "title": "Return a TileJSON document for data coverage layers",
+    "title": "Coverage TileJSON",
     "version": "1.0.0",
     "name": "TileJSON",
     "group": "Map",
@@ -699,7 +699,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/map/:z/:x/:y.mvt",
-    "title": "Return a given Mapbox Vector Tile",
+    "title": "Coverage MVT",
     "version": "1.0.0",
     "name": "VectorTile",
     "group": "Map",
@@ -743,7 +743,7 @@ define({ "api": [
   {
     "type": "post",
     "url": "/api/run",
-    "title": "Create a Run",
+    "title": "Create Run",
     "version": "1.0.0",
     "name": "Create",
     "group": "Run",
@@ -808,7 +808,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/run",
-    "title": "Search for data runs",
+    "title": "List Runs",
     "version": "1.0.0",
     "name": "List",
     "group": "Run",
@@ -897,37 +897,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/run/:run",
-    "title": "Get a specific run",
-    "version": "1.0.0",
-    "name": "Single",
-    "group": "Run",
-    "permission": [
-      {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
-      }
-    ],
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": false,
-            "field": "run",
-            "description": "<p>Run ID</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./index.js",
-    "groupTitle": "Run"
-  },
-  {
-    "type": "patch",
-    "url": "/api/run/:run",
-    "title": "Update a specific run",
+    "title": "Get Run",
     "version": "1.0.0",
     "name": "Single",
     "group": "Run",
@@ -1030,9 +1000,39 @@ define({ "api": [
     "groupTitle": "Run"
   },
   {
+    "type": "patch",
+    "url": "/api/run/:run",
+    "title": "Update Run",
+    "version": "1.0.0",
+    "name": "Update",
+    "group": "Run",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "run",
+            "description": "<p>Run ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Run"
+  },
+  {
     "type": "post",
     "url": "/api/schedule",
-    "title": "Kick off the scheduled full rebuild",
+    "title": "Scheduled Event",
     "version": "1.0.0",
     "name": "Schedule",
     "group": "Schedule",
@@ -1062,7 +1062,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/health",
-    "title": "Healthcheck endpoint for AWS ELB",
+    "title": "Server Healthcheck",
     "version": "1.0.0",
     "name": "Health",
     "group": "Server",
@@ -1088,7 +1088,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api",
-    "title": "Get API metadata",
+    "title": "Get Metadata",
     "version": "1.0.0",
     "name": "Meta",
     "group": "Server",
@@ -1162,7 +1162,7 @@ define({ "api": [
   {
     "type": "post",
     "url": "/api/upload",
-    "title": "Allow a user to upload a manually maintained data source",
+    "title": "Create Upload",
     "version": "1.0.0",
     "name": "upload",
     "group": "Upload",
@@ -1179,7 +1179,7 @@ define({ "api": [
   {
     "type": "post",
     "url": "/api/health",
-    "title": "Create a new user",
+    "title": "Create User",
     "version": "1.0.0",
     "name": "Create",
     "group": "User",
@@ -1196,7 +1196,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/user",
-    "title": "Return a list of all active users",
+    "title": "List Users",
     "version": "1.0.0",
     "name": "list",
     "group": "User",
@@ -1213,7 +1213,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/user/me",
-    "title": "If the user has an active session, return metadata about the user",
+    "title": "Get User Session Metadata",
     "version": "1.0.0",
     "name": "self",
     "group": "User",
@@ -1230,7 +1230,7 @@ define({ "api": [
   {
     "type": "patch",
     "url": "/api/user/:id",
-    "title": "Update a user with the given body",
+    "title": "Update User",
     "version": "1.0.0",
     "name": "self",
     "group": "User",

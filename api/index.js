@@ -121,7 +121,7 @@ async function server(args, config, cb) {
     app.use(express.static('web/dist'));
 
     /**
-     * @api {get} /api Get API metadata
+     * @api {get} /api Get Metadata
      * @apiVersion 1.0.0
      * @apiName Meta
      * @apiGroup Server
@@ -140,7 +140,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /health Healthcheck endpoint for AWS ELB
+     * @api {get} /health Server Healthcheck
      * @apiVersion 1.0.0
      * @apiName Health
      * @apiGroup Server
@@ -211,7 +211,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/upload Allow a user to upload a manually maintained data source
+     * @api {post} /api/upload Create Upload
      * @apiVersion 1.0.0
      * @apiName upload
      * @apiGroup Upload
@@ -244,7 +244,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/user Return a list of all active users
+     * @api {get} /api/user List Users
      * @apiVersion 1.0.0
      * @apiName list
      * @apiGroup User
@@ -263,7 +263,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/health Create a new user
+     * @api {post} /api/health Create User
      * @apiVersion 1.0.0
      * @apiName Create
      * @apiGroup User
@@ -283,7 +283,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/user/me If the user has an active session, return metadata about the user
+     * @api {get} /api/user/me Get User Session Metadata
      * @apiVersion 1.0.0
      * @apiName self
      * @apiGroup User
@@ -301,7 +301,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {patch} /api/user/:id Update a user with the given body
+     * @api {patch} /api/user/:id Update User
      * @apiVersion 1.0.0
      * @apiName self
      * @apiGroup User
@@ -422,7 +422,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/schedule Kick off the scheduled full rebuild
+     * @api {post} /api/schedule Scheduled Event
      * @apiVersion 1.0.0
      * @apiName Schedule
      * @apiGroup Schedule
@@ -443,7 +443,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/collections List data collections
+     * @api {get} /api/collections List Collections
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Collections
@@ -460,7 +460,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/collections/:collection/data Get data for a given collection
+     * @api {get} /api/collections/:collection/data Get Collection Data
      * @apiVersion 1.0.0
      * @apiName Data
      * @apiGroup Collections
@@ -543,7 +543,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/map Return a TileJSON document for data coverage layers
+     * @api {get} /api/map Coverage TileJSON
      * @apiVersion 1.0.0
      * @apiName TileJSON
      * @apiGroup Map
@@ -554,7 +554,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/map/:z/:x/:y.mvt Return a given Mapbox Vector Tile
+     * @api {get} /api/map/:z/:x/:y.mvt Coverage MVT
      * @apiVersion 1.0.0
      * @apiName VectorTile
      * @apiGroup Map
@@ -580,7 +580,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/data Search for processed data
+     * @api {get} /api/data List Data
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Data
@@ -613,7 +613,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/data/:data Get data by data ID
+     * @api {get} /api/data/:data Get Data
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Data
@@ -632,7 +632,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/data/:data/history Return full job history for a given data ID
+     * @api {get} /api/data/:data/history Return Data History
      * @apiVersion 1.0.0
      * @apiName SingleHistory
      * @apiGroup Data
@@ -651,7 +651,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/run Search for data runs
+     * @api {get} /api/run List Runs
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Run
@@ -693,7 +693,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/run Create a Run
+     * @api {post} /api/run Create Run
      * @apiVersion 1.0.0
      * @apiName Create
      * @apiGroup Run
@@ -706,7 +706,6 @@ async function server(args, config, cb) {
      * @apiParam {String} github.sha Git SHA of the given run
      * @apiParam {String} github.url Github URL to the specific commit
      * @apiParam {Number} github.check Github check ID to update
-     *
      */
     router.post('/run', async (req, res) => {
         try {
@@ -721,7 +720,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/run/:run Get a specific run
+     * @api {get} /api/run/:run Get Run
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Run
@@ -742,9 +741,9 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {patch} /api/run/:run Update a specific run
+     * @api {patch} /api/run/:run Update Run
      * @apiVersion 1.0.0
-     * @apiName Single
+     * @apiName Update
      * @apiGroup Run
      * @apiPermission public
      *
@@ -839,7 +838,7 @@ async function server(args, config, cb) {
 
 
     /**
-     * @api {get} /api/job Search for job runs
+     * @api {get} /api/job List Jobs
      * @apiVersion 1.0.0
      * @apiName List
      * @apiGroup Job
@@ -899,7 +898,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/job/error Create a new job error
+     * @api {post} /api/job/error Create Job Error
      * @apiVersion 1.0.0
      * @apiName ErrorCreate
      * @apiGroup Job
@@ -938,7 +937,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/:job Get a given job by id
+     * @api {get} /api/job/:job Get Job
      * @apiVersion 1.0.0
      * @apiName Single
      * @apiGroup Job
@@ -983,7 +982,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/:job/output/source.png Get the preview image for a given job
+     * @api {get} /api/job/:job/output/source.png Get Job Preview
      * @apiVersion 1.0.0
      * @apiName SingleOutputPreview
      * @apiGroup Job
@@ -997,7 +996,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/:job/output/source.geojson.gz Get the raw data for a given job
+     * @api {get} /api/job/:job/output/source.geojson.gz Get Job Data
      * @apiVersion 1.0.0
      * @apiName SingleOutputData
      * @apiGroup Job
@@ -1016,7 +1015,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/:job/output/cache.zip Get the raw unprocessed data for a given job
+     * @api {get} /api/job/:job/output/cache.zip Get Job Cache
      * @apiVersion 1.0.0
      * @apiName SingleOutputCache
      * @apiGroup Job
@@ -1030,7 +1029,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/:job/log Get the log file for a given job
+     * @api {get} /api/job/:job/log Get Job Log
      * @apiVersion 1.0.0
      * @apiName SingleLog
      * @apiGroup Job
@@ -1051,7 +1050,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {patch} /api/job/:job Update a given job
+     * @api {patch} /api/job/:job Update Job
      * @apiVersion 1.0.0
      * @apiName JobPatch
      * @apiGroup Job
@@ -1080,7 +1079,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/dash/traffic Get daily session counts
+     * @api {get} /api/dash/traffic Session Counts
      * @apiVersion 1.0.0
      * @apiName traffic
      * @apiGroup Analytics
@@ -1097,7 +1096,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/dash/collections List collections by their download popularity
+     * @api {get} /api/dash/collections Collection Counts
      * @apiVersion 1.0.0
      * @apiName collections
      * @apiGroup Analytics
@@ -1115,7 +1114,7 @@ async function server(args, config, cb) {
 
 
     /**
-     * @api {post} /api/github/event Github APP event webhook
+     * @api {post} /api/github/event Github Webhook
      * @apiVersion 1.0.0
      * @apiName Event
      * @apiGroup Github

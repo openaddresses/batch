@@ -903,6 +903,9 @@ async function server(args, config, cb) {
      * @apiName ErrorCreate
      * @apiGroup Job
      * @apiPermission admin
+     *
+     * @apiParam {Number} job Job ID of the given error
+     * @apiParam {String} message Text representation of the error
      */
     router.post('/job/error', async (req, res) => {
         try {

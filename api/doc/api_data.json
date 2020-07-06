@@ -282,6 +282,26 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "job",
+            "description": "<p>Job ID of the given error</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Text representation of the error</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },

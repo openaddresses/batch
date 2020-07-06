@@ -261,6 +261,32 @@ class Job {
             });
         });
     }
+
+    compare(api) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: `${api}/api/job/${this.job}/delta`,
+                json: true,
+                method: 'GET',
+                body: body
+            }, (err, res) => {
+                if (err) return reject(err);
+
+                return resolve(res.body);
+            });
+        });
+    }
+
+    async check(api) {
+        const stats = await this.compare(api);
+
+        console.error(job.stats);
+        console.error(stats);
+
+        return new Promise((resolve, reject) => {
+            return resolve(true);
+        });
+    }
 }
 
 module.exports = Job;

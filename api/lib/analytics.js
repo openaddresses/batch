@@ -89,21 +89,32 @@ class Analytics {
     }
 
     /**
-     * Return daily unique visitors
+     * Return daily unique visitors (visitor must make at least 2 api calls within session to ensure it's not a curl)
      */
     async traffic() {
         let pgres;
         try {
             pgres = await this.pool.query(`
                 SELECT
-                    ts::DATE AS x,
-                    count(*) AS y
-                FROM
-                    analytics
+                    s.x,
+                    count(s.y)
+                FROM (
+                    SELECT
+                        ts::DATE AS x,
+                        count(*) AS y,
+                        sid
+                    FROM
+                        analytics
+                    GROUP BY
+                        ts::DATE,
+                        sid
+                    ) s
+                WHERE
+                    y > 1
                 GROUP BY
-                    ts::DATE
+                    x
                 ORDER BY
-                    ts::DATE DESC
+                    x DESC
             `, []);
         } catch (err) {
             throw new Err(500, err, 'failed to retrieve traffic');

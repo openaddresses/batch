@@ -12,6 +12,8 @@ class Analytics {
 
     middleware() {
         return (req, res, next) => {
+            if (req.url === '/health') return next();
+
             const point = {
                 sid: req.sessionID || 'unknown',
                 ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown',
@@ -58,8 +60,8 @@ class Analytics {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                SELECT 
-                    a.count, 
+                SELECT
+                    a.count,
                     collections.name
                 FROM (
                     SELECT

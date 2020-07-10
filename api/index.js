@@ -588,19 +588,19 @@ async function server(args, config, cb) {
      *
      * @apiParam {String} [source] Filter results by source name
      * @apiParamExample {String} ?source
-     *     ?source="us/ca"
+     *     ?source=us/ca
      *
      * @apiParam {String} [layer] Filter results by layer type
      * @apiParamExample {String} ?layer
-     *     ?layer="addresses"
+     *     ?layer=addresses
      *
      * @apiParam {String} [name] Filter results by layer name
      * @apiParamExample {String} ?name
-     *     ?name="city"
+     *     ?name=city
      *
      * @apiParam {String} [point] Filter results by geographic point
      * @apiParamExample {String} ?point
-     *     ?point="<lng>,<lat>"
+     *     ?point=<lng>,<lat>
      */
     router.get('/data', async (req, res) => {
         try {

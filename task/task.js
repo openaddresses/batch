@@ -5,6 +5,7 @@
 const config = require('./package.json');
 const dke = require('@mapbox/decrypt-kms-env');
 const Job = require('./lib/job');
+const JobError = require('./lib/joberror');
 const path = require('path');
 const CP = require('child_process');
 const fs = require('fs');
@@ -86,6 +87,8 @@ async function flow(api, job) {
         await job.update(api, {
             status: 'Fail'
         });
+
+        await JobError.create(api, job.id, 'machine failed to process source');
 
         throw new Error(err);
     }

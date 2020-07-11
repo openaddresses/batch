@@ -119,7 +119,10 @@ export default {
             }).catch((err) => {
                 this.$emit('err', err);
             });
-        }
+        },
+        external: function(url) {
+            window.open(url, "_blank");
+        },
     }
 }
 </script>

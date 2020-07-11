@@ -44,6 +44,7 @@ class Job {
 
         this.job = job;
         this.url = url;
+        this.run = false;
         this.source = false;
         this.layer = layer;
         this.name = name;

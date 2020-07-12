@@ -97,7 +97,7 @@ class Analytics {
             pgres = await this.pool.query(`
                 SELECT
                     s.x,
-                    count(s.y)
+                    count(s.y) AS y
                 FROM (
                     SELECT
                         ts::DATE AS x,

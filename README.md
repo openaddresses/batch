@@ -25,6 +25,27 @@ On every commit, GitHub actions will build the latest Docker image and push it t
 This parameter will be populated automatically by the `deploy` cli and simply points the stack
 to use the correspondingly Docker image from ECR.
 
+#### MapboxToken
+
+A read-only Mapbox API token for displaying base maps underneath our address data. (Token should start with `pk.`)
+
+#### Bucket
+
+The bucket in which assets should be saved to. See the `S3 Assets` section of this document for more information
+
+#### Branch
+
+The branch with which weekly sources should be built from. When deployed into production this is generally `master`. When
+testing new features this can be any `openaddresses/openaddresses` branch.
+
+#### DatabaseType
+
+The AWS RDS database class that powers the backend. 
+
+#### DatabasePassword
+
+The password to set on the backend database. Passed to the API via docker env vars
+
 #### SharedSecret
 
 API functions that are public currently do not require any auth at all. Internal functions however are protected
@@ -37,10 +58,6 @@ This value can be any secure alpha-numeric combination of characters and is safe
 
 This is the secret that Github uses to sign API events that are sent to this API. This shared signature allows
 us to verify that events are from github. Only the production stack should use this parameter.
-
-#### Bucket
-
-The bucket in which assets should be saved to. See the `S3 Assets` section of this document for more information
 
 ## Components
 

@@ -38,7 +38,7 @@
     },
     "devDependencies": {
         "apidoc": "^0.23.0",
-        "codecov": "^3.7.0",
+        "codecov": "^3.7.1",
         "eslint": "^7.0.0",
         "eslint-plugin-node": "^11.0.0",
         "nock": "^13.0.2",

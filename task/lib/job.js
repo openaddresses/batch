@@ -268,8 +268,7 @@ class Job {
             request({
                 url: `${api}/api/job/${this.job}/delta`,
                 json: true,
-                method: 'GET',
-                body: body
+                method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);
 

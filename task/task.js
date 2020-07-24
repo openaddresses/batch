@@ -83,7 +83,7 @@ async function flow(api, job) {
             stats: job.stats
         });
 
-        await job.check(api);
+        await job.check(api, run);
     } catch (err) {
         console.error(err);
 

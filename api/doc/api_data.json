@@ -168,22 +168,22 @@
       "examples": [
         {
           "title": "?source",
-          "content": "?source=\"us/ca\"",
+          "content": "?source=us/ca",
           "type": "String"
         },
         {
           "title": "?layer",
-          "content": "?layer=\"addresses\"",
+          "content": "?layer=addresses",
           "type": "String"
         },
         {
           "title": "?name",
-          "content": "?name=\"city\"",
+          "content": "?name=city",
           "type": "String"
         },
         {
           "title": "?point",
-          "content": "?point=\"<lng>,<lat>\"",
+          "content": "?point=<lng>,<lat>",
           "type": "String"
         }
       ]

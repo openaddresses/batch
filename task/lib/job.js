@@ -284,20 +284,20 @@ class Job {
         // 10% reduction or greater is bad
         if (diff.delta.count / diff.master.count <= -0.1) {
             await this.update(api, { status: 'Warn' });
-            if (run.live) await JobError.create(api, job.id, `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`);
+            if (run.live) await JobError.create(api, this.job, `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`);
         }
 
-        if (job.layer === 'addresses') {
+        if (this.job.layer === 'addresses') {
             let number = diff.delta.stats.counts.number / diff.master.stats.counts.number;
             if (number <= -0.1) {
                 await this.update(api, { status: 'Warn' });
-                if (run.live) await JobError.create(api, job.id, `"number" prop dropped by ${Math.round(number * 100) / 100}`);
+                if (run.live) await JobError.create(api, this.job, `"number" prop dropped by ${Math.round(number * 100) / 100}`);
             }
 
             let street = diff.delta.stats.counts.street / diff.master.stats.counts.street;
             if (street <= -0.1) {
                 await this.update(api, { status: 'Warn' });
-                if (run.live) await JobError.create(api, job.id, `"number" prop dropped by ${Math.round(street * 100) / 100}`);
+                if (run.live) await JobError.create(api, this.job, `"number" prop dropped by ${Math.round(street * 100) / 100}`);
             }
         }
 

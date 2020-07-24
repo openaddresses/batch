@@ -92,7 +92,7 @@ async function flow(api, job) {
         });
 
         if (run.live) {
-            await JobError.create(api, job.id, 'machine failed to process source');
+            await JobError.create(api, job.job, 'machine failed to process source');
         }
 
         throw new Error(err);

@@ -50,6 +50,8 @@ if (require.main === module) {
 }
 
 async function flow(api, job) {
+    let run = false;
+
     try {
         const update = {
             status: 'Pending',
@@ -64,7 +66,7 @@ async function flow(api, job) {
         await job.update(api, update);
         await job.fetch();
 
-        const run = Run.get(api, job.run);
+        run = Run.get(api, job.run);
 
         const source_path = path.resolve(job.tmp, 'source.json');
 
@@ -91,7 +93,7 @@ async function flow(api, job) {
             status: 'Fail'
         });
 
-        if (run.live) {
+        if (run && run.live) {
             await JobError.create(api, job.job, 'machine failed to process source');
         }
 

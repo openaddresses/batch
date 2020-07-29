@@ -1,3 +1,7 @@
+'use strict';
+
+const request = require('request');
+
 class Run {
     static async get(api, id) {
         return new Promise((resolve, reject) => {

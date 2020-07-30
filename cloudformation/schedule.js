@@ -2,7 +2,7 @@
 
 const cf = require('@mapbox/cloudfriend');
 
-function schedule(type, cron) {
+function schedule(type, cron, desc) {
     const stack =  {
         Resources: { }
     };
@@ -31,7 +31,6 @@ function schedule(type, cron) {
     stack.Resources[`${title}LambdaSchedule`] = {
         Type : 'AWS::Events::Rule',
         Properties: {
-            Description: 'Biweekly Friday @ 12 UTM',
             ScheduleExpression: cron,
             State: 'ENABLED',
             Targets: [{
@@ -54,7 +53,7 @@ function schedule(type, cron) {
     stack.Resources[`${title}LambdaScheduleFunction`] = {
         Type: 'AWS::Lambda::Function',
         Properties: {
-            Description: 'Biweekly Scheduled Runs',
+            Description: desc,
             Environment: {
                 Variables: {
                     OA_API: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]),

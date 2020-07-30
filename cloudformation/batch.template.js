@@ -35,7 +35,7 @@ module.exports = cf.merge(
     db,
     api,
     batch,
-    schedule('sources', 'cron(0 12 ? * fri *)'),
-    schedule('collect', 'cron(0 12 ? * sun *)'),
-    schedule('close',   'cron(0 11 * * ? *)')
+    schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),
+    schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
+    schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs')
 );

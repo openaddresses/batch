@@ -166,7 +166,9 @@ async function server(args, config, cb) {
 
     router.use(bodyparser.urlencoded({ extended: true }));
     router.use(morgan('combined'));
-    router.use(bodyparser.json());
+    router.use(bodyparser.json({
+        limit: '50mb'
+    }));
 
     // Unified Auth
     router.use(async (req, res, next) => {

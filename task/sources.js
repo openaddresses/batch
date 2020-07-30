@@ -115,7 +115,7 @@ async function run_create() {
         }, (err, res) => {
             if (err) return reject(err);
             if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error('Failed to create run'));
+            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to create run`));
             return resolve(res.body);
         });
     });
@@ -136,7 +136,7 @@ async function run_pop(run_id, jobs) {
         }, (err, res) => {
             if (err) return reject(err);
             if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error('Failed to populate run'));
+            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
             return resolve(res.body);
         });
     });

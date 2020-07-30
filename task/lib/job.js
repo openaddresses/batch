@@ -281,6 +281,11 @@ class Job {
     async check(api, run) {
         const diff = await this.compare(api);
 
+        // New Source
+        if (diff && diff.message && diff.message === 'Job does not match a live job') {
+            return true;
+        }
+
         // 10% reduction or greater is bad
         if (diff.delta.count / diff.master.count <= -0.1) {
             await this.update(api, { status: 'Warn' });

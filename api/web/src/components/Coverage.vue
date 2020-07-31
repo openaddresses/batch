@@ -14,7 +14,7 @@
                 </button>
             </div>
 
-            <div id="map" class='w-full h300'></div>
+            <div id="map" class='w-full' :class='{ h300: !fullscreen, h600: fullscreen }'></div>
         </div>
     </div>
 </template>

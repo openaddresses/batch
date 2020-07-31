@@ -99,6 +99,8 @@ export default {
                         this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 
+                    const base = '#0b6623';
+
                     this.map.addLayer({
                         id: 'coverage-poly',
                         type: 'fill',
@@ -106,7 +108,7 @@ export default {
                         'source-layer': 'data',
                         layout: { },
                         'paint': {
-                            'fill-color': '#ff0000',
+                            'fill-color': base,
                             'fill-opacity': 0.8
                         }
                     });
@@ -119,7 +121,7 @@ export default {
                         layout: { },
                         filter: ['==', ['geometry-type'], 'Point'],
                         paint: {
-                            'circle-color': '#ff0000',
+                            'circle-color': base,
                             'circle-radius': [
                                 'interpolate',
                                 ['exponential', 0.5],

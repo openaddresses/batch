@@ -62,6 +62,15 @@
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
+        <template v-else-if='!jobs.length && !loading.jobs'>
+            <div class='w-full flex-parent flex-parent--center-main'>
+                <div class='flex-child py24'>
+                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                </div>
+            </div>
+            <div class='w-full align-center txt-bold'>No Jobs Found</div>
+            <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
+        </template>
         <template v-else>
             <div class='col col--12 pt12'>
                 <h2 class='txt-h4 pb12 fl'>Jobs:</h2>
@@ -121,8 +130,8 @@ export default {
             },
             jobs: [],
             loading: {
-                run: false,
-                jobs: false
+                run: true,
+                jobs: true
             }
         };
     },
@@ -196,8 +205,12 @@ export default {
                     method: 'GET'
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message ? body.message : 'Failed to register user');
+                let body = await res.json();
+                if (res.status === 404) {
+                    body = [];
+                } else if (!res.ok) {
+                    throw new Error(body.message ? body.message : 'Failed to register user');
+                }
 
                 this.loading.jobs = false;
                 this.jobs = body;

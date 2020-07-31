@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <div class='col col--12 mb12 my12'>
+        <div class='col col--12 mb12 my12 clearfix' :class='{ h600}'>
             <Coverage
                 @err='$emit("err", $event)'
                 v-on:point='filter.point = $event'

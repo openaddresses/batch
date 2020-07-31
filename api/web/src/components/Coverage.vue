@@ -1,20 +1,22 @@
 <template>
-    <div class='col col--12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
-        <div class='col col--12 relative'>
-            <div class='absolute top right z1'>
-                <button @click='setFull' class='btn round btn--stroke fr color-gray bg-white my12 mx12'>
-                    <svg v-if='!fullscreen' class='icon'><use href='#icon-fullscreen'/></svg>
-                    <svg v-else class='icon'><use href='#icon-shrink'/></svg>
-                </button>
-            </div>
+    <div class='col col--12' :class='{ h300: !fullscreen, h600: fullscreen }'>
+        <div class='col col--12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
+            <div class='col col--12 relative'>
+                <div class='absolute top right z1'>
+                    <button @click='setFull' class='btn round btn--stroke fr color-gray bg-white my12 mx12'>
+                        <svg v-if='!fullscreen' class='icon'><use href='#icon-fullscreen'/></svg>
+                        <svg v-else class='icon'><use href='#icon-shrink'/></svg>
+                    </button>
+                </div>
 
-            <div v-if='point' class='absolute top left z1'>
-                <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
-                    <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
-                </button>
-            </div>
+                <div v-if='point' class='absolute top left z1'>
+                    <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
+                        <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
+                    </button>
+                </div>
 
-            <div id="map" class='w-full' :class='{ h300: !fullscreen, h600: fullscreen }'></div>
+                <div id="map" class='w-full' :class='{ h300: !fullscreen, h600: fullscreen }'></div>
+            </div>
         </div>
     </div>
 </template>

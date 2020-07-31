@@ -445,6 +445,13 @@ define({ "api": [
             "field": "after",
             "defaultValue": "",
             "description": "<p>Only show jobs after the given date</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "source",
+            "description": "<p>Filter results by source name</p>"
           }
         ]
       },
@@ -477,6 +484,11 @@ define({ "api": [
         {
           "title": "?after",
           "content": "?after=2020-01-01\n?after=2020-12-01",
+          "type": "String"
+        },
+        {
+          "title": "?source",
+          "content": "?source=us/ca",
           "type": "String"
         }
       ]

@@ -874,6 +874,10 @@ async function server(args, config, cb) {
      * @apiParamExample {String} ?after
      *     ?after=2020-01-01
      *     ?after=2020-12-01
+     *
+     * @apiParam {String} [source] Filter results by source name
+     * @apiParamExample {String} ?source
+     *     ?source=us/ca
      */
     router.get('/job', async (req, res) => {
         try {

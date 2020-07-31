@@ -14,8 +14,46 @@
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
 
+                <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
+                    <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
+                    <svg v-else class='icon'><use href='#icon-close'/></svg>
+                </button>
+
                 <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
 
+                <template v-if='showFilter'>
+                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
+                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
+
+                        <div class='col col--3 px6'>
+                            <label>Status</label>
+                            <select v-model='filter.status' class='select'>
+                                <option>All</option>
+                                <option>Pending</option>
+                                <option>Success</option>
+                                <option>Warn</option>
+                                <option>Fail</option>
+                            </select>
+                            <div class='select-arrow'></div>
+                        </div>
+                        <div class='col col--6 px6'>
+                            <label>Source</label>
+                            <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
+                        </div>
+                        <div class='col col--3 px6'>
+                            <label>Layer</label>
+                            <div class='w-full select-container'>
+                                <select v-model='filter.layer' class='select'>
+                                    <option>all</option>
+                                    <option>addresses</option>
+                                    <option>buildings</option>
+                                    <option>parcels</option>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
 
@@ -71,6 +109,12 @@ export default {
     props: ['runid'],
     data: function() {
         return {
+            showFilter: false,
+            filter: {
+                source: '',
+                layer: 'all',
+                status: 'All'
+            },
             run: {
                 status: '',
                 github: {}
@@ -87,6 +131,22 @@ export default {
     },
     components: {
         Status
+    },
+    watch: {
+        showFilter: function() {
+            this.filter.source = '';
+            this.filter.layer = 'all';
+            this.filter.status = 'All'
+        },
+        'filter.status': function() {
+            this.getJobs();
+        },
+        'filter.layer': function() {
+            this.getJobs();
+        },
+        'filter.source': function() {
+            this.getJobs();
+        }
     },
     methods: {
         external: function(url) {
@@ -122,25 +182,28 @@ export default {
                 this.$emit('err', err);
             })
         },
-        getJobs: function() {
-            this.loading.run = true;
-            fetch(window.location.origin + `/api/job?run=${this.runid}`, {
-                method: 'GET'
-            }).then((res) => {
+        getJobs: async function() {
+            this.loading.jobs = true;
+
+            const url = new URL(`${window.location.origin}/api/job`);
+            url.searchParams.set('run', this.runid);
+            if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
+            if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
+            if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message ? body.message : 'Failed to register user');
+
                 this.loading.jobs = false;
-
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to register user');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.jobs = res;
-            }).catch((err) => {
+                this.jobs = body;
+            } catch(err) {
                 this.$emit('err', err);
-            })
+            }
         }
     }
 }

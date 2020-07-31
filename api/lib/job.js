@@ -198,11 +198,14 @@ class Job {
      * @param {String} [query.live=undefined] - Only show jobs that are part of live runs
      * @param {String} [query.before=undefined] - Only show jobs before the given date
      * @param {String} [query.after=undefined] - Only show jobs after the given date
+     * @param {String} [query.source=Null] - Filter results by source
      * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
      */
     static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
+        if (!query.source) query.source = '';
+        if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.status) query.status = Status.list();
 
         const where = [];
@@ -228,6 +231,9 @@ class Job {
         } else if (query.live === 'false') {
             where.push('runs.live = false');
         }
+
+        query.source = '%' + query.source + '%';
+        query.layer = query.layer + '%';
 
         if (query.after) {
             try {
@@ -268,11 +274,15 @@ class Job {
                 WHERE
                     '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
                     ${where.length ? 'AND ' + where.join(' AND ') : ''}
+                    AND job.layer ilike $2
+                    AND job.source ilike $3
                 ORDER BY
                     job.created DESC
                 LIMIT $1
             `, [
-                query.limit
+                query.limit,
+                query.layer,
+                query.source
             ]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load jobs');

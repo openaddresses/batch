@@ -10,7 +10,13 @@
 
                 <h2 class='txt-h4 ml12 fl mb6'>
                     Job #<span v-text='jobid'/>
-                    <button class='cursor-pointer'><svg class='icon fr' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg></button>
+                    <div class='cursor-pointer fr dropdown'>
+                        <svg class='icon' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg>
+
+                        <div class='round dropdown-content'>
+                            <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
+                        </div>
+                    </div>
                 </h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
@@ -176,7 +182,45 @@ export default {
             }).catch((err) => {
                 this.$emit('err', err);
             });
+        },
+        createRerun: function() {
+            this.loading = true;
+            fetch(window.location.origin + `/api/job/${this.jobid}/rerun`, {
+                method: 'POST'
+            }).then((res) => {
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to rerun job');
+                }
+
+                return res.json();
+            }).then((res) => {
+                this.$router.push({ path: `/run/${res.run}` });
+            }).catch((err) => {
+                this.$emit('err', err);
+            });
         }
     }
 }
 </script>
+
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        padding: 6px 12px;
+        z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>

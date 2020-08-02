@@ -982,6 +982,38 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {post} /api/job/:job Rerun Job
+     * @apiVersion 1.0.0
+     * @apiName JobRerun
+     * @apiGroup Job
+     * @apiPermission admin
+     *
+     * @apiParam {Number} job Job ID
+     */
+    router.post('/job/:job/rerun', async (req, res) => {
+        Param.int(req, res, 'job');
+
+        try {
+            await auth.is_admin(req);
+
+            const job = await Job.from(pool, req.params.job);
+            const run = await Run.from(pool, job.run);
+
+            const new_run = await Run.generate(pool, {
+                live: !!run.live
+            });
+
+            return res.json(await Run.populate(pool, new_run.id, [{
+                source: job.source,
+                layer: job.layer,
+                name: job.name
+            }]));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/job/:job/delta Job Stats Comparison
      * @apiVersion 1.0.0
      * @apiName SingleDelta

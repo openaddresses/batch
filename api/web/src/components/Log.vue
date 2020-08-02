@@ -1,6 +1,6 @@
 <template>
-    <div class='col col--12 pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
+    <div class='col col--12'>
+        <div class='col col--12 grid border-b border--gray-light bg-white pt12' :class='scrollHeader'>
             <div class='col col--12'>
                 <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
@@ -19,7 +19,9 @@
             </div>
         </template>
         <template v-else>
-            <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
+            <div class='col col--12'>
+                <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
+            </div>
         </template>
     </div>
 </template>
@@ -30,12 +32,25 @@ export default {
     props: ['jobid'],
     data: function() {
         return {
+            scrolled: 0,
             loading: false,
             lines: []
         };
     },
     mounted: function() {
+        window.onscroll = (e) => {
+             this.scrolled = window.scrollY;
+        }
+
         this.refresh();
+    },
+    computed: {
+        scrollHeader: function () {
+            return {
+                fixed: this.scrolled > 50,
+                top: this.scrolled > 50
+            }
+        }
     },
     methods: {
         refresh: function() {

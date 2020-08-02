@@ -133,6 +133,22 @@ class JobError {
 
         return pgres.rows;
     }
+
+    static async count(pool) {
+        let pgres;
+        try {
+            pgres = await pool.query(`
+                SELECT
+                    count(*) AS count
+                FROM
+                    job_errors
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to count job_errors');
+        }
+
+        return pgres.rows[0].count;
+    }
 }
 
 module.exports = JobError;

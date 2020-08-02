@@ -904,6 +904,21 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/job/error/count Return a count of job errors
+     * @apiVersion 1.0.0
+     * @apiName ErrorCount
+     * @apiGroup Job
+     * @apiPermission public
+     */
+    router.get('/job/error/count', async (req, res) => {
+        try {
+            return res.json(await JobError.count(pool));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/job/error Create Job Error
      * @apiVersion 1.0.0
      * @apiName ErrorCreate

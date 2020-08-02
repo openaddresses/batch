@@ -269,6 +269,23 @@ define({ "api": [
     "groupTitle": "Github"
   },
   {
+    "type": "get",
+    "url": "/api/job/error/count",
+    "title": "Return a count of job errors",
+    "version": "1.0.0",
+    "name": "ErrorCount",
+    "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
     "type": "post",
     "url": "/api/job/error",
     "title": "Create Job Error",

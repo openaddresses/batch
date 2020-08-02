@@ -38,7 +38,7 @@ export default {
         };
     },
     mounted: function() {
-        window.onscroll = (e) => {
+        window.onscroll = () => {
              this.scrolled = window.scrollY;
         }
 

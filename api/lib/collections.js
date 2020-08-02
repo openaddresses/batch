@@ -125,7 +125,7 @@ class Collection {
                     $1,
                     $2::JSONB,
                     NOW()
-                )
+                ) RETURNING *
             `, [
                 this.name,
                 JSON.stringify(this.sources)

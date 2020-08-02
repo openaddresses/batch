@@ -8,7 +8,10 @@
 
                 <Status :status='job.status'/>
 
-                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
+                <h2 class='txt-h4 ml12 fl mb6'>
+                    Job #<span v-text='jobid'/>
+                    <button class='cursor-pointer'><svg class='icon fr' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg></button>
+                </h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>

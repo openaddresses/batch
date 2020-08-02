@@ -1,6 +1,6 @@
 <template>
     <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
+        <div class='col col--12 grid'>
             <div class='col col--12'>
                 <h2 class='txt-h4 pb12 fl'>Runs:</h2>
 

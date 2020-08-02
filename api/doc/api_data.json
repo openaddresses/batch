@@ -400,6 +400,36 @@
     "groupTitle": "Job"
   },
   {
+    "type": "post",
+    "url": "/api/job/:job",
+    "title": "Rerun Job",
+    "version": "1.0.0",
+    "name": "JobRerun",
+    "group": "Job",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "job",
+            "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
     "type": "get",
     "url": "/api/job",
     "title": "List Jobs",

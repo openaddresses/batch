@@ -4,7 +4,7 @@ jobs:
     build:
         docker:
             - image: ubuntu:20.04
-            - image: mdillon/postgis:12
+            - image: mdillon/postgis:11
         steps:
             - run:
                 name: "Add ubuntu-toolchain"

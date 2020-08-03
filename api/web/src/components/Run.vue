@@ -73,6 +73,52 @@
         </template>
         <template v-else>
             <div class='col col--12 pt12'>
+                <h2 class='txt-h4 pb12 fl'>Dashboard:</h2>
+
+                <template v-if='loading.count'>
+                    <div class='flex-parent flex-parent--center-main w-full'>
+                        <div class='flex-child loading py24'></div>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class='col col--12 grid border round border--gray-light'>
+                        <div class='col col--3'>
+                            <div class='align-center' v-text='count.status.Pending'></div>
+                            <div class='flex-parent flex-parent--center-main w-full'>
+                                <div class='flex-child'>
+                                    <Status status='Pending' class='fl'/> Pending
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col col--3'>
+                            <div class='align-center' v-text='count.status.Warn'></div>
+                            <div class='flex-parent flex-parent--center-main w-full'>
+                                <div class='flex-child'>
+                                    <Status status='Warn' class='fl'/> Warn
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col col--3'>
+                            <div class='align-center' v-text='count.status.Fail'></div>
+                            <div class='flex-parent flex-parent--center-main w-full'>
+                                <div class='flex-child'>
+                                    <Status status='Fail' class='fl'/> Fail
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col col--3'>
+                            <div class='align-center' v-text='count.status.Success'></div>
+                            <div class='flex-parent flex-parent--center-main w-full'>
+                                <div class='flex-child'>
+                                    <Status status='Success' class='fl'/> Success
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div class='col col--12 pt12'>
                 <h2 class='txt-h4 pb12 fl'>Jobs:</h2>
             </div>
 
@@ -128,8 +174,17 @@ export default {
                 status: '',
                 github: {}
             },
+            count: {
+                status: {
+                    Pending: 0,
+                    Warn: 0,
+                    Fail: 0,
+                    Success: 0
+                }
+            },
             jobs: [],
             loading: {
+                count: true,
                 run: true,
                 jobs: true
             }
@@ -163,6 +218,7 @@ export default {
         },
         refresh: function() {
             this.getRun();
+            this.getCount();
             this.getJobs();
         },
         emitjob: function(jobid) {
@@ -187,6 +243,25 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.run = res;
+            }).catch((err) => {
+                this.$emit('err', err);
+            })
+        },
+        getCount: function() {
+            this.loading.count = true;
+            fetch(window.location.origin + `/api/run/${this.runid}/count`, {
+                method: 'GET'
+            }).then((res) => {
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to register user');
+                }
+
+                return res.json();
+            }).then((res) => {
+                this.loading.count = false;
+                this.count = res;
             }).catch((err) => {
                 this.$emit('err', err);
             })

@@ -3,7 +3,7 @@
 const request = require('request');
 
 class JobError {
-    async create(api, id, message) {
+    static async create(api, id, message) {
         return new Promise((resolve, reject) => {
             request({
                 url: `${api}/api/job/error`,

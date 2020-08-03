@@ -743,6 +743,25 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/run/:run/count Run Stats
+     * @apiVersion 1.0.0
+     * @apiName RunStats
+     * @apiGroup Run
+     * @apiPermission public
+     *
+     * @apiParam {Number} run Run ID
+     */
+    router.get('/run/:run/count', async (req, res) => {
+        Param.int(req, res, 'run');
+
+        try {
+            res.json(await Run.stats(pool, req.params.run));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {patch} /api/run/:run Update Run
      * @apiVersion 1.0.0
      * @apiName Update

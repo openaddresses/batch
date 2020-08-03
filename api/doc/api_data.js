@@ -975,6 +975,36 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/run/:run/count",
+    "title": "Run Stats",
+    "version": "1.0.0",
+    "name": "RunStats",
+    "group": "Run",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "run",
+            "description": "<p>Run ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Run"
+  },
+  {
+    "type": "get",
     "url": "/api/run/:run",
     "title": "Get Run",
     "version": "1.0.0",

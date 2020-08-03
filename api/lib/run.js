@@ -295,6 +295,44 @@ class Run {
         }
     }
 
+    static async stats(pool, id) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    status,
+                    count(*) AS count
+                FROM
+                    job
+                WHERE
+                    run = $1
+                GROUP BY
+                    status
+            `, [id]);
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'no run jobs by that id');
+            }
+
+            const res = {
+                run: id,
+                status: {
+                    Warn: 0,
+                    Success: 0,
+                    Pending: 0,
+                    Fail: 0
+                }
+            };
+
+            for (const row of pgres.rows) {
+                res.status[row.status] = parseInt(row.count);
+            }
+
+            return res;
+        } catch (err) {
+            throw new Err(500, err, 'failed to fetch run');
+        }
+    }
+
     static close(pool, id) {
         return new Promise((resolve, reject) => {
             pool.query(`

@@ -170,7 +170,7 @@ class Job {
      */
     json() {
         return {
-            id: parseInt(this.id),
+            id: this.id ? parseInt(this.id) : false,
             run: parseInt(this.run),
             map: this.map ? parseInt(this.map) : null,
             created: this.created,

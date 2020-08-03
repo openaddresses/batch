@@ -3,8 +3,8 @@ version: 2
 jobs:
     build:
         docker:
-            - image: ubuntu:18.04
-            - image: mdillon/postgis:11
+            - image: ubuntu:20.04
+            - image: mdillon/postgis:12
         steps:
             - run:
                 name: "Add ubuntu-toolchain"
@@ -25,12 +25,5 @@ jobs:
                   yarn install
 
             - run:
-                name: "Yarn Install"
-                command: yarn install
-            - run:
-                name: "Yarn Lint"
-                command: "yarn run lint"
-            - run:
-                name: "Yarn Coverage"
-                command: "cd api && yarn run cov"
-                no_output_timeout: "12m"
+                name: "Test"
+                command: ./test

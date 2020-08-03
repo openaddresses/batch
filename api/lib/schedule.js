@@ -21,8 +21,8 @@ class Schedule {
             // TODO actuall close old jobs and runs
             return {
                 status: 200,
-                message: "Closed old jobs/runs"
-            }
+                message: 'Closed old jobs/runs'
+            };
         }
     }
 

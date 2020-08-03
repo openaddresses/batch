@@ -8,6 +8,7 @@
     "license": "MIT",
     "private": false,
     "scripts": {
+        "test": "echo 'no tests'",
         "lint": "eslint cli.js cloudformation/**.js"
     },
     "dependencies": {

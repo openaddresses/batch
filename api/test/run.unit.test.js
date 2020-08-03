@@ -90,16 +90,20 @@ test('Run#populate', async (t) => {
         t.error(err, 'no error');
     }
 
-    Run.populate(pool, 2, [{
-        source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
-        layer: 'addresses',
-        name: 'city'
-    }]).catch((err) => {
-        t.equals(err.safe, 'Run is already closed');
+    let e;
+    try {
+        await Run.populate(pool, 2, [{
+            source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            layer: 'addresses',
+            name: 'city'
+        }])
+    } catch (err) {
+        e = err;
+    }
+    t.equals(e.safe, 'Run is already closed');
 
-        pool.end();
-        t.end();
-    });
+    pool.end();
+    t.end();
 });
 
 test('Run#list', async (t) => {

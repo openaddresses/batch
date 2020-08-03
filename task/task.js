@@ -11,6 +11,13 @@ const path = require('path');
 const CP = require('child_process');
 const fs = require('fs');
 const AWS = require('aws-sdk');
+const prompts = require('prompts');
+const args = require('minimist')(process.argv, {
+    boolean: ['interactive'],
+    alias: {
+        interactive: 'i'
+    }
+});
 
 if (!process.env.AWS_DEFAULT_REGION) {
     process.env.AWS_DEFAULT_REGION = 'us-east-1';
@@ -21,6 +28,50 @@ const batch = new AWS.Batch({
 });
 
 if (require.main === module) {
+    if (args.interactive) return prompt();
+    return cli();
+}
+
+async function prompt() {
+    const p = await prompts([{
+        type: 'text',
+        name: 'StackName',
+        message: 'Name of the stack to push to',
+        initial: 'local'
+    },{
+        type: 'text',
+        name: 'Bucket',
+        message: 'AWS S3 bucket to push results to',
+        initial: 'v2.openaddreses.io'
+    },{
+        type: 'text',
+        message: 'OA Job ID',
+        name: 'OA_JOB'
+    },{
+        type: 'text',
+        message: 'OA Github Source URL',
+        name: 'OA_SOURCE'
+    },{
+        type: 'text',
+        message: 'OA Layer String',
+        name: 'OA_SOURCE_LAYER'
+    },{
+        type: 'text',
+        message: 'OA Layer Name',
+        name: 'OA_SOURCE_LAYER_NAME'
+    },{
+        type: 'text',
+        name: 'OA_API',
+        message: 'OA API Base URL',
+        initial: 'http://localhost:5000'
+    }]);
+
+    Object.assign(process.env, p);
+
+    return cli();
+}
+
+async function cli() {
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
 

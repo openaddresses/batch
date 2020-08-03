@@ -16,8 +16,10 @@
         "csv-parse": "^4.8.8",
         "find": "^0.3.0",
         "glob": "^7.1.6",
+        "minimist": "^1.2.5",
         "mkdirp": "^1.0.4",
         "parallel-transform": "^1.2.0",
+        "prompts": "^2.3.2",
         "request": "^2.88.2",
         "split": "^1.0.1",
         "unzipper": "^0.10.11"

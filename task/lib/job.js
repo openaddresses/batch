@@ -152,12 +152,16 @@ class Job {
                 async (err) => {
                     if (err) return reject(err);
 
-                    const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
-                    await stats.calc();
+                    try {
+                        const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
+                        await stats.calc();
 
-                    this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
-                    this.count = stats.stats.count;
-                    this.stats = stats.stats[stats.layer];
+                        this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
+                        this.count = stats.stats.count;
+                        this.stats = stats.stats[stats.layer];
+                    } catch (err) {
+                        return new reject(new Error(err));
+                    }
 
                     return resolve(path.resolve(this.tmp, 'out.geojson'));
                 }

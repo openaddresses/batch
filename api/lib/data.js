@@ -62,7 +62,7 @@ class Data {
                     AND results.name ilike $3
                     AND (
                         char_length($4) = 0
-                        OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 0.01)
+                        OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
                     )
             `, [
                 query.source,

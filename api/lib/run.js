@@ -356,6 +356,7 @@ class Run {
     json() {
         return {
             id: parseInt(this.id),
+            live: this.live,
             created: this.created,
             github: this.github,
             closed: this.closed

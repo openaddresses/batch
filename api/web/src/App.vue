@@ -47,6 +47,7 @@ export default {
     name: 'OpenAddresses',
     mounted: function() {
         this.getLogin();
+        this.getCount();
     },
     data: function() {
         return {
@@ -82,7 +83,7 @@ export default {
             }).then((res) => {
                 return res.json();
             }).then((res) => {
-                this.errors = res.body;
+                this.errors = res.count;
             }).catch((err) => {
                 console.error(err);
                 this.err = err;

@@ -147,7 +147,9 @@ class JobError {
             throw new Err(500, err, 'Failed to count job_errors');
         }
 
-        return pgres.rows[0].count;
+        return {
+            count: parseInt(pgres.rows[0].count)
+        }
     }
 }
 

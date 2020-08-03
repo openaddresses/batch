@@ -60,6 +60,21 @@ class Job {
         };
     }
 
+    get(api) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: `${api}/api/job/${this.job}`,
+                json: true,
+                method: 'GET',
+            }, (err, res) => {
+                if (err) return reject(err);
+                this.run = res.body.run;
+
+                return resolve();
+            });
+        });
+    }
+
     fetch() {
         return new Promise((resolve, reject) => {
             request({

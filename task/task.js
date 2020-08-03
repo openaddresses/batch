@@ -41,10 +41,14 @@ if (require.main === module) {
     );
 
     dke(process.env, (err) => {
-        if (err) throw err;
+        if (err) {
+            console.error(err);
+            process.exit(1);
+        }
 
         flow(api, job).catch((err) => {
-            throw err;
+            console.error(err);
+            process.exit(1);
         });
     });
 }
@@ -64,9 +68,10 @@ async function flow(api, job) {
         }
 
         await job.update(api, update);
+        await job.get(api);
         await job.fetch();
 
-        run = Run.get(api, job.run);
+        run = await Run.get(api, job.run);
 
         const source_path = path.resolve(job.tmp, 'source.json');
 
@@ -93,6 +98,7 @@ async function flow(api, job) {
             status: 'Fail'
         });
 
+        console.error(run)
         if (run && run.live) {
             await JobError.create(api, job.job, 'machine failed to process source');
         }

@@ -12,6 +12,7 @@ class Run {
         this.id = false;
         this.created = false;
         this.github = {};
+        this.live = false;
         this.closed = false;
 
         // Attributes which are allowed to be patched

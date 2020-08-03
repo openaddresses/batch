@@ -10,7 +10,7 @@ class JobError {
                 json: true,
                 method: 'POST',
                 body: {
-                    job: id,
+                    job: parseInt(id),
                     message: message
                 },
                 headers: {

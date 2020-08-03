@@ -64,6 +64,10 @@ async function prompt() {
         name: 'OA_API',
         message: 'OA API Base URL',
         initial: 'http://localhost:5000'
+    },{
+        type: 'text',
+        name: 'SharedSecret',
+        message: 'OA API SharedSecret'
     }]);
 
     Object.assign(process.env, p);
@@ -75,6 +79,7 @@ async function cli() {
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
 
+    if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.OA_JOB) throw new Error('No OA_JOB env var defined');
     if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
     if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');

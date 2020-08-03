@@ -160,7 +160,7 @@ class Job {
                         this.count = stats.stats.count;
                         this.stats = stats.stats[stats.layer];
                     } catch (err) {
-                        return new reject(new Error(err));
+                        return reject(new Error(err));
                     }
 
                     return resolve(path.resolve(this.tmp, 'out.geojson'));

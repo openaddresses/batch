@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 'use strict';
-const Q = require('d3-queue').queue;
 const glob = require('glob');
 const os = require('os');
 const {Unzip} = require('zlib');
@@ -40,18 +39,21 @@ async function fetch() {
     const tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
     fs.mkdirSync(tmp);
 
-    const collections = await fetch_collections();
-    console.error('ok - got collections list');
-    const datas = await fetch_datas();
-    console.error('ok - got data list');
+    try {
+        const collections = await fetch_collections();
+        console.error('ok - got collections list');
+        const datas = await fetch_datas();
+        console.error('ok - got data list');
 
 
-    const stats = await sources(tmp, datas);
+        const stats = await sources(tmp, datas);
 
-    for (const collection of collections) {
-        await collect(tmp, collection);
+        for (const collection of collections) {
+            await collect(tmp, collection);
+        }
+    } catch (err) {
+        throw new Error(err);
     }
-
 }
 
 async function collect(tmp, collection) {
@@ -77,58 +79,58 @@ async function collect(tmp, collection) {
     }
 }
 
-function sources(tmp, datas) {
-    const q = new Q();
-
+async function sources(tmp, datas) {
     const stats = {
         count: 0,
         sources: datas.length
     };
 
-    return new Promise((resolve, reject) => {
+    try {
         for (const data of datas) {
-            q.defer((data, done) => {
-                const dir = path.parse(data.source).dir;
-                const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
-
-                mkdirp(path.resolve(tmp, 'sources', dir));
-
-                console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
-                pipeline(
-                    s3.getObject({
-                        Bucket: process.env.Bucket,
-                        Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-                    }).createReadStream(),
-                    Unzip(),
-                    split(),
-                    transform(100, (line, cb) => {
-                        if (!line || !line.trim()) return cb(null, '');
-
-                        stats.count++; return cb(null, line + '\n');
-                    }),
-                    fs.createWriteStream(path.resolve(tmp, 'sources', dir, source)),
-                    (err) => {
-                        if (!err) {
-                            console.error('ok - ' + path.resolve(tmp, 'sources',  dir, source));
-                        } else {
-                            console.error('not ok - ' + path.resolve(tmp, 'sources', dir, source));
-                        }
-
-                        return done(err);
-                    }
-                );
-            }, data);
+            await get_source(tmp, data, stats);
         }
+    } catch (err) {
+        throw new Error(err);
+    }
 
-        q.awaitAll(async (err) => {
-            if (err) return reject(err);
+    console.error('ok - all sources fetched');
 
-            console.error('ok - all sources fetched');
+    return stats;
+}
 
-            return resolve(stats);
-        });
+function get_source(tmp, data, stats) {
+    return new Promise((resolve, reject) => {
+        const dir = path.parse(data.source).dir;
+        const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
+
+        mkdirp(path.resolve(tmp, 'sources', dir));
+
+        console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
+        pipeline(
+            s3.getObject({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
+            }).createReadStream(),
+            Unzip(),
+            split(),
+            transform(100, (line, cb) => {
+                if (!line || !line.trim()) return cb(null, '');
+
+                stats.count++; return cb(null, line + '\n');
+            }),
+            fs.createWriteStream(path.resolve(tmp, 'sources', dir, source)),
+            (err) => {
+                if (err) {
+                    console.error(err);
+                    console.error('not ok - ' + path.resolve(tmp, 'sources', dir, source));
+                    return reject(err);
+                }
+
+                console.error('ok - ' + path.resolve(tmp, 'sources',  dir, source));
+                return resolve();
+            }
+        );
     });
-
 }
 
 function upload_collection(file, name) {
@@ -161,7 +163,7 @@ function update_collection(collection) {
         }, (err, res) => {
             if (err) return reject(err);
 
-            if (res.statusCode !== 200) throw new Error(res.body);
+            if (res.statusCode !== 200) throw new Error(res.body.message ? res.body.message : res.body);
             return resolve(res.body);
         });
     });

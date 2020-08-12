@@ -149,7 +149,7 @@ class JobError {
 
         return {
             count: parseInt(pgres.rows[0].count)
-        }
+        };
     }
 }
 

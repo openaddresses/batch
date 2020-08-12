@@ -24,6 +24,9 @@ test('POST: api/run', (t) => {
         url: 'http://localhost:5000/api/run',
         method: 'POST',
         json: true,
+        headers: {
+            'shared-secret': '123'
+        },
         body: {
             live: true
         }
@@ -63,6 +66,9 @@ test('POST: api/run/:run/jobs', (t) => {
         url: 'http://localhost:5000/api/run/1/jobs',
         method: 'POST',
         json: true,
+        headers: {
+            'shared-secret': '123'
+        },
         body: {
             jobs: [
                 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json'
@@ -101,6 +107,9 @@ test('PATCH: api/job/:job', (t) => {
         url: 'http://localhost:5000/api/job/1',
         method: 'PATCH',
         json: true,
+        headers: {
+            'shared-secret': '123'
+        },
         body: {
             status: 'Success'
         }

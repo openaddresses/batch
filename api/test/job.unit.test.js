@@ -247,7 +247,7 @@ test('Job#generate', async (t) => {
         t.equals(job.id, 1, 'job.id: 1');
         t.equals(job.run, 1, 'job.run: 1');
         t.equals(job.map, null, 'job.map: null');
-        t.ok(job.created, false, 'job.created: <date>');
+        t.ok(job.created, 'job.created: <date>');
         t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
         t.equals(job.layer, 'addresses', 'job.layer: addresses');
         t.equals(job.count, null, 'job.count: null');
@@ -296,7 +296,7 @@ test('Job#from', async (t) => {
         t.equals(job.id, 1, 'job.id: 1');
         t.equals(job.run, 1, 'job.run: 1');
         t.equals(job.map, null, 'job.map: null');
-        t.ok(job.created, false, 'job.created: <date>');
+        t.ok(job.created, 'job.created: <date>');
         t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
         t.equals(job.layer, 'addresses', 'job.layer: addresses');
         t.equals(job.count, null, 'job.count: null');
@@ -322,7 +322,56 @@ test('Job#from', async (t) => {
     t.end();
 });
 
-test('Job#patch', (t) => {
+test('Job#patch', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        const job = await Job.from(pool, 1);
+
+        // These should not update
+        job.id = 1;
+        job.run = 2;
+
+        job.loglink = 'loglink123';
+        job.version = '0.0.1';
+        job.count = 123;
+
+        await job.commit(pool);
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    try {
+        const job = await Job.from(pool, 1);
+
+        t.equals(job.id, 1, 'job.id: 1');
+        t.equals(job.run, 1, 'job.run: 1');
+        t.equals(job.map, null, 'job.map: null');
+        t.ok(job.created, 'job.created: <date>');
+        t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+        t.equals(job.layer, 'addresses', 'job.layer: addresses');
+        t.equals(job.count, 123, 'job.count: null');
+        t.equals(job.bounds, null, 'job.bounds: null');
+        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
+        t.equals(job.name, 'city', 'job.name: city');
+        t.deepLooseEqual(job.output, {
+            cache: false,
+            output: false,
+            preview: false
+        }, 'job.output: false');
+        t.equals(job.loglink, 'loglink123', 'job.loglink: <obj>');
+        t.equals(job.status, 'Pending', 'job.status: Pending');
+        t.equals(job.version, '0.0.1', 'job.version: <version>');
+        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
+        t.equals(job.raw, false, 'job.raw: false');
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    pool.end();
     t.end();
 });
 

@@ -96,7 +96,7 @@ test('Run#populate', async (t) => {
             source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'addresses',
             name: 'city'
-        }])
+        }]);
     } catch (err) {
         e = err;
     }

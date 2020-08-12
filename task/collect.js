@@ -43,7 +43,7 @@ async function fetch() {
     try {
         const collections = await fetch_collections();
         console.error('ok - got collections list');
-        const datas = (await fetch_datas()).slice(0, 4);
+        const datas = await fetch_datas();
         console.error('ok - got data list');
 
         const stats = await sources(tmp, datas);

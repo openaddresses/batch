@@ -27,7 +27,8 @@ if (require.main == module) {
     try {
         fetch();
     } catch (err) {
-        throw new Error(err);
+        console.error(err);
+        process.exit(1);
     }
 }
 
@@ -42,13 +43,14 @@ async function fetch() {
     try {
         const collections = await fetch_collections();
         console.error('ok - got collections list');
-        const datas = await fetch_datas();
+        const datas = (await fetch_datas()).slice(0, 4);
         console.error('ok - got data list');
 
-
         const stats = await sources(tmp, datas);
+        console.error('ok - all sources fetched');
 
         for (const collection of collections) {
+            console.error(`# ${collection.name}`);
             await collect(tmp, collection);
         }
     } catch (err) {
@@ -92,8 +94,6 @@ async function sources(tmp, datas) {
     } catch (err) {
         throw new Error(err);
     }
-
-    console.error('ok - all sources fetched');
 
     return stats;
 }

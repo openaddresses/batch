@@ -89,7 +89,7 @@ const stack = {
                 ComputeResources: {
                     ImageId: 'ami-056807e883f197989',
                     MaxvCpus: 128,
-                    DesiredvCpus: 32,
+                    DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     Subnets:  [

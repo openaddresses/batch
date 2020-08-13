@@ -80,6 +80,21 @@ const stack = {
                 Path: '/'
             }
         },
+        BatchLaunchTemplate: {
+            Type : 'AWS::EC2::LaunchTemplate',
+            Properties : {
+                LaunchTemplateData: {
+                    BlockDeviceMappings: [{
+                        DeviceName: '/dev/xvda',
+                        Ebs: {
+                            VolumeSize: 100,
+                            VolumeType: 'gp2'
+                        }
+                    }]
+                },
+                LaunchTemplateName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
+            }
+        },
         BatchComputeEnvironment: {
             Type: 'AWS::Batch::ComputeEnvironment',
             Properties: {
@@ -92,6 +107,7 @@ const stack = {
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    LaunchTemplate: cf.ref('BatchLaunchTemplate'),
                     Subnets:  [
                         'subnet-de35c1f5',
                         'subnet-e67dc7ea',

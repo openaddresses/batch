@@ -73,7 +73,7 @@ async function collect(tmp, collection) {
 
         console.error(`ok - zip created: ${zip}`);
         await upload_collection(zip, collection.name);
-        console.error('ok - global archive uploaded');
+        console.error('ok - archive uploaded');
 
         await update_collection(collection);
     } catch (err) {

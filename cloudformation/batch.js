@@ -102,7 +102,7 @@ const stack = {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
                 ComputeResources: {
-                    ImageId: 'ami-056807e883f197989',
+                    ImageId: 'ami-07c876cff3f8ae3fe',
                     MaxvCpus: 128,
                     DesiredvCpus: 0,
                     MinvCpus: 0,

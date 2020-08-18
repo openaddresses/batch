@@ -14,6 +14,8 @@ const mkdirp = require('mkdirp').sync;
 const AWS = require('aws-sdk');
 const archiver = require('archiver');
 
+const DRIVE = '/tmp';
+
 if (!process.env.AWS_DEFAULT_REGION) {
     process.env.AWS_DEFAULT_REGION = 'us-east-1';
 }
@@ -35,8 +37,6 @@ if (require.main == module) {
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
 });
-
-const DRIVE = '/tmp';
 
 async function fetch() {
     let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));

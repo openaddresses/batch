@@ -72,6 +72,8 @@ function trigger(event) {
         throw new Error('Unknown event type: ' + event.type);
     }
 
+    console.error(JSON.stringify(params));
+
     batch.submitJob(params, (err, res) => {
         if (err) throw err;
 

@@ -101,7 +101,7 @@ const stack = {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
+                ComputeEnvironmentName: cf.join('-', ['batch1', cf.ref('AWS::StackName')]),
                 ComputeResources: {
                     ImageId: 'ami-056807e883f197989',
                     MaxvCpus: 128,
@@ -137,7 +137,7 @@ const stack = {
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     LaunchTemplate: {
                           LaunchTemplateId: cf.ref('BatchMegaLaunchTemplate'),
-                          Version: cf.getAtt('BatchLaunchTemplate', 'LatestVersionNumber')
+                          Version: cf.getAtt('BatchMegaLaunchTemplate', 'LatestVersionNumber')
                     },
                     Subnets:  [
                         'subnet-de35c1f5',

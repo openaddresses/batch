@@ -36,15 +36,17 @@ const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
 });
 
+const DRIVE = '/tmp';
+
 async function fetch() {
     let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
 
     try {
-        fs.stat('/data')
+        fs.stat(DRIVE)
 
-        tmp = path.resolve('/data/', Math.random().toString(36).substring(2, 15));
+        tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     } catch (err) {
-        console.error('ok - could not find /data drive');
+        console.error(`ok - could not find ${DRIVE}`);
     }
 
     fs.mkdirSync(tmp);

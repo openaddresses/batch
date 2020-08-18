@@ -80,45 +80,20 @@ const stack = {
                 Path: '/'
             }
         },
-        BatchLaunchTemplate: {
+        BatchMegaLaunchTemplate: {
             Type: 'AWS::EC2::LaunchTemplate',
             Properties: {
                 LaunchTemplateData: {
                     BlockDeviceMappings: [{
-                        DeviceName: '/dev/sdb',
+                        DeviceName: '/dev/xvda',
                         Ebs: {
-                            DeleteOnTermination: true,
-                            VolumeSize: 100,
+                            Encrypted: true,
+                            VolumeSize: 250,
                             VolumeType: 'gp2'
                         }
-                    }],
-                    UserData: cf.userData([
-                        'MIME-Version: 1.0',
-                        'Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="',
-                        '',
-                        '--==MYBOUNDARY==',
-                        'Content-Type: text/x-shellscript; charset="us-ascii"
-                        '',
-                        '#!/bin/bash',
-                        'mkfs.ext4  /dev/sdb',
-                        '(',
-                        'echo n # Add a new partition'
-                        'echo p # Primary partition',
-                        'echo 1 # Partition number',
-                        'echo   # First sector (Accept default: 1)',
-                        'echo   # Last sector (Accept default: varies)',
-                        'echo w # Write changes',
-                        ') | fdisk  /dev/sdb',
-                        'mkfs.ext4  /dev/xvdb1',
-                        'mkdir /data',
-                        'echo " /dev/xvdb1       /data  ext4    defaults        0       2" >> /etc/fstab',
-                        'mount -a',
-                        'serSpeciale docker restart',
-                        '',
-                        '--==MYBOUNDARY=='
-                    ])
+                    }]
                 },
-                LaunchTemplateName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
+                LaunchTemplateName: cf.join('-', ['batch-mega', cf.ref('AWS::StackName')]),
             }
         },
         BatchComputeEnvironment: {
@@ -126,15 +101,42 @@ const stack = {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: cf.join('-', ['batch1', cf.ref('AWS::StackName')]),
+                ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
                 ComputeResources: {
                     ImageId: 'ami-056807e883f197989',
                     MaxvCpus: 128,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    Subnets:  [
+                        'subnet-de35c1f5',
+                        'subnet-e67dc7ea',
+                        'subnet-38b72502',
+                        'subnet-76ae3713',
+                        'subnet-35d87242',
+                        'subnet-b978ade0'
+                    ],
+                    Type : 'EC2',
+                    InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
+                    InstanceTypes : ['optimal']
+                },
+                State: 'ENABLED'
+            }
+        },
+        BatchMegaComputeEnvironment: {
+            Type: 'AWS::Batch::ComputeEnvironment',
+            Properties: {
+                Type: 'MANAGED',
+                ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
+                ComputeEnvironmentName: cf.join('-', ['batch-hg', cf.ref('AWS::StackName')]),
+                ComputeResources: {
+                    ImageId: 'ami-056807e883f197989',
+                    MaxvCpus: 16,
+                    DesiredvCpus: 0,
+                    MinvCpus: 0,
+                    SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     LaunchTemplate: {
-                          LaunchTemplateId: cf.ref('LaunchTemplateId'),
+                          LaunchTemplateId: cf.ref('BatchMegaLaunchTemplate'),
                           Version: cf.getAtt('BatchLaunchTemplate', 'LatestVersionNumber')
                     },
                     Subnets:  [
@@ -207,7 +209,19 @@ const stack = {
                 }],
                 'State': 'ENABLED',
                 'Priority': 1,
-                'JobQueueName': 'HighPriority'
+                'JobQueueName': 'StdQueue'
+            }
+        },
+        BatchMegaJobQueue: {
+            'Type': 'AWS::Batch::JobQueue',
+            'Properties': {
+                'ComputeEnvironmentOrder': [{
+                    'Order': 1,
+                    'ComputeEnvironment': cf.ref('BatchMegaComputeEnvironment')
+                }],
+                'State': 'ENABLED',
+                'Priority': 1,
+                'JobQueueName': 'MegaQueue'
             }
         },
         BatchLambdaExecutionRole: {
@@ -268,7 +282,8 @@ const stack = {
                 Environment: {
                     Variables: {
                         JOB_DEFINITION: cf.ref('BatchJobDefinition'),
-                        JOB_QUEUE: cf.ref('BatchJobQueue'),
+                        JOB_STD_QUEUE: cf.ref('BatchJobQueue'),
+                        JOB_MEGA_QUEUE: cf.ref('BatchMegaJobQueue'),
                         JOB_NAME: 'lambda-trigger-job'
                     }
                 },

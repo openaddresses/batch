@@ -8,11 +8,11 @@ const batch = new AWS.Batch({
 
 function trigger(event) {
     const jobDefinition = process.env.JOB_DEFINITION;
-    const jobQueue = process.env.JOB_QUEUE;
+    const jobStdQueue = process.env.JOB_STD_QUEUE;
+    const jobMegaQueue = process.env.JOB_MEGA_QUEUE;
     const jobName = process.env.JOB_NAME;
 
     console.error('EVENT: ', JSON.stringify(event));
-
 
     if (typeof event !== 'object' || Array.isArray(event)) {
         throw new Error('event must be Key/Value pairs');
@@ -29,7 +29,7 @@ function trigger(event) {
 
         params = {
             jobDefinition: jobDefinition,
-            jobQueue: jobQueue,
+            jobQueue: jobStdQueue,
             jobName: jobName,
             containerOverrides: {
                 command: ['./task.js'],
@@ -51,7 +51,7 @@ function trigger(event) {
     } else if (event.type === 'collect') {
         params = {
             jobDefinition: jobDefinition,
-            jobQueue: jobQueue,
+            jobQueue: jobMegaQueue,
             jobName: jobName,
             containerOverrides: {
                 command: ['./collect.js'],
@@ -61,7 +61,7 @@ function trigger(event) {
     } else if (event.type === 'sources') {
         params = {
             jobDefinition: jobDefinition,
-            jobQueue: jobQueue,
+            jobQueue: jobStdQueue,
             jobName: jobName,
             containerOverrides: {
                 command: ['./sources.js'],

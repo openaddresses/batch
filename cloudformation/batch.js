@@ -85,12 +85,38 @@ const stack = {
             Properties: {
                 LaunchTemplateData: {
                     BlockDeviceMappings: [{
-                        DeviceName: '/dev/xvda',
+                        DeviceName: '/dev/sdb',
                         Ebs: {
+                            DeleteOnTermination: true,
                             VolumeSize: 100,
                             VolumeType: 'gp2'
                         }
-                    }]
+                    }],
+                    UserData: cf.userData([
+                        'MIME-Version: 1.0',
+                        'Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="',
+                        '',
+                        '--==MYBOUNDARY==',
+                        'Content-Type: text/x-shellscript; charset="us-ascii"
+                        '',
+                        '#!/bin/bash',
+                        'mkfs.ext4  /dev/sdb',
+                        '(',
+                        'echo n # Add a new partition'
+                        'echo p # Primary partition',
+                        'echo 1 # Partition number',
+                        'echo   # First sector (Accept default: 1)',
+                        'echo   # Last sector (Accept default: varies)',
+                        'echo w # Write changes',
+                        ') | fdisk  /dev/sdb',
+                        'mkfs.ext4  /dev/xvdb1',
+                        'mkdir /data',
+                        'echo " /dev/xvdb1       /data  ext4    defaults        0       2" >> /etc/fstab',
+                        'mount -a',
+                        'serSpeciale docker restart',
+                        '',
+                        '--==MYBOUNDARY=='
+                    ])
                 },
                 LaunchTemplateName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
             }
@@ -100,15 +126,16 @@ const stack = {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
+                ComputeEnvironmentName: cf.join('-', ['batch1', cf.ref('AWS::StackName')]),
                 ComputeResources: {
-                    ImageId: 'ami-07c876cff3f8ae3fe',
+                    ImageId: 'ami-056807e883f197989',
                     MaxvCpus: 128,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     LaunchTemplate: {
-                          LaunchTemplateName: cf.join('-', ['batch', cf.ref('AWS::StackName')])
+                          LaunchTemplateId: cf.ref('LaunchTemplateId'),
+                          Version: cf.getAtt('BatchLaunchTemplate', 'LatestVersionNumber')
                     },
                     Subnets:  [
                         'subnet-de35c1f5',

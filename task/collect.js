@@ -37,8 +37,18 @@ const s3 = new AWS.S3({
 });
 
 async function fetch() {
-    const tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
+    let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
+
+    try {
+        fs.stat('/data')
+
+        tmp = path.resolve('/data/', Math.random().toString(36).substring(2, 15));
+    } catch (err) {
+        console.error('ok - could not find /data drive');
+    }
+
     fs.mkdirSync(tmp);
+    console.error(`ok - TMP: ${tmp}`);
 
     try {
         const collections = await fetch_collections();

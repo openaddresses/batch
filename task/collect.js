@@ -14,6 +14,8 @@ const mkdirp = require('mkdirp').sync;
 const AWS = require('aws-sdk');
 const archiver = require('archiver');
 
+const DRIVE = '/tmp';
+
 if (!process.env.AWS_DEFAULT_REGION) {
     process.env.AWS_DEFAULT_REGION = 'us-east-1';
 }
@@ -37,8 +39,18 @@ const s3 = new AWS.S3({
 });
 
 async function fetch() {
-    const tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
+    let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
+
+    try {
+        fs.stat(DRIVE)
+
+        tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
+    } catch (err) {
+        console.error(`ok - could not find ${DRIVE}`);
+    }
+
     fs.mkdirSync(tmp);
+    console.error(`ok - TMP: ${tmp}`);
 
     try {
         const collections = await fetch_collections();
@@ -73,7 +85,7 @@ async function collect(tmp, collection) {
 
         console.error(`ok - zip created: ${zip}`);
         await upload_collection(zip, collection.name);
-        console.error('ok - global archive uploaded');
+        console.error('ok - archive uploaded');
 
         await update_collection(collection);
     } catch (err) {

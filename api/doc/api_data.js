@@ -386,10 +386,10 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/job/error/count",
-    "title": "Return a count of job errors",
+    "title": "Job Error Count",
     "version": "1.0.0",
     "name": "ErrorCount",
-    "group": "Job",
+    "group": "JobError",
     "permission": [
       {
         "name": "public",
@@ -407,7 +407,7 @@ define({ "api": [
       ]
     },
     "filename": "./index.js",
-    "groupTitle": "Job"
+    "groupTitle": "JobError"
   },
   {
     "type": "post",
@@ -415,7 +415,7 @@ define({ "api": [
     "title": "Create Job Error",
     "version": "1.0.0",
     "name": "ErrorCreate",
-    "group": "Job",
+    "group": "JobError",
     "permission": [
       {
         "name": "admin",
@@ -453,15 +453,15 @@ define({ "api": [
       ]
     },
     "filename": "./index.js",
-    "groupTitle": "Job"
+    "groupTitle": "JobError"
   },
   {
     "type": "get",
     "url": "/api/job/error",
-    "title": "Search for job runs with recent errors",
+    "title": "Get Job Errors",
     "version": "1.0.0",
     "name": "ErrorList",
-    "group": "Job",
+    "group": "JobError",
     "permission": [
       {
         "name": "public",
@@ -470,15 +470,15 @@ define({ "api": [
       }
     ],
     "filename": "./index.js",
-    "groupTitle": "Job"
+    "groupTitle": "JobError"
   },
   {
     "type": "post",
     "url": "/api/job/error/:job",
-    "title": "Mark a specific job error as confirmed or rejected",
+    "title": "Resolve Job Error",
     "version": "1.0.0",
     "name": "ErrorManager",
-    "group": "Job",
+    "group": "JobError",
     "permission": [
       {
         "name": "admin",
@@ -500,7 +500,7 @@ define({ "api": [
       }
     },
     "filename": "./index.js",
-    "groupTitle": "Job"
+    "groupTitle": "JobError"
   },
   {
     "type": "patch",
@@ -857,7 +857,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]

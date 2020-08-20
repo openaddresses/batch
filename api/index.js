@@ -983,7 +983,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/run/:run/jobs Populate a created run with jobs
+     * @api {post} /api/run/:run/jobs Populate Run Jobs
      * @apiVersion 1.0.0
      * @apiName SingleJobsCreate
      * @apiGroup Run
@@ -1028,7 +1028,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/run/:run/jobs Get jobs for a given run ID
+     * @api {get} /api/run/:run/jobs List Run Jobs
      * @apiVersion 1.0.0
      * @apiName SingleJobs
      * @apiGroup Run
@@ -1101,10 +1101,10 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/error Search for job runs with recent errors
+     * @api {get} /api/job/error Get Job Errors
      * @apiVersion 1.0.0
      * @apiName ErrorList
-     * @apiGroup Job
+     * @apiGroup JobError
      * @apiPermission public
      */
     router.get('/job/error', async (req, res) => {
@@ -1116,10 +1116,11 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/job/error/count Return a count of job errors
+     * @api {get} /api/job/error/count Job Error Count
+
      * @apiVersion 1.0.0
      * @apiName ErrorCount
-     * @apiGroup Job
+     * @apiGroup JobError
      * @apiPermission public
      *
      * @apiSuccessExample Success-Response:
@@ -1140,7 +1141,7 @@ async function server(args, config, cb) {
      * @api {post} /api/job/error Create Job Error
      * @apiVersion 1.0.0
      * @apiName ErrorCreate
-     * @apiGroup Job
+     * @apiGroup JobError
      * @apiPermission admin
      *
      * @apiParam {Number} job Job ID of the given error
@@ -1165,10 +1166,10 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/job/error/:job Mark a specific job error as confirmed or rejected
+     * @api {post} /api/job/error/:job Resolve Job Error
      * @apiVersion 1.0.0
      * @apiName ErrorManager
-     * @apiGroup Job
+     * @apiGroup JobError
      * @apiPermission admin
      *
      * @apiParam {Number} :job Job ID
@@ -1303,7 +1304,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.get('/job/:job/output/source.png', async (req, res) => {
         Param.int(req, res, 'job');

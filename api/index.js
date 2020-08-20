@@ -127,6 +127,9 @@ async function server(args, config, cb) {
      * @apiGroup Server
      * @apiPermission public
      *
+     * @apiDescription
+     *     Return basic metadata about server configuration
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
@@ -145,6 +148,9 @@ async function server(args, config, cb) {
      * @apiName Health
      * @apiGroup Server
      * @apiPermission public
+     *
+     * @apiDescription
+     *     AWS ELB Healthcheck for the server
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -218,6 +224,12 @@ async function server(args, config, cb) {
      * @apiName upload
      * @apiGroup Upload
      * @apiPermission upload
+     *
+     * @apiDescription
+     *     Statically cache source data
+     *
+     *     If a source is unable to be pulled from directly, authenticated users can cache
+     *     data resources to the OpenAddresses S3 cache to be pulled from
      */
     router.post('/upload', async (req, res) => {
         try {
@@ -251,6 +263,9 @@ async function server(args, config, cb) {
      * @apiName list
      * @apiGroup User
      * @apiPermission admin
+     *
+     * @apiDescription
+     *     Return a list of users that have registered with the service
      */
     router.get('/user', async (req, res) => {
         try {
@@ -270,6 +285,9 @@ async function server(args, config, cb) {
      * @apiName Create
      * @apiGroup User
      * @apiPermission public
+     *
+     * @apiDescription
+     *     Create a new user
      */
     router.post('/user', async (req, res) => {
         try {
@@ -290,6 +308,18 @@ async function server(args, config, cb) {
      * @apiName self
      * @apiGroup User
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Return basic user information about the currently authenticated user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *       "email": "example@example.com",
+     *       "access": "admin",
+     *       "flags": {}
+     *   }
      */
     router.get('/user/me', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.uid) {
@@ -309,6 +339,9 @@ async function server(args, config, cb) {
      * @apiGroup User
      * @apiPermission admin
      *
+     * @apiDescription
+     *     Update information about a given user
+     *
      * @apiParam {Number} id The UID of the user to update
      */
     router.patch('/user/:id', async (req, res) => {
@@ -324,11 +357,23 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/login If the user has an active session, reauthenticate the frontend
+     * @api {get} /api/login Session Info
      * @apiVersion 1.0.0
      * @apiName get
      * @apiGroup Login
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Return information about the currently logged in user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *       "email": "example@example.com",
+     *       "access": "admin",
+     *       "flags": {}
+     *   }
      */
     router.get('/login', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.username) {
@@ -347,11 +392,20 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/login Get auth cookies for a given session
+     * @api {post} /api/login Create Session
      * @apiVersion 1.0.0
      * @apiName login
      * @apiGroup Login
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Log a user into the service and create an authenticated cookie
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *   }
      */
     router.post('/login', async (req, res) => {
         try {
@@ -371,7 +425,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {get} /api/token List API Tokens for the authenticated user
+     * {get} /api/token List Tokens
      * @apiVersion 1.0.0
      * @apiName ListTokens
      * @apiGroup Token
@@ -388,7 +442,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {post} /api/token Create an API token for the authenticated user
+     * {post} /api/token Create Token
      * @apiVersion 1.0.0
      * @apiName CreateToken
      * @apiGroup Token
@@ -405,7 +459,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {delete} /api/token/:id Delete an API token that is owned by the authenticated user
+     * {delete} /api/token/:id Delete Token
      * @apiVersion 1.0.0
      * @apiName DeleteToken
      * @apiGroup Token
@@ -450,6 +504,27 @@ async function server(args, config, cb) {
      * @apiName List
      * @apiGroup Collections
      * @apiPermission public
+     *
+     * @apiDescription
+     *     Return a list of all collections and their glob rules
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   [{
+     *       "id": 1,
+     *       "name": "us-northeast",
+     *       "created": "2020-08-12T04:17:45.063Z"",
+     *       "sources": [
+     *           "us/ri/**",
+     *           "us/ct/**",
+     *           "us/ma/**"
+     *           "us/nh/**"
+     *           "us/vt/**"
+     *           "us/me/**"*
+     *       ]
+     *   }]
+     *
+     * [{"id":1,"name":"global","created":"2020-08-12T04:17:44.111Z","sources":["**"]},{"id":2,"name":"us-northeast","created":"2020-08-12T04:17:45.063Z","sources":["us/ri/**","us/ct/**","us/ma/**","us/nh/**","us/vt/**","us/me/**"]},{"id":5,"name":"us-south","created":"2020-08-12T04:17:50.246Z","sources":["us/fl/**","us/ga/**","us/sc/**","us/nc/**","us/dc/**","us/md/**","us/de/**","us/va/**","us/wv/**","us/al/**","us/ms/**","us/tn/**","us/ky/**","us/la/**","us/ar/**","us/ok/**","us/tx/**"]},{"id":6,"name":"us-west","created":"2020-08-12T04:17:53.223Z","sources":["us/ak/**","us/nm/**","us/az/**","us/co/**","us/ut/**","us/nv/**","us/wy/**","us/id/**","us/mt/**","us/ca/**","us/or/**","us/wa/**"]},{"id":7,"name":"us-midwest","created":"2020-08-12T04:17:53.835Z","sources":["us/oh/**","us/in/**","us/mi/**","us/il/**","us/wi/**","us/md/**","us/ia/**","us/ks/**","us/ne/**","us/mn/**","us/sd/**","us/nd/**"]}]
      */
     router.get('/collections', async (req, res) => {
         try {
@@ -467,6 +542,9 @@ async function server(args, config, cb) {
      * @apiName Data
      * @apiGroup Collections
      * @apiPermission public
+     *
+     * @apiDescription
+     *     Download a given collection file
      */
     router.get('/collections/:collection/data', async (req, res) => {
         Param.int(req, res, 'collection');
@@ -603,6 +681,22 @@ async function server(args, config, cb) {
      * @apiParam {String} [point] Filter results by geographic point
      * @apiParamExample {String} ?point
      *     ?point=<lng>,<lat>
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   [{
+     *       "id": 271,
+     *       "source": "pl/lubelskie",
+     *       "updated": "2020-07-30T11:56:37.405Z",
+     *       "layer": "addresses",
+     *       "name": "country",
+     *       "job": 635,
+     *       "output": {
+     *           "cache": true,
+     *           "output": true,
+     *           "preview": true
+     *       }
+     *   }]
      */
     router.get('/data', async (req, res) => {
         try {
@@ -622,6 +716,22 @@ async function server(args, config, cb) {
      * @apiPermission public
      *
      * @apiParam {Number} data Data ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 271,
+     *       "source": "pl/lubelskie",
+     *       "updated": "2020-07-30T11:56:37.405Z",
+     *       "layer": "addresses",
+     *       "name": "country",
+     *       "job": 635,
+     *       "output": {
+     *           "cache": true,
+     *           "output": true,
+     *           "preview": true
+     *       }
+     *   }
      */
     router.get('/data/:data', async (req, res) => {
         try {
@@ -641,6 +751,23 @@ async function server(args, config, cb) {
      * @apiPermission public
      *
      * @apiParam {Number} data Data ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "jobs": [{
+     *           "id": 1,
+     *           "created": "2020-04-20T06:31:11.689Z",
+     *           "status": "Success"
+     *           "output": {
+     *               "cache": true,
+     *               "output": true,
+     *               "preview": true
+     *           },
+     *           "run": 1
+     *       }]
+     *   }
      */
     router.get('/data/:data/history', async (req, res) => {
         try {
@@ -682,6 +809,18 @@ async function server(args, config, cb) {
      * @apiParamExample {String} ?after
      *     ?after=2020-01-01
      *     ?after=2020-12-01
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   [{
+     *       "id": 1,
+     *       "live": true,
+     *       "created": "2020-08-03T17:37:47.036Z",
+     *       "github": {},
+     *       "closed": true,
+     *       "status": "Fail",
+     *       "jobs": 1
+     *   }]
      */
     router.get('/run', async (req, res) => {
         try {
@@ -729,6 +868,16 @@ async function server(args, config, cb) {
      * @apiPermission public
      *
      * @apiParam {Number} run Run ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   [{
+     *       "id": 1,
+     *       "live": true,
+     *       "created": "2020-08-03T17:37:47.036Z",
+     *       "github": {},
+     *       "closed": true
+     *   }]
      */
     router.get('/run/:run', async (req, res) => {
         Param.int(req, res, 'run');
@@ -749,7 +898,22 @@ async function server(args, config, cb) {
      * @apiGroup Run
      * @apiPermission public
      *
+     * @apiDescription
+     *     Return statistics about jobs within a given run
+     *
      * @apiParam {Number} run Run ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "run": 1,
+     *       "status": {
+     *           "Warn": 1
+     *           "Success": 3,
+     *           "Pending": 2,
+     *           "Fail": 0
+     *       }
+     *   }
      */
     router.get('/run/:run/count', async (req, res) => {
         Param.int(req, res, 'run');
@@ -841,7 +1005,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} run Run ID
      */
-    router.get('run/:run/jobs', async (req, res) => {
+    router.get('/run/:run/jobs', async (req, res) => {
         Param.int(req, res, 'run');
 
         try {
@@ -855,8 +1019,6 @@ async function server(args, config, cb) {
             return Err.respond(err, res);
         }
     });
-
-
 
     /**
      * @api {get} /api/job List Jobs
@@ -928,6 +1090,12 @@ async function server(args, config, cb) {
      * @apiName ErrorCount
      * @apiGroup Job
      * @apiPermission public
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "count": 123
+     *   }
      */
     router.get('/job/error/count', async (req, res) => {
         try {
@@ -987,6 +1155,40 @@ async function server(args, config, cb) {
      * @apiPermission public
      *
      * @apiParam {Number} job Job ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "run": 187
+     *       "map": null;
+     *       "created": "2020-08-03T17:37:47.036Z",
+     *       "source_name":"us/wy/lincoln",
+     *       "source":"https://raw.githubusercontent.com/openaddresses/openaddresses/0f2888ba5bd572f844991f8ea0bef9c39fa39ada/sources/us/wy/lincoln.json",
+     *       "layer":"addresses",
+     *       "name":"country",
+     *       "output":{
+     *           "cache":true,
+     *           "output":true,
+     *           "preview":true
+     *       },
+     *       "loglink":"batch-staging-job/default/bfdd23b5-9575-4344-93d3-bf9cacd4761c",
+     *       "status":"Success",
+     *       "version":"1.0.0",
+     *       "count":4257,
+     *       "bounds":{"type":"Polygon","coordinates": ["..geojson coords here.."],
+     *       "stats":{
+     *           "counts":{
+     *               "city":0,
+     *               "unit":0,
+     *               "number":4244,
+     *               "region":0,
+     *               "street":4257,
+     *               "district":0,
+     *               "postcode":0
+     *           }
+     *       }
+     *   }
      */
     router.get('/job/:job', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1159,6 +1361,18 @@ async function server(args, config, cb) {
      * @apiName traffic
      * @apiGroup Analytics
      * @apiPermission admin
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "datasets": [{
+     *           "label": "Unique Daily Sessions" ,
+     *           "data": [{
+     *               "x": "2020-08-19T06:00:00.000Z",
+     *               "y": 145
+     *           }]
+     *       }]
+     *   }
      */
     router.get('/dash/traffic', async (req, res) => {
         try {

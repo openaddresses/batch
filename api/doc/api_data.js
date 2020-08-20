@@ -30,6 +30,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Report anonymouns traffic data about the number of user session created in a given day.</p>",
     "success": {
       "examples": [
         {
@@ -56,6 +57,15 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Collection Name\",\n    \"sources\": [\"**\"]\n    \"created\": \"2020-07-30T11:56:37.405Z\",\n\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Collections"
   },
@@ -74,6 +84,19 @@ define({ "api": [
       }
     ],
     "description": "<p>Download a given collection file</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":collection",
+            "description": "<p>Collection ID</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Collections"
   },
@@ -91,6 +114,28 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":collection",
+            "description": "<p>Collection ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\ntrue",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Collections"
   },
@@ -135,6 +180,28 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":collection",
+            "description": "<p>Collection ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Collection Name\",\n    \"sources\": [\"**\"]\n    \"created\": \"2020-07-30T11:56:37.405Z\",\n\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Collections"
   },
@@ -241,7 +308,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "data",
+            "field": ":data",
             "description": "<p>Data ID</p>"
           }
         ]
@@ -280,7 +347,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "data",
+            "field": ":data",
             "description": "<p>Data ID</p>"
           }
         ]
@@ -312,6 +379,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Callback endpoint for GitHub Webhooks. Should not be called by user functions</p>",
     "filename": "./index.js",
     "groupTitle": "Github"
   },
@@ -375,6 +443,15 @@ define({ "api": [
         ]
       }
     },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"job\": 123,\n    \"message\": \"Failed to download source\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -416,7 +493,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -446,7 +523,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -476,7 +553,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -620,7 +697,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -659,7 +736,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -690,7 +767,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -720,7 +797,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -750,7 +827,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "job",
+            "field": ":job",
             "description": "<p>Job ID</p>"
           }
         ]
@@ -1089,7 +1166,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "run",
+            "field": ":run",
             "description": "<p>Run ID</p>"
           }
         ]
@@ -1128,7 +1205,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "run",
+            "field": ":run",
             "description": "<p>Run ID</p>"
           }
         ]
@@ -1167,7 +1244,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "run",
+            "field": ":run",
             "description": "<p>Run ID</p>"
           }
         ]
@@ -1198,7 +1275,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "run",
+            "field": ":run",
             "description": "<p>Run ID</p>"
           },
           {
@@ -1242,7 +1319,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "run",
+            "field": ":run",
             "description": "<p>Run ID</p>"
           }
         ]
@@ -1272,8 +1349,8 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "Type",
-            "description": "<p>of lambda scheduled event to respond to. One of &quot;sources&quot; or &quot;collect&quot;</p>"
+            "field": "type",
+            "description": "<p>Type of lambda scheduled event to respond to. One of &quot;sources&quot; or &quot;collect&quot;</p>"
           }
         ]
       }
@@ -1486,7 +1563,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "id",
+            "field": ":id",
             "description": "<p>The UID of the user to update</p>"
           }
         ]

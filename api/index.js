@@ -342,7 +342,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Update information about a given user
      *
-     * @apiParam {Number} id The UID of the user to update
+     * @apiParam {Number} :id The UID of the user to update
      */
     router.patch('/user/:id', async (req, res) => {
         Param.int(req, res, 'id');
@@ -484,7 +484,7 @@ async function server(args, config, cb) {
      * @apiGroup Schedule
      * @apiPermission admin
      *
-     * @apiParam {Number} Type of lambda scheduled event to respond to. One of "sources" or "collect"
+     * @apiParam {Number} type Type of lambda scheduled event to respond to. One of "sources" or "collect"
      */
     router.post('/schedule', async (req, res) => {
         try {
@@ -545,6 +545,8 @@ async function server(args, config, cb) {
      *
      * @apiDescription
      *     Download a given collection file
+     *
+     * @apiParam {Number} :collection Collection ID
      */
     router.get('/collections/:collection/data', async (req, res) => {
         Param.int(req, res, 'collection');
@@ -561,6 +563,12 @@ async function server(args, config, cb) {
      * @apiName Delete
      * @apiGroup Collections
      * @apiPermission admin
+     *
+     * @apiParam {Number} :collection Collection ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   true
      */
     router.delete('/collections/:collection', async (req, res) => {
         Param.int(req, res, 'collection');
@@ -582,6 +590,16 @@ async function server(args, config, cb) {
      * @apiName Create
      * @apiGroup Collections
      * @apiPermission admin
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "name": "Collection Name",
+     *       "sources": ["**"]
+     *       "created": "2020-07-30T11:56:37.405Z",
+     *
+     *   }
      */
     router.post('/collections', async (req, res) => {
         try {
@@ -603,6 +621,18 @@ async function server(args, config, cb) {
      * @apiName Update
      * @apiGroup Collections
      * @apiPermission admin
+     *
+     * @apiParam {Number} :collection Collection ID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "name": "Collection Name",
+     *       "sources": ["**"]
+     *       "created": "2020-07-30T11:56:37.405Z",
+     *
+     *   }
      */
     router.patch('/collections/:collection', async (req, res) => {
         Param.int(req, res, 'collection');
@@ -715,7 +745,7 @@ async function server(args, config, cb) {
      * @apiGroup Data
      * @apiPermission public
      *
-     * @apiParam {Number} data Data ID
+     * @apiParam {Number} :data Data ID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -750,7 +780,7 @@ async function server(args, config, cb) {
      * @apiGroup Data
      * @apiPermission public
      *
-     * @apiParam {Number} data Data ID
+     * @apiParam {Number} :data Data ID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -867,7 +897,7 @@ async function server(args, config, cb) {
      * @apiGroup Run
      * @apiPermission public
      *
-     * @apiParam {Number} run Run ID
+     * @apiParam {Number} :run Run ID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -901,7 +931,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return statistics about jobs within a given run
      *
-     * @apiParam {Number} run Run ID
+     * @apiParam {Number} :run Run ID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -932,7 +962,7 @@ async function server(args, config, cb) {
      * @apiGroup Run
      * @apiPermission public
      *
-     * @apiParam {Number} run Run ID
+     * @apiParam {Number} :run Run ID
      */
     router.patch('/run/:run', async (req, res) => {
         Param.int(req, res, 'run');
@@ -966,7 +996,8 @@ async function server(args, config, cb) {
      *     Note: once jobs are attached to a run, the run is "closed" and subsequent
      *     jobs cannot be attached to it
      *
-     * @apiParam {Number} run Run ID
+     * @apiParam {Number} :run Run ID
+     *
      * @apiParam {json} jobs Jobs to attach to run
      * @apiParamExample {json} jobs
      *     ['https://github.com/path_to_source', {
@@ -1003,7 +1034,7 @@ async function server(args, config, cb) {
      * @apiGroup Run
      * @apiPermission public
      *
-     * @apiParam {Number} run Run ID
+     * @apiParam {Number} :run Run ID
      */
     router.get('/run/:run/jobs', async (req, res) => {
         Param.int(req, res, 'run');
@@ -1114,6 +1145,13 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} job Job ID of the given error
      * @apiParam {String} message Text representation of the error
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "job": 123,
+     *       "message": "Failed to download source"
+     *   }
      */
     router.post('/job/error', async (req, res) => {
         try {
@@ -1133,7 +1171,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission admin
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.post('/job/error/:job', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1154,7 +1192,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -1209,7 +1247,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission admin
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.post('/job/:job/rerun', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1241,7 +1279,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      * @apiDescription
      *   Compare the stats of the given job against the current live data job
      *
@@ -1279,7 +1317,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.get('/job/:job/output/source.geojson.gz', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1298,7 +1336,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.get('/job/:job/output/cache.zip', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1312,7 +1350,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.get('/job/:job/log', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1333,7 +1371,7 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission admin
      *
-     * @apiParam {Number} job Job ID
+     * @apiParam {Number} :job Job ID
      */
     router.patch('/job/:job', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1361,6 +1399,9 @@ async function server(args, config, cb) {
      * @apiName traffic
      * @apiGroup Analytics
      * @apiPermission admin
+     *
+     * @apiDescription
+     *   Report anonymouns traffic data about the number of user session created in a given day.
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -1408,6 +1449,9 @@ async function server(args, config, cb) {
      * @apiName Event
      * @apiGroup Github
      * @apiPermission admin
+     *
+     * @apiDescription
+     *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
      */
     router.post('/github/event', async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');

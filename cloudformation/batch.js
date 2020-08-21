@@ -209,7 +209,7 @@ const stack = {
                 }],
                 'State': 'ENABLED',
                 'Priority': 1,
-                'JobQueueName': 'StdQueue'
+                'JobQueueName': cf.join('-', [cf.stackName, 'std-queue'])
             }
         },
         BatchMegaJobQueue: {
@@ -221,7 +221,7 @@ const stack = {
                 }],
                 'State': 'ENABLED',
                 'Priority': 1,
-                'JobQueueName': 'MegaQueue'
+                'JobQueueName': cf.join('-', [cf.stackName, 'meta-queue'])
             }
         },
         BatchLambdaExecutionRole: {

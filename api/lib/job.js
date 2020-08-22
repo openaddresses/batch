@@ -42,6 +42,7 @@ class Job {
         this.stats = {};
         this.count = 0;
         this.bounds = false;
+        this.s3 = false;
 
         // Attributes which are allowed to be patched
         this.attrs = [
@@ -171,6 +172,7 @@ class Job {
     json() {
         return {
             id: this.id ? parseInt(this.id) : false,
+            s3: this.s3,
             run: parseInt(this.run),
             map: this.map ? parseInt(this.map) : null,
             created: this.created,
@@ -297,6 +299,10 @@ class Job {
             job.run = parseInt(job.run);
             job.map = job.map ? parseInt(job.map) : null;
 
+            if (job.output && job.output.output) {
+                job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
+            }
+
             return job;
         });
     }
@@ -345,6 +351,10 @@ class Job {
 
                 for (const key of Object.keys(pgres.rows[0])) {
                     job[key] = pgres.rows[0][key];
+                }
+
+                if (job.output && job.output.output) {
+                    job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
                 }
 
                 return resolve(job);

@@ -23,6 +23,7 @@ class Collection {
         this.name = name;
         this.sources = sources;
         this.created = false;
+        this.s3 = false;
 
         // Attributes which are allowed to be patched
         this.attrs = [
@@ -34,6 +35,7 @@ class Collection {
     json() {
         return {
             id: parseInt(this.id),
+            s3: this.s3,
             name: this.name,
             sources: this.sources,
             created: this.created
@@ -80,6 +82,8 @@ class Collection {
             for (const key of Object.keys(pgres.rows[0])) {
                 collection[key] = pgres.rows[0][key];
             }
+
+            collection.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${collection.name}.zip`;
 
             return collection;
         } catch (err) {
@@ -137,6 +141,8 @@ class Collection {
                 this[key] = pgres.rows[0][key];
             }
 
+            this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${pgres.rows[0].name}.zip`;
+
             return this;
         } catch (err) {
             throw new Err(500, err, 'failed to generate collection');
@@ -165,6 +171,7 @@ class Collection {
 
         return pgres.rows.map((res) => {
             res.id = parseInt(res.id);
+            res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}.zip`;
             return res;
         });
     }

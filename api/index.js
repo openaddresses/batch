@@ -514,6 +514,7 @@ async function server(args, config, cb) {
      *       "id": 1,
      *       "name": "us-northeast",
      *       "created": "2020-08-12T04:17:45.063Z"",
+     *       "s3": "s3://v2.openaddresses.io/test/collection-us-northeast.zip",
      *       "sources": [
      *           "us/ri/**",
      *           "us/ct/**",
@@ -595,10 +596,10 @@ async function server(args, config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1,
-     *       "name": "Collection Name",
+     *       "name": "global",
      *       "sources": ["**"]
      *       "created": "2020-07-30T11:56:37.405Z",
-     *
+     *       "s3": "s3://v2.openaddresses.io/test/collection-global.zip",
      *   }
      */
     router.post('/collections', async (req, res) => {
@@ -628,10 +629,10 @@ async function server(args, config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1,
-     *       "name": "Collection Name",
+     *       "name": "global",
      *       "sources": ["**"]
      *       "created": "2020-07-30T11:56:37.405Z",
-     *
+     *       "s3": "s3://v2.openaddresses.io/test/collection-global.zip",
      *   }
      */
     router.patch('/collections/:collection', async (req, res) => {

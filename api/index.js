@@ -542,16 +542,27 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName Data
      * @apiGroup Collections
-     * @apiPermission public
+     * @apiPermission user
      *
      * @apiDescription
-     *     Download a given collection file
+     *   Download a given collection file
+     *
+     *    Note: the user must be authenticated to perform a download. One of our largest costs is
+     *    S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw
+     *
+     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
+     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
+     *
+     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+     *    Please consider donating if you are able https://opencollective.com/openaddresses
      *
      * @apiParam {Number} :collection Collection ID
      */
     router.get('/collections/:collection/data', async (req, res) => {
         Param.int(req, res, 'collection');
         try {
+            await auth.is_auth(req);
+
             Collection.data(pool, req.params.collection, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -1323,12 +1334,24 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
+     * @apiDescription
+     *    Note: the user must be authenticated to perform a download. One of our largest costs is
+     *    S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw
+     *
+     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
+     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
+     *
+     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+     *    Please consider donating if you are able https://opencollective.com/openaddresses
+     *
      * @apiParam {Number} :job Job ID
      */
     router.get('/job/:job/output/source.geojson.gz', async (req, res) => {
         Param.int(req, res, 'job');
 
         try {
+            await auth.is_auth(req);
+
             await Job.data(pool, req.params.job, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -1342,11 +1365,29 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
+     *  @apiDescription
+     *    Note: the user must be authenticated to perform a download. One of our largest costs is
+     *    S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw
+     *
+     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
+     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
+     *
+     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+     *    Please consider donating if you are able https://opencollective.com/openaddresses
+     *
      * @apiParam {Number} :job Job ID
+     *
      */
     router.get('/job/:job/output/cache.zip', async (req, res) => {
         Param.int(req, res, 'job');
-        Job.cache(req.params.job, res);
+
+        try {
+            await auth.is_auth(req);
+
+            Job.cache(req.params.job, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**

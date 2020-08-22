@@ -64,6 +64,10 @@ class Data {
                         char_length($4) = 0
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
                     )
+                ORDER BY
+                    results.source,
+                    results.layer,
+                    results.name
             `, [
                 query.source,
                 query.layer,

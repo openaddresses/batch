@@ -722,6 +722,7 @@ async function server(args, config, cb) {
      *       "layer": "addresses",
      *       "name": "country",
      *       "job": 635,
+     *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
      *       "output": {
      *           "cache": true,
      *           "output": true,
@@ -757,6 +758,7 @@ async function server(args, config, cb) {
      *       "layer": "addresses",
      *       "name": "country",
      *       "job": 635,
+     *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
      *       "output": {
      *           "cache": true,
      *           "output": true,
@@ -791,6 +793,7 @@ async function server(args, config, cb) {
      *           "id": 1,
      *           "created": "2020-04-20T06:31:11.689Z",
      *           "status": "Success"
+     *           "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
      *           "output": {
      *               "cache": true,
      *               "output": true,
@@ -1200,6 +1203,7 @@ async function server(args, config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1,
+     *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
      *       "run": 187
      *       "map": null;
      *       "created": "2020-08-03T17:37:47.036Z",

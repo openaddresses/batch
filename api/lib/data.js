@@ -74,6 +74,7 @@ class Data {
             return pgres.rows.map((res) => {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
+                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
 
                 return res;
             });
@@ -122,6 +123,7 @@ class Data {
                 jobs: pgres.rows.map((res) => {
                     res.id = parseInt(res.id);
                     res.run = parseInt(res.run);
+                    res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;
                 })
             };
@@ -158,6 +160,7 @@ class Data {
             return pgres.rows.map((res) => {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
+                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
                 return res;
             })[0];
         } catch (err) {

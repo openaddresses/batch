@@ -16,7 +16,7 @@
         "@octokit/auth-app": "^2.4.4",
         "@octokit/request": "^5.3.4",
         "@octokit/rest": "^18.0.0",
-        "@octokit/webhooks": "^7.11.0",
+        "@octokit/webhooks": "7.1.0",
         "@turf/turf": "^5.1.6",
         "aws-sdk": "^2.630.0",
         "bcrypt": "^5.0.0",

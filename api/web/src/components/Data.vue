@@ -125,6 +125,7 @@ import Coverage from './Coverage.vue';
 
 export default {
     name: 'Data',
+    props: ['auth'],
     data: function() {
         return {
             loading: {
@@ -171,9 +172,11 @@ export default {
             this.$router.push({ path: `/data/${d.id}/history` })
         },
         datapls: function(d) {
+            if (!this.auth.username) return this.$emit('login');
             this.external(`${window.location.origin}/api/job/${d.job}/output/source.geojson.gz`);
         },
         collectionpls: function(c) {
+            if (!this.auth.username) return this.$emit('login');
             this.external(`${window.location.origin}/api/collections/${c.id}/data`);
         },
         external: function(url) {

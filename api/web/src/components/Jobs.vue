@@ -56,6 +56,7 @@ import Status from './Status.vue';
 
 export default {
     name: 'Jobs',
+    props: [ 'auth' ],
     mounted: function() {
         this.refresh();
     },
@@ -82,6 +83,7 @@ export default {
             this.getJobs();
         },
         datapls: function(job) {
+            if (!this.auth.username) return this.$emit('login');
             this.external(`${window.location.origin}/api/job/${job.id}/output/source.geojson.gz`);
         },
         getJobs: function() {

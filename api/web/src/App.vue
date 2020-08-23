@@ -27,6 +27,7 @@
                 <router-view
                     :auth='auth'
                     @auth='getLogin'
+                    @login='mustlogin = true'
                     @err='err = $event'
                 />
             </div>
@@ -37,10 +38,17 @@
             :err='err'
             @err='err = $event'
         />
+
+        <MustLogin
+            v-if='mustlogin'
+            @login='mustlogin = false'
+            @err='err = $event'
+        />
     </div>
 </template>
 
 <script>
+import MustLogin from './components/MustLogin.vue'
 import Err from './components/Err.vue'
 
 export default {
@@ -51,6 +59,7 @@ export default {
     },
     data: function() {
         return {
+            mustlogin: false,
             errors: 0, //Number of Job Errors
             err: false,
             auth: {
@@ -98,6 +107,7 @@ export default {
         },
     },
     components: {
+        MustLogin,
         Err
     }
 }

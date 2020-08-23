@@ -94,7 +94,7 @@ import JobMap from './job/JobMap.vue';
 
 export default {
     name: 'Job',
-    props: ['jobid'],
+    props: ['jobid', 'auth'],
     data: function() {
         return {
             mode: 'preview',
@@ -128,6 +128,7 @@ export default {
     },
     methods: {
         datapls: function() {
+            if (!this.auth.username) return this.$emit('login');
             this.external(`${window.location.origin}/api/job/${this.job.id}/output/source.geojson.gz`);
         },
         external: function(url) {

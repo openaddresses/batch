@@ -78,12 +78,12 @@ define({ "api": [
     "group": "Collections",
     "permission": [
       {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Download a given collection file</p>",
+    "description": "<p>Download a given collection file</p> <p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -279,7 +279,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}]",
+          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}]",
           "type": "json"
         }
       ]
@@ -318,7 +318,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}",
           "type": "json"
         }
       ]
@@ -357,7 +357,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"jobs\": [{\n        \"id\": 1,\n        \"created\": \"2020-04-20T06:31:11.689Z\",\n        \"status\": \"Success\"\n        \"output\": {\n            \"cache\": true,\n            \"output\": true,\n            \"preview\": true\n        },\n        \"run\": 1\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"jobs\": [{\n        \"id\": 1,\n        \"created\": \"2020-04-20T06:31:11.689Z\",\n        \"status\": \"Success\"\n        \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n        \"output\": {\n            \"cache\": true,\n            \"output\": true,\n            \"preview\": true\n        },\n        \"run\": 1\n    }]\n}",
           "type": "json"
         }
       ]
@@ -707,7 +707,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"run\": 187\n    \"map\": null;\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"source_name\":\"us/wy/lincoln\",\n    \"source\":\"https://raw.githubusercontent.com/openaddresses/openaddresses/0f2888ba5bd572f844991f8ea0bef9c39fa39ada/sources/us/wy/lincoln.json\",\n    \"layer\":\"addresses\",\n    \"name\":\"country\",\n    \"output\":{\n        \"cache\":true,\n        \"output\":true,\n        \"preview\":true\n    },\n    \"loglink\":\"batch-staging-job/default/bfdd23b5-9575-4344-93d3-bf9cacd4761c\",\n    \"status\":\"Success\",\n    \"version\":\"1.0.0\",\n    \"count\":4257,\n    \"bounds\":{\"type\":\"Polygon\",\"coordinates\": [\"..geojson coords here..\"],\n    \"stats\":{\n        \"counts\":{\n            \"city\":0,\n            \"unit\":0,\n            \"number\":4244,\n            \"region\":0,\n            \"street\":4257,\n            \"district\":0,\n            \"postcode\":0\n        }\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"run\": 187\n    \"map\": null;\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"source_name\":\"us/wy/lincoln\",\n    \"source\":\"https://raw.githubusercontent.com/openaddresses/openaddresses/0f2888ba5bd572f844991f8ea0bef9c39fa39ada/sources/us/wy/lincoln.json\",\n    \"layer\":\"addresses\",\n    \"name\":\"country\",\n    \"output\":{\n        \"cache\":true,\n        \"output\":true,\n        \"preview\":true\n    },\n    \"loglink\":\"batch-staging-job/default/bfdd23b5-9575-4344-93d3-bf9cacd4761c\",\n    \"status\":\"Success\",\n    \"version\":\"1.0.0\",\n    \"count\":4257,\n    \"bounds\":{\"type\":\"Polygon\",\"coordinates\": [\"..geojson coords here..\"],\n    \"stats\":{\n        \"counts\":{\n            \"city\":0,\n            \"unit\":0,\n            \"number\":4244,\n            \"region\":0,\n            \"street\":4257,\n            \"district\":0,\n            \"postcode\":0\n        }\n    }\n}",
           "type": "json"
         }
       ]
@@ -790,6 +790,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -820,6 +821,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
     "parameter": {
       "fields": {
         "Parameter": [

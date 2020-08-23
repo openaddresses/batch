@@ -51,8 +51,8 @@ class Config {
             }
 
             if (!process.env.BaseUrl) {
-                console.error('ok - set env BaseUrl: http://staging.openaddresses.io');
-                process.env.BaseUrl = 'http://staging.openaddresses.io';
+                console.error('ok - set env BaseUrl: http://batch.openaddresses.io');
+                process.env.BaseUrl = 'http://batch.openaddresses.io';
             }
 
             if (!process.env.Bucket) {

@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const session = require('express-session');
-const WebhooksApi = require('@octokit/webhooks');
+const { Webhooks } = require('@octokit/webhooks');
 const Busboy = require('busboy');
 const Analytics = require('./lib/analytics');
 const path = require('path');
@@ -1503,7 +1503,7 @@ async function server(args, config, cb) {
     router.post('/github/event', async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
-        const ghverify = new WebhooksApi({
+        const ghverify = new Webhooks({
             secret: process.env.GithubSecret
         });
 

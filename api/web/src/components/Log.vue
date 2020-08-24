@@ -19,7 +19,7 @@
             </div>
         </template>
         <template v-else>
-            <div class='col col--12'>
+            <div class='col col--12 pre'>
                 <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
             </div>
         </template>

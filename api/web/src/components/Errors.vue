@@ -44,6 +44,7 @@
                             <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Suppress</button>
                             <button v-on:click.stop.prevent='createRerun(job.id)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Rerun</button>
                         </template>
+                        <button v-on:click.stop.prevent='$router.push({ path: `/job/${job.id}/log` })' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Logs</button>
                     </div>
                     <div class='col col--12 py3'>
                         <div class='align-center w-full' v-text='job.message'></div>

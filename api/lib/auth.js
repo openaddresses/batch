@@ -22,6 +22,46 @@ class Auth {
         return true;
     }
 
+    /**
+     * Given a username or email, generate a password reset email
+     * @param {string} user username or email to reset
+     */
+    async forgot(user) {
+        if (!user || !user.length) trhow new Err(400, null, 'user must not be empty');
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    username,
+                    email
+                FROM
+                    users
+                WHERE
+                    username == $1
+                    OR email == $1
+            `, [ user ]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        if (!pgres.rows.length !== 1) return;
+
+        return new Promise((resolve, reject) => {
+            crypto.randomBytes(40, async (err, buffer) => {
+                if (err) return reject(err);
+
+                try {
+                    const pgres = await this.pool.query(`
+                        INSERT INTO reset_pass
+                    `);
+                } catch (err) {
+                    return reject(err);
+                }
+            }
+        });
+    }
+
     async is_flag(req, flag) {
         await this.is_auth(req);
 

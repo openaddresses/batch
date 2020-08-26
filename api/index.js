@@ -425,6 +425,37 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {post} /api/login/forgot Forgot Login
+     * @apiVersion 1.0.0
+     * @apiName ForgotLogin
+     * @apiGroup Login
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     If a user has forgotten their password, send them a password reset link to their email
+     *
+     * @apiParam {Number} user Username or Email of account
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "status": 200
+     *   }
+     */
+    router.post('/login/forgot', async (req, res) => {
+        try {
+            await auth.forgot(body.user) // Username or email
+
+            // To avoid email scraping - this will always return true, regardless of success
+            res.json({ status: 200 });
+
+
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * {get} /api/token List Tokens
      * @apiVersion 1.0.0
      * @apiName ListTokens

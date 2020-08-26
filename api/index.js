@@ -95,6 +95,7 @@ async function server(args, config, cb) {
     }
 
     const auth = new (require('./lib/auth').Auth)(pool);
+    const email = new (require('./lib/email'))();
     const authtoken = new (require('./lib/auth').AuthToken)(pool);
 
     app.disable('x-powered-by');
@@ -444,12 +445,12 @@ async function server(args, config, cb) {
      */
     router.post('/login/forgot', async (req, res) => {
         try {
-            const reset = await auth.forgot(req.body.user) // Username or email
+            const reset = await auth.forgot(req.body.user); // Username or email
+
+            await email.forgot(reset);
 
             // To avoid email scraping - this will always return true, regardless of success
             res.json({ status: 200 });
-
-            console.error(reset)
         } catch (err) {
             return Err.respond(err, res);
         }

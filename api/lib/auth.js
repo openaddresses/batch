@@ -43,7 +43,7 @@ class Auth {
                 WHERE
                     username = $1
                     OR email = $1
-            `, [ user ]);
+            `, [user]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -58,7 +58,7 @@ class Auth {
                     users_reset
                 WHERE
                     uid = $1
-            `, [ u.id ]);
+            `, [u.id]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -74,14 +74,14 @@ class Auth {
                     NOW() + interval '1 hour',
                     $2
                 )
-            `, [ u.id, buffer.toString('hex') ]);
+            `, [u.id, buffer.toString('hex')]);
 
             return {
                 uid: u.id,
                 username: u.username,
                 email: u.email,
                 token: buffer.toString('hex')
-            }
+            };
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }

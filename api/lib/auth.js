@@ -37,10 +37,9 @@ class Auth {
                 FROM
                     users_reset
                 WHERE
-                    expires < NOW()
+                    expires > NOW()
                     AND token = $1
-            `);
-
+            `, [user.token]);
         } catch (err) {
             throw new Err(500, err, 'User Reset Error');
         }
@@ -60,9 +59,15 @@ class Auth {
                         password = $1
                     WHERE
                         id = $2
-                )
             `, [
                 userhash,
+                uid
+            ]);
+
+            await this.pool.query(`
+                DELETE FROM users_reset
+                    WHERE uid = $1
+            `, [
                 uid
             ]);
 
@@ -117,7 +122,7 @@ class Auth {
         try {
             const buffer = await randomBytes(40);
 
-            const pgres = await this.pool.query(`
+            await this.pool.query(`
                 INSERT INTO
                     users_reset (uid, expires, token)
                 VALUES (

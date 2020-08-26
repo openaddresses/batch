@@ -451,7 +451,7 @@ async function server(args, config, cb) {
             await email.forgot(reset);
 
             // To avoid email scraping - this will always return true, regardless of success
-            res.json({ status: 200, message: 'Password Email Sent' });
+            return res.json({ status: 200, message: 'Password Email Sent' });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -480,7 +480,7 @@ async function server(args, config, cb) {
      */
     router.post('/login/reset', async (req, res) => {
         try {
-            res.json(await auth.reset({
+            return res.json(await auth.reset({
                 token: req.body.token,
                 password: req.body.password
             }));

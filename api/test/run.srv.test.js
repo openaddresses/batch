@@ -151,6 +151,7 @@ test('GET: api/data', (t) => {
 
         t.deepEquals(res.body, [{
             id: 1,
+            s3: 's3://v2.openaddresses.io/test/job/1/source.geojson.gz',
             source: 'us/dc/statewide',
             layer: 'addresses',
             name: 'dcgis',

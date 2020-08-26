@@ -154,7 +154,7 @@ async function flow(api, job) {
             status: 'Fail'
         });
 
-        console.error(run)
+        console.error(run);
         if (run && run.live) {
             await JobError.create(api, job.job, 'machine failed to process source');
         }

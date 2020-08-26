@@ -65,7 +65,7 @@ class Job {
             request({
                 url: `${api}/api/job/${this.job}`,
                 json: true,
-                method: 'GET',
+                method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);
                 this.run = res.body.run;

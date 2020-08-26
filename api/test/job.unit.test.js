@@ -127,6 +127,7 @@ test('Job#json', (t) => {
 
     t.deepLooseEqual(job.json(), {
         id: false,
+        s3: false,
         run: 1,
         map: null,
         created: false,

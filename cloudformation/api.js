@@ -3,10 +3,13 @@ const cf = require('@mapbox/cloudfriend');
 
 const stack = {
     Parameters: {
-        SSLCertificateIdentifier: {
+        SharedSecret: {
             Type: 'String',
-            Description: 'SSL certificate for HTTPS protocol',
-            Default: ''
+            Description: 'Secret for auth against internal API functions'
+        },
+        MailGun: {
+            Type: 'String',
+            Description: 'MailGun API Token to send user emails'
         },
         SharedSecret: {
             Type: 'String',
@@ -56,7 +59,6 @@ const stack = {
         },
         APIHTTPListener: {
             Type: 'AWS::ElasticLoadBalancingV2::Listener',
-            Condition: 'HasNoSSL',
             Properties: {
                 DefaultActions: [{
                     Type: 'forward',
@@ -200,6 +202,9 @@ const stack = {
                         Name: 'MAPBOX_TOKEN',
                         Value: cf.ref('MapboxToken')
                     },{
+                        Name: 'MAILGUN_API_KEY',
+                        Value: cf.ref('MailGun')
+                    },{
                         Name: 'POSTGRES',
                         Value: cf.join([
                             'postgresql://openaddresses:',
@@ -289,10 +294,6 @@ const stack = {
                 SourceArn: cf.ref('APITaskDefinition')
             }
         }
-    },
-    Conditions: {
-        HasSSL: cf.notEquals(cf.ref('SSLCertificateIdentifier'), ''),
-        HasNoSSL: cf.equals(cf.ref('SSLCertificateIdentifier'), '')
     },
     Outputs: {
         APIELB: {

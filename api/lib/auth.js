@@ -3,6 +3,8 @@
 const Err = require('./error');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const { promisify } = require('util');
+const randomBytes = promisify(crypto.randomBytes);
 
 class Auth {
     constructor(pool) {
@@ -27,39 +29,62 @@ class Auth {
      * @param {string} user username or email to reset
      */
     async forgot(user) {
-        if (!user || !user.length) trhow new Err(400, null, 'user must not be empty');
+        if (!user || !user.length) throw new Err(400, null, 'user must not be empty');
 
         let pgres;
         try {
             pgres = await this.pool.query(`
                 SELECT
+                    id,
                     username,
                     email
                 FROM
                     users
                 WHERE
-                    username == $1
-                    OR email == $1
+                    username = $1
+                    OR email = $1
             `, [ user ]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        if (!pgres.rows.length !== 1) return;
+        if (pgres.rows.length !== 1) return;
+        const u = pgres.rows[0];
+        u.id = parseInt(u.id);
 
-        return new Promise((resolve, reject) => {
-            crypto.randomBytes(40, async (err, buffer) => {
-                if (err) return reject(err);
+        try {
+            await this.pool.query(`
+                DELETE FROM
+                    users_reset
+                WHERE
+                    uid = $1
+            `, [ u.id ]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
 
-                try {
-                    const pgres = await this.pool.query(`
-                        INSERT INTO reset_pass
-                    `);
-                } catch (err) {
-                    return reject(err);
-                }
+        try {
+            const buffer = await randomBytes(40);
+
+            const pgres = await this.pool.query(`
+                INSERT INTO
+                    users_reset (uid, expires, token)
+                VALUES (
+                    $1,
+                    NOW() + interval '1 hour',
+                    $2
+                )
+            `, [ u.id, buffer.toString('hex') ]);
+
+            return {
+                uid: u.id,
+                username: u.username,
+                email: u.email,
+                token: buffer.toString('hex')
             }
-        });
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
     }
 
     async is_flag(req, flag) {
@@ -395,7 +420,7 @@ class AuthToken {
                     $3
                 ) RETURNING *
             `, [
-                'oa.' + crypto.randomBytes(32).toString('hex'),
+                'oa.' + await randomBytes(32).toString('hex'),
                 auth.uid,
                 name
             ]);

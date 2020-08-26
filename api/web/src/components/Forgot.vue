@@ -55,7 +55,7 @@ export default {
                 })
             }).then((res) => {
                 this.loading = false;
-                if (!res.ok) throw new Error('Incorrect username or password');
+                if (!res.ok) throw new Error('Failed to reset password');
             }).catch((err) => {
                 this.$emit('err', err);
             });

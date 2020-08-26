@@ -15,6 +15,7 @@ import Upload from './components/Upload.vue';
 import Errors from './components/Errors.vue';
 import Login from './components/Login.vue';
 import Forgot from './components/Forgot.vue';
+import Reset from './components/Reset.vue';
 import History from './components/History.vue';
 import Data from './components/Data.vue';
 import Runs from './components/Runs.vue';
@@ -44,6 +45,7 @@ const router = new VueRouter({
 
         { path: '/login', component: Login },
         { path: '/login/forgot', component: Forgot },
+        { path: '/login/reset', component: Reset },
         { path: '/profile', component: Profile },
         { path: '/register', component: Register },
 

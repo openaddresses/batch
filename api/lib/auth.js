@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
+const hash = promisify(bcrypt.hash);
 
 class Auth {
     constructor(pool) {
@@ -22,6 +23,56 @@ class Auth {
         }
 
         return true;
+    }
+
+    async reset(user) {
+        if (!user.token) throw new Err(400, null, 'token required');
+        if (!user.password) throw new Err(400, null, 'password required');
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    uid
+                FROM
+                    users_reset
+                WHERE
+                    expires < NOW()
+                    AND token = $1
+            `);
+
+        } catch (err) {
+            throw new Err(500, err, 'User Reset Error');
+        }
+
+        if (pgres.rows.length !== 1) {
+            throw new Err(401, null, 'Invalid or Expired Reset Token');
+        }
+
+        const uid = pgres.rows[0].uid;
+
+        try {
+            const userhash = await hash(user.password, 10);
+
+            await this.pool.query(`
+                UPDATE users
+                    SET
+                        password = $1
+                    WHERE
+                        id = $2
+                )
+            `, [
+                userhash,
+                uid
+            ]);
+
+            return {
+                status: 200,
+                message: 'User Reset'
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to create user');
+        }
     }
 
     /**

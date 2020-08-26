@@ -869,6 +869,93 @@
     "groupTitle": "Job"
   },
   {
+    "type": "post",
+    "url": "/api/login/forgot",
+    "title": "Forgot Login",
+    "version": "1.0.0",
+    "name": "ForgotLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>If a user has forgotten their password, send them a password reset link to their email</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user",
+            "description": "<p>Username or Email of account</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Password Email Sent\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "post",
+    "url": "/api/login/reset",
+    "title": "Reset Login",
+    "version": "1.0.0",
+    "name": "ResetLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Once a user has obtained a password reset by email via the Forgot Login API, use the token to reset the password</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Password reset token</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>New password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Password Email Sent\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
     "type": "get",
     "url": "/api/login",
     "title": "Session Info",

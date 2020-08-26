@@ -435,12 +435,13 @@ async function server(args, config, cb) {
      * @apiDescription
      *     If a user has forgotten their password, send them a password reset link to their email
      *
-     * @apiParam {Number} user Username or Email of account
+     * @apiParam {String} user Username or Email of account
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
-     *       "status": 200
+     *       "status": 200,
+     *       "message": "Password Email Sent"
      *   }
      */
     router.post('/login/forgot', async (req, res) => {
@@ -450,7 +451,40 @@ async function server(args, config, cb) {
             await email.forgot(reset);
 
             // To avoid email scraping - this will always return true, regardless of success
-            res.json({ status: 200 });
+            res.json({ status: 200, message: 'Password Email Sent' });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/login/reset Reset Login
+     * @apiVersion 1.0.0
+     * @apiName ResetLogin
+     * @apiGroup Login
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Once a user has obtained a password reset by email via the Forgot Login API,
+     *     use the token to reset the password
+     *
+     * @apiParam {String} token Password reset token
+     * @apiParam {String} password New password
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "status": 200,
+     *       "message": "Password Email Sent"
+     *   }
+     */
+    router.post('/login/reset', async (req, res) => {
+        try {
+            res.json(await auth.reset({
+                token: req.body.token,
+                password: req.body.password
+            }));
+
         } catch (err) {
             return Err.respond(err, res);
         }

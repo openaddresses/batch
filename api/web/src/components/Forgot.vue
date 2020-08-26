@@ -5,6 +5,20 @@
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
+        <template v-else-if='reset'>
+            <div class='col col--12 flex-parent flex-parent--center-main'>
+                <h3 class='flex-child txt-h4 py6'>Reset Login</h3>
+            </div>
+            <div class='col col--12 flex-parent flex-parent--center-main'>
+                <div class='flex-child py6'>A password reset email has been sent</div>
+            </div>
+            <div class='col col--12 flex-parent flex-parent--center-main'>
+                <div class='flex-child py6'>(If a user account exists)</div>
+            </div>
+            <div class='col col--12 flex-parent flex-parent--center-main'>
+                <button @click='$router.push({ path: "/data" })' class='btn btn--stroke round my12'>Thanks</button>
+            </div>
+        </template>
         <template v-else>
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <h3 class='flex-child txt-h4 py6'>Reset Login</h3>
@@ -56,6 +70,7 @@ export default {
             }).then((res) => {
                 this.loading = false;
                 if (!res.ok) throw new Error('Failed to reset password');
+                this.reset = true;
             }).catch((err) => {
                 this.$emit('err', err);
             });

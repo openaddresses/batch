@@ -11,10 +11,6 @@ const stack = {
             Type: 'String',
             Description: 'MailGun API Token to send user emails'
         },
-        SharedSecret: {
-            Type: 'String',
-            Description: 'Secret for auth against internal API functions'
-        },
         GithubSecret: {
             Type: 'String',
             Description: 'Github CI Integration Secret'

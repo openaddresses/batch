@@ -3,6 +3,9 @@
 const Err = require('./error');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const { promisify } = require('util');
+const randomBytes = promisify(crypto.randomBytes);
+const hash = promisify(bcrypt.hash);
 
 class Auth {
     constructor(pool) {
@@ -20,6 +23,124 @@ class Auth {
         }
 
         return true;
+    }
+
+    async reset(user) {
+        if (!user.token) throw new Err(400, null, 'token required');
+        if (!user.password) throw new Err(400, null, 'password required');
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    uid
+                FROM
+                    users_reset
+                WHERE
+                    expires > NOW()
+                    AND token = $1
+            `, [user.token]);
+        } catch (err) {
+            throw new Err(500, err, 'User Reset Error');
+        }
+
+        if (pgres.rows.length !== 1) {
+            throw new Err(401, null, 'Invalid or Expired Reset Token');
+        }
+
+        const uid = pgres.rows[0].uid;
+
+        try {
+            const userhash = await hash(user.password, 10);
+
+            await this.pool.query(`
+                UPDATE users
+                    SET
+                        password = $1
+                    WHERE
+                        id = $2
+            `, [
+                userhash,
+                uid
+            ]);
+
+            await this.pool.query(`
+                DELETE FROM users_reset
+                    WHERE uid = $1
+            `, [
+                uid
+            ]);
+
+            return {
+                status: 200,
+                message: 'User Reset'
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to create user');
+        }
+    }
+
+    /**
+     * Given a username or email, generate a password reset email
+     * @param {string} user username or email to reset
+     */
+    async forgot(user) {
+        if (!user || !user.length) throw new Err(400, null, 'user must not be empty');
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    id,
+                    username,
+                    email
+                FROM
+                    users
+                WHERE
+                    username = $1
+                    OR email = $1
+            `, [user]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        if (pgres.rows.length !== 1) return;
+        const u = pgres.rows[0];
+        u.id = parseInt(u.id);
+
+        try {
+            await this.pool.query(`
+                DELETE FROM
+                    users_reset
+                WHERE
+                    uid = $1
+            `, [u.id]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        try {
+            const buffer = await randomBytes(40);
+
+            await this.pool.query(`
+                INSERT INTO
+                    users_reset (uid, expires, token)
+                VALUES (
+                    $1,
+                    NOW() + interval '1 hour',
+                    $2
+                )
+            `, [u.id, buffer.toString('hex')]);
+
+            return {
+                uid: u.id,
+                username: u.username,
+                email: u.email,
+                token: buffer.toString('hex')
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
     }
 
     async is_flag(req, flag) {
@@ -355,7 +476,7 @@ class AuthToken {
                     $3
                 ) RETURNING *
             `, [
-                'oa.' + crypto.randomBytes(32).toString('hex'),
+                'oa.' + await randomBytes(32).toString('hex'),
                 auth.uid,
                 name
             ]);

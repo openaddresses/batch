@@ -93,3 +93,9 @@ CREATE TABLE IF NOT EXISTS runs (
     closed      BOOL
 );
 
+CREATE TABLE IF NOT EXISTS users_reset (
+    uid         BIGINT,
+    expires     TIMESTAMP,
+    token       TEXT
+);
+

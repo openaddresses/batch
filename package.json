@@ -2,14 +2,13 @@
     "name": "batch",
     "version": "1.0.0",
     "description": "AWS Batch based ETL Processing",
-    "main": "cli.js",
     "repository": "git@github.com:openaddresses/batch",
     "author": "ingalls <nick@ingalls.ca>",
     "license": "MIT",
     "private": false,
     "scripts": {
         "test": "echo 'no tests'",
-        "lint": "eslint cli.js cloudformation/**.js"
+        "lint": "eslint cloudformation/**.js"
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^4.0.0",

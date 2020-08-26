@@ -93,7 +93,7 @@ const stack = {
                         }
                     }]
                 },
-                LaunchTemplateName: cf.join('-', ['batch-mega', cf.ref('AWS::StackName')]),
+                LaunchTemplateName: cf.join('-', ['batch-mega', cf.ref('AWS::StackName')])
             }
         },
         BatchComputeEnvironment: {
@@ -138,8 +138,8 @@ const stack = {
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     LaunchTemplate: {
-                          LaunchTemplateId: cf.ref('BatchMegaLaunchTemplate'),
-                          Version: cf.getAtt('BatchMegaLaunchTemplate', 'LatestVersionNumber')
+                        LaunchTemplateId: cf.ref('BatchMegaLaunchTemplate'),
+                        Version: cf.getAtt('BatchMegaLaunchTemplate', 'LatestVersionNumber')
                     },
                     Subnets:  [
                         'subnet-de35c1f5',

@@ -27,6 +27,8 @@
         "express": "^4.17.1",
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
+        "mailgen": "^2.0.13",
+        "mailgun.js": "^2.0.1",
         "minimist": "^1.2.2",
         "moment": "^2.27.0",
         "morgan": "^1.10.0",

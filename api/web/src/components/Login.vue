@@ -12,19 +12,19 @@
 
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
-                    <label class='mt12'>Username:</label>
+                    <label class='mt12 w-full'>Username: <span @click='$router.push({ path: "/login/forgot" })' class='fr cursor-pointer txt-underline-on-hover'>Forgot it?</span></label>
                     <input v-on:keyup.enter='login' :class='{
                          "input--border-red": attempted && !username
                     }' v-model='username' type='text' class='input'/>
 
-                    <label class='mt12'>Password:</label>
+                    <label class='mt12 w-full'>Password: <span @click='$router.push({ path: "/login/forgot" })' class='fr cursor-pointer txt-underline-on-hover'>Forgot it?</span></label>
                     <input v-on:keyup.enter='login' :class='{
                          "input--border-red": attempted && !password
                    } ' v-model='password' type='password' class='input'/>
 
                     <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
 
-                    <div @click='emitregister' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
+                    <div @click='$router.push({ path: "/register" })' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
                 </div>
             </div>
 
@@ -45,9 +45,6 @@ export default {
         }
     },
     methods: {
-        emitregister: function() {
-            this.$router.push({ path: '/register' });
-        },
         login: function() {
             this.attempted = true;
 

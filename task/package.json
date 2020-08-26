@@ -5,23 +5,28 @@
     "license": "MIT",
     "private": true,
     "scripts": {
+        "test": "tape test/*.test.js",
         "lint": "eslint task.js lib/**.js test/**.js"
     },
     "dependencies": {
         "@mapbox/decrypt-kms-env": "^3.0.0",
+        "@turf/turf": "^5.1.6",
         "ajv": "^6.12.0",
+        "archiver": "^5.0.0",
         "csv-parse": "^4.8.8",
         "find": "^0.3.0",
+        "glob": "^7.1.6",
+        "minimist": "^1.2.5",
+        "mkdirp": "^1.0.4",
         "parallel-transform": "^1.2.0",
-        "request": "^2.88.2"
+        "prompts": "^2.3.2",
+        "request": "^2.88.2",
+        "split": "^1.0.1",
+        "unzipper": "^0.10.11"
     },
     "devDependencies": {
-        "@mapbox/eslint-config-geocoding": "^2.0.2",
-        "eslint": "^6.8.0",
+        "eslint": "^7.0.0",
         "eslint-plugin-node": "^11.0.0",
-        "tape": "^4.13.0"
-    },
-    "eslintConfig": {
-        "extends": "@mapbox/eslint-config-geocoding"
+        "tape": "^5.0.0"
     }
 }

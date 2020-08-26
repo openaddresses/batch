@@ -1,7 +1,13 @@
 'use strict';
 
 const Run = require('./run');
+const request = require('request');
+const Err = require('./error');
+const pkg = require('../package.json');
 
+/**
+ * @class GH
+ */
 class GH {
     constructor(url, ref, sha, check) {
         this.url = url;
@@ -26,14 +32,88 @@ class GH {
     }
 }
 
+/**
+ * @class CI
+ */
 class CI {
+    /**
+     * @constructor
+     *
+     * @param {Config} config Server config
+     */
     constructor(config) {
         this.config = config;
     }
 
-    async push(pool, event) {
+    /**
+     * Once a run is finished, update the corresponding check
+     *
+     * @param {Run} run object to update GH status with
+     */
+    async check(run) {
+        if (!['Success', 'Fail'].includes(run.status)) {
+            throw new Err(400, null, `Github check can only report Success/Fail, given: ${run.status}`);
+        }
+
         try {
-            const check = await this.config.okta.checks.create({
+            const conclusion = run.status === 'Success' ? 'success' : 'failure';
+
+            await this.config.octo.checks.update({
+                owner: 'openaddresses',
+                repo: 'openaddresses',
+                check_run_id: run.github.check,
+                conclusion: conclusion
+            });
+        } catch (err) {
+            throw new Error(err);
+        }
+    }
+
+    /**
+     * Accept git repo relative file paths and convert them into github.com paths
+     *
+     * @param {string[]} files List of files to prep
+     * @param {string} sha GitSha of files to prep
+     *
+     * @returns {string[]} Deduped list of github.com file paths
+     */
+    static fileprep(files, sha) {
+        return Array.from(new Set(files.filter((file) => {
+            if (!/sources\//.test(file) || !/\.json$/.test(file)) return false;
+            return true;
+        }).map((file) => {
+            file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/${file}`;
+            return file;
+        }))).sort();
+    }
+
+    async filediff(ref) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
+                json: true,
+                headers: {
+                    'User-Agent': `OpenAddresses v${pkg.version}`
+                },
+                method: 'GET'
+            }, (err, res) => {
+                if (err) return reject(err);
+
+                return resolve(res.body.files.map((file) => {
+                    return file.filename;
+                }));
+            });
+        });
+    }
+
+    async push(pool, event) {
+        // The push event was to merge/delete a given branch/pr
+        if (event.after === '0000000000000000000000000000000000000000') {
+            return true;
+        }
+
+        try {
+            const check = await this.config.octo.checks.create({
                 owner: 'openaddresses',
                 repo: 'openaddresses',
                 name: 'openaddresses/data-pls',
@@ -44,35 +124,31 @@ class CI {
                 event.head_commit.url,
                 event.ref,
                 event.after,
-                check.id
+                check.data.id
             );
 
             console.error(`ok - GH:Push:${event.after}: Added Check`);
 
-            const files = [].concat(event.head_commit.added, event.head_commit.modified);
+            let files = [];
+            if (event.ref === 'refs/heads/master') {
+                files = [].concat(event.head_commit.added, event.head_commit.modified);
+            } else {
+                files = await this.filediff(event.ref.replace(/refs\/heads\//, ''));
+            }
 
-            files.filter((file) => {
-                if (
-                    !/sources\//.test(file)
-                    || !/\.json$\//.test(file)
-                ) {
-                    return true;
-                }
-
-                return false;
-            }).forEach((file) => {
-                file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${gh.sha}/${file}`;
-
+            CI.fileprep(files, gh.sha).forEach((file) => {
+                console.error(`ok - GH:Push:${event.after}: Job: ${file}`);
                 gh.add_job(file);
             });
+
             console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
 
             if (!gh.jobs.length) {
-                await this.config.okta.checks.update({
+                await this.config.octo.checks.update({
                     owner: 'openaddresses',
                     repo: 'openaddresses',
                     check_run_id: gh.check,
-                    conclusion: 'No data sources to run'
+                    conclusion: 'success'
                 });
                 console.error(`ok - GH:Push:${event.after}: Closed Check - No Jobs`);
             } else {
@@ -82,8 +158,27 @@ class CI {
                 });
                 console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);
 
-                await Run.populate(pool, run.id, gh.jobs);
+                const jobs = await Run.populate(pool, run.id, gh.jobs);
                 console.error(`ok - GH:Push:${event.after}: Run Populated`);
+
+                if (jobs.jobs.length === 0) {
+                    await this.config.octo.checks.update({
+                        owner: 'openaddresses',
+                        repo: 'openaddresses',
+                        check_run_id: gh.check,
+                        conclusion: 'success'
+                    });
+
+                    console.error(`ok - GH:Push:${event.after}: Check Closed - No Run Jobs Populated`);
+                } else {
+                    await this.config.octo.checks.update({
+                        owner: 'openaddresses',
+                        repo: 'openaddresses',
+                        check_run_id: gh.check,
+                        details_url: process.env.BaseUrl + `/run/${run.id}`
+                    });
+                    console.error(`ok - GH:Push:${event.after}: Check Updated`);
+                }
             }
         } catch (err) {
             throw new Error(err);

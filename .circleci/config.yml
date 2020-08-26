@@ -1,0 +1,29 @@
+version: 2
+
+jobs:
+    build:
+        docker:
+            - image: ubuntu:20.04
+            - image: mdillon/postgis:11
+        steps:
+            - run:
+                name: "Add ubuntu-toolchain"
+                command: |
+                  apt-get update -y \
+                  && apt-get install -y build-essential git postgresql-client curl wget gnupg2
+
+            - checkout
+
+            - run:
+                name: "Install NodeJS"
+                command: |
+                  curl 'https://nodejs.org/dist/v10.15.3/node-v10.15.3-linux-x64.tar.gz' | tar -xzv \
+                  && cp ./node-v10.15.3-linux-x64/bin/node /usr/bin/ \
+                  && ./node-v10.15.3-linux-x64/bin/npm install -g yarn \
+                  && ./node-v10.15.3-linux-x64/bin/npm install -g npm \
+                  && echo "export PATH=$(yarn global bin):$PATH" >> $BASH_ENV \
+                  yarn install
+
+            - run:
+                name: "Test"
+                command: ./test

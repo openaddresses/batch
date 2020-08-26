@@ -10,14 +10,14 @@ class PublicError {
     }
 
     static respond(err, res) {
+        console.error(err);
+
         if (err instanceof PublicError) {
-            res.status(this.status).json({
-                status: this.status,
-                message: this.safe
+            res.status(err.status).json({
+                status: err.status,
+                message: err.safe
             });
         } else {
-            console.error(err);
-
             res.status(500).json({
                 status: 500,
                 message: 'Internal Server Error'

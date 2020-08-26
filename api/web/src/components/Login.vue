@@ -13,12 +13,18 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12'>Username:</label>
-                    <input type='text' class='input'/>
+                    <input v-on:keyup.enter='login' :class='{
+                         "input--border-red": attempted && !username
+                    }' v-model='username' type='text' class='input'/>
 
                     <label class='mt12'>Password:</label>
-                    <input type='password' class='input'/>
+                    <input v-on:keyup.enter='login' :class='{
+                         "input--border-red": attempted && !password
+                   } ' v-model='password' type='password' class='input'/>
 
                     <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
+
+                    <div @click='emitregister' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
                 </div>
             </div>
 
@@ -33,15 +39,20 @@ export default {
     data: function() {
         return {
             loading: false,
+            attempted: false,
             username: '',
             password: ''
         }
     },
-    mounted: function() {
-        window.location.hash = `login`
-    },
     methods: {
+        emitregister: function() {
+            this.$router.push({ path: '/register' });
+        },
         login: function() {
+            this.attempted = true;
+
+            if (!this.username.length) return;
+            if (!this.password.length) return;
             this.loading = true;
 
             fetch(window.location.origin + `/api/login`, {
@@ -54,8 +65,14 @@ export default {
                     username: this.username,
                     password: this.password
                 })
-            }).then(() => {
+            }).then((res) => {
                 this.loading = false;
+                if (!res.ok) throw new Error('Incorrect username or password');
+
+                this.$emit('auth');
+                this.$router.push('/data')
+            }).catch((err) => {
+                this.$emit('err', err);
             });
         }
     }

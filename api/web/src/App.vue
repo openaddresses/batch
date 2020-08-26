@@ -2,144 +2,333 @@
     <div id='app' class='col col--12'>
         <div class='col col--12 px12 py12 border-b border--gray'>
             <img @click='external("https://openaddresses.io")' class='h24 w24 round mr12 cursor-pointer' src='../public/logo.jpg'/>
-            <button @click='mode = "data"' class='btn btn--stroke btn--s btn--gray round mr12'>Data</button>
-            <button @click='mode = "runs"' class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button>
-            <button @click='mode = "jobs"' class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button>
+            <router-link to='/data'><button class='btn btn--stroke btn--s btn--gray round mr12'>Data</button></router-link>
+            <router-link to='/run'><button class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button></router-link>
+            <router-link to='/job'><button class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button></router-link>
+            <router-link to='/errors'><button class='btn btn--stroke btn--s btn--gray round mr12'>
+                <span class='bg-gray-light round color-gray px6' v-text='errors'/>
+                Errors
+            </button></router-link>
 
-            <button @click='mode = "login"' class='fr btn btn--stroke btn--s btn--gray round mr12'>Login</button>
+            <span class='fr'>
+                <router-link to='/upload'><button class='btn btn--stroke btn--s btn--gray round mr12 h24'>Contribute</button></router-link>
+
+                <button @click='external("/docs", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
+
+                <router-link v-if='!auth.username' to='/login'><button class='btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
+                <router-link v-else to='/profile'><button class='btn btn--stroke btn--s btn--gray round mr12'>
+                    <svg class='inline pt3 icon'><use xlink:href='#icon-user'/></svg><span v-text='auth.username'/>
+                </button></router-link>
+            </span>
         </div>
 
-        <div class='col col--12 flex-parent flex-parent--center-main'>
-            <div class='flex-child wmax600 col col--12'>
-                <template v-if='mode === "login"'>
-                    <Login
-                        v-on:job='emitlogin($event)'
-                    />
-                </template>
-                <template v-if='mode === "data"'>
-                    <Data
-                        v-on:job='emitjob($event)'
-                    />
-                </template>
-                <template v-else-if='mode === "runs"'>
-                    <Runs
-                        v-on:run='emitrun($event)'
-                    />
-                </template>
-                <template v-else-if='mode === "jobs"'>
-                    <Jobs
-                        v-on:log='emitlog($event)'
-                        v-on:job='emitjob($event)'
-                    />
-                </template>
-                <template v-else-if='mode === "log"'>
-                    <Log
-                        :jobid='jobid'
-                        v-on:close='mode = "job"'
-                    />
-                </template>
-                <template v-else-if='mode === "job"'>
-                    <Job
-                        :jobid='jobid'
-                        v-on:close='mode = "jobs"'
-                        v-on:log='emitlog($event)'
-                    />
-                </template>
-                <template v-else-if='mode === "run"'>
-                    <Run
-                        :runid='runid'
-                        v-on:job='emitjob($event)'
-                        v-on:close='mode = "runs"'
-                    />
-                </template>
+        <div class='col col--12 flex-parent flex-parent--center-main relative'>
+            <div class='flex-child col col--12 wmax600'>
+                <router-view
+                    :auth='auth'
+                    @auth='getLogin'
+                    @login='mustlogin = true'
+                    @err='err = $event'
+                />
             </div>
         </div>
+
+        <Err
+            v-if='err'
+            :err='err'
+            @err='err = $event'
+        />
+
+        <MustLogin
+            v-if='mustlogin'
+            @login='mustlogin = false'
+            @err='err = $event'
+        />
     </div>
 </template>
 
 <script>
-import Login from './components/Login.vue';
-import Data from './components/Data.vue';
-import Runs from './components/Runs.vue';
-import Jobs from './components/Jobs.vue';
-import Job from './components/Job.vue';
-import Run from './components/Run.vue';
-import Log from './components/Log.vue';
+import MustLogin from './components/MustLogin.vue'
+import Err from './components/Err.vue'
 
 export default {
     name: 'OpenAddresses',
+    mounted: function() {
+        this.getLogin();
+        this.getCount();
+    },
     data: function() {
         return {
-            mode: false,
+            mustlogin: false,
+            errors: 0, //Number of Job Errors
+            err: false,
+            auth: {
+                username: false,
+                email: false,
+                access: false,
+                flags: {}
+            },
             runid: false,
-            jobid: false
+            jobid: false,
+            dataid: false
         };
     },
-    mounted: function() {
-        const mode = window.location.hash.replace('#', '').split(':');
-        if (mode.length && ['data', 'runs', 'jobs'].includes(mode[0])) {
-            if (mode[0] === 'jobs') {
-                if (mode.length >= 2) {
-                    this.jobid = parseInt(mode[1]);
-
-                    if (mode.length >= 3) {
-                        this.mode = 'log'
-                    } else {
-                        this.mode = 'job';
-                    }
-                } else {
-                    this.mode = 'jobs';
-                }
-            } else if (mode[0] === 'runs') {
-                if (mode.length >= 2) {
-                    this.runid = parseInt(mode[1]);
-                    this.mode = 'run';
-                } else {
-                    this.mode = 'runs';
-                }
-            } else if (mode[0] === 'login') {
-                this.mode = 'login';
-            } else if (mode[0] === 'data') {
-                this.mode = 'data';
-            } else {
-                this.mode = 'data';
-            }
-        } else {
-            this.mode = 'data';
-        }
-    },
-    watch: {
-        mode: function() {
-            if (!['log', 'job'].includes(this.mode)) {
-                this.jobid = false;
-            }
-        }
-    },
     methods: {
-        external: function(url) {
-            window.location.href = url;
+        getLogin: function() {
+            fetch(`${window.location.origin}/api/login`, {
+                method: 'GET'
+            }).then((res) => {
+                return res.json();
+            }).then((res) => {
+                this.auth = res;
+            }).catch((err) => {
+                console.error(err);
+                this.err = err;
+            });
         },
-        emitlog: function(jobid) {
-            this.jobid = jobid;
-            this.mode = 'log';
+        getCount: function() {
+            fetch(`${window.location.origin}/api/job/error/count`, {
+                method: 'GET'
+            }).then((res) => {
+                return res.json();
+            }).then((res) => {
+                this.errors = res.count;
+            }).catch((err) => {
+                console.error(err);
+                this.err = err;
+            });
         },
-        emitrun: function(runid) {
-            this.runid = runid;
-            this.mode = 'run';
+        external: function(url, tab) {
+            if (!tab) {
+                window.location.href = url;
+            } else {
+                window.open(url, "_blank");
+            }
         },
-        emitjob: function(jobid) {
-            this.jobid = jobid;
-            this.mode = 'job';
-        }
     },
     components: {
-        Login,
-        Data,
-        Runs,
-        Jobs,
-        Run,
-        Log,
-        Job
+        MustLogin,
+        Err
     }
 }
 </script>
+
+<style>
+.tooltip {
+    display: block !important;
+    z-index: 10000;
+
+    .tooltip-inner {
+        background: black;
+        color: white;
+        border-radius: 4px;
+        padding: 5px 10px 4px;
+    }
+
+    .tooltip-arrow {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        position: absolute;
+        margin: 5px;
+        border-color: black;
+        z-index: 1;
+    }
+
+    &[x-placement^="top"] {
+        margin-bottom: 5px;
+
+        .tooltip-arrow {
+            border-width: 5px 5px 0 5px;
+            border-left-color: transparent !important;
+            border-right-color: transparent !important;
+            border-bottom-color: transparent !important;
+            bottom: -5px;
+            left: calc(50% - 5px);
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    &[x-placement^="bottom"] {
+        margin-top: 5px;
+
+        .tooltip-arrow {
+            border-width: 0 5px 5px 5px;
+            border-left-color: transparent !important;
+            border-right-color: transparent !important;
+            border-top-color: transparent !important;
+            top: -5px;
+            left: calc(50% - 5px);
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    &[x-placement^="right"] {
+        margin-left: 5px;
+
+        .tooltip-arrow {
+            border-width: 5px 5px 5px 0;
+            border-left-color: transparent !important;
+            border-top-color: transparent !important;
+            border-bottom-color: transparent !important;
+            left: -5px;
+            top: calc(50% - 5px);
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+
+    &[x-placement^="left"] {
+        margin-right: 5px;
+
+        .tooltip-arrow {
+            border-width: 5px 0 5px 5px;
+            border-top-color: transparent !important;
+            border-right-color: transparent !important;
+            border-bottom-color: transparent !important;
+            right: -5px;
+            top: calc(50% - 5px);
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+
+    &.popover {
+        $color: #f9f9f9;
+
+        .popover-inner {
+            background: $color;
+            color: black;
+            padding: 24px;
+            border-radius: 5px;
+            box-shadow: 0 5px 30px rgba(black, .1);
+        }
+
+        .popover-arrow {
+            border-color: $color;
+        }
+    }
+
+    &[aria-hidden='true'] {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity .15s, visibility .15s;
+    }
+
+    &[aria-hidden='false'] {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity .15s;
+    }
+}
+
+CSS
+
+.tooltip {
+    display: block !important;
+    z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+    background: black;
+    color: white;
+    border-radius: 4px;
+    padding: 5px 10px 4px;
+}
+
+.tooltip .tooltip-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    margin: 5px;
+    border-color: black;
+    z-index: 1;
+}
+
+.tooltip[x-placement^="top"] {
+    margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+    border-width: 5px 5px 0 5px;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    bottom: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+    margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+    border-width: 0 5px 5px 5px;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-top-color: transparent !important;
+    top: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+    margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+    border-width: 5px 5px 5px 0;
+    border-left-color: transparent !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    left: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+    margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+    border-width: 5px 0 5px 5px;
+    border-top-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    right: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+    background: #f9f9f9;
+    color: black;
+    padding: 24px;
+    border-radius: 5px;
+    box-shadow: 0 5px 30px rgba(black, .1);
+}
+
+.tooltip.popover .popover-arrow {
+    border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
+}
+</style>

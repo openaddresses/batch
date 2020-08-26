@@ -8,6 +8,7 @@
     "license": "MIT",
     "private": false,
     "scripts": {
+        "test": "echo 'no tests'",
         "lint": "eslint cli.js cloudformation/**.js"
     },
     "dependencies": {
@@ -18,11 +19,7 @@
         "request": "^2.88.2"
     },
     "devDependencies": {
-        "@mapbox/eslint-config-geocoding": "^2.0.2",
-        "eslint": "^6.8.0",
+        "eslint": "^7.0.0",
         "eslint-plugin-node": "^11.0.0"
-    },
-    "eslintConfig": {
-        "extends": "@mapbox/eslint-config-geocoding"
     }
 }

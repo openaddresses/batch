@@ -1,6 +1,29 @@
 'use strict';
 
 const request = require('request');
+const pkg = require('../package.json');
+const Err = require('./error');
+
+class Status {
+    static list() {
+        return [
+            'Pending',
+            'Success',
+            'Fail',
+            'Warn'
+        ];
+    }
+
+    static verify(statuses) {
+        const list = Status.list();
+
+        for (const status of statuses) {
+            if (!list.includes(status)) {
+                throw new Err(400, null, 'Invalid status param');
+            }
+        }
+    }
+}
 
 class Param {
     static int(req, res, name) {
@@ -18,6 +41,9 @@ function explode(url) {
     return new Promise((resolve, reject) => {
         request({
             url: url,
+            headers: {
+                'User-Agent': `OpenAddresses v${pkg.version}`
+            },
             method: 'GET',
             json: true
         }, (err, res) => {
@@ -52,5 +78,9 @@ function explode(url) {
     });
 }
 
-module.exports.explode = explode;
-module.exports.Param = Param;
+module.exports = {
+    explode,
+    Param,
+    Status
+};
+

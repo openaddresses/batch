@@ -4,6 +4,7 @@ const cf = require('@mapbox/cloudfriend');
 const api = require('./api');
 const batch = require('./batch');
 const db = require('./db');
+const schedule = require('./schedule');
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -20,6 +21,11 @@ const stack = {
         Bucket: {
             Type: 'String',
             Description: 'S3 Asset Storage'
+        },
+        Branch: {
+            Type: 'String',
+            Description: 'Github branch to schedule source runs from',
+            Default: 'master'
         }
     }
 };
@@ -28,5 +34,8 @@ module.exports = cf.merge(
     stack,
     db,
     api,
-    batch
+    batch,
+    schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),
+    schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
+    schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs')
 );

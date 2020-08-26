@@ -1,6 +1,8 @@
 'use strict';
 
 const Ajv = require('ajv');
+const JobError = require('./joberror');
+const turf = require('@turf/turf');
 const gzip = require('zlib').createGzip;
 const os = require('os');
 const fs = require('fs');
@@ -43,15 +45,34 @@ class Job {
 
         this.job = job;
         this.url = url;
+        this.run = false;
         this.source = false;
         this.layer = layer;
         this.name = name;
+        this.bounds = [];
+        this.count = 0;
+        this.stats = {};
 
         this.assets = {
             cache: false,
             output: false,
             preview: false
         };
+    }
+
+    get(api) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: `${api}/api/job/${this.job}`,
+                json: true,
+                method: 'GET',
+            }, (err, res) => {
+                if (err) return reject(err);
+                this.run = res.body.run;
+
+                return resolve();
+            });
+        });
     }
 
     fetch() {
@@ -98,10 +119,16 @@ class Job {
         });
     }
 
-    convert() {
-        return new Promise(async (resolve, reject) => {
-            const output = await Job.find('out.csv', this.tmp);
+    async convert() {
+        let output;
 
+        try {
+            output = await Job.find('out.csv', this.tmp);
+        } catch (err) {
+            throw new Error(err);
+        }
+
+        return new Promise((resolve, reject) => {
             if (output.length !== 1) return reject(new Error('out.csv not found'));
 
             pipeline(
@@ -110,6 +137,10 @@ class Job {
                     delimiter: ','
                 }),
                 transform(100, (data, cb) => {
+                    if (data[2] === 'NUMBER' && data[3] === 'STREET') {
+                        return cb(null, '');
+                    }
+
                     return cb(null, JSON.stringify({
                         type: 'Feature',
                         properties: {
@@ -125,13 +156,27 @@ class Job {
                         },
                         geometry: {
                             type: 'Point',
-                            coordinates: [data[0], data[1]]
+                            coordinates: [
+                                Number(data[0]),
+                                Number(data[1])
+                            ]
                         }
                     }) + '\n');
                 }),
                 fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),
-                (err) => {
+                async (err) => {
                     if (err) return reject(err);
+
+                    try {
+                        const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
+                        await stats.calc();
+
+                        this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
+                        this.count = stats.stats.count;
+                        this.stats = stats.stats[stats.layer];
+                    } catch (err) {
+                        return reject(new Error(err));
+                    }
 
                     return resolve(path.resolve(this.tmp, 'out.geojson'));
                 }
@@ -226,13 +271,61 @@ class Job {
                 url: `${api}/api/job/${this.job}`,
                 json: true,
                 method: 'PATCH',
-                body: body
+                body: body,
+                headers: {
+                    'shared-secret': process.env.SharedSecret
+                }
             }, (err, res) => {
                 if (err) return reject(err);
 
                 return resolve(res.body);
             });
         });
+    }
+
+    compare(api) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: `${api}/api/job/${this.job}/delta`,
+                json: true,
+                method: 'GET'
+            }, (err, res) => {
+                if (err) return reject(err);
+
+                return resolve(res.body);
+            });
+        });
+    }
+
+    async check(api, run) {
+        const diff = await this.compare(api);
+
+        // New Source
+        if (diff && diff.message && diff.message === 'Job does not match a live job') {
+            return true;
+        }
+
+        // 10% reduction or greater is bad
+        if (diff.delta.count / diff.master.count <= -0.1) {
+            await this.update(api, { status: 'Warn' });
+            if (run.live) await JobError.create(api, this.job, `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`);
+        }
+
+        if (this.job.layer === 'addresses') {
+            const number = diff.delta.stats.counts.number / diff.master.stats.counts.number;
+            if (number <= -0.1) {
+                await this.update(api, { status: 'Warn' });
+                if (run.live) await JobError.create(api, this.job, `"number" prop dropped by ${Math.round(number * 100) / 100}`);
+            }
+
+            const street = diff.delta.stats.counts.street / diff.master.stats.counts.street;
+            if (street <= -0.1) {
+                await this.update(api, { status: 'Warn' });
+                if (run.live) await JobError.create(api, this.job, `"number" prop dropped by ${Math.round(street * 100) / 100}`);
+            }
+        }
+
+        return true;
     }
 }
 

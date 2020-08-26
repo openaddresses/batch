@@ -8,7 +8,8 @@ COPY ./ $HOME/api
 WORKDIR $HOME/api
 
 RUN apk add nodejs yarn
-RUN yarn install
+RUN yarn install \
+    && yarn doc
 
 RUN cd web \
     && yarn install \

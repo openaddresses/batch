@@ -5,34 +5,48 @@
     "license": "MIT",
     "private": true,
     "scripts": {
+        "doc": "apidoc -i ./ -f index.js -e node_modules --private",
         "lint": "eslint index.js lib/**.js test/**.js",
-        "start": "node index.js"
+        "test": "tape test/*.test.js",
+        "start": "node index.js",
+        "cov": "nyc tape 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },
     "dependencies": {
         "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^2.4.4",
         "@octokit/request": "^5.3.4",
-        "@octokit/rest": "^17.1.4",
-        "@octokit/webhooks": "^7.1.0",
+        "@octokit/rest": "^18.0.0",
+        "@octokit/webhooks": "7.11.0",
+        "@turf/turf": "^5.1.6",
         "aws-sdk": "^2.630.0",
+        "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
+        "busboy": "^0.3.1",
+        "connect-pg-simple": "^6.1.0",
         "d3-queue": "^3.0.7",
         "express": "^4.17.1",
         "express-minify": "^1.0.0",
+        "express-session": "^1.17.1",
         "minimist": "^1.2.2",
-        "morgan": "^1.9.1",
+        "moment": "^2.27.0",
+        "morgan": "^1.10.0",
+        "object-hash": "^2.0.3",
         "parallel-transform": "^1.2.0",
         "pg": "^8.0.0",
         "request": "^2.88.2",
-        "split": "^1.0.1",
-        "tape": "^4.13.0"
+        "split": "^1.0.1"
     },
     "devDependencies": {
-        "@mapbox/eslint-config-geocoding": "^2.0.2",
-        "eslint": "^6.8.0",
-        "eslint-plugin-node": "^11.0.0"
+        "apidoc": "^0.25.0",
+        "codecov": "^3.7.1",
+        "eslint": "^7.0.0",
+        "eslint-plugin-node": "^11.0.0",
+        "nock": "^13.0.2",
+        "nyc": "^15.1.0",
+        "tape": "^5.0.0"
     },
-    "eslintConfig": {
-        "extends": "@mapbox/eslint-config-geocoding"
+    "apidoc": {
+        "name": "OpenAddresses API",
+        "title": "OpenAddresses API"
     }
 }

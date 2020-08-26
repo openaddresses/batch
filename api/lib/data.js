@@ -1,26 +1,146 @@
 'use strict';
 
 const Err = require('./error');
-const Bin = require('./bin');
+const Map = require('./map');
 
 /**
  * @class Data
  */
 class Data {
-    static list(pool, query) {
+    /**
+     * Return the last sucessful state for all data runs
+     *
+     * @param {Pool} pool - Postgres Pool Instance
+     * @param {Object} query - Query object
+     * @param {String} [query.source=Null] - Filter results by source
+     * @param {String} [query.layer=Null] - Filter results by source layer
+     * @param {String} [query.name=Null] - Filter results by source layer name
+     * @param {String} [query.point=false] - Filter results by geographic point
+     */
+    static async list(pool, query) {
         if (!query) query = {};
 
         if (!query.source) query.source = '';
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';
 
+        if (!query.point) {
+            query.point = '';
+        } else {
+            query.point = query.point.split(',');
+
+            if (query.point.length !== 2) {
+                throw new Err(404, null, 'invalid point query');
+            }
+
+            query.point = `POINT(${query.point.join(' ')})`;
+        }
+
         query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
         query.name = query.name + '%';
 
-        return new Promise((resolve, reject) => {
-            pool.query(`
+        try {
+            const pgres = await pool.query(`
                 SELECT
+                    results.id,
+                    results.source,
+                    results.updated,
+                    results.layer,
+                    results.name,
+                    results.job,
+                    job.output
+                FROM
+                    results
+                        INNER JOIN
+                            job LEFT JOIN map
+                                ON job.map = map.id
+                            ON results.job = job.id
+                WHERE
+                    results.source ilike $1
+                    AND results.layer ilike $2
+                    AND results.name ilike $3
+                    AND (
+                        char_length($4) = 0
+                        OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
+                    )
+                ORDER BY
+                    results.source,
+                    results.layer,
+                    results.name
+            `, [
+                query.source,
+                query.layer,
+                query.name,
+                query.point
+            ]);
+
+            return pgres.rows.map((res) => {
+                res.id = parseInt(res.id);
+                res.job = parseInt(res.job);
+                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
+
+                return res;
+            });
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load data');
+        }
+    }
+
+    /**
+     * Return a complete job history for a given data source
+     * (jobs part of live run & in any status)
+     *
+     * @param {Pool} pool - Postgres Pool Instance
+     * @param {Numeric} data_id - ID of data row
+     */
+    static async history(pool, data_id) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    job.id,
+                    job.created,
+                    job.status,
+                    job.output,
+                    job.run
+                FROM
+                    results INNER JOIN job
+                        ON
+                            job.source_name = results.source
+                            AND job.layer = results.layer
+                            AND job.name = results.name
+                        INNER JOIN runs
+                            ON job.run = runs.id
+                WHERE
+                    runs.live = true
+                    AND results.id = $1
+            `, [
+                data_id
+            ]);
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'No data by that id');
+            }
+
+            return {
+                id: parseInt(data_id),
+                jobs: pgres.rows.map((res) => {
+                    res.id = parseInt(res.id);
+                    res.run = parseInt(res.run);
+                    res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
+                    return res;
+                })
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get data history');
+        }
+    }
+
+    static async from(pool, data_id) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    results.id,
                     results.source,
                     results.updated,
                     results.layer,
@@ -32,39 +152,49 @@ class Data {
                     job
                 WHERE
                     results.job = job.id
-                    AND results.source ilike $1
-                    AND results.layer ilike $2
-                    AND results.name ilike $3
+                    AND results.id = $1
             `, [
-                query.source,
-                query.layer,
-                query.name
-            ], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to load data'));
+                data_id
+            ]);
 
-                return resolve(pgres.rows.map((res) => {
-                    res.job = parseInt(res.job);
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'No data by that id');
+            }
 
-                    return res;
-                }));
-            });
-        });
+            return pgres.rows.map((res) => {
+                res.id = parseInt(res.id);
+                res.job = parseInt(res.job);
+                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
+                return res;
+            })[0];
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load data');
+        }
     }
 
     static async update(pool, job) {
-        const data = await Data.list(pool, {
-            source: job.fullname(),
-            layer: job.layer,
-            name: job.name
-        });
+        let data;
+        try {
+            data = await Data.list(pool, {
+                source: job.source_name,
+                layer: job.layer,
+                name: job.name
+            });
+        } catch (err) {
+            throw new Err(500, err, 'Failed to fetch data');
+        }
 
-        await Bin.covered(job);
+        try {
+            await Map.match(pool, job);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to match coverage');
+        }
 
-        return new Promise((resolve, reject) => {
-            if (data.length > 1) {
-                throw Err(500, null, 'More than 1 source matches job');
-            } else if (data.length === 0) {
-                pool.query(`
+        if (data.length > 1) {
+            throw new Err(500, null, 'More than 1 source matches job');
+        } else if (data.length === 0) {
+            try {
+                await pool.query(`
                     INSERT INTO results (
                         source,
                         layer,
@@ -79,17 +209,19 @@ class Data {
                         NOW()
                     )
                 `, [
-                    job.fullname(),
+                    job.source_name,
                     job.layer,
                     job.name,
                     job.id
-                ], (err) => {
-                    if (err) return reject(new Err(500, err, 'Failed to update data'));
+                ]);
 
-                    return resolve(true);
-                });
-            } else {
-                pool.query(`
+                return true;
+            } catch (err) {
+                throw new Err(500, err, 'Failed to update data');
+            }
+        } else {
+            try {
+                await pool.query(`
                     UPDATE results
                         SET
                             source = $1,
@@ -102,17 +234,17 @@ class Data {
                             AND layer = $2
                             AND name = $3
                 `, [
-                    job.fullname(),
+                    job.source_name,
                     job.layer,
                     job.name,
                     job.id
-                ], (err) => {
-                    if (err) return reject(new Err(500, err, 'Failed to update data'));
+                ]);
 
-                    return resolve(true);
-                });
+                return true;
+            } catch (err) {
+                throw new Err(500, err, 'Failed to update data');
             }
-        });
+        }
     }
 }
 

@@ -14,45 +14,59 @@ class Config {
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
-            const secrets = await Config.secret('Batch');
+            if (!process.env.StackName || process.env.StackName === 'test') {
+                console.error('ok - set env StackName: test');
+                process.env.StackName = 'test';
 
-            let github = secrets.GitHubKey
-                .replace('-----BEGIN RSA PRIVATE KEY-----', '')
-                .replace('-----END RSA PRIVATE KEY-----', '')
-                .replace(/ /g, '\n');
+                this.octo = false;
+                this.CookieSecret = '123';
+                this.SharedSecret = '123';
+            } else {
+                const secrets = await Config.secret('Batch');
 
-            github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
+                this.GithubWebhookSecret = secrets.GithubWebhookSecret;
+                this.CookieSecret = secrets.CookieSecret;
+                this.SharedSecret = process.env.SharedSecret;
+                this.MailGun = secrets.MailGun;
 
-            this.okta = new Octokit({
-                type: 'app',
-                userAgent: `OpenAddresses v${pkg.version}`,
-                authStrategy: createAppAuth,
-                auth: {
-                    id: 56179,
-                    privateKey: github,
-                    installationId: 7214840,
-                    clientId: secrets.GitHubClientID,
-                    clientSecret: secrets.GitHubClientSecret
-                }
-            });
+                let github = secrets.GitHubKey
+                    .replace('-----BEGIN RSA PRIVATE KEY-----', '')
+                    .replace('-----END RSA PRIVATE KEY-----', '')
+                    .replace(/ /g, '\n');
+
+                github = `-----BEGIN RSA PRIVATE KEY-----${github}-----END RSA PRIVATE KEY-----`;
+
+                this.octo = new Octokit({
+                    type: 'app',
+                    userAgent: `OpenAddresses v${pkg.version}`,
+                    authStrategy: createAppAuth,
+                    auth: {
+                        id: 56179,
+                        privateKey: github,
+                        installationId: 7214840,
+                        clientId: secrets.GitHubClientID,
+                        clientSecret: secrets.GitHubClientSecret
+                    }
+                });
+            }
+
+            if (!process.env.BaseUrl) {
+                console.error('ok - set env BaseUrl: http://batch.openaddresses.io');
+                process.env.BaseUrl = 'http://batch.openaddresses.io';
+            }
 
             if (!process.env.Bucket) {
                 console.error('ok - set env Bucket: v2.openaddresses.io');
                 process.env.Bucket = 'v2.openaddresses.io';
             }
 
-            if (!process.env.MapboxToken) {
-                throw new Error('not ok - MapboxToken env var required');
+            if (!process.env.MAPBOX_TOKEN) {
+                throw new Error('not ok - MAPBOX_TOKEN env var required');
             }
 
             if (!process.env.GithubSecret) {
                 console.error('ok - set env GithubSecret: no-secret');
                 process.env.GithubSecret = 'no-secret';
-            }
-
-            if (!process.env.StackName) {
-                console.error('ok - set env StackName: test');
-                process.env.StackName = 'test';
             }
         } catch (err) {
             throw new Error(err);

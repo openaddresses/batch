@@ -80,6 +80,22 @@ const stack = {
                 Path: '/'
             }
         },
+        BatchMegaLaunchTemplate: {
+            Type: 'AWS::EC2::LaunchTemplate',
+            Properties: {
+                LaunchTemplateData: {
+                    BlockDeviceMappings: [{
+                        DeviceName: '/dev/xvda',
+                        Ebs: {
+                            Encrypted: true,
+                            VolumeSize: 250,
+                            VolumeType: 'gp2'
+                        }
+                    }]
+                },
+                LaunchTemplateName: cf.join('-', ['batch-mega', cf.ref('AWS::StackName')]),
+            }
+        },
         BatchComputeEnvironment: {
             Type: 'AWS::Batch::ComputeEnvironment',
             Properties: {
@@ -87,11 +103,44 @@ const stack = {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
                 ComputeResources: {
+                    AllocationStrategy: 'SPOT_CAPACITY_OPTIMIZED',
+                    BidPercentage: 80,
                     ImageId: 'ami-056807e883f197989',
                     MaxvCpus: 128,
-                    DesiredvCpus: 32,
+                    DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    Subnets:  [
+                        'subnet-de35c1f5',
+                        'subnet-e67dc7ea',
+                        'subnet-38b72502',
+                        'subnet-76ae3713',
+                        'subnet-35d87242',
+                        'subnet-b978ade0'
+                    ],
+                    Type : 'SPOT',
+                    InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
+                    InstanceTypes : ['optimal']
+                },
+                State: 'ENABLED'
+            }
+        },
+        BatchMegaComputeEnvironment: {
+            Type: 'AWS::Batch::ComputeEnvironment',
+            Properties: {
+                Type: 'MANAGED',
+                ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
+                ComputeEnvironmentName: cf.join('-', ['batch-hg', cf.ref('AWS::StackName')]),
+                ComputeResources: {
+                    ImageId: 'ami-056807e883f197989',
+                    MaxvCpus: 16,
+                    DesiredvCpus: 0,
+                    MinvCpus: 0,
+                    SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    LaunchTemplate: {
+                          LaunchTemplateId: cf.ref('BatchMegaLaunchTemplate'),
+                          Version: cf.getAtt('BatchMegaLaunchTemplate', 'LatestVersionNumber')
+                    },
                     Subnets:  [
                         'subnet-de35c1f5',
                         'subnet-e67dc7ea',
@@ -117,13 +166,15 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
-                    Command: ['./task.js'],
                     Environment: [{
-                        Name: 'MapboxToken',
+                        Name: 'MAPBOX_TOKEN',
                         Value: cf.ref('MapboxToken')
                     },{
                         Name: 'SharedSecret',
                         Value: cf.ref('SharedSecret')
+                    },{
+                        Name: 'OA_BRANCH',
+                        Value: cf.ref('Branch')
                     },{
                         Name: 'OA_API' ,
                         Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
@@ -160,7 +211,19 @@ const stack = {
                 }],
                 'State': 'ENABLED',
                 'Priority': 1,
-                'JobQueueName': 'HighPriority'
+                'JobQueueName': cf.join('-', [cf.stackName, 'std-queue'])
+            }
+        },
+        BatchMegaJobQueue: {
+            'Type': 'AWS::Batch::JobQueue',
+            'Properties': {
+                'ComputeEnvironmentOrder': [{
+                    'Order': 1,
+                    'ComputeEnvironment': cf.ref('BatchMegaComputeEnvironment')
+                }],
+                'State': 'ENABLED',
+                'Priority': 1,
+                'JobQueueName': cf.join('-', [cf.stackName, 'meta-queue'])
             }
         },
         BatchLambdaExecutionRole: {
@@ -221,10 +284,9 @@ const stack = {
                 Environment: {
                     Variables: {
                         JOB_DEFINITION: cf.ref('BatchJobDefinition'),
-                        JOB_QUEUE: cf.ref('BatchJobQueue'),
-                        JOB_NAME: 'lambda-trigger-job',
-                        OA_API: cf.getAtt('APIELB', 'DNSName'),
-                        SharedSecret: cf.ref('SharedSecret')
+                        JOB_STD_QUEUE: cf.ref('BatchJobQueue'),
+                        JOB_MEGA_QUEUE: cf.ref('BatchMegaJobQueue'),
+                        JOB_NAME: 'lambda-trigger-job'
                     }
                 },
                 Runtime: 'nodejs12.x',

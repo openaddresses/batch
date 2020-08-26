@@ -476,7 +476,7 @@ class AuthToken {
                     $3
                 ) RETURNING *
             `, [
-                'oa.' + await randomBytes(32).toString('hex'),
+                'oa.' + (await randomBytes(32)).toString('hex'),
                 auth.uid,
                 name
             ]);

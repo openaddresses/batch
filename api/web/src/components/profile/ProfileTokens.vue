@@ -101,6 +101,16 @@ export default {
     mounted: function() {
         this.refresh();
     },
+    watch: {
+        'newToken.show': function() {
+            if (!this.newToken.show) {
+                this.newToken.name = '';
+                this.newToken.token = '';
+            }
+
+            this.getTokens();
+        }
+    },
     methods: {
         refresh: function() {
             this.newToken.show = false;
@@ -109,28 +119,26 @@ export default {
 
             this.getTokens();
         },
-        setToken: function() {
-            fetch(`${window.location.origin}/api/token`, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: this.newToken.name
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to create token');
-                }
-                return res.json();
-            }).then((res) => {
-                this.newToken.token = res.token;
-            }).catch((err) => {
+        setToken: async function() {
+            try {
+                const res = await fetch(`${window.location.origin}/api/token`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: this.newToken.name
+                    })
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+
+                this.newToken.token = body.token;
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
         getTokens: function() {
             this.loading = true;

@@ -120,6 +120,8 @@ class CI {
                 head_sha: event.after
             });
 
+            const is_live = event.ref === 'refs/heads/master';
+
             const gh = new GH(
                 event.head_commit.url,
                 event.ref,
@@ -153,7 +155,7 @@ class CI {
                 console.error(`ok - GH:Push:${event.after}: Closed Check - No Jobs`);
             } else {
                 const run = await Run.generate(pool, {
-                    live: false, // TODO if ref is master - live should be true
+                    live: is_live,
                     github: gh.json()
                 });
                 console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);

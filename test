@@ -1,0 +1,16 @@
+#! /bin/bash
+
+set -euo pipefail
+
+test() {
+    cd $1
+    yarn install
+    yarn lint
+    yarn test
+    cd -
+}
+
+test .
+test api/
+test task/
+test lambda/

@@ -102,6 +102,7 @@ export default {
             });
         },
         getProblems: function() {
+            this.loading = true;
             const url = new URL(`${window.location.origin}/api/job/error`);
 
             fetch(url, {
@@ -115,6 +116,7 @@ export default {
                     throw new Error('Failed to get error sources');
                 }
 
+                this.loading = false;
                 return res.json();
             }).then((res) => {
                 this.problems = res;

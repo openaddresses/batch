@@ -40,7 +40,7 @@ testing new features this can be any `openaddresses/openaddresses` branch.
 
 #### DatabaseType
 
-The AWS RDS database class that powers the backend. 
+The AWS RDS database class that powers the backend.
 
 #### DatabasePassword
 
@@ -67,6 +67,7 @@ The project is divided into several componenets
 | --------- | ------- |
 | cloudformation | Deploy Configuration |
 | api | Dockerized server for handling all API interactions |
+| api/web | Subfolder for UI specific components |
 | cli | CLI for manually queueing work to batch |
 | lambda | Lambda responsible for instantiating a batch job environement and submitting it |
 | task | Docker container for running a batch job |
@@ -88,4 +89,30 @@ s3://v2.openaddresses.io/<stack>/upload/<user_id>/<file_name>
 
 ## API
 
-API documentation is availiable [here](http://staging.openaddresses.io/docs/)
+API documentation is availiable [here](https://batch.openaddresses.io/docs/)
+
+## Development
+
+In order to set up an effective dev environment, first obtain a copy of the metastore.
+
+Create a local
+
+```sh
+./clone prod
+```
+
+Then from the `/api` directory, run
+
+```sh
+yarn start
+```
+
+Now, to build the latest UI, navigate to the `/api/web` directory in a seperate tab, and run:
+
+```sh
+yarn build --watch
+```
+
+Note: changes to the website will now to automatically rebuilt, just refresh the page to see them.
+
+Finally, to access the api, navigate to `http://localhost:5000` in your web browser.

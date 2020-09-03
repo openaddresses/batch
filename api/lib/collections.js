@@ -52,7 +52,7 @@ class Collection {
     static async data(pool, collection_id, res) {
         const collection = await Collection.from(pool, collection_id);
 
-        return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`)
+        return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
     }
 
     static async from(pool, id) {

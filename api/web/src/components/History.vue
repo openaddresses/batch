@@ -16,6 +16,31 @@
 
         <div class='col col--12 pt12'>
             <h2 class='txt-h4 pb12 fl'>Feature History:</h2>
+
+            <template v-if='loading'>
+                <div class='flex-parent flex-parent--center-main w-full'>
+                    <div class='flex-child loading py24'></div>
+                </div>
+            </template>
+            <template v-else>
+                <LineChart class='w-full mb24' style='height: 200px' :chartData='chart' options='{
+                    "maintainAspectRatio": false,
+                    "scales": {
+                        "xAxes": [{
+                            "type": "time",
+                            "time": {
+                                "unit": "day"
+                            },
+                            "distribution": "linear"
+                        }],
+                        "yAxes": [{
+                            "ticks": {
+                                "beginAtZero": true
+                            }
+                        }]
+                    }
+                }'/>
+            </template>
         </div>
 
         <div class='col col--12 pt12'>
@@ -70,12 +95,24 @@
 </template>
 
 <script>
+import LineChart from './LineChart.js';
+
 export default {
     name: 'History',
     props: ['dataid'],
+    components: {
+        LineChart
+    },
     data: function() {
         return {
             loading: false,
+            colours: [ /* Thanks for the colours! https://github.com/johannesbjork/LaCroixColoR */ ],
+            chart: {
+                datasets: [{
+                    label: 'Feature Count',
+                    data: []
+                }]
+            },
             data: {},
             history: {
                 jobs: []
@@ -83,21 +120,24 @@ export default {
         }
     },
     mounted: function() {
+        this.colours = [
+            '#EA7580','#F6A1A5','#F8CD9C','#1BB6AF','#088BBE','#172869' // Pamplemousse
+        ]
         this.refresh();
     },
     methods: {
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}`});
         },
-        refresh: function() {
-            this.getData();
+        refresh: async function() {
+            await this.getData();
             this.getHistory();
         },
         datapls: function(id) {
             this.external(`${window.location.origin}/api/job/${id}/output/source.geojson.gz`);
         },
         external: function(url) {
-            window.open(url, "_blank");
+            window.open(url, '_blank');
         },
         getHistory: function() {
             this.loading = true;
@@ -113,27 +153,79 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.history = res;
+
+                this.chart = {
+                    datasets: [{
+                        label: 'Features',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.count }
+                        })
+                    }]
+                };
+
+                if (this.data.layer === 'addresses') {
+                    this.chart.datasets.push({
+                        label: 'Numbers',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.number }
+                        })
+                    });
+
+                    this.chart.datasets.push({
+                        label: 'Streets',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.street }
+                        })
+                    });
+
+                    this.chart.datasets.push({
+                        label: 'Cities',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.city }
+                        })
+                    });
+
+                    this.chart.datasets.push({
+                        label: 'Postcodes',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.postcode }
+                        })
+                    });
+                }
+
                 this.loading = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });
         },
-        getData: function() {
-            fetch(window.location.origin + `/api/data/${this.dataid}`, {
-                method: 'GET'
-            }).then((res) => {
+        getData: async function() {
+            try {
+                const res = await fetch(window.location.origin + `/api/data/${this.dataid}`, {
+                    method: 'GET'
+                });
+
                 if (!res.ok && res.message) {
                     throw new Error(res.message);
                 } else if (!res.ok) {
                     throw new Error('Failed to get data history');
                 }
 
-                return res.json();
-            }).then((res) => {
-                this.data = res;
-            }).catch((err) => {
+                const body = await res.json();
+
+                this.data = body;
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

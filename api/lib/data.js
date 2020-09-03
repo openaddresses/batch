@@ -103,6 +103,7 @@ class Data {
                     job.status,
                     job.output,
                     job.run,
+                    job.count,
                     job.stats
                 FROM
                     results INNER JOIN job

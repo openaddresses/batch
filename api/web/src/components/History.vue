@@ -15,7 +15,7 @@
         </div>
 
         <div class='col col--12 pt12'>
-            <h2 class='txt-h4 pb12 fl'>Feature History:</h2>
+            <h2 class='txt-h4 pb12 fl'>Stats History:</h2>
 
             <template v-if='loading'>
                 <div class='flex-parent flex-parent--center-main w-full'>

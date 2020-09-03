@@ -13,21 +13,25 @@ class Email {
         this.arg = arg;
         this.srv = srv;
 
-        this.mg = mailgun.client({
-            username: 'api',
-            key: process.env.MAILGUN_API_KEY
-        });
+        if (process.env.MAILGUN_API_KEY) {
+            this.mg = mailgun.client({
+                username: 'api',
+                key: process.env.MAILGUN_API_KEY
+            });
 
-        this.mailGenerator = new Mailgen({
-            theme: 'default',
-            product: {
-                name: 'OpenAddresses',
-                link: 'https://batch.openaddresses.io'
-            }
-        });
+            this.mailGenerator = new Mailgen({
+                theme: 'default',
+                product: {
+                    name: 'OpenAddresses',
+                    link: 'https://batch.openaddresses.io'
+                }
+            });
+        }
     }
 
     async forgot(user) {
+        if (!this.mg) return;
+
         const email = {
             body: {
                 name: user.email,

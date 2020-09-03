@@ -876,6 +876,11 @@ async function server(args, config, cb) {
      *               "output": true,
      *               "preview": true
      *           },
+     *           "count": 123,
+     *           "stats": {
+     *               "counts": {
+     *               }
+     *           },
      *           "run": 1
      *       }]
      *   }

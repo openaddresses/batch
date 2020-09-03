@@ -6,12 +6,41 @@
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
-                <h2 class='txt-h4 ml12 pb12 fl'>DATA HISTORY TITLE</h2>
+                <h2 class='txt-h4 ml12 pb12 fl' v-text='data.source + " - " + data.layer + " - " + data.name'></h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
             </div>
+        </div>
+
+        <div class='col col--12 pt12'>
+            <h2 class='txt-h4 pb12 fl'>Stats History:</h2>
+
+            <template v-if='loading'>
+                <div class='flex-parent flex-parent--center-main w-full'>
+                    <div class='flex-child loading py24'></div>
+                </div>
+            </template>
+            <template v-else>
+                <LineChart class='w-full mb24' style='height: 200px' :chartData='chart' options='{
+                    "maintainAspectRatio": false,
+                    "scales": {
+                        "xAxes": [{
+                            "type": "time",
+                            "time": {
+                                "unit": "day"
+                            },
+                            "distribution": "linear"
+                        }],
+                        "yAxes": [{
+                            "ticks": {
+                                "beginAtZero": true
+                            }
+                        }]
+                    }
+                }'/>
+            </template>
         </div>
 
         <div class='col col--12 pt12'>
@@ -54,7 +83,7 @@
                         Job <span v-text='job.id'/>
                     </div>
                     <div class='col col--5'>
-                        <span v-text='job.created'></span>
+                        <span v-text='job.created.match(/[0-9]{4}\-[0-9]{2}\-[0-9]{2}/)[0]'></span>
                     </div>
                     <div class='col col--3'>
                         <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
@@ -66,32 +95,49 @@
 </template>
 
 <script>
+import LineChart from './LineChart.js';
+
 export default {
     name: 'History',
     props: ['dataid'],
+    components: {
+        LineChart
+    },
     data: function() {
         return {
             loading: false,
+            colours: [ /* Thanks for the colours! https://github.com/johannesbjork/LaCroixColoR */ ],
+            chart: {
+                datasets: [{
+                    label: 'Feature Count',
+                    data: []
+                }]
+            },
+            data: {},
             history: {
                 jobs: []
             }
         }
     },
     mounted: function() {
+        this.colours = [
+            '#EA7580','#F6A1A5','#F8CD9C','#1BB6AF','#088BBE','#172869' // Pamplemousse
+        ]
         this.refresh();
     },
     methods: {
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}`});
         },
-        refresh: function() {
+        refresh: async function() {
+            await this.getData();
             this.getHistory();
         },
         datapls: function(id) {
             this.external(`${window.location.origin}/api/job/${id}/output/source.geojson.gz`);
         },
         external: function(url) {
-            window.open(url, "_blank");
+            window.open(url, '_blank');
         },
         getHistory: function() {
             this.loading = true;
@@ -107,10 +153,79 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.history = res;
+
+                this.chart = {
+                    datasets: [{
+                        label: 'Features',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.count }
+                        })
+                    }]
+                };
+
+                if (this.data.layer === 'addresses') {
+                    this.chart.datasets.push({
+                        label: 'Numbers',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.number }
+                        })
+                    });
+
+                    this.chart.datasets.push({
+                        label: 'Streets',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.street }
+                        })
+                    });
+
+                    this.chart.datasets.push({
+                        label: 'Cities',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.city }
+                        })
+                    });
+
+                    this.chart.datasets.push({
+                        label: 'Postcodes',
+                        fill: false,
+                        borderColor: this.colours.pop(),
+                        data: this.history.jobs.map((ele) => {
+                            return { x: ele.created, y: ele.stats.counts.postcode }
+                        })
+                    });
+                }
+
                 this.loading = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });
+        },
+        getData: async function() {
+            try {
+                const res = await fetch(window.location.origin + `/api/data/${this.dataid}`, {
+                    method: 'GET'
+                });
+
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to get data history');
+                }
+
+                const body = await res.json();
+
+                this.data = body;
+            } catch (err) {
+                this.$emit('err', err);
+            }
         }
     }
 }

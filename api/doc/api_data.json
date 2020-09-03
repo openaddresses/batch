@@ -357,7 +357,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"jobs\": [{\n        \"id\": 1,\n        \"created\": \"2020-04-20T06:31:11.689Z\",\n        \"status\": \"Success\"\n        \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n        \"output\": {\n            \"cache\": true,\n            \"output\": true,\n            \"preview\": true\n        },\n        \"run\": 1\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"jobs\": [{\n        \"id\": 1,\n        \"created\": \"2020-04-20T06:31:11.689Z\",\n        \"status\": \"Success\"\n        \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n        \"output\": {\n            \"cache\": true,\n            \"output\": true,\n            \"preview\": true\n        },\n        \"count\": 123,\n        \"stats\": {\n            \"counts\": {\n            }\n        },\n        \"run\": 1\n    }]\n}",
           "type": "json"
         }
       ]

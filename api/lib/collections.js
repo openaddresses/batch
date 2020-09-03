@@ -1,6 +1,5 @@
 'use strict';
 const Err = require('./error');
-const S3 = require('./s3');
 
 /**
  * @class Collections
@@ -53,12 +52,7 @@ class Collection {
     static async data(pool, collection_id, res) {
         const collection = await Collection.from(pool, collection_id);
 
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/collection-${collection.name}.zip`
-        });
-
-        return s3.stream(res, `openaddresses-${collection.name}.zip`);
+        return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
     }
 
     static async from(pool, id) {

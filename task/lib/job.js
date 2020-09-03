@@ -223,6 +223,7 @@ class Job {
                 console.error('ok - found cache', cache[0]);
 
                 await s3.putObject({
+                    ContentType: 'application/zip',
                     Bucket: process.env.Bucket,
                     Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
                     Body: fs.createReadStream(cache[0])
@@ -234,6 +235,7 @@ class Job {
 
             const data = path.resolve(this.tmp, 'out.geojson.gz');
             await s3.putObject({
+                ContentType: 'application/gzip',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
                 Body: fs.createReadStream(data)
@@ -246,6 +248,7 @@ class Job {
                 console.error('ok - found preview', preview[0]);
 
                 await s3.putObject({
+                    ContentType: 'image/png',
                     Bucket: process.env.Bucket,
                     Key: `${process.env.StackName}/job/${this.job}/source.png`,
                     Body: fs.createReadStream(preview[0])

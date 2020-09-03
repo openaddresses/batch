@@ -6,12 +6,16 @@
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
 
-                <h2 class='txt-h4 ml12 pb12 fl'>DATA HISTORY TITLE</h2>
+                <h2 class='txt-h4 ml12 pb12 fl' v-text='data.source + " - " + data.layer + " - " + data.name'></h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
             </div>
+        </div>
+
+        <div class='col col--12 pt12'>
+            <h2 class='txt-h4 pb12 fl'>Feature History:</h2>
         </div>
 
         <div class='col col--12 pt12'>
@@ -54,7 +58,7 @@
                         Job <span v-text='job.id'/>
                     </div>
                     <div class='col col--5'>
-                        <span v-text='job.created'></span>
+                        <span v-text='job.created.match(/[0-9]{4}\-[0-9]{2}\-[0-9]{2}/)[0]'></span>
                     </div>
                     <div class='col col--3'>
                         <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
@@ -72,6 +76,7 @@ export default {
     data: function() {
         return {
             loading: false,
+            data: {},
             history: {
                 jobs: []
             }
@@ -85,6 +90,7 @@ export default {
             this.$router.push({ path: `/job/${jobid}`});
         },
         refresh: function() {
+            this.getData();
             this.getHistory();
         },
         datapls: function(id) {
@@ -108,6 +114,23 @@ export default {
             }).then((res) => {
                 this.history = res;
                 this.loading = false;
+            }).catch((err) => {
+                this.$emit('err', err);
+            });
+        },
+        getData: function() {
+            fetch(window.location.origin + `/api/data/${this.dataid}`, {
+                method: 'GET'
+            }).then((res) => {
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to get data history');
+                }
+
+                return res.json();
+            }).then((res) => {
+                this.data = res;
             }).catch((err) => {
                 this.$emit('err', err);
             });

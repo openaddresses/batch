@@ -102,7 +102,8 @@ class Data {
                     job.created,
                     job.status,
                     job.output,
-                    job.run
+                    job.run,
+                    job.stats
                 FROM
                     results INNER JOIN job
                         ON
@@ -114,6 +115,8 @@ class Data {
                 WHERE
                     runs.live = true
                     AND results.id = $1
+                ORDER BY
+                    created DESC
             `, [
                 data_id
             ]);

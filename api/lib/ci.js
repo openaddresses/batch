@@ -64,6 +64,41 @@ class CI {
                 check_run_id: run.github.check,
                 conclusion: conclusion
             });
+
+            const prs = await this.get_pr(run.github.sha);
+            for (const pr of prs) {
+                this.add_issue(pr);
+            }
+        } catch (err) {
+            throw new Error(err);
+        }
+    }
+
+    async add_issue(pr) {
+        await this.config.octo.issues.createComment({
+            owner: 'openaddresses',
+            repo: 'openaddresses',
+            issue_number: pr,
+            body: 'All finished :)'
+        });
+    }
+
+    /**
+     * Find out whether a particular GitSha is part of an open PR
+     *
+     * @param {String} gitsha The GitSha to check
+     */
+    async get_prs(gitsha) {
+        try {
+            const res = await this.config.octo.search.issuesAndPullRequests({
+                q: `repo:openaddresses/openaddresses+${gitsha}`
+            });
+
+            if (res.total_count === 0) return [];
+
+            return res.items.map((ele) => {
+                return ele.number;
+            });
         } catch (err) {
             throw new Error(err);
         }

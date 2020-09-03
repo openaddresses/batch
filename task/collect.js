@@ -148,6 +148,7 @@ function get_source(tmp, data, stats) {
 function upload_collection(file, name) {
     return new Promise((resolve, reject) => {
         s3.upload({
+            ContentType: 'application/zip',
             Body: fs.createReadStream(file),
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/collection-${name}.zip`

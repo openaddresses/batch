@@ -89,7 +89,7 @@ class Data {
 
     /**
      * Return a complete job history for a given data source
-     * (jobs part of live run & in any status)
+     * (jobs part of live run & in success status)
      *
      * @param {Pool} pool - Postgres Pool Instance
      * @param {Numeric} data_id - ID of data row
@@ -116,6 +116,7 @@ class Data {
                 WHERE
                     runs.live = true
                     AND results.id = $1
+                    AND job.status = 'Success'
                 ORDER BY
                     created DESC
             `, [
@@ -130,6 +131,7 @@ class Data {
                 id: parseInt(data_id),
                 jobs: pgres.rows.map((res) => {
                     res.id = parseInt(res.id);
+                    res.id = parseInt(res.count);
                     res.run = parseInt(res.run);
                     res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;

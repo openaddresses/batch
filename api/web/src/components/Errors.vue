@@ -24,7 +24,7 @@
             <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
         </template>
         <template v-else>
-            <div @click='$router.push({ path: `/job/${job.id}` })' :key='job.id' v-for='job in problems' class='col col--12 grid'>
+            <div @click='$router.push({ path: `/job/${job.id}` })' :key='job.id' v-for='(job, i) in problems' class='col col--12 grid'>
                 <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <Status :status='job.status'/>
@@ -37,11 +37,11 @@
                     </div>
                     <div class='col col--4'>
                         <template v-if='job.status === "Warn"'>
-                            <button v-on:click.stop.prevent='mod(job.id, true)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
-                            <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
+                            <button v-on:click.stop.prevent='mod(job.id, true, i)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
+                            <button v-on:click.stop.prevent='mod(job.id, false, i)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
                         </template>
                         <template v-else-if='job.status === "Fail"'>
-                            <button v-on:click.stop.prevent='mod(job.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Suppress</button>
+                            <button v-on:click.stop.prevent='mod(job.id, false, i)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Suppress</button>
                             <button v-on:click.stop.prevent='createRerun(job.id)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Rerun</button>
                         </template>
                         <button v-on:click.stop.prevent='$router.push({ path: `/job/${job.id}/log` })' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Logs</button>
@@ -64,7 +64,7 @@ export default {
     props: [ ],
     data: function() {
         return {
-            loading: false,
+            loading: true,
             problems: []
         };
     },
@@ -74,11 +74,16 @@ export default {
     components: {
         Status
     },
+    watch: {
+        problems: function() {
+            this.$emit('errors', this.problems.length);
+        }
+    },
     methods: {
         refresh: function() {
             this.getProblems();
         },
-        mod: function(job_id, confirm) {
+        mod: function(job_id, confirm, i) {
             const url = new URL(`${window.location.origin}/api/job/error/${job_id}`);
 
             fetch(url, {
@@ -96,7 +101,7 @@ export default {
                     throw new Error('Failed to get update job error');
                 }
 
-                this.refresh();
+                this.problems.splice(i, 1);
             }).catch((err) => {
                 this.$emit('err', err);
             });
@@ -116,10 +121,10 @@ export default {
                     throw new Error('Failed to get error sources');
                 }
 
-                this.loading = false;
                 return res.json();
             }).then((res) => {
                 this.problems = res;
+                this.loading = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });

@@ -65,7 +65,7 @@ class CI {
                 conclusion: conclusion
             });
 
-            const prs = await this.get_pr(run.github.sha);
+            const prs = await this.get_prs(run.github.sha);
             for (const pr of prs) {
                 this.add_issue(pr);
             }

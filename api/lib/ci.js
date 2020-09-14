@@ -94,10 +94,9 @@ class CI {
                 q: `repo:openaddresses/openaddresses+${gitsha}`
             });
 
-            if (res.total_count === 0) return [];
+            if (res.data.total_count === 0) return [];
 
-            console.error(res);
-            return res.items.map((ele) => {
+            return res.data.items.map((ele) => {
                 return ele.number;
             });
         } catch (err) {

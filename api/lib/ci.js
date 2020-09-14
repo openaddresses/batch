@@ -48,9 +48,10 @@ class CI {
     /**
      * Once a run is finished, update the corresponding check
      *
+     * @param {Pool} pool - Postgres Pool instance
      * @param {Run} run object to update GH status with
      */
-    async check(run) {
+    async check(pool, run) {
         if (!['Success', 'Fail'].includes(run.status)) {
             throw new Err(400, null, `Github check can only report Success/Fail, given: ${run.status}`);
         }
@@ -65,21 +66,53 @@ class CI {
                 conclusion: conclusion
             });
 
+            const issue = this.format_issue(pool, run);
+            console.error('ISSUE: ', issue);
+            if (!issue) return; // No Successful Jobs = No Issue Comment
+
             const prs = await this.get_prs(run.github.sha);
             for (const pr of prs) {
-                this.add_issue(pr);
+                this.add_issue(pr, issue);
             }
         } catch (err) {
             throw new Error(err);
         }
     }
 
-    async add_issue(pr) {
+    /**
+     * Create a markdown formatted issue showing successful preview.pngs for all jobs in a given run
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Run} run object to update GH status with
+     */
+    async format_issue(pool, run) {
+        const jobs = Run.jobs(pool, run.id);
+        let issue = '';
+
+        for (const job of jobs) {
+            if (!['Warn', 'Success'].includes(job.status)) continue;
+
+            issue = issue + '\n'
+                + `### ${job.source_name}-${job.layer}-${job.name}\n`
+                + `![Preview Image](https://batch.openaddresses.io/api/job/${job.id}/output/source.png)\n`;
+        }
+
+        return issue.trim();
+    }
+
+
+    /**
+     * Add an issue showing a preview PNG to a given PR
+     *
+     * @param {Numeric} pr PR Number to add comment to
+     * @param {String} issue Issue body
+     */
+    async add_issue(pr, issue) {
         await this.config.octo.issues.createComment({
             owner: 'openaddresses',
             repo: 'openaddresses',
             issue_number: pr,
-            body: 'All finished :)'
+            body: issue
         });
     }
 

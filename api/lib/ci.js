@@ -96,6 +96,7 @@ class CI {
 
             if (res.total_count === 0) return [];
 
+            console.error(res)
             return res.items.map((ele) => {
                 return ele.number;
             });

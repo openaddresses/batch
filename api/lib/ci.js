@@ -86,7 +86,7 @@ class CI {
      * @param {Run} run object to update GH status with
      */
     async format_issue(pool, run) {
-        const jobs = Run.jobs(pool, run.id);
+        const jobs = await Run.jobs(pool, run.id);
         let issue = '';
 
         for (const job of jobs) {

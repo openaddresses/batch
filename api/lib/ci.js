@@ -66,7 +66,7 @@ class CI {
                 conclusion: conclusion
             });
 
-            const issue = this.format_issue(pool, run);
+            const issue = await this.format_issue(pool, run);
             console.error('ISSUE: ', issue);
             if (!issue) return; // No Successful Jobs = No Issue Comment
 

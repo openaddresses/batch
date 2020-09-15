@@ -29,6 +29,8 @@
                     @auth='getLogin'
                     @login='mustlogin = true'
                     @err='err = $event'
+
+                    @errors='errors = $event'
                 />
             </div>
         </div>

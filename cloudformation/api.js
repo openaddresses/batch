@@ -18,6 +18,13 @@ const stack = {
 
     },
     Resources: {
+        APILogs: {
+            Type: 'AWS::Logs::LogGroup',
+            Properties: {
+                LogGroupName: cf.join('-', ['awslogs', cf.stackName]),
+                RetentionInDays: 7
+            }
+        },
         APIELB: {
             Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer',
             Properties: {

@@ -6,7 +6,7 @@ test() {
     cd $1
     yarn install
     yarn lint
-    yarn test
+    yarn cov || yarn test
     cd -
 }
 

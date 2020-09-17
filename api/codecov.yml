@@ -1,3 +1,2 @@
-codecov:
-  fixes:
-    - "::api/"
+fixes:
+  - "::api/"

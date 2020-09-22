@@ -271,6 +271,7 @@ class CI {
         }
 
         await this.create_check(
+            pool,
             event.after, // GitSha
             event.ref,
             event.head_commit
@@ -301,6 +302,7 @@ class CI {
 
         if (['opened', 'synchronize'].includes(event.action) && event.pull_request.head.repo.fork) {
             await this.create_check(
+                pool,
                 event.pull_request.head.sha,
                 event.pull_request.head.label,
                 {

@@ -301,10 +301,10 @@ class CI {
 
         if (['opened', 'synchronize'].includes(event.action) && event.pull_request.head.repo.fork) {
             await this.create_check(
-                event.head.sha,
-                event.head.label,
+                event.pull_request.head.sha,
+                event.pull_request.head.label,
                 {
-                    url: `https://github.com/openaddresses/openaddresses/pull/${event.number}/commits/${event.head.sha}`
+                    url: `https://github.com/openaddresses/openaddresses/pull/${event.number}/commits/${event.pull_request.head.sha}`
                 }
             );
         }

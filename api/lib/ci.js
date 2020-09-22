@@ -46,12 +46,12 @@ class CI {
     }
 
     /**
-     * Once a run is finished, update the corresponding check
+     * Once a run is finished, update the corresponding github check
      *
      * @param {Pool} pool - Postgres Pool instance
      * @param {Run} run object to update GH status with
      */
-    async check(pool, run) {
+    async finish_check(pool, run) {
         if (!['Success', 'Fail'].includes(run.status)) {
             throw new Err(400, null, `Github check can only report Success/Fail, given: ${run.status}`);
         }
@@ -73,6 +73,90 @@ class CI {
             const prs = await this.get_prs(run.github.sha);
             for (const pr of prs) {
                 this.add_issue(pr, issue);
+            }
+        } catch (err) {
+            throw new Error(err);
+        }
+    }
+
+    /**
+     * Once a run is created, create a pending github check
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {String} sha - GitSha to attach to
+     * @param {String} ref - Git Ref
+     * @param {Object} head_commit - Information about head commit
+     */
+    async create_check(pool, sha, ref, head_commit) {
+        try {
+            const check = await this.config.octo.checks.create({
+                owner: 'openaddresses',
+                repo: 'openaddresses',
+                name: 'openaddresses/data-pls',
+                head_sha: sha
+            });
+
+            const is_live = ref === 'refs/heads/master';
+
+            const gh = new GH(
+                head_commit.url,
+                ref,
+                sha,
+                check.data.id
+            );
+
+            console.error(`ok - GH:Push:${sha}: Added Check`);
+
+            let files = [];
+            if (ref === 'refs/heads/master') {
+                files = [].concat(head_commit.added, head_commit.modified);
+            } else {
+                files = await this.filediff(ref.replace(/refs\/heads\//, ''));
+            }
+
+            CI.fileprep(files, gh.sha).forEach((file) => {
+                console.error(`ok - GH:Push:${sha}: Job: ${file}`);
+                gh.add_job(file);
+            });
+
+            console.error(`ok - GH:Push:${sha}: ${gh.jobs.length} Jobs`);
+
+            if (!gh.jobs.length) {
+                await this.config.octo.checks.update({
+                    owner: 'openaddresses',
+                    repo: 'openaddresses',
+                    check_run_id: gh.check,
+                    conclusion: 'success'
+                });
+                console.error(`ok - GH:Push:${sha}: Closed Check - No Jobs`);
+            } else {
+                const run = await Run.generate(pool, {
+                    live: is_live,
+                    github: gh.json()
+                });
+                console.error(`ok - GH:Push:${sha}: Run ${run.id} Created `);
+
+                const jobs = await Run.populate(pool, run.id, gh.jobs);
+                console.error(`ok - GH:Push:${sha}: Run Populated`);
+
+                if (jobs.jobs.length === 0) {
+                    await this.config.octo.checks.update({
+                        owner: 'openaddresses',
+                        repo: 'openaddresses',
+                        check_run_id: gh.check,
+                        conclusion: 'success'
+                    });
+
+                    console.error(`ok - GH:Push:${sha}: Check Closed - No Run Jobs Populated`);
+                } else {
+                    await this.config.octo.checks.update({
+                        owner: 'openaddresses',
+                        repo: 'openaddresses',
+                        check_run_id: gh.check,
+                        details_url: process.env.BaseUrl + `/run/${run.id}`
+                    });
+                    console.error(`ok - GH:Push:${sha}: Check Updated`);
+                }
             }
         } catch (err) {
             throw new Error(err);
@@ -174,99 +258,66 @@ class CI {
         });
     }
 
+    /**
+     * Respond to push events
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} event - GitHub Event Object
+     */
     async push(pool, event) {
         // The push event was to merge/delete a given branch/pr
         if (event.after === '0000000000000000000000000000000000000000') {
             return true;
         }
 
-        try {
-            const check = await this.config.octo.checks.create({
-                owner: 'openaddresses',
-                repo: 'openaddresses',
-                name: 'openaddresses/data-pls',
-                head_sha: event.after
-            });
-
-            const is_live = event.ref === 'refs/heads/master';
-
-            const gh = new GH(
-                event.head_commit.url,
-                event.ref,
-                event.after,
-                check.data.id
-            );
-
-            console.error(`ok - GH:Push:${event.after}: Added Check`);
-
-            let files = [];
-            if (event.ref === 'refs/heads/master') {
-                files = [].concat(event.head_commit.added, event.head_commit.modified);
-            } else {
-                files = await this.filediff(event.ref.replace(/refs\/heads\//, ''));
-            }
-
-            CI.fileprep(files, gh.sha).forEach((file) => {
-                console.error(`ok - GH:Push:${event.after}: Job: ${file}`);
-                gh.add_job(file);
-            });
-
-            console.error(`ok - GH:Push:${event.after}: ${gh.jobs.length} Jobs`);
-
-            if (!gh.jobs.length) {
-                await this.config.octo.checks.update({
-                    owner: 'openaddresses',
-                    repo: 'openaddresses',
-                    check_run_id: gh.check,
-                    conclusion: 'success'
-                });
-                console.error(`ok - GH:Push:${event.after}: Closed Check - No Jobs`);
-            } else {
-                const run = await Run.generate(pool, {
-                    live: is_live,
-                    github: gh.json()
-                });
-                console.error(`ok - GH:Push:${event.after}: Run ${run.id} Created `);
-
-                const jobs = await Run.populate(pool, run.id, gh.jobs);
-                console.error(`ok - GH:Push:${event.after}: Run Populated`);
-
-                if (jobs.jobs.length === 0) {
-                    await this.config.octo.checks.update({
-                        owner: 'openaddresses',
-                        repo: 'openaddresses',
-                        check_run_id: gh.check,
-                        conclusion: 'success'
-                    });
-
-                    console.error(`ok - GH:Push:${event.after}: Check Closed - No Run Jobs Populated`);
-                } else {
-                    await this.config.octo.checks.update({
-                        owner: 'openaddresses',
-                        repo: 'openaddresses',
-                        check_run_id: gh.check,
-                        details_url: process.env.BaseUrl + `/run/${run.id}`
-                    });
-                    console.error(`ok - GH:Push:${event.after}: Check Updated`);
-                }
-            }
-        } catch (err) {
-            throw new Error(err);
-        }
+        await this.create_check(
+            event.after, // GitSha
+            event.ref,
+            event.head_commit
+        );
 
         return true;
     }
 
+    /**
+     * Respond to issue events
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} event - GitHub Event Object
+     */
     async issue(pool, event) {
         console.error('ISSUE', JSON.stringify(event));
         return true;
     }
 
+    /**
+     * Respond to pull request events
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} event - GitHub Event Object
+     */
     async pull(pool, event) {
         console.error('PULL', JSON.stringify(event));
+
+        if (event.action === 'opened' && event.pull_request.head.repo.fork) {
+            await this.create_check(
+                event.head.sha,
+                event.head.label,
+                {
+                    url: `https://github.com/openaddresses/openaddresses/pull/${event.number}/commits/${event.head.sha}`
+                }
+            );
+        }
+
         return true;
     }
 
+    /**
+     * Respond to issue comment request events
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} event - GitHub Event Object
+     */
     async comment(pool, event) {
         console.error('COMMENT', JSON.stringify(event));
         return true;

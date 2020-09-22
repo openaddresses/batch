@@ -49,7 +49,7 @@ class Run {
             }
 
             if (runs[0].status === 'Success' || runs[0].status === 'Fail') {
-                await ci.check(pool, runs[0]);
+                await ci.finish_check(pool, runs[0]);
             }
         } catch (err) {
             console.error(err);

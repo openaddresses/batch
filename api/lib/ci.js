@@ -299,7 +299,7 @@ class CI {
     async pull(pool, event) {
         console.error('PULL', JSON.stringify(event));
 
-        if (event.action === 'opened' && event.pull_request.head.repo.fork) {
+        if (['opened', 'synchronize'].includes(event.action) && event.pull_request.head.repo.fork) {
             await this.create_check(
                 event.head.sha,
                 event.head.label,

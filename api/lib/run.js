@@ -48,9 +48,9 @@ class Run {
                 return true;
             }
 
-            const is_pending = !!jobs.filter((job) => {
+            const is_pending = !!Run.jobs(pool, run.id).filter((job) => {
                 return job.status === 'Pending';
-            }).length
+            }).length;
 
             if (!is_pending) {
                 await ci.finish_check(pool, run);
@@ -252,7 +252,7 @@ class Run {
      * @param {Number} run_id run id
      * @returns {Promise} promise
      */
-    static jobs(pool, run_id) {
+    static async jobs(pool, run_id) {
         try {
             const pgres = await pool.query(`
                 SELECT
@@ -261,7 +261,7 @@ class Run {
                     job
                 WHERE
                     job.run = $1
-            `, [run_id])
+            `, [run_id]);
 
             return pgres.rows.map((job) => {
                 job.id = parseInt(job.id);

@@ -126,6 +126,7 @@ async function flow(api, job) {
         await job.update(api, update);
         await job.get(api);
         await job.fetch();
+        await job.check_source(api);
 
         run = await Run.get(api, job.run);
 
@@ -146,7 +147,7 @@ async function flow(api, job) {
             stats: job.stats
         });
 
-        await job.check(api, run);
+        await job.check_stats(api, run);
     } catch (err) {
         console.error(err);
 

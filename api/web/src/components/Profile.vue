@@ -78,10 +78,8 @@ export default {
                 access: '',
                 email: ''
             },
-            tokens: [],
             loading: {
                 profile: false,
-                tokens: false
             }
         };
     },

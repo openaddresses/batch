@@ -48,8 +48,12 @@ class Run {
                 return true;
             }
 
-            if (runs[0].status === 'Success' || runs[0].status === 'Fail') {
-                await ci.finish_check(pool, runs[0]);
+            const is_pending = !!jobs.filter((job) => {
+                return job.status === 'Pending';
+            }).length
+
+            if (!is_pending) {
+                await ci.finish_check(pool, run);
             }
         } catch (err) {
             console.error(err);
@@ -249,25 +253,25 @@ class Run {
      * @returns {Promise} promise
      */
     static jobs(pool, run_id) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+        try {
+            const pgres = await pool.query(`
                 SELECT
                     *
                 FROM
                     job
                 WHERE
                     job.run = $1
-            `, [run_id], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to fetch jobs'));
+            `, [run_id])
 
-                return resolve(pgres.rows.map((job) => {
-                    job.id = parseInt(job.id);
-                    job.run = parseInt(job.run);
+            return pgres.rows.map((job) => {
+                job.id = parseInt(job.id);
+                job.run = parseInt(job.run);
 
-                    return job;
-                }));
+                return job;
             });
-        });
+        } catch (err) {
+            throw new Err(500, err, 'failed to fetch jobs');
+        }
     }
 
     static async from(pool, id) {

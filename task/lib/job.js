@@ -307,7 +307,7 @@ class Job {
         }
 
         if (l.skip) await JobError.create(api, this.job, `Job has skip: true flag enabled`);
-        if (l.year && parseInt(l.year) !== new Date().getFullYear()) await JobError.create(api, this.job, `Job has year: ${} which is not the current year`);
+        if (l.year && parseInt(l.year) !== new Date().getFullYear()) await JobError.create(api, this.job, `Job has year: ${l.year} which is not the current year`);
 
         return true;
     }

@@ -48,7 +48,7 @@ class Run {
                 return true;
             }
 
-            const is_pending = !!Run.jobs(pool, run.id).filter((job) => {
+            const is_pending = !!(await Run.jobs(pool, run.id)).filter((job) => {
                 return job.status === 'Pending';
             }).length;
 

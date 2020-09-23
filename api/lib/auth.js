@@ -238,7 +238,7 @@ class Auth {
         }
 
         return {
-            total: parseInt(pgres.rows.count),
+            total: parseInt(pgres.rows[0].count),
             users: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),

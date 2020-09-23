@@ -22,9 +22,16 @@
         </template>
         <template v-else>
             <div :key='user.id' v-for='user in users' class='col col--12 grid'>
-                <div @click='user._open = !user._open' class='col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
-                    <span v-text='user.username'/>
-                    <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                <div @click='user._open = !user._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
+                    <div class='col col--3'>
+                        <span v-text='user.username'/>
+                    </div>
+                    <div class='col col--6'>
+                        <span v-text='user.email'/>
+                    </div>
+                    <div class='col col--3'>
+                        <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                    </div>
                 </div>
 
                 <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
@@ -65,7 +72,7 @@ export default {
     data: function() {
         return {
             loading: false,
-            page: 1,
+            page: 0,
             perpage: 10,
             total: 100,
             users: []
@@ -73,6 +80,11 @@ export default {
     },
     mounted: function() {
         this.refresh();
+    },
+    watch:  {
+        page: function() {
+            this.getUsers();
+        }
     },
     methods: {
         refresh: function() {
@@ -83,7 +95,7 @@ export default {
 
             const url = new URL(`${window.location.origin}/api/user`);
             url.searchParams.append('limit', this.perpage)
-            url.searchParams.append('page', this.page)
+            url.searchParams.append('page', this.page + 1)
 
             fetch(url, {
                 method: 'GET'

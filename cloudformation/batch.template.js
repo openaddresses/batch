@@ -18,6 +18,10 @@ const stack = {
             Type: 'String',
             Description: '[secure] Mapbox API Token to create Slippy Maps With'
         },
+        BunnyToken: {
+            Type: 'String',
+            Description: '[secure] Bunny CDN Token for signing data downloads'
+        },
         Bucket: {
             Type: 'String',
             Description: 'S3 Asset Storage'

@@ -37,6 +37,14 @@
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
+        <template v-else-if='!users.length'>
+            <div class='flex-parent flex-parent--center-main w-full'>
+                <div class='flex-child py24'>
+                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                </div>
+            </div>
+            <div class='w-full align-center txt-bold'>No Users Found</div>
+        </template>
         <template v-else>
             <div :key='user.id' v-for='user in users' class='col col--12 grid'>
                 <div @click='user._open = !user._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
@@ -76,7 +84,7 @@
             </div>
         </template>
 
-        <Pager @page='page = $event' :perpage='perpage' :total='total'/>
+        <Pager v-if='users.length' @page='page = $event' :perpage='perpage' :total='total'/>
     </div>
 </template>
 
@@ -105,6 +113,7 @@ export default {
             this.getUsers();
         },
         filter: function() {
+            this.page = 0;
             this.getUsers();
         }
     },
@@ -117,7 +126,7 @@ export default {
 
             const url = new URL(`${window.location.origin}/api/user`);
             url.searchParams.append('limit', this.perpage)
-            url.searchParams.append('page', this.page + 1)
+            url.searchParams.append('page', this.page)
             url.searchParams.append('filter', this.filter)
 
             fetch(url, {
@@ -125,9 +134,9 @@ export default {
             }).then((res) => {
                 this.loading = false;
 
-                if (!res.ok && res.message) {
+                if (!res.ok && res.statusCode !== 404 && res.message) {
                     throw new Error(res.message);
-                } else if (!res.ok) {
+                } else if (!res.ok && res.statusCode !== 404) {
                     throw new Error('Failed to load users');
                 }
                 return res.json();

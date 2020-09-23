@@ -269,9 +269,9 @@ async function server(args, config, cb) {
      * @apiParamExample {String} ?limit
      *     ?limit=12
      *
-     * @apiParam {Number} [page=1] The offset based on limit to return
+     * @apiParam {Number} [page=0] The offset based on limit to return
      * @apiParamExample {String} ?page
-     *     ?page=1
+     *     ?page=0
      *
      * @apiParam {String} [filter=] Filter a complete or partial username/email
      * @apiParamExample {String} ?filter

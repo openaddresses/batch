@@ -201,11 +201,25 @@ class Auth {
         };
     }
 
-    async list() {
+    /**
+     * Return a list of users
+     *
+     * @param {Object} query - Query Object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page of users to return
+     * @param {String} [query.filter=] - Username or Email fragment to filter by
+     */
+    async list(query) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 1;
+        if (!query.filter) query.filter = '';
+
         let pgres;
         try {
             pgres = await this.pool.query(`
                 SELECT
+                    count(*) OVER() AS count,
                     id,
                     username,
                     access,
@@ -213,20 +227,34 @@ class Auth {
                     flags
                 FROM
                     users
-            `, []);
+                WHERE
+                    username iLIKE '%'||$3||'%'
+                    OR email iLIKE '%'||$3||'%'
+                LIMIT
+                    $1
+                OFFSET
+                    $2
+            `, [
+                query.limit,
+                query.page,
+                query.filter
+            ]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        return pgres.rows.map((row) => {
-            return {
-                id: parseInt(row.id),
-                username: row.username,
-                email: row.email,
-                access: row.access,
-                flags: row.flags
-            };
-        });
+        return {
+            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
+            users: pgres.rows.map((row) => {
+                return {
+                    id: parseInt(row.id),
+                    username: row.username,
+                    email: row.email,
+                    access: row.access,
+                    flags: row.flags
+                };
+            })
+        };
     }
 
     async user(uid) {

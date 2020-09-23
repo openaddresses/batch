@@ -1502,6 +1502,9 @@
     "groupTitle": "Server"
   },
   {
+    "type": "post",
+    "url": "/api/token",
+    "title": "Create Token",
     "version": "1.0.0",
     "name": "CreateToken",
     "group": "Token",
@@ -1512,12 +1515,13 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "type": "",
-    "url": "",
     "filename": "./index.js",
     "groupTitle": "Token"
   },
   {
+    "type": "delete",
+    "url": "/api/token/:id",
+    "title": "Delete Token",
     "version": "1.0.0",
     "name": "DeleteToken",
     "group": "Token",
@@ -1528,12 +1532,13 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "type": "",
-    "url": "",
     "filename": "./index.js",
     "groupTitle": "Token"
   },
   {
+    "type": "get",
+    "url": "/api/token",
+    "title": "List Tokens",
     "version": "1.0.0",
     "name": "ListTokens",
     "group": "Token",
@@ -1544,8 +1549,6 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "type": "",
-    "url": "",
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1599,6 +1602,53 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial username/email</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "?limit",
+          "content": "?limit=12",
+          "type": "String"
+        },
+        {
+          "title": "?page",
+          "content": "?page=0",
+          "type": "String"
+        },
+        {
+          "title": "?filter",
+          "content": "?filter=person@example.com",
+          "type": "String"
+        }
+      ]
+    },
     "description": "<p>Return a list of users that have registered with the service</p>",
     "filename": "./index.js",
     "groupTitle": "User"

@@ -254,7 +254,7 @@ class Auth {
                     flags: row.flags
                 };
             })
-        }
+        };
     }
 
     async user(uid) {

@@ -1618,7 +1618,7 @@ define({ "api": [
             "type": "Number",
             "optional": true,
             "field": "page",
-            "defaultValue": "1",
+            "defaultValue": "0",
             "description": "<p>The offset based on limit to return</p>"
           },
           {
@@ -1639,7 +1639,7 @@ define({ "api": [
         },
         {
           "title": "?page",
-          "content": "?page=1",
+          "content": "?page=0",
           "type": "String"
         },
         {

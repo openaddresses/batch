@@ -8,12 +8,29 @@
                 </h2>
 
                 <div class='fr'>
-                    <button @click='refresh' class='btn round btn--stroke color-gray mx3'>
+                    <button @click='showFilter = !showFilter' class='btn round btn--stroke color-gray mr12'>
+                        <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
+                        <svg v-else class='icon'><use href='#icon-close'/></svg>
+                    </button>
+
+                    <button @click='refresh' class='btn round btn--stroke color-gray'>
                         <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                     </button>
                 </div>
             </div>
         </div>
+
+        <template v-if='showFilter'>
+            <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
+                <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
+
+                <div class='col col--12 px6'>
+                    <label>Username/Email Filter</label>
+                    <input v-model='filter' class='input' placeholder='john-doe' />
+                </div>
+            </div>
+        </template>
+
 
         <template v-if='loading'>
             <div class='flex-parent flex-parent--center-main w-full'>
@@ -72,6 +89,8 @@ export default {
     data: function() {
         return {
             loading: false,
+            filter: '',
+            showFilter: false,
             page: 0,
             perpage: 10,
             total: 100,
@@ -96,6 +115,7 @@ export default {
             const url = new URL(`${window.location.origin}/api/user`);
             url.searchParams.append('limit', this.perpage)
             url.searchParams.append('page', this.page + 1)
+            url.searchParams.append('filter', this.filter)
 
             fetch(url, {
                 method: 'GET'

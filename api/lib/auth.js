@@ -201,11 +201,23 @@ class Auth {
         };
     }
 
-    async list() {
+    /**
+     * Return a list of users
+     *
+     * @param {Object} query - Query Object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=1] - Page of users to return
+     */
+    async list(query) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 1;
+
         let pgres;
         try {
             pgres = await this.pool.query(`
                 SELECT
+                    count(*) OVER() AS count,
                     id,
                     username,
                     access,
@@ -213,20 +225,30 @@ class Auth {
                     flags
                 FROM
                     users
-            `, []);
+                LIMIT
+                    $1
+                OFFSET
+                    $2
+            `, [
+                query.limit,
+                query.page
+            ]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        return pgres.rows.map((row) => {
-            return {
-                id: parseInt(row.id),
-                username: row.username,
-                email: row.email,
-                access: row.access,
-                flags: row.flags
-            };
-        });
+        return {
+            total: parseInt(pgres.rows.count),
+            users: pgres.rows.map((row) => {
+                return {
+                    id: parseInt(row.id),
+                    username: row.username,
+                    email: row.email,
+                    access: row.access,
+                    flags: row.flags
+                };
+            })
+        }
     }
 
     async user(uid) {

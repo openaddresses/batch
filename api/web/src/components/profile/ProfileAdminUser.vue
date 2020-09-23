@@ -50,17 +50,24 @@
                     </div>
                 </div>
             </div>
+
+            <Pager @page='page = $event' :perpage='perpage' :total='total'/>
         </template>
     </div>
 </template>
 
 <script>
+import Pager from '../util/Pager.vue';
+
 export default {
     name: 'ProfileAdminUser',
     props: [ ],
     data: function() {
         return {
             loading: false,
+            page: 1,
+            perpage: 10,
+            total: 100,
             users: []
         };
     },
@@ -75,6 +82,8 @@ export default {
             this.loading = true;
 
             const url = new URL(`${window.location.origin}/api/user`);
+            url.searchParams.append('limit', this.perpage)
+            url.searchParams.append('page', this.page)
 
             fetch(url, {
                 method: 'GET'
@@ -88,7 +97,8 @@ export default {
                 }
                 return res.json();
             }).then((res) => {
-                this.users = res.map((user) => {
+                this.total = res.total;
+                this.users = res.users.map((user) => {
                     user._open = false;
                     return user;
                 });
@@ -122,6 +132,9 @@ export default {
                 this.$emit('err', err);
             });
         }
+    },
+    components: {
+        Pager
     }
 }
 </script>

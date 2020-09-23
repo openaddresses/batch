@@ -1599,6 +1599,40 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "1",
+            "description": "<p>The offset based on limit to return</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "?limit",
+          "content": "?limit=12",
+          "type": "String"
+        },
+        {
+          "title": "?page",
+          "content": "?page=1",
+          "type": "String"
+        }
+      ]
+    },
     "description": "<p>Return a list of users that have registered with the service</p>",
     "filename": "./index.js",
     "groupTitle": "User"

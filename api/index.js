@@ -265,6 +265,14 @@ async function server(args, config, cb) {
      * @apiGroup User
      * @apiPermission admin
      *
+     * @apiParam {Number} [limit=100] Limit number of returned runs
+     * @apiParamExample {String} ?limit
+     *     ?limit=12
+     *
+     * @apiParam {Number} [page=1] The offset based on limit to return
+     * @apiParamExample {String} ?page
+     *     ?page=1
+     *
      * @apiDescription
      *     Return a list of users that have registered with the service
      */
@@ -272,7 +280,7 @@ async function server(args, config, cb) {
         try {
             await auth.is_admin(req);
 
-            const users = await auth.list();
+            const users = await auth.list(req.query);
 
             return res.json(users);
         } catch (err) {

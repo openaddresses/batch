@@ -300,7 +300,19 @@ class Job {
         });
     }
 
-    async check(api, run) {
+    async check_source(api) {
+        let layer;
+        for (const l of this.source.layers[this.layer]) {
+            if (l.name === this.name) layer = l;
+        }
+
+        if (layer.skip) await JobError.create(api, this.job, 'Job has skip: true flag enabled');
+        if (layer.year && parseInt(layer.year) !== new Date().getFullYear()) await JobError.create(api, this.job, `Job has year: ${layer.year} which is not the current year`);
+
+        return true;
+    }
+
+    async check_stats(api, run) {
         const diff = await this.compare(api);
 
         // New Source

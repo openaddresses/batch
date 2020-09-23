@@ -57,9 +57,9 @@
                     </div>
                 </div>
             </div>
-
-            <Pager @page='page = $event' :perpage='perpage' :total='total'/>
         </template>
+
+        <Pager @page='page = $event' :perpage='perpage' :total='total'/>
     </div>
 </template>
 

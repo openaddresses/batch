@@ -306,8 +306,8 @@ class Job {
             if (l.name === this.name) layer = l;
         }
 
-        if (l.skip) await JobError.create(api, this.job, `Job has skip: true flag enabled`);
-        if (l.year && parseInt(l.year) !== new Date().getFullYear()) await JobError.create(api, this.job, `Job has year: ${l.year} which is not the current year`);
+        if (layer.skip) await JobError.create(api, this.job, `Job has skip: true flag enabled`);
+        if (layer.year && parseInt(layer.year) !== new Date().getFullYear()) await JobError.create(api, this.job, `Job has year: ${layer.year} which is not the current year`);
 
         return true;
     }

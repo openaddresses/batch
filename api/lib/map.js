@@ -61,7 +61,9 @@ class Map {
                 FROM (
                     SELECT
                         n.code,
-                        JSON_object(ARRAY_AGG(k)::TEXT[], ARRAY_AGG(v)::TEXT[]) AS layers,
+                        addresses,
+                        buildings,
+                        parcels,
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
@@ -78,8 +80,9 @@ class Map {
                             map.name,
                             map.code,
                             map.geom,
-                            job.layer AS k,
-                            true AS v
+                            job.layer = 'addresses' AS addresses,
+                            job.layer = 'buildings' AS buildings,
+                            job.layer = 'parcels' AS parcels
                         FROM
                             map INNER JOIN job ON map.id = job.map
                         WHERE
@@ -92,6 +95,9 @@ class Map {
                         )
                     ) n
                     GROUP BY
+                        n.addresses,
+                        n.buildings,
+                        n.parcels,
                         n.code,
                         n.geom
                 ) q

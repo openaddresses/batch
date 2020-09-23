@@ -71,6 +71,7 @@
             <Coverage
                 @err='$emit("err", $event)'
                 v-on:point='filter.point = $event'
+                :layer='filter.layer'
             />
         </div>
 

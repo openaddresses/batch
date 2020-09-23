@@ -27,15 +27,34 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default {
     name: 'Coverage',
-    props: [],
+    props: ['layer'],
     data: function() {
         return {
+            layers: ['addresses', 'parcels', 'buildings'],
             fullscreen: false,
             point: false,
             map: ''
         }
     },
     watch: {
+        layer: function() {
+            for (const layer of this.layers) {
+                this.map.setLayoutProperty(`coverage-${layer}-poly`, 'visibility', 'none');
+                this.map.setLayoutProperty(`coverage-${layer}-point`, 'visibility', 'none');
+            }
+
+            if (this.layer !== 'all') {
+                this.map.setLayoutProperty('coverage-poly', 'visibility', 'none');
+                this.map.setLayoutProperty('coverage-point', 'visibility', 'none');
+
+                this.map.setLayoutProperty(`coverage-${this.layer}-poly`, 'visibility', 'visible');
+                this.map.setLayoutProperty(`coverage-${this.layer}-point`, 'visibility', 'visible');
+            } else {
+                this.map.setLayoutProperty('coverage-poly', 'visibility', 'visible');
+                this.map.setLayoutProperty('coverage-point', 'visibility', 'visible');
+            }
+
+        },
         point: function() {
             if (!this.point) {
                 this.map.getSource('click').setData({
@@ -98,25 +117,27 @@ export default {
                     });
 
                     this.map.on('click', (e) => {
+                        console.error(this.map.queryRenderedFeatures(e.point))
                         this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 
                     const base = '#0b6623';
 
                     this.map.addLayer({
-                        id: 'coverage-poly',
+                        id: `coverage-poly`,
                         type: 'fill',
                         source: 'coverage',
                         'source-layer': 'data',
                         layout: { },
-                        'paint': {
+                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        paint: {
                             'fill-color': base,
                             'fill-opacity': 0.8
                         }
                     });
 
                     this.map.addLayer({
-                        id: 'coverage-point',
+                        id: `coverage-point`,
                         type: 'circle',
                         source: 'coverage',
                         'source-layer': 'data',
@@ -139,6 +160,58 @@ export default {
                             'circle-stroke-width': 1
                         }
                     });
+
+                    for (const layer of ['addresses', 'parcels', 'buildings']) {
+                        this.map.addLayer({
+                            id: `coverage-${layer}-poly`,
+                            type: 'fill',
+                            source: 'coverage',
+                            'source-layer': 'data',
+                            layout: {
+                                visibility: 'none'
+                            },
+                            filter: [
+                                "all",
+                                ["==", ['get', layer], true],
+                                ['==', ['geometry-type'], 'Polygon'],
+                            ],
+                            paint: {
+                                'fill-color': base,
+                                'fill-opacity': 0.8
+                            }
+                        });
+
+                        this.map.addLayer({
+                            id: `coverage-${layer}-point`,
+                            type: 'circle',
+                            source: 'coverage',
+                            'source-layer': 'data',
+                            layout: {
+                                visibility: 'none'
+                            },
+                            filter: [
+                                "all",
+                                ["==", ['get', layer], true],
+                                ['==', ['geometry-type'], 'Point'],
+                            ],
+                            paint: {
+                                'circle-color': base,
+                                'circle-radius': [
+                                    'interpolate',
+                                    ['exponential', 0.5],
+                                    ['zoom'],
+                                    1, 1,
+                                    10, 2,
+                                    13, 10,
+                                    15, 50,
+                                    17, 100
+                                ],
+                                'circle-opacity': 1.0,
+                                'circle-stroke-color': '#ffffff',
+                                'circle-stroke-width': 1
+                            }
+                        });
+                    }
 
                     this.map.addSource('click', {
                         type: 'geojson',

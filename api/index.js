@@ -273,6 +273,10 @@ async function server(args, config, cb) {
      * @apiParamExample {String} ?page
      *     ?page=1
      *
+     * @apiParam {String} [filter=] Filter a complete or partial username/email
+     * @apiParamExample {String} ?filter
+     *     ?filter=person@example.com
+     *
      * @apiDescription
      *     Return a list of users that have registered with the service
      */
@@ -499,7 +503,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {get} /api/token List Tokens
+     * @api {get} /api/token List Tokens
      * @apiVersion 1.0.0
      * @apiName ListTokens
      * @apiGroup Token
@@ -516,7 +520,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {post} /api/token Create Token
+     * @api {post} /api/token Create Token
      * @apiVersion 1.0.0
      * @apiName CreateToken
      * @apiGroup Token
@@ -533,7 +537,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * {delete} /api/token/:id Delete Token
+     * @api {delete} /api/token/:id Delete Token
      * @apiVersion 1.0.0
      * @apiName DeleteToken
      * @apiGroup Token

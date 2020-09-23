@@ -103,6 +103,9 @@ export default {
     watch:  {
         page: function() {
             this.getUsers();
+        },
+        filter: function() {
+            this.getUsers();
         }
     },
     methods: {

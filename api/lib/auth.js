@@ -207,11 +207,13 @@ class Auth {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=1] - Page of users to return
+     * @param {String} [query.filter=] - Username or Email fragment to filter by
      */
     async list(query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 1;
+        if (!query.filter) query.filter = '';
 
         let pgres;
         try {
@@ -225,13 +227,17 @@ class Auth {
                     flags
                 FROM
                     users
+                WHERE
+                    username iLIKE '%'||$3||'%'
+                    OR email iLIKE '%'||$3||'%'
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page
+                query.page,
+                query.filter
             ]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');

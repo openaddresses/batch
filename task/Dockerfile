@@ -6,10 +6,10 @@ RUN apk add nodejs yarn git python3 python3-dev py3-pip \
     py3-cairo
 
 # Install Machine Process One Script
-RUN git clone --depth 1 --single-branch --branch batch https://github.com/openaddresses/machine.git \
+RUN git clone --depth 1 --single-branch https://github.com/openaddresses/batch-machine.git \
     && pip3 install 'honcho == 1.0.1' 'virtualenv == 15.1.0' \
     && pip3 install psycopg2 \
-    && pip3 install -U ./machine/
+    && pip3 install -U ./batch-machine/
 
 # Download and install Tippecanoe
 RUN git clone -b 1.35.0 https://github.com/mapbox/tippecanoe.git /tmp/tippecanoe && \

@@ -38,10 +38,13 @@ class S3 {
             new readline.createInterface({
                 input: s3stream
             }).on('line', (line) => {
-                buffer.push(JSON.parse(line));
-                if (buffer.length === 20) {
-                    req.abort();
-                    return resolve(buffer);
+                if (buffer.length <= 20) {
+                    buffer.push(JSON.parse(line));
+
+                    if (buffer.length === 21) {
+                        req.abort();
+                        return resolve(buffer);
+                    }
                 }
             }).on('error', (err) => {
                 return reject(err);

@@ -678,6 +678,37 @@
   },
   {
     "type": "get",
+    "url": "/api/job/:job/output/sample",
+    "title": "Small Sample",
+    "version": "1.0.0",
+    "name": "SampleData",
+    "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return an Array containing a sample of the properties</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":job",
+            "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
+    "type": "get",
     "url": "/api/job/:job",
     "title": "Get Job",
     "version": "1.0.0",

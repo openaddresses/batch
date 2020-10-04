@@ -48,6 +48,7 @@
                 <div class='flex-parent-inline fr'>
                     <button @click='mode = "preview"' :class='{ "btn--stroke": mode !== "preview" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Preview</button>
                     <button @click='mode = "numeric"' :class='{ "btn--stroke": mode !== "numeric" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Numeric</button>
+                    <button @click='mode = "sample"' :class='{ "btn--stroke": mode !== "sample" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Sample</button>
                     <button @click='mode = "bounds"' :class='{ "btn--stroke": mode !== "bounds" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Map</button>
                 </div>
             </div>
@@ -75,6 +76,12 @@
                     :delta='delta'
                 />
             </template>
+            <template v-else-if='mode === "sample"'>
+                <JobSample
+                    @err='$emit("err", $event)'
+                    :job='job'
+                />
+            </template>
             <template v-else-if='mode === "bounds"'>
                 <JobMap
                     @err='$emit("err", $event)'
@@ -91,6 +98,7 @@
 import Status from './Status.vue';
 import JobStats from './job/JobStats.vue';
 import JobMap from './job/JobMap.vue';
+import JobSample from './job/JobSample.vue';
 
 export default {
     name: 'Job',

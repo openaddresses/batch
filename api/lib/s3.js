@@ -41,7 +41,7 @@ class S3 {
                 if (buffer.length <= 20) {
                     buffer.push(JSON.parse(line));
 
-                    if (buffer.length === 21) {
+                    if (buffer.length === 20) {
                         req.abort();
                         return resolve(buffer);
                     }

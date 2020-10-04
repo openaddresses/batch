@@ -120,7 +120,7 @@ const stack = {
                     ],
                     Type : 'SPOT',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    InstanceTypes : ['c5.large']
+                    InstanceTypes : ['c5']
                 },
                 State: 'ENABLED'
             }
@@ -151,7 +151,7 @@ const stack = {
                     ],
                     Type : 'EC2',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    InstanceTypes : ['c5.large']
+                    InstanceTypes : ['c5']
                 },
                 State: 'ENABLED'
             }

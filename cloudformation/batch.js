@@ -120,7 +120,7 @@ const stack = {
                     ],
                     Type : 'SPOT',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    InstanceTypes : ['optimal']
+                    InstanceTypes : ['t3']
                 },
                 State: 'ENABLED'
             }

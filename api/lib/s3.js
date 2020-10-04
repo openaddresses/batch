@@ -47,7 +47,13 @@ class S3 {
                     }
                 }
             }).on('error', (err) => {
-                return reject(err);
+                // Zlib will often complain the stream is cut short
+                // If we've already returned the 20 required lines, ignore eit
+                if (buffer.length < 20) {
+                    return resolve(buffer);
+                } else {
+                    return reject(new Error(err));
+                }
             });
         });
     }

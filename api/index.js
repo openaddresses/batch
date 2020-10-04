@@ -1442,6 +1442,28 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/job/:job/output/sample Small Sample
+     * @apiVersion 1.0.0
+     * @apiName SampleData
+     * @apiGroup Job
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Return an Array containing a sample of the properties
+     *
+     * @apiParam {Number} :job Job ID
+     */
+    router.get('/job/:job/output/sample', async (req, res) => {
+        Param.int(req, res, 'job');
+
+        try {
+            return res.json(await Job.sample(pool, req.params.job));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/job/:job/output/cache.zip Get Job Cache
      * @apiVersion 1.0.0
      * @apiName SingleOutputCache

@@ -2,6 +2,8 @@
 
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
+const readline = require('readline');
+const zlib = require('zlib');
 
 class S3 {
     constructor(params) {
@@ -23,6 +25,31 @@ class S3 {
         });
 
         s3stream.pipe(res);
+    }
+
+    async sample() {
+        return new Promise((resolve, reject) => {
+            const buffer = [];
+            const req = s3.getObject(this.params);
+            const s3stream = req
+                .createReadStream()
+                .pipe(zlib.createGunzip());
+
+            new readline.createInterface({
+                input: s3stream
+            }).on('line', (line) => {
+                if (buffer.length <= 20) {
+                    buffer.push(JSON.parse(line));
+
+                    if (buffer.length === 21) {
+                        req.abort();
+                        return resolve(buffer);
+                    }
+                }
+            }).on('error', (err) => {
+                return reject(err);
+            });
+        });
     }
 }
 

@@ -55,6 +55,21 @@
             <template v-if='mode === "preview"'>
                 <template v-if='job.output.preview'>
                     <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
+
+                    <h3 class='fl txt-h4 py6'>Job Sample:</h3>
+                    <table class='table txt-xs mb60'>
+                        <thead>
+                            <tr>
+                                <th :key='key' v-for='key of props' v-text='key'></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr :key='s.properties.hash' v-for='s of sample'>
+                                <th :key='s.properties.hash + ":" + key' v-for='key of props' v-text='s.properties[key]'></th>
+                            </tr>
+                        </tbody>
+                    </table>
+
                 </template>
                 <template v-else>
                     <div class='col col--12 border border--gray-light round'>
@@ -99,6 +114,8 @@ export default {
         return {
             mode: 'preview',
             loading: false,
+            sample: [],
+            props: [],
             name: '',
             delta: {
                 compare: false,
@@ -140,6 +157,7 @@ export default {
         refresh: function() {
             this.getJob();
             this.getDelta();
+            this.getSample();
         },
         getDelta: function() {
             fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
@@ -156,6 +174,31 @@ export default {
                 this.delta.master = res.master;
                 this.delta.compare = res.compare;
                 this.delta.delta = res.delta;
+            }).catch(() => {
+                this.delta = false;
+            });
+        },
+        getSample: function() {
+            fetch(window.location.origin + `/api/job/${this.jobid}/output/sample`, {
+                method: 'GET'
+            }).then((res) => {
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to get job sample');
+                }
+
+                return res.json();
+            }).then((res) => {
+                const props = {};
+                for (const r of res) {
+                    for (const key of Object.keys(r.properties)) {
+                        props[key] = true;
+                    }
+                }
+
+                this.props = Object.keys(props);
+                this.sample = res;
             }).catch(() => {
                 this.delta = false;
             });

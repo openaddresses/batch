@@ -2,10 +2,7 @@
 
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const split = require('split');
-const util = require('util');
-const stream = require('stream');
-const pipeline = util.promisify(stream.pipeline);
+const readline = require('readline');
 const zlib = require('zlib');
 
 class S3 {
@@ -30,24 +27,26 @@ class S3 {
         s3stream.pipe(res);
     }
 
-    async sample(name) {
-        try {
-            console.error(this.params)
-            await pipeline(
-                s3.getObject(this.params).createReadStream(),
-                zlib.Gunzip,
-                split(),
-                async function* (source) {
-                    source.setEncoding('utf8');
-                    for await (const chunk of source) {
-                        console.error(chunk)
-                        yield chunk.toUpperCase();
-                    }
-                },
-            );
-        } catch (err) {
-            throw new Error(err);
-        }
+    async sample() {
+        return new Promise((resolve, reject) => {
+            const buffer = [];
+            const req = s3.getObject(this.params);
+            const s3stream = req
+                .createReadStream()
+                .pipe(zlib.createGunzip());
+
+            new readline.createInterface({
+                input: s3stream
+            }).on('line', (line) => {
+                buffer.push(JSON.parse(line));
+                if (buffer.length === 20) {
+                    req.abort();
+                    return resolve(buffer);
+                }
+            }).on('error', (err) => {
+                return reject(err);
+            });
+        });
     }
 }
 

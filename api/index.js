@@ -1457,7 +1457,7 @@ async function server(args, config, cb) {
         Param.int(req, res, 'job');
 
         try {
-            await Job.sample(pool, req.params.job);
+            return res.json(await Job.sample(pool, req.params.job));
         } catch (err) {
             return Err.respond(err, res);
         }

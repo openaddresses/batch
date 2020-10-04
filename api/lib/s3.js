@@ -31,12 +31,17 @@ class S3 {
         return new Promise((resolve, reject) => {
             const buffer = [];
             const req = s3.getObject(this.params);
-            const s3stream = req
-                .createReadStream()
-                .pipe(zlib.createGunzip());
+
+            const zlibstream = zlib.createGunzip();
+            zlibstream.on('error', error);
+
+            const s3stream = req.createReadStream();
+            s3stream.on('error', error);
+
+            const input = s3stream.pipe(zlibstream);
 
             new readline.createInterface({
-                input: s3stream
+                input: input
             }).on('line', (line) => {
                 if (buffer.length <= 20) {
                     buffer.push(JSON.parse(line));
@@ -46,7 +51,9 @@ class S3 {
                         return resolve(buffer);
                     }
                 }
-            }).on('error', (err) => {
+            }).on('error', error)
+
+            function error(err) {
                 // Zlib will often complain the stream is cut short
                 // If we've already returned the 20 required lines, ignore eit
                 if (buffer.length < 20) {
@@ -54,7 +61,7 @@ class S3 {
                 } else {
                     return reject(new Error(err));
                 }
-            });
+            }
         });
     }
 }

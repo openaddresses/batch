@@ -11,7 +11,7 @@ const request = require('request');
 const { pipeline } = require('stream');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
-const schema_v2 = require('./source_schema_v2.json');
+const schema_v2 = require('oa').schema['2'];
 const transform = require('parallel-transform');
 const Stats = require('./stats');
 

@@ -9,6 +9,7 @@
         "lint": "eslint task.js lib/**.js test/**.js"
     },
     "dependencies": {
+        "oa": "2.0.2",
         "@mapbox/decrypt-kms-env": "^3.0.0",
         "@turf/turf": "^5.1.6",
         "ajv": "^6.12.0",

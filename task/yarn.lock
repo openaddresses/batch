@@ -2476,6 +2476,11 @@ normalize-path@^3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
+oa@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/oa/-/oa-2.0.2.tgz#b819dd099933038e68a2117e19ea60a439359619"
+  integrity sha512-CmWYPHV+SMx7ym1+HTGvQe2lknyyaz1YyFnaTZOYAtJlsKQCdZ4D3/bLr7XVKGcVU0ls2PZJeZooCDVvm4JQnQ==
+
 oauth-sign@~0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"

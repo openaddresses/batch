@@ -51,7 +51,7 @@ class S3 {
                         return resolve(buffer);
                     }
                 }
-            }).on('error', error)
+            }).on('error', error);
 
             function error(err) {
                 // Zlib will often complain the stream is cut short

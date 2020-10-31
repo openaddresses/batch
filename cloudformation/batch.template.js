@@ -5,6 +5,7 @@ const api = require('./api');
 const batch = require('./batch');
 const db = require('./db');
 const schedule = require('./schedule');
+const alarms = require('batch-alarms');
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -39,6 +40,14 @@ module.exports = cf.merge(
     db,
     api,
     batch,
+    alarms({
+        prefix: 'Batch',
+        email: 'nick@ingalls.ca',
+        cluster: cf.ref('APIECSCluster'),
+        service: cf.getAtt('APIService', 'Name'),
+        loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName')
+
+    }),
     schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),
     schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
     schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs')

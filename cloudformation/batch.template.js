@@ -46,7 +46,7 @@ module.exports = cf.merge(
         cluster: cf.ref('APIECSCluster'),
         service: cf.getAtt('APIService', 'Name'),
         loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName'),
-        targetgroup: cf.getAtt('APITargetGroup', 'TargetGroupFullName'),
+        targetgroup: cf.getAtt('APITargetGroup', 'TargetGroupFullName')
 
     }),
     schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),

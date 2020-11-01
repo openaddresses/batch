@@ -161,10 +161,10 @@ base64-js@^1.0.2:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.3.1.tgz#58ece8cb75dd07e71ed08c736abc5fac4dbf8df1"
   integrity sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==
 
-batch-alarms@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/batch-alarms/-/batch-alarms-1.0.0.tgz#c655e56f474ab257c47db55bf0e1d0f76c2420ce"
-  integrity sha512-L35+9s7/G+1Gu357ARychk0x0DlkH5ixoLlE5EZDlw7wEL8iy5KyJtARanVPJpreDTk4u5z5FFeY231HKn1o5Q==
+batch-alarms@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/batch-alarms/-/batch-alarms-1.1.0.tgz#4085e024644e03ad5748ffe77a093b3591f2d0c2"
+  integrity sha512-Z/c820D1RpN8VczWnKTln0z4JbANh2PtMvJq2NCEuxEwX/NyjMzIWctn3kk8/iM0w9nIRv3JUSWenpZr3Nq8lQ==
   dependencies:
     "@mapbox/cloudfriend" "^4.4.0"
 

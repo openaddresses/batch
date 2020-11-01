@@ -45,7 +45,8 @@ module.exports = cf.merge(
         email: 'nick@ingalls.ca',
         cluster: cf.ref('APIECSCluster'),
         service: cf.getAtt('APIService', 'Name'),
-        loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName')
+        loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName'),
+        targetgroup: cf.getAtt('APITargetGroup', 'TargetGroupFullName')
 
     }),
     schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),

@@ -18,7 +18,7 @@
         "glob": "^7.1.6",
         "minimist": "^1.2.5",
         "mkdirp": "^1.0.4",
-        "oa": "2.0.2",
+        "oa": "2.1.0",
         "parallel-transform": "^1.2.0",
         "prompts": "^2.4.0",
         "request": "^2.88.2",

@@ -1644,7 +1644,7 @@ async function server(args, config, cb) {
         });
     });
 
-    const srv = app.listen(5000, (err) => {
+    const srv = app.listen(4999, (err) => {
         if (err) return err;
 
         if (cb) return cb(srv, pool);

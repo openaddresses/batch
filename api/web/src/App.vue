@@ -13,7 +13,7 @@
             <span class='fr'>
                 <router-link to='/upload'><button class='btn btn--stroke btn--s btn--gray round mr12 h24'>Contribute</button></router-link>
 
-                <button @click='external("/docs", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
+                <button @click='internal("/docs", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
 
                 <router-link v-if='!auth.username' to='/login'><button class='btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
                 <router-link v-else to='/profile'><button class='btn btn--stroke btn--s btn--gray round mr12'>
@@ -99,6 +99,15 @@ export default {
                 console.error(err);
                 this.err = err;
             });
+        },
+        internal: function(url, tab) {
+            url = window.location.origin + url;
+
+            if (!tab) {
+                window.location.href = url;
+            } else {
+                window.open(url, "_blank");
+            }
         },
         external: function(url, tab) {
             if (!tab) {

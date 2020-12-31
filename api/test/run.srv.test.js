@@ -21,7 +21,7 @@ test('start: server', (t) => {
 
 test('POST: api/run', (t) => {
     request({
-        url: 'http://localhost:5000/api/run',
+        url: 'http://localhost:4999/api/run',
         method: 'POST',
         json: true,
         headers: {
@@ -46,7 +46,7 @@ test('POST: api/run', (t) => {
 
 test('GET: api/run', (t) => {
     request({
-        url: 'http://localhost:5000/api/run',
+        url: 'http://localhost:4999/api/run',
         method: 'GET',
         json: true
     }, (err, res) => {
@@ -63,7 +63,7 @@ test('GET: api/run', (t) => {
 
 test('POST: api/run/:run/jobs', (t) => {
     request({
-        url: 'http://localhost:5000/api/run/1/jobs',
+        url: 'http://localhost:4999/api/run/1/jobs',
         method: 'POST',
         json: true,
         headers: {
@@ -89,7 +89,7 @@ test('POST: api/run/:run/jobs', (t) => {
 
 test('GET: api/data', (t) => {
     request({
-        url: 'http://localhost:5000/api/data',
+        url: 'http://localhost:4999/api/data',
         method: 'GET',
         json: true
     }, (err, res) => {
@@ -104,7 +104,7 @@ test('GET: api/data', (t) => {
 
 test('PATCH: api/job/:job', (t) => {
     request({
-        url: 'http://localhost:5000/api/job/1',
+        url: 'http://localhost:4999/api/job/1',
         method: 'PATCH',
         json: true,
         headers: {
@@ -138,7 +138,7 @@ test('PATCH: api/job/:job', (t) => {
 
 test('GET: api/data', (t) => {
     request({
-        url: 'http://localhost:5000/api/data',
+        url: 'http://localhost:4999/api/data',
         method: 'GET',
         json: true
     }, (err, res) => {

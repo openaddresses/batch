@@ -1644,12 +1644,12 @@ async function server(args, config, cb) {
         });
     });
 
-    const srv = app.listen(5000, (err) => {
+    const srv = app.listen(4999, (err) => {
         if (err) return err;
 
         if (cb) return cb(srv, pool);
 
-        console.log('ok - http://localhost:5000');
+        console.log('ok - http://localhost:4999');
     });
 }
 

@@ -13,7 +13,7 @@
             <span class='fr'>
                 <router-link to='/upload'><button class='btn btn--stroke btn--s btn--gray round mr12 h24'>Contribute</button></router-link>
 
-                <button @click='internal("/docs", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
+                <button @click='internal("/docs/", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>
 
                 <router-link v-if='!auth.username' to='/login'><button class='btn btn--stroke btn--s btn--gray round mr12'>Login</button></router-link>
                 <router-link v-else to='/profile'><button class='btn btn--stroke btn--s btn--gray round mr12'>

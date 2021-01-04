@@ -11,7 +11,7 @@
         "@mapbox/assembly": "^0.24.1-0",
         "chart.js": "^2.9.4",
         "core-js": "^3.6.4",
-        "mapbox-gl": "^1.10.0",
+        "mapbox-gl": "^2.0.1",
         "moment-timezone": "^0.5.31",
         "v-tooltip": "^2.0.3",
         "vue": "^2.6.11",

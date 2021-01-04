@@ -19,6 +19,8 @@ deploy update production
 
 ### Parameters
 
+Whenever you deploy, you will be prompted for the following parameters
+
 #### GitSha
 
 On every commit, GitHub actions will build the latest Docker image and push it to the `batch` ECR.

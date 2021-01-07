@@ -118,3 +118,9 @@ yarn build --watch
 Note: changes to the website will now to automatically rebuilt, just refresh the page to see them.
 
 Finally, to access the api, navigate to `http://localhost:5000` in your web browser.
+
+## Database
+
+All data is persisted in an AWS RDS managed postgres database.
+
+![dbdiagram.io](./docs/db.png)

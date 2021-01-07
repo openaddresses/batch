@@ -209,6 +209,7 @@ async function server(args, config, cb) {
 
             try {
                 req.auth = await authtoken.validate(authorization[1]);
+                req.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -293,7 +294,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {post} /api/health Create User
+     * @api {post} /api/user Create User
      * @apiVersion 1.0.0
      * @apiName Create
      * @apiGroup User

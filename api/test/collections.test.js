@@ -48,3 +48,29 @@ test('Collecton()', (t) => {
 
     t.end();
 });
+
+test('Collection#json()', (t) => {
+    const collection = new Collection(
+        'usa',
+        ['us/**']
+    );
+
+    t.equals(collection.id, false, 'collection.id: false');
+    t.equals(collection.name, 'usa', 'collection.name: global');
+    t.deepEquals(collection.sources, [ 'us/**' ], 'collection.sources:  ["**"]');
+    t.equals(collection.created, false, 'collection.created: false');
+    t.equals(collection.size, 0, 'collection.size: 0');
+    t.equals(collection.s3, false, 'collection.s3: false');
+
+    t.deepEquals(collection.json(), {
+        id: NaN,
+        name: 'usa',
+        sources: ['us/**'],
+        created: false,
+        size: 0,
+        s3: false
+    });
+
+    t.end();
+});
+

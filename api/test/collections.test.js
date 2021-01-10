@@ -232,7 +232,7 @@ test('Collection#from()', async (t) => {
     }
 
     try {
-        const collection = await Collection.from(pool, 2);
+        await Collection.from(pool, 2);
 
         t.fail('collection should not be found');
     } catch (err) {

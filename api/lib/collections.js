@@ -76,6 +76,7 @@ class Collection {
             if (pgres.rows.length === 0) throw new Err(404, null, 'collection not found');
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
+            pgres.rows[0].size = parseInt(pgres.rows[0].size);
 
             const collection = new Collection(pgres.rows[0].name, pgres.rows[0].sources);
 
@@ -140,6 +141,7 @@ class Collection {
             ]);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
+            pgres.rows[0].size = parseInt(pgres.rows[0].size);
 
             for (const key of Object.keys(pgres.rows[0])) {
                 this[key] = pgres.rows[0][key];

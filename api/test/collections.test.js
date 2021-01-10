@@ -74,7 +74,7 @@ test('Collection#json()', (t) => {
     t.end();
 });
 
-test('Collection#json()', (t) => {
+test('Collection#patch()', (t) => {
     const collection = new Collection(
         'usa',
         ['us/**']
@@ -157,7 +157,7 @@ test('Collection#list', async (t) => {
         t.equals(list.length, 1, 'list.length: 1');
 
         t.ok(list[0].created, 'list[0].created: <date>');
-        delete list[0].created
+        delete list[0].created;
 
         t.same(list[0], {
             id: 1,
@@ -168,6 +168,76 @@ test('Collection#list', async (t) => {
         }, 'list[0]: <object>');
     } catch (err) {
         t.error(err, 'no errors');
+    }
+
+    pool.end();
+    t.end();
+});
+
+test('Collection#data', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        let param = false;
+
+        await Collection.data(pool, 1, {
+            redirect: (p) => {
+                param = p;
+            }
+        });
+
+        t.equals(param, 'https://v2.openaddresses.io/test/collection-usa.zip', 'html data url');
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    try {
+        let param = false;
+
+        await Collection.data(pool, 2, {
+            redirect: (p) => {
+                param = p;
+            }
+        });
+
+        t.equals(param, 'https://v2.openaddresses.io/test/collection-usa.zip', 'html data url');
+
+        t.fail('collection should not be found');
+    } catch (err) {
+        t.deepEquals(err, new Err(404, null, 'collection not found'));
+    }
+
+    pool.end();
+    t.end();
+});
+
+test('Collection#from()', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        const collection = await Collection.from(pool, 1);
+
+        t.equals(collection.id, 1, 'collection.id: 1');
+        t.equals(collection.name, 'usa', 'collection.name: use');
+        t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
+        t.ok(collection.created, 'collection.created: <date>');
+        t.equals(collection.size, 0, 'collection.size: 0');
+        t.equals(collection.s3, 's3://undefined/test/collection-usa.zip', 'collection.s3: <s3 path>');
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    try {
+        const collection = await Collection.from(pool, 2);
+
+        t.fail('collection should not be found');
+    } catch (err) {
+        t.deepEquals(err, new Err(404, null, 'collection not found'));
     }
 
     pool.end();

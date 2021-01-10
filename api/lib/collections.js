@@ -73,6 +73,8 @@ class Collection {
                     id = $1
             `, [id]);
 
+            if (pgres.rows.length === 0) throw new Err(404, null, 'collection not found');
+
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
 
             const collection = new Collection(pgres.rows[0].name, pgres.rows[0].sources);
@@ -85,6 +87,7 @@ class Collection {
 
             return collection;
         } catch (err) {
+            if (err instanceof Err) throw err;
             throw new Err(500, err, 'failed to get collection');
         }
     }
@@ -111,6 +114,7 @@ class Collection {
 
             return this;
         } catch (err) {
+            if (err instanceof Err) throw err;
             throw new Err(500, err, 'failed to save collection');
         }
     }

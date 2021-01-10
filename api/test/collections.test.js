@@ -1,6 +1,5 @@
 'use strict';
 
-const { Pool } = require('pg');
 const test = require('tape');
 
 const Collection = require('../lib/collections');
@@ -31,7 +30,7 @@ test('Collecton()', (t) => {
     }, new Err(400, null, 'Collection.sources must be > 0'), 'Collection.sources must be > 0');
 
     t.throws(() => {
-        new Collection('global', [ true ]);
+        new Collection('global', [true]);
     }, new Err(400, null, 'Collection.sources array must contain strings'), 'Collection.sources array must contain strings');
 
     const collection = new Collection(
@@ -41,7 +40,7 @@ test('Collecton()', (t) => {
 
     t.equals(collection.id, false, 'collection.id: false');
     t.equals(collection.name, 'global', 'collection.name: global');
-    t.deepEquals(collection.sources, [ '**' ], 'collection.sources:  ["**"]');
+    t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 0, 'collection.size: 0');
     t.equals(collection.s3, false, 'collection.s3: false');
@@ -57,7 +56,7 @@ test('Collection#json()', (t) => {
 
     t.equals(collection.id, false, 'collection.id: false');
     t.equals(collection.name, 'usa', 'collection.name: usa');
-    t.deepEquals(collection.sources, [ 'us/**' ], 'collection.sources:  ["us/**"]');
+    t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 0, 'collection.size: 0');
     t.equals(collection.s3, false, 'collection.s3: false');
@@ -82,7 +81,7 @@ test('Collection#json()', (t) => {
 
     t.equals(collection.id, false, 'collection.id: false');
     t.equals(collection.name, 'usa', 'collection.name: use');
-    t.deepEquals(collection.sources, [ 'us/**' ], 'collection.sources:  ["us/**"]');
+    t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 0, 'collection.size: 0');
     t.equals(collection.s3, false, 'collection.s3: false');
@@ -99,7 +98,7 @@ test('Collection#json()', (t) => {
     t.equals(collection.s3, false, 'collection.s3: false');
 
     // Can be changed
-    t.deepEquals(collection.sources, [ '**' ], 'collection.sources:  ["**"]');
+    t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 123, 'collection.size: 123');
 

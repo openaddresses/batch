@@ -56,8 +56,8 @@ test('Collection#json()', (t) => {
     );
 
     t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.name, 'usa', 'collection.name: global');
-    t.deepEquals(collection.sources, [ 'us/**' ], 'collection.sources:  ["**"]');
+    t.equals(collection.name, 'usa', 'collection.name: usa');
+    t.deepEquals(collection.sources, [ 'us/**' ], 'collection.sources:  ["us/**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 0, 'collection.size: 0');
     t.equals(collection.s3, false, 'collection.s3: false');
@@ -70,6 +70,38 @@ test('Collection#json()', (t) => {
         size: 0,
         s3: false
     });
+
+    t.end();
+});
+
+test('Collection#json()', (t) => {
+    const collection = new Collection(
+        'usa',
+        ['us/**']
+    );
+
+    t.equals(collection.id, false, 'collection.id: false');
+    t.equals(collection.name, 'usa', 'collection.name: use');
+    t.deepEquals(collection.sources, [ 'us/**' ], 'collection.sources:  ["us/**"]');
+    t.equals(collection.created, false, 'collection.created: false');
+    t.equals(collection.size, 0, 'collection.size: 0');
+    t.equals(collection.s3, false, 'collection.s3: false');
+
+    collection.patch({
+        name: 'global',
+        sources: ['**'],
+        size: 123
+    });
+
+    // Cannot be changed
+    t.equals(collection.id, false, 'collection.id: false');
+    t.equals(collection.name, 'usa', 'collection.name: usa');
+    t.equals(collection.s3, false, 'collection.s3: false');
+
+    // Can be changed
+    t.deepEquals(collection.sources, [ '**' ], 'collection.sources:  ["**"]');
+    t.equals(collection.created, false, 'collection.created: false');
+    t.equals(collection.size, 123, 'collection.size: 123');
 
     t.end();
 });

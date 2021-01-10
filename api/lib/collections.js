@@ -22,12 +22,14 @@ class Collection {
         this.name = name;
         this.sources = sources;
         this.created = false;
+        this.size = 0;
         this.s3 = false;
 
         // Attributes which are allowed to be patched
         this.attrs = [
             'created',
-            'sources'
+            'sources',
+            'size'
         ];
     }
 
@@ -35,6 +37,7 @@ class Collection {
         return {
             id: parseInt(this.id),
             s3: this.s3,
+            size: parseInt(this.size),
             name: this.name,
             sources: this.sources,
             created: this.created
@@ -62,7 +65,8 @@ class Collection {
                     id,
                     name,
                     sources,
-                    created
+                    created,
+                    size
                 FROM
                     collections
                 WHERE
@@ -94,13 +98,15 @@ class Collection {
                     SET
                         name = $1,
                         sources = $2::JSONB,
-                        created = NOW()
+                        created = NOW(),
+                        size = $4
                     WHERE
                         id = $3
             `, [
                 this.name,
                 JSON.stringify(this.sources),
-                this.id
+                this.id,
+                this.size
             ]);
 
             return this;
@@ -118,15 +124,18 @@ class Collection {
                 INSERT INTO collections (
                     name,
                     sources,
-                    created
+                    created,
+                    size
                 ) VALUES (
                     $1,
                     $2::JSONB,
-                    NOW()
+                    NOW(),
+                    $4
                 ) RETURNING *
             `, [
                 this.name,
-                JSON.stringify(this.sources)
+                JSON.stringify(this.sources),
+                this.size
             ]);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
@@ -151,7 +160,8 @@ class Collection {
                     id,
                     name,
                     created,
-                    sources
+                    sources,
+                    size
                 FROM
                     collections
             `);
@@ -166,6 +176,7 @@ class Collection {
         return pgres.rows.map((res) => {
             res.id = parseInt(res.id);
             res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}.zip`;
+            res.size = parseInt(res.size);
             return res;
         });
     }

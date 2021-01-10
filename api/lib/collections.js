@@ -116,9 +116,6 @@ class Collection {
     }
 
     async generate(pool) {
-        if (!this.name) throw new Err(400, null, 'Cannot generate a collection without a name');
-        if (!this.sources) throw new Err(400, null, 'Cannot generate a collection without sources');
-
         try {
             const pgres = await pool.query(`
                 INSERT INTO collections (
@@ -130,7 +127,7 @@ class Collection {
                     $1,
                     $2::JSONB,
                     NOW(),
-                    $4
+                    $3
                 ) RETURNING *
             `, [
                 this.name,
@@ -148,6 +145,10 @@ class Collection {
 
             return this;
         } catch (err) {
+            if (err.code && err.code === '23505') {
+                throw new Err(400, null, 'duplicate collections not allowed');
+            }
+
             throw new Err(500, err, 'failed to generate collection');
         }
     }

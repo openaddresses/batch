@@ -270,7 +270,6 @@ test('Job#generate', async (t) => {
         t.error(err, 'no error');
     }
 
-
     pool.end();
     t.end();
 });

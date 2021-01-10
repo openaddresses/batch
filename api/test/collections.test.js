@@ -2,6 +2,7 @@
 
 const test = require('tape');
 
+const { Pool } = require('pg');
 const Collection = require('../lib/collections');
 const { init } = require('./init');
 const Err = require('../lib/error');
@@ -105,3 +106,70 @@ test('Collection#json()', (t) => {
     t.end();
 });
 
+test('Collection#generate()', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        const collection = new Collection(
+            'usa',
+            ['us/**']
+        );
+
+        await collection.generate(pool);
+        t.equals(collection.id, 1, 'collection.id: 1');
+        t.equals(collection.name, 'usa', 'collection.name: use');
+        t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
+        t.ok(collection.created, 'collection.created: <data>');
+        t.equals(collection.size, 0, 'collection.size: 0');
+        t.equals(collection.s3, 's3://undefined/test/collection-usa.zip', 'collection.s3: s3://undefined/test/collection-usa.zip');
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    try {
+        const collection = new Collection(
+            'usa',
+            ['us/**']
+        );
+
+        await collection.generate(pool);
+
+        t.fail('duplicate collections should fail');
+    } catch (err) {
+        t.deepEquals(err, new Err(400, null, 'duplicate collections not allowed'));
+    }
+
+    pool.end();
+    t.end();
+});
+
+test('Collection#list', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+
+        const list = await Collection.list(pool);
+
+        t.equals(list.length, 1, 'list.length: 1');
+
+        t.ok(list[0].created, 'list[0].created: <date>');
+        delete list[0].created
+
+        t.same(list[0], {
+            id: 1,
+            name: 'usa',
+            sources: ['us/**'],
+            size: 0,
+            s3: 's3://undefined/test/collection-usa.zip'
+        }, 'list[0]: <object>');
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    pool.end();
+    t.end();
+});

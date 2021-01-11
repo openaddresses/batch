@@ -9,6 +9,7 @@
         "lint": "eslint index.js lib/**.js test/**.js",
         "test": "tape test/*.test.js",
         "start": "node index.js",
+        "cov-html": "nyc tape 'test/**/*.js' && nyc report --reporter=html",
         "cov": "nyc tape 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },
     "dependencies": {

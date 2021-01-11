@@ -23,6 +23,7 @@
                     </div>
                     <div class='col col--5'>
                         <span class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
+                        <span class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(c.size)'></span>
                     </div>
                 </div>
             </div>
@@ -162,6 +163,11 @@ export default {
         }
     },
     methods: {
+        size: function(bytes) {
+            if (bytes == 0) { return "0.00 B"; }
+            var e = Math.floor(Math.log(bytes) / Math.log(1024));
+            return (bytes/Math.pow(1024, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
+        },
         refresh: function() {
             this.getData();
             this.getCollections();

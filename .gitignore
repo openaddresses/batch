@@ -1,3 +1,5 @@
+coverage.lcov
+coverage/
 .nyc_output/
 node_modules/
 dist/

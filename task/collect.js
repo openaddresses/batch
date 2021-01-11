@@ -87,7 +87,10 @@ async function collect(tmp, collection) {
         await upload_collection(zip, collection.name);
         console.error('ok - archive uploaded');
 
-        await update_collection(collection);
+        await update_collection(collection, {
+            created: new Date().toISOString(),
+            size: fs.statSync(zip).size
+        });
     } catch (err) {
         return reject(err);
     }
@@ -161,7 +164,7 @@ function upload_collection(file, name) {
     });
 }
 
-function update_collection(collection) {
+function update_collection(collection, patch) {
     return new Promise((resolve, reject) => {
         request({
             url: `${process.env.OA_API}/api/collections/${collection.id}`,
@@ -170,9 +173,7 @@ function update_collection(collection) {
             headers: {
                 'shared-secret': process.env.SharedSecret
             },
-            body: {
-                created: new Date().toISOString()
-            }
+            body: patch
         }, (err, res) => {
             if (err) return reject(err);
 

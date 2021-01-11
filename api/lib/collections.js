@@ -12,7 +12,7 @@ class Collection {
 
         if (!Array.isArray(sources)) throw new Err(400, null, 'Collection.sources must be an array');
         if (sources.length === 0) throw new Err(400, null, 'Collection.sources must be > 0');
-        for (const source in sources) {
+        for (const source of sources) {
             if (typeof source !== 'string') {
                 throw new Err(400, null, 'Collection.sources array must contain strings');
             }
@@ -22,12 +22,14 @@ class Collection {
         this.name = name;
         this.sources = sources;
         this.created = false;
+        this.size = 0;
         this.s3 = false;
 
         // Attributes which are allowed to be patched
         this.attrs = [
             'created',
-            'sources'
+            'sources',
+            'size'
         ];
     }
 
@@ -35,6 +37,7 @@ class Collection {
         return {
             id: parseInt(this.id),
             s3: this.s3,
+            size: parseInt(this.size),
             name: this.name,
             sources: this.sources,
             created: this.created
@@ -62,14 +65,18 @@ class Collection {
                     id,
                     name,
                     sources,
-                    created
+                    created,
+                    size
                 FROM
                     collections
                 WHERE
                     id = $1
             `, [id]);
 
+            if (pgres.rows.length === 0) throw new Err(404, null, 'collection not found');
+
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
+            pgres.rows[0].size = parseInt(pgres.rows[0].size);
 
             const collection = new Collection(pgres.rows[0].name, pgres.rows[0].sources);
 
@@ -81,6 +88,7 @@ class Collection {
 
             return collection;
         } catch (err) {
+            if (err instanceof Err) throw err;
             throw new Err(500, err, 'failed to get collection');
         }
     }
@@ -94,42 +102,46 @@ class Collection {
                     SET
                         name = $1,
                         sources = $2::JSONB,
-                        created = NOW()
+                        created = NOW(),
+                        size = $4
                     WHERE
                         id = $3
             `, [
                 this.name,
                 JSON.stringify(this.sources),
-                this.id
+                this.id,
+                this.size
             ]);
 
             return this;
         } catch (err) {
+            if (err instanceof Err) throw err;
             throw new Err(500, err, 'failed to save collection');
         }
     }
 
     async generate(pool) {
-        if (!this.name) throw new Err(400, null, 'Cannot generate a collection without a name');
-        if (!this.sources) throw new Err(400, null, 'Cannot generate a collection without sources');
-
         try {
             const pgres = await pool.query(`
                 INSERT INTO collections (
                     name,
                     sources,
-                    created
+                    created,
+                    size
                 ) VALUES (
                     $1,
                     $2::JSONB,
-                    NOW()
+                    NOW(),
+                    $3
                 ) RETURNING *
             `, [
                 this.name,
-                JSON.stringify(this.sources)
+                JSON.stringify(this.sources),
+                this.size
             ]);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
+            pgres.rows[0].size = parseInt(pgres.rows[0].size);
 
             for (const key of Object.keys(pgres.rows[0])) {
                 this[key] = pgres.rows[0][key];
@@ -139,6 +151,10 @@ class Collection {
 
             return this;
         } catch (err) {
+            if (err.code && err.code === '23505') {
+                throw new Err(400, null, 'duplicate collections not allowed');
+            }
+
             throw new Err(500, err, 'failed to generate collection');
         }
     }
@@ -151,7 +167,8 @@ class Collection {
                     id,
                     name,
                     created,
-                    sources
+                    sources,
+                    size
                 FROM
                     collections
             `);
@@ -166,6 +183,7 @@ class Collection {
         return pgres.rows.map((res) => {
             res.id = parseInt(res.id);
             res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}.zip`;
+            res.size = parseInt(res.size);
             return res;
         });
     }

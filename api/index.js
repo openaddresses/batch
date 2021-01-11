@@ -591,6 +591,7 @@ async function server(args, config, cb) {
      *   HTTP/1.1 200 OK
      *   [{
      *       "id": 1,
+     *       "size": 1234,
      *       "name": "us-northeast",
      *       "created": "2020-08-12T04:17:45.063Z"",
      *       "s3": "s3://v2.openaddresses.io/test/collection-us-northeast.zip",
@@ -603,8 +604,6 @@ async function server(args, config, cb) {
      *           "us/me/**"*
      *       ]
      *   }]
-     *
-     * [{"id":1,"name":"global","created":"2020-08-12T04:17:44.111Z","sources":["**"]},{"id":2,"name":"us-northeast","created":"2020-08-12T04:17:45.063Z","sources":["us/ri/**","us/ct/**","us/ma/**","us/nh/**","us/vt/**","us/me/**"]},{"id":5,"name":"us-south","created":"2020-08-12T04:17:50.246Z","sources":["us/fl/**","us/ga/**","us/sc/**","us/nc/**","us/dc/**","us/md/**","us/de/**","us/va/**","us/wv/**","us/al/**","us/ms/**","us/tn/**","us/ky/**","us/la/**","us/ar/**","us/ok/**","us/tx/**"]},{"id":6,"name":"us-west","created":"2020-08-12T04:17:53.223Z","sources":["us/ak/**","us/nm/**","us/az/**","us/co/**","us/ut/**","us/nv/**","us/wy/**","us/id/**","us/mt/**","us/ca/**","us/or/**","us/wa/**"]},{"id":7,"name":"us-midwest","created":"2020-08-12T04:17:53.835Z","sources":["us/oh/**","us/in/**","us/mi/**","us/il/**","us/wi/**","us/md/**","us/ia/**","us/ks/**","us/ne/**","us/mn/**","us/sd/**","us/nd/**"]}]
      */
     router.get('/collections', async (req, res) => {
         try {
@@ -686,6 +685,7 @@ async function server(args, config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1,
+     *       "size": 0,
      *       "name": "global",
      *       "sources": ["**"]
      *       "created": "2020-07-30T11:56:37.405Z",
@@ -720,6 +720,7 @@ async function server(args, config, cb) {
      *   {
      *       "id": 1,
      *       "name": "global",
+     *       "size": 1234,
      *       "sources": ["**"]
      *       "created": "2020-07-30T11:56:37.405Z",
      *       "s3": "s3://v2.openaddresses.io/test/collection-global.zip",

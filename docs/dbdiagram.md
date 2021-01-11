@@ -44,6 +44,7 @@ Table "map" {
 
 Table "collections" {
   "id" BIGSERIAL
+  "size" BIGINT
   "name" TEXT [unique, not null]
   "sources" JSONB
   "created" timestamp

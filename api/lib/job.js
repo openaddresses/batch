@@ -432,7 +432,7 @@ class Job {
                         map = $8,
                         size = $9
                     WHERE
-                        id = $9
+                        id = $10
             `, [
                 this.output,
                 this.loglink,
@@ -442,8 +442,8 @@ class Job {
                 this.stats,
                 this.bounds,
                 this.map,
-                this.id,
-                this.size
+                this.size,
+                this.id
             ]);
 
             return this;

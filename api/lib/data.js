@@ -49,7 +49,8 @@ class Data {
                     results.layer,
                     results.name,
                     results.job,
-                    job.output
+                    job.output,
+                    job.size
                 FROM
                     results
                         INNER JOIN
@@ -78,6 +79,7 @@ class Data {
             return pgres.rows.map((res) => {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
+                res.size = parseInt(res.size);
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
 
                 return res;
@@ -152,7 +154,8 @@ class Data {
                     results.layer,
                     results.name,
                     results.job,
-                    job.output
+                    job.output,
+                    job.size
                 FROM
                     results,
                     job
@@ -170,6 +173,7 @@ class Data {
             return pgres.rows.map((res) => {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
+                res.size = parseInt(res.size);
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
                 return res;
             })[0];

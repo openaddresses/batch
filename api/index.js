@@ -814,6 +814,7 @@ async function server(args, config, cb) {
      *       "name": "country",
      *       "job": 635,
      *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
+     *       "size": 65325432,
      *       "output": {
      *           "cache": true,
      *           "output": true,
@@ -849,6 +850,7 @@ async function server(args, config, cb) {
      *       "layer": "addresses",
      *       "name": "country",
      *       "job": 635,
+     *       "size": 4326432,
      *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
      *       "output": {
      *           "cache": true,
@@ -1301,6 +1303,7 @@ async function server(args, config, cb) {
      *       "id": 1,
      *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
      *       "run": 187
+     *       "size": 4325643264,
      *       "map": null;
      *       "created": "2020-08-03T17:37:47.036Z",
      *       "source_name":"us/wy/lincoln",

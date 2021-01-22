@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS results (
 -- Each batch task processes a single name, of a single layer, from a single source
 CREATE TABLE IF NOT EXISTS job (
     id          BIGSERIAL PRIMARY KEY,
+    size        BIGINT,
     run         BIGINT,     -- run ID
     map         BIGINT,     -- Map coverage ID
     created     TIMESTAMP,  -- Job submission timestamp

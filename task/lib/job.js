@@ -52,6 +52,7 @@ class Job {
         this.bounds = [];
         this.count = 0;
         this.stats = {};
+        this.size = 0;
 
         this.assets = {
             cache: false,
@@ -234,6 +235,9 @@ class Job {
             }
 
             const data = path.resolve(this.tmp, 'out.geojson.gz');
+
+            this.size = fs.statSync(data).size;
+
             await s3.putObject({
                 ContentType: 'application/gzip',
                 Bucket: process.env.Bucket,

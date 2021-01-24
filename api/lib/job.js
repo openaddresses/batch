@@ -41,11 +41,13 @@ class Job {
         this.version = pkg.version,
         this.stats = {};
         this.count = 0;
+        this.size = 0;
         this.bounds = false;
         this.s3 = false;
 
         // Attributes which are allowed to be patched
         this.attrs = [
+            'size',
             'map',
             'output',
             'loglink',
@@ -172,6 +174,7 @@ class Job {
     json() {
         return {
             id: this.id ? parseInt(this.id) : false,
+            size: parseInt(this.size),
             s3: this.s3,
             run: parseInt(this.run),
             map: this.map ? parseInt(this.map) : null,
@@ -269,7 +272,8 @@ class Job {
                     job.name,
                     job.output,
                     job.loglink,
-                    job.status
+                    job.status,
+                    job.size
                 FROM
                     job INNER JOIN runs
                         ON job.run = runs.id
@@ -298,6 +302,7 @@ class Job {
             job.id = parseInt(job.id);
             job.run = parseInt(job.run);
             job.map = job.map ? parseInt(job.map) : null;
+            job.size = parseInt(job.size);
 
             if (job.output && job.output.output) {
                 job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
@@ -325,7 +330,8 @@ class Job {
                     stats,
                     count,
                     ST_AsGeoJSON(bounds)::JSON AS bounds,
-                    version
+                    version,
+                    size
                 FROM
                     job
                 WHERE
@@ -341,6 +347,7 @@ class Job {
                 pgres.rows[0].run = parseInt(pgres.rows[0].run);
                 pgres.rows[0].map = pgres.rows[0].map ? parseInt(pgres.rows[0].map) : null;
                 pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count);
+                pgres.rows[0].size = parseInt(pgres.rows[0].size);
 
                 const job = new Job(
                     pgres.rows[0].run,
@@ -422,9 +429,10 @@ class Job {
                         count = $5,
                         stats = $6,
                         bounds = ST_SetSRID(ST_GeomFromGeoJSON($7), 4326),
-                        map = $8
+                        map = $8,
+                        size = $9
                     WHERE
-                        id = $9
+                        id = $10
             `, [
                 this.output,
                 this.loglink,
@@ -434,6 +442,7 @@ class Job {
                 this.stats,
                 this.bounds,
                 this.map,
+                this.size,
                 this.id
             ]);
 
@@ -484,7 +493,8 @@ class Job {
                     name,
                     status,
                     version,
-                    output
+                    output,
+                    size
                 ) VALUES (
                     $1,
                     NOW(),
@@ -495,7 +505,8 @@ class Job {
                     $5,
                     'Pending',
                     $6,
-                    $7
+                    $7,
+                    $8
                 ) RETURNING *
             `, [
                 this.run,
@@ -504,11 +515,13 @@ class Job {
                 this.layer,
                 this.name,
                 this.version,
-                this.output
+                this.output,
+                this.size
             ]);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
             pgres.rows[0].run = parseInt(pgres.rows[0].run);
+            pgres.rows[0].size = parseInt(pgres.rows[0].size);
             for (const key of Object.keys(pgres.rows[0])) {
                 this[key] = pgres.rows[0][key];
             }

@@ -156,6 +156,7 @@ test('GET: api/data', (t) => {
             layer: 'addresses',
             name: 'dcgis',
             job: 1,
+            size: 0,
             output: {
                 cache: false,
                 output: false,

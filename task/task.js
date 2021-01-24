@@ -144,7 +144,8 @@ async function flow(api, job) {
             output: job.assets,
             count: job.count,
             bounds: job.bounds,
-            stats: job.stats
+            stats: job.stats,
+            size: job.size
         });
 
         await job.check_stats(api, run);

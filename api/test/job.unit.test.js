@@ -50,6 +50,7 @@ test('Job()', (t) => {
     t.equals(job.bounds, false, 'job.bounds: false');
     t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
     t.equals(job.name, 'city', 'job.name: city');
+    t.equals(job.size, 0, 'job.size: 0');
     t.deepLooseEqual(job.output, {
         cache: false,
         output: false,
@@ -130,6 +131,7 @@ test('Job#json', (t) => {
         s3: false,
         run: 1,
         map: null,
+        size: 0,
         created: false,
         source_name: 'us/pa/bucks',
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',

@@ -106,13 +106,13 @@ Create a local
 Then from the `/api` directory, run
 
 ```sh
-yarn start
+npm run dev
 ```
 
 Now, to build the latest UI, navigate to the `/api/web` directory in a seperate tab, and run:
 
 ```sh
-yarn build --watch
+npm run build --watch
 ```
 
 Note: changes to the website will now to automatically rebuilt, just refresh the page to see them.

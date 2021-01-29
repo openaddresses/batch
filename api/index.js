@@ -56,7 +56,6 @@ function configure(args, cb) {
  *   This API endpoint does not require authentication
  */
 
-
 async function server(args, config, cb) {
     // these must be run after lib/config
     const Map = require('./lib/map');
@@ -131,11 +130,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return basic metadata about server configuration
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "version": "1.0.0"
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Meta.json} apiSuccess
      */
     app.get('/api', (req, res) => {
         return res.json({
@@ -153,12 +148,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     AWS ELB Healthcheck for the server
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "healthy": true,
-     *       "message": "I work all day, I work all night to get the open the data!"
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Health.json} apiSuccess
      */
     app.get('/health', (req, res) => {
         return res.json({
@@ -262,32 +252,21 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/user List Users
      * @apiVersion 1.0.0
-     * @apiName list
+     * @apiName ListUsers
      * @apiGroup User
      * @apiPermission admin
      *
-     * @apiParam {Number} [limit=100] Limit number of returned runs
-     * @apiParamExample {String} ?limit
-     *     ?limit=12
-     *
-     * @apiParam {Number} [page=0] The offset based on limit to return
-     * @apiParamExample {String} ?page
-     *     ?page=0
-     *
-     * @apiParam {String} [filter=] Filter a complete or partial username/email
-     * @apiParamExample {String} ?filter
-     *     ?filter=person@example.com
-     *
      * @apiDescription
      *     Return a list of users that have registered with the service
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.ListUsers.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListUsers.json} apiSuccess
      */
     router.get('/user', async (req, res) => {
         try {
             await auth.is_admin(req);
 
-            const users = await auth.list(req.query);
-
-            return res.json(users);
+            res.json(await auth.list(req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -296,60 +275,28 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/user Create User
      * @apiVersion 1.0.0
-     * @apiName Create
+     * @apiName CreateUser
      * @apiGroup User
      * @apiPermission public
      *
      * @apiDescription
      *     Create a new user
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateUser.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
      */
     router.post('/user', async (req, res) => {
         try {
-            await auth.register(req.body);
-
-            return res.json({
-                status: 200,
-                message: 'User Created'
-            });
+            res.json(await auth.register(req.body));
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
     /**
-     * @api {get} /api/user/me Get User Session Metadata
-     * @apiVersion 1.0.0
-     * @apiName self
-     * @apiGroup User
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return basic user information about the currently authenticated user
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *       "email": "example@example.com",
-     *       "access": "admin",
-     *       "flags": {}
-     *   }
-     */
-    router.get('/user/me', async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.uid) {
-            return res.json(await auth.user(req.session.auth.uid));
-        } else {
-            return res.status(401).json({
-                status: 401,
-                message: 'Invalid session'
-            });
-        }
-    });
-
-    /**
      * @api {patch} /api/user/:id Update User
      * @apiVersion 1.0.0
-     * @apiName self
+     * @apiName PatchUser
      * @apiGroup User
      * @apiPermission admin
      *
@@ -357,6 +304,9 @@ async function server(args, config, cb) {
      *     Update information about a given user
      *
      * @apiParam {Number} :id The UID of the user to update
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchUser.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
      */
     router.patch('/user/:id', async (req, res) => {
         Param.int(req, res, 'id');
@@ -373,25 +323,19 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/login Session Info
      * @apiVersion 1.0.0
-     * @apiName get
+     * @apiName GetLogin
      * @apiGroup Login
      * @apiPermission user
      *
      * @apiDescription
      *     Return information about the currently logged in user
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *       "email": "example@example.com",
-     *       "access": "admin",
-     *       "flags": {}
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
      */
     router.get('/login', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.username) {
             return res.json({
+                uid: req.session.auth.uid,
                 username: req.session.auth.username,
                 email: req.session.auth.email,
                 access: req.session.auth.access,
@@ -408,18 +352,15 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/login Create Session
      * @apiVersion 1.0.0
-     * @apiName login
+     * @apiName CreateLogin
      * @apiGroup Login
      * @apiPermission user
      *
      * @apiDescription
      *     Log a user into the service and create an authenticated cookie
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *   }
+     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateLogin.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
      */
     router.post('/login', async (req, res) => {
         try {
@@ -431,7 +372,11 @@ async function server(args, config, cb) {
             req.session.auth = user;
 
             return res.json({
-                username: user.username
+                uid: req.session.auth.uid,
+                username: req.session.auth.username,
+                email: req.session.auth.email,
+                access: req.session.auth.access,
+                flags: req.session.auth.flags
             });
         } catch (err) {
             return Err.respond(err, res);
@@ -448,14 +393,8 @@ async function server(args, config, cb) {
      * @apiDescription
      *     If a user has forgotten their password, send them a password reset link to their email
      *
-     * @apiParam {String} user Username or Email of account
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "status": 200,
-     *       "message": "Password Email Sent"
-     *   }
+     * @apiSchema (Body) {jsonschema=./schema/req.body.ForgotLogin.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.post('/login/forgot', async (req, res) => {
         try {
@@ -481,15 +420,8 @@ async function server(args, config, cb) {
      *     Once a user has obtained a password reset by email via the Forgot Login API,
      *     use the token to reset the password
      *
-     * @apiParam {String} token Password reset token
-     * @apiParam {String} password New password
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "status": 200,
-     *       "message": "Password Email Sent"
-     *   }
+     * @apiSchema (Body) {jsonschema=./schema/req.body.ResetLogin.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.post('/login/reset', async (req, res) => {
         try {
@@ -509,6 +441,11 @@ async function server(args, config, cb) {
      * @apiName ListTokens
      * @apiGroup Token
      * @apiPermission user
+     *
+     * @apiDescription
+     *     List all tokens associated with the requester's account
+     *
+     * @apiSchema {jsonschema=./schema/res.ListTokens.json} apiSuccess
      */
     router.get('/token', async (req, res) => {
         try {
@@ -526,6 +463,12 @@ async function server(args, config, cb) {
      * @apiName CreateToken
      * @apiGroup Token
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new API token for programatic access
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateToken.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.CreateToken.json} apiSuccess
      */
     router.post('/token', async (req, res) => {
         try {
@@ -543,6 +486,11 @@ async function server(args, config, cb) {
      * @apiName DeleteToken
      * @apiGroup Token
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete a user's API Token
+     *
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.delete('/token/:id', async (req, res) => {
         Param.int(req, res, 'id');
@@ -563,7 +511,11 @@ async function server(args, config, cb) {
      * @apiGroup Schedule
      * @apiPermission admin
      *
-     * @apiParam {Number} type Type of lambda scheduled event to respond to. One of "sources" or "collect"
+     * @apiDescription
+     *     Internal function to allow scheduled lambdas to kick off events
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.Schedule.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.post('/schedule', async (req, res) => {
         try {
@@ -571,7 +523,10 @@ async function server(args, config, cb) {
 
             await Schedule.event(pool, req.body);
 
-            return res.json(true);
+            return res.json({
+                status: 200,
+                message: 'Schedule Event Started'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -580,30 +535,14 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/collections List Collections
      * @apiVersion 1.0.0
-     * @apiName List
+     * @apiName ListCollections
      * @apiGroup Collections
      * @apiPermission public
      *
      * @apiDescription
      *     Return a list of all collections and their glob rules
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [{
-     *       "id": 1,
-     *       "size": 1234,
-     *       "name": "us-northeast",
-     *       "created": "2020-08-12T04:17:45.063Z"",
-     *       "s3": "s3://v2.openaddresses.io/test/collection-us-northeast.zip",
-     *       "sources": [
-     *           "us/ri/**",
-     *           "us/ct/**",
-     *           "us/ma/**"
-     *           "us/nh/**"
-     *           "us/vt/**"
-     *           "us/me/**"*
-     *       ]
-     *   }]
+     * @apiSchema {jsonschema=./schema/res.ListCollections.json} apiSuccess
      */
     router.get('/collections', async (req, res) => {
         try {
@@ -618,7 +557,7 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/collections/:collection/data Get Collection Data
      * @apiVersion 1.0.0
-     * @apiName Data
+     * @apiName DataCollection
      * @apiGroup Collections
      * @apiPermission user
      *
@@ -650,15 +589,16 @@ async function server(args, config, cb) {
     /**
      * @api {delete} /api/collections/:collection Delete Collection
      * @apiVersion 1.0.0
-     * @apiName Delete
+     * @apiName DeleteCollection
      * @apiGroup Collections
      * @apiPermission admin
      *
+     * @apiDescription
+     *   Delete a collection (This should not be done lightly)
+     *
      * @apiParam {Number} :collection Collection ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   true
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.delete('/collections/:collection', async (req, res) => {
         Param.int(req, res, 'collection');
@@ -668,7 +608,10 @@ async function server(args, config, cb) {
 
             await Collection.delete(pool, req.params.collection);
 
-            return res.json(true);
+            return res.json({
+                status: 200,
+                message: 'Collection Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -677,20 +620,15 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/collections Create Collection
      * @apiVersion 1.0.0
-     * @apiName Create
+     * @apiName CreateCollection
      * @apiGroup Collections
      * @apiPermission admin
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "size": 0,
-     *       "name": "global",
-     *       "sources": ["**"]
-     *       "created": "2020-07-30T11:56:37.405Z",
-     *       "s3": "s3://v2.openaddresses.io/test/collection-global.zip",
-     *   }
+     * @apiDescription
+     *   Create a new collection
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateCollection.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
      */
     router.post('/collections', async (req, res) => {
         try {
@@ -707,24 +645,19 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {patch} /api/collections/:collection Update Collection
+     * @api {patch} /api/collections/:collection Patch Collection
      * @apiVersion 1.0.0
-     * @apiName Update
+     * @apiName PatchCollection
      * @apiGroup Collections
      * @apiPermission admin
      *
+     * @apiDescription
+     *   Update a collection
+     *
      * @apiParam {Number} :collection Collection ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "name": "global",
-     *       "size": 1234,
-     *       "sources": ["**"]
-     *       "created": "2020-07-30T11:56:37.405Z",
-     *       "s3": "s3://v2.openaddresses.io/test/collection-global.zip",
-     *   }
+     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchCollection.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
      */
     router.patch('/collections/:collection', async (req, res) => {
         Param.int(req, res, 'collection');
@@ -750,6 +683,9 @@ async function server(args, config, cb) {
      * @apiName TileJSON
      * @apiGroup Map
      * @apiPermission public
+     *
+     * @apiDescription
+     *   Data required for map initialization
      */
     router.get('/map', (req, res) => {
         return res.json(Map.map());
@@ -761,6 +697,9 @@ async function server(args, config, cb) {
      * @apiName VectorTile
      * @apiGroup Map
      * @apiPermission public
+     *
+     * @apiDescription
+     *   Retrive coverage Mapbox Vector Tiles
      *
      * @apiParam {Number} z Z coordinate
      * @apiParam {Number} x X coordinate
@@ -784,43 +723,15 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/data List Data
      * @apiVersion 1.0.0
-     * @apiName List
+     * @apiName ListData
      * @apiGroup Data
      * @apiPermission public
      *
-     * @apiParam {String} [source] Filter results by source name
-     * @apiParamExample {String} ?source
-     *     ?source=us/ca
+     * @apiDescription
+     *   Get the latest successful run of a given geographic area
      *
-     * @apiParam {String} [layer] Filter results by layer type
-     * @apiParamExample {String} ?layer
-     *     ?layer=addresses
-     *
-     * @apiParam {String} [name] Filter results by layer name
-     * @apiParamExample {String} ?name
-     *     ?name=city
-     *
-     * @apiParam {String} [point] Filter results by geographic point
-     * @apiParamExample {String} ?point
-     *     ?point=<lng>,<lat>
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [{
-     *       "id": 271,
-     *       "source": "pl/lubelskie",
-     *       "updated": "2020-07-30T11:56:37.405Z",
-     *       "layer": "addresses",
-     *       "name": "country",
-     *       "job": 635,
-     *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
-     *       "size": 65325432,
-     *       "output": {
-     *           "cache": true,
-     *           "output": true,
-     *           "preview": true
-     *       }
-     *   }]
+     * @apiSchema (Query) {jsonschema=./schema/req.query.ListData.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListData.json} apiSuccess
      */
     router.get('/data', async (req, res) => {
         try {
@@ -835,31 +746,20 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/data/:data Get Data
      * @apiVersion 1.0.0
-     * @apiName Single
+     * @apiName SingleData
      * @apiGroup Data
      * @apiPermission public
      *
+     * @apiDescription
+     *   Return all information about a specific data segment
+     *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 271,
-     *       "source": "pl/lubelskie",
-     *       "updated": "2020-07-30T11:56:37.405Z",
-     *       "layer": "addresses",
-     *       "name": "country",
-     *       "job": 635,
-     *       "size": 4326432,
-     *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
-     *       "output": {
-     *           "cache": true,
-     *           "output": true,
-     *           "preview": true
-     *       }
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Data.json} apiSuccess
      */
     router.get('/data/:data', async (req, res) => {
+        Param.int(req, res, 'data');
+
         try {
             const data = await Data.from(pool, req.params.data);
 
@@ -872,34 +772,16 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/data/:data/history Return Data History
      * @apiVersion 1.0.0
-     * @apiName SingleHistory
+     * @apiName SingleHistoryData
      * @apiGroup Data
      * @apiPermission public
      *
+     * @apiDescription
+     *   Return the job history for a given data component
+     *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "jobs": [{
-     *           "id": 1,
-     *           "created": "2020-04-20T06:31:11.689Z",
-     *           "status": "Success"
-     *           "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
-     *           "output": {
-     *               "cache": true,
-     *               "output": true,
-     *               "preview": true
-     *           },
-     *           "count": 123,
-     *           "stats": {
-     *               "counts": {
-     *               }
-     *           },
-     *           "run": 1
-     *       }]
-     *   }
+     * @apiSchema {jsonschema=./schema/res.DataHistory.json} apiSuccess
      */
     router.get('/data/:data/history', async (req, res) => {
         try {
@@ -914,45 +796,17 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/run List Runs
      * @apiVersion 1.0.0
-     * @apiName List
+     * @apiName ListRuns
      * @apiGroup Run
      * @apiPermission public
      *
-     * @apiParam {Number} [limit=100] Limit number of returned runs
-     * @apiParamExample {String} ?limit
-     *     ?limit=12
+     * @apiDescription
+     *   Runs are container objects that contain jobs that were started at the same time or by the same process
      *
-     * @apiParam {Number} [run] Only show run associated with a given ID
-     * @apiParamExample {String} ?run
-     *     ?run=12
+     * @apiParam {Number} :data Data ID
      *
-     * @apiParam {String} [status="Success,Fail,Pending,Warn"] Only show runs with one of the given statuses
-     * @apiParamExample {String} ?status
-     *     ?status=Warn
-     *     ?status=Warn,Pending
-     *     ?status=Success,Fail,Pending,Warn
-     *
-     * @apiParam {String} [before=] Only show runs before the given date
-     * @apiParamExample {String} ?before
-     *     ?before=2020-01-01
-     *     ?before=2020-12-01
-     *
-     * @apiParam {String} [after=] Only show runs after the given date
-     * @apiParamExample {String} ?after
-     *     ?after=2020-01-01
-     *     ?after=2020-12-01
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [{
-     *       "id": 1,
-     *       "live": true,
-     *       "created": "2020-08-03T17:37:47.036Z",
-     *       "github": {},
-     *       "closed": true,
-     *       "status": "Fail",
-     *       "jobs": 1
-     *   }]
+     * @apiSchema (Query) {jsonschema=./schema/req.query.ListRuns.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListRuns.json} apiSuccess
      */
     router.get('/run', async (req, res) => {
         try {
@@ -968,17 +822,15 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/run Create Run
      * @apiVersion 1.0.0
-     * @apiName Create
+     * @apiName CreateRun
      * @apiGroup Run
      * @apiPermission admin
      *
-     * @apiParam {Boolean} live If the job succeeds, should it replace the current data entry
+     * @apiDescription
+     *   Create a new run to hold a batch of jobs
      *
-     * @apiParam {Object} github If not live, information about the GitHub CI reference
-     * @apiParam {String} github.ref Git reference (branch) of the given run
-     * @apiParam {String} github.sha Git SHA of the given run
-     * @apiParam {String} github.url Github URL to the specific commit
-     * @apiParam {Number} github.check Github check ID to update
+     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateRun.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
      */
     router.post('/run', async (req, res) => {
         try {
@@ -1001,23 +853,13 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [{
-     *       "id": 1,
-     *       "live": true,
-     *       "created": "2020-08-03T17:37:47.036Z",
-     *       "github": {},
-     *       "closed": true
-     *   }]
+     * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
      */
     router.get('/run/:run', async (req, res) => {
         Param.int(req, res, 'run');
 
         try {
-            const run = await Run.from(pool, req.params.run);
-
-            return res.json(run.json());
+            res.json(await Run.from(pool, req.params.run));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -1035,17 +877,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "run": 1,
-     *       "status": {
-     *           "Warn": 1
-     *           "Success": 3,
-     *           "Pending": 2,
-     *           "Fail": 0
-     *       }
-     *   }
+     * @apiSchema {jsonschema=./schema/res.RunStats.json} apiSuccess
      */
     router.get('/run/:run/count', async (req, res) => {
         Param.int(req, res, 'run');
@@ -1064,7 +896,14 @@ async function server(args, config, cb) {
      * @apiGroup Run
      * @apiPermission public
      *
+     * @apiDescription
+     *   Update an existing run
+     *
      * @apiParam {Number} :run Run ID
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchRun.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
+     *
      */
     router.patch('/run/:run', async (req, res) => {
         Param.int(req, res, 'run');
@@ -1100,13 +939,8 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiParam {json} jobs Jobs to attach to run
-     * @apiParamExample {json} jobs
-     *     ['https://github.com/path_to_source', {
-     *         "source": "https://github/path_to_source",
-     *         "layer": "addresses",
-     *         "name": "dcgis"
-     *     }]
+     * @apiSchema (Body) {jsonschema=./schema/req.body.SingleJobsCreate.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
     router.post('/run/:run/jobs', async (req, res) => {
         Param.int(req, res, 'run');
@@ -1136,7 +970,12 @@ async function server(args, config, cb) {
      * @apiGroup Run
      * @apiPermission public
      *
+     * @apiDescription
+     *     Return all jobs for a given run
+     *
      * @apiParam {Number} :run Run ID
+     *
+     * @apiSchema {jsonschema=./schema/res.SingleJobs.json} apiSuccess
      */
     router.get('/run/:run/jobs', async (req, res) => {
         Param.int(req, res, 'run');
@@ -1156,42 +995,15 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/job List Jobs
      * @apiVersion 1.0.0
-     * @apiName List
+     * @apiName ListJobs
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} [limit=100] Limit number of returned jobs
-     * @apiParamExample {String} ?limit
-     *     ?limit=12
+     * @apiDescription
+     *     Return information about a given subset of jobs
      *
-     * @apiParam {Number} [run] Only show job associated with a given ID
-     * @apiParamExample {String} ?run
-     *     ?run=12
-     *
-     * @apiParam {String} [status="Success,Fail,Pending,Warn"] Only show job with one of the given statuses
-     * @apiParamExample {String} ?status
-     *     ?status=Warn
-     *     ?status=Warn,Pending
-     *     ?status=Success,Fail,Pending,Warn
-     *
-     * @apiParam {String} [live="All"] Only show jobs associated with a live run
-     * @apiParamExample {String} ?env
-     *     ?env=true
-     *     ?env=false
-     *
-     * @apiParam {String} [before=] Only show jobs before the given date
-     * @apiParamExample {String} ?before
-     *     ?before=2020-01-01
-     *     ?before=2020-12-01
-     *
-     * @apiParam {String} [after=] Only show jobs after the given date
-     * @apiParamExample {String} ?after
-     *     ?after=2020-01-01
-     *     ?after=2020-12-01
-     *
-     * @apiParam {String} [source] Filter results by source name
-     * @apiParamExample {String} ?source
-     *     ?source=us/ca
+     * @apiSchema (query) {jsonschema=./schema/req.query.ListJobs.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListJobs.json} apiSuccess
      */
     router.get('/job', async (req, res) => {
         try {
@@ -1208,6 +1020,13 @@ async function server(args, config, cb) {
      * @apiName ErrorList
      * @apiGroup JobError
      * @apiPermission public
+     *
+     * @apiDescription
+     *     All jobs that fail as part of a live run are entered into the JobError API
+     *     This API powers a page that allows for human review of failing jobs
+     *     Note: Job Errors are cleared with every subsequent full cache
+     *
+     * @apiSchema {jsonschema=./schema/res.ErrorList.json} apiSuccess
      */
     router.get('/job/error', async (req, res) => {
         try {
@@ -1225,11 +1044,10 @@ async function server(args, config, cb) {
      * @apiGroup JobError
      * @apiPermission public
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "count": 123
-     *   }
+     * @apiDescription
+     *     Return a simple count of the current number of job errors
+     *
+     * @apiSchema {jsonschema=./schema/res.ErrorCount.json} apiSuccess
      */
     router.get('/job/error/count', async (req, res) => {
         try {
@@ -1246,15 +1064,13 @@ async function server(args, config, cb) {
      * @apiGroup JobError
      * @apiPermission admin
      *
+     * @apiDescription
+     *     Create a new Job Error in response to a live job that Failed or Warned
+     *
      * @apiParam {Number} job Job ID of the given error
      * @apiParam {String} message Text representation of the error
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "job": 123,
-     *       "message": "Failed to download source"
-     *   }
+     * @apiSchema {jsonschema=./schema/res.ErrorCreate.json} apiSuccess
      */
     router.post('/job/error', async (req, res) => {
         try {
@@ -1270,11 +1086,17 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/job/error/:job Resolve Job Error
      * @apiVersion 1.0.0
-     * @apiName ErrorManager
+     * @apiName ErrorModerate
      * @apiGroup JobError
      * @apiPermission admin
      *
+     * @apiDescription
+     *     Mark a job error as resolved
+     *
      * @apiParam {Number} :job Job ID
+     *
+     * @apiSchema (Body) {jsonschema=./schema/res.ErrorModerate.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ErrorModerate.json} apiSuccess
      */
     router.post('/job/error/:job', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1295,43 +1117,12 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
+     * @apiDescription
+     *     Return all information about a given job
+     *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "s3": "s3://v2.openaddresses.io/test/job/1/source.geojson.gz",
-     *       "run": 187
-     *       "size": 4325643264,
-     *       "map": null;
-     *       "created": "2020-08-03T17:37:47.036Z",
-     *       "source_name":"us/wy/lincoln",
-     *       "source":"https://raw.githubusercontent.com/openaddresses/openaddresses/0f2888ba5bd572f844991f8ea0bef9c39fa39ada/sources/us/wy/lincoln.json",
-     *       "layer":"addresses",
-     *       "name":"country",
-     *       "output":{
-     *           "cache":true,
-     *           "output":true,
-     *           "preview":true
-     *       },
-     *       "loglink":"batch-staging-job/default/bfdd23b5-9575-4344-93d3-bf9cacd4761c",
-     *       "status":"Success",
-     *       "version":"1.0.0",
-     *       "count":4257,
-     *       "bounds":{"type":"Polygon","coordinates": ["..geojson coords here.."],
-     *       "stats":{
-     *           "counts":{
-     *               "city":0,
-     *               "unit":0,
-     *               "number":4244,
-     *               "region":0,
-     *               "street":4257,
-     *               "district":0,
-     *               "postcode":0
-     *           }
-     *       }
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Job.json} apiSuccess
      */
     router.get('/job/:job', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1352,7 +1143,12 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission admin
      *
+     * @apiDescription
+     *     Submit a job for reprocessing - often useful for network errors
+     *
      * @apiParam {Number} :job Job ID
+     *
+     * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
     router.post('/job/:job/rerun', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1384,10 +1180,12 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
-     * @apiParam {Number} :job Job ID
      * @apiDescription
      *   Compare the stats of the given job against the current live data job
      *
+     * @apiParam {Number} :job Job ID
+     *
+     * @apiSchema {jsonschema=./schema/res.SingleDelta.json} apiSuccess
      */
     router.get('/job/:job/delta', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1407,6 +1205,9 @@ async function server(args, config, cb) {
      * @apiName SingleOutputPreview
      * @apiGroup Job
      * @apiPermission public
+     *
+     * @apiDescription
+     *   Return the preview image for a given job
      *
      * @apiParam {Number} :job Job ID
      */
@@ -1507,7 +1308,14 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission public
      *
+     * @apiDescription
+     *   Return the batch-machine processing log for a given job
+     *   Note: These are stored in AWS CloudWatch and *do* expire
+     *   The presence of a loglink on a job, does not guarentree log retention
+     *
      * @apiParam {Number} :job Job ID
+     *
+     * @apiSchema {jsonschema=./schema/res.SingleLog.json} apiSuccess
      */
     router.get('/job/:job/log', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1528,7 +1336,13 @@ async function server(args, config, cb) {
      * @apiGroup Job
      * @apiPermission admin
      *
+     * @apiDescription
+     *   Update a job
+     *
      * @apiParam {Number} :job Job ID
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchJob.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Job.json} apiSuccess
      */
     router.patch('/job/:job', async (req, res) => {
         Param.int(req, res, 'job');
@@ -1553,24 +1367,14 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/dash/traffic Session Counts
      * @apiVersion 1.0.0
-     * @apiName traffic
+     * @apiName TrafficAnalytics
      * @apiGroup Analytics
      * @apiPermission admin
      *
      * @apiDescription
      *   Report anonymouns traffic data about the number of user session created in a given day.
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "datasets": [{
-     *           "label": "Unique Daily Sessions" ,
-     *           "data": [{
-     *               "x": "2020-08-19T06:00:00.000Z",
-     *               "y": 145
-     *           }]
-     *       }]
-     *   }
+     * @apiSchema {jsonschema=./schema/res.TrafficAnalytics.json} apiSuccess
      */
     router.get('/dash/traffic', async (req, res) => {
         try {
@@ -1585,9 +1389,14 @@ async function server(args, config, cb) {
     /**
      * @api {get} /api/dash/collections Collection Counts
      * @apiVersion 1.0.0
-     * @apiName collections
+     * @apiName CollectionsAnalytics
      * @apiGroup Analytics
      * @apiPermission admin
+     *
+     * @apiDescription
+     *   Report anonymouns traffic data about the number of collection downloads
+     *
+     * @apiSchema {jsonschema=./schema/res.CollectionsAnalytics.json} apiSuccess
      */
     router.get('/dash/collections', async (req, res) => {
         try {

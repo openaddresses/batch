@@ -4,7 +4,7 @@ define({ "api": [
     "url": "/api/dash/collections",
     "title": "Collection Counts",
     "version": "1.0.0",
-    "name": "collections",
+    "name": "CollectionsAnalytics",
     "group": "Analytics",
     "permission": [
       {
@@ -13,6 +13,27 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Report anonymouns traffic data about the number of collection downloads</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Analytics"
   },
@@ -21,7 +42,7 @@ define({ "api": [
     "url": "/api/dash/traffic",
     "title": "Session Counts",
     "version": "1.0.0",
-    "name": "traffic",
+    "name": "TrafficAnalytics",
     "group": "Analytics",
     "permission": [
       {
@@ -32,13 +53,52 @@ define({ "api": [
     ],
     "description": "<p>Report anonymouns traffic data about the number of user session created in a given day.</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"datasets\": [{\n        \"label\": \"Unique Daily Sessions\" ,\n        \"data\": [{\n            \"x\": \"2020-08-19T06:00:00.000Z\",\n            \"y\": 145\n        }]\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": true,
+            "field": "type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.label",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "items.data",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.data.x",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.data.y",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Analytics"
@@ -48,7 +108,7 @@ define({ "api": [
     "url": "/api/collections",
     "title": "Create Collection",
     "version": "1.0.0",
-    "name": "Create",
+    "name": "CreateCollection",
     "group": "Collections",
     "permission": [
       {
@@ -57,14 +117,74 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new collection</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": true,
+            "field": "size",
+            "description": "<p>Size of collection in bytes</p>"
+          }
+        ]
+      }
+    },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"size\": 0,\n    \"name\": \"global\",\n    \"sources\": [\"**\"]\n    \"created\": \"2020-07-30T11:56:37.405Z\",\n    \"s3\": \"s3://v2.openaddresses.io/test/collection-global.zip\",\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the collection</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The date on which this collection was uploaded</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the collection in bytes</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -74,7 +194,7 @@ define({ "api": [
     "url": "/api/collections/:collection/data",
     "title": "Get Collection Data",
     "version": "1.0.0",
-    "name": "Data",
+    "name": "DataCollection",
     "group": "Collections",
     "permission": [
       {
@@ -105,7 +225,7 @@ define({ "api": [
     "url": "/api/collections/:collection",
     "title": "Delete Collection",
     "version": "1.0.0",
-    "name": "Delete",
+    "name": "DeleteCollection",
     "group": "Collections",
     "permission": [
       {
@@ -114,6 +234,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Delete a collection (This should not be done lightly)</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -128,13 +249,24 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\ntrue",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -144,7 +276,7 @@ define({ "api": [
     "url": "/api/collections",
     "title": "List Collections",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListCollections",
     "group": "Collections",
     "permission": [
       {
@@ -155,13 +287,52 @@ define({ "api": [
     ],
     "description": "<p>Return a list of all collections and their glob rules</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 1,\n    \"size\": 1234,\n    \"name\": \"us-northeast\",\n    \"created\": \"2020-08-12T04:17:45.063Z\"\",\n    \"s3\": \"s3://v2.openaddresses.io/test/collection-us-northeast.zip\",\n    \"sources\": [\n        \"us/ri/**\",\n        \"us/ct/**\",\n        \"us/ma/**\"\n        \"us/nh/**\"\n        \"us/vt/**\"\n        \"us/me/**\"*\n    ]\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>Download size in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "sources",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -169,9 +340,9 @@ define({ "api": [
   {
     "type": "patch",
     "url": "/api/collections/:collection",
-    "title": "Update Collection",
+    "title": "Patch Collection",
     "version": "1.0.0",
-    "name": "Update",
+    "name": "PatchCollection",
     "group": "Collections",
     "permission": [
       {
@@ -180,6 +351,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Update a collection</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -190,17 +362,72 @@ define({ "api": [
             "field": ":collection",
             "description": "<p>Collection ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String[]",
+            "optional": true,
+            "field": "sources",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": true,
+            "field": "size",
+            "description": "<p>Size of collection in bytes</p>"
+          }
         ]
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"global\",\n    \"size\": 1234,\n    \"sources\": [\"**\"]\n    \"created\": \"2020-07-30T11:56:37.405Z\",\n    \"s3\": \"s3://v2.openaddresses.io/test/collection-global.zip\",\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the collection</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The date on which this collection was uploaded</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the collection in bytes</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -210,7 +437,7 @@ define({ "api": [
     "url": "/api/data",
     "title": "List Data",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListData",
     "group": "Data",
     "permission": [
       {
@@ -219,70 +446,130 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Get the latest successful run of a given geographic area</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Query": [
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "source",
             "description": "<p>Filter results by source name</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "layer",
             "description": "<p>Filter results by layer type</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "name",
             "description": "<p>Filter results by layer name</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "point",
-            "description": "<p>Filter results by geographic point</p>"
+            "description": "<p>Filter results by geographic point '{lng},{lat}'</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?source",
-          "content": "?source=us/ca",
-          "type": "String"
-        },
-        {
-          "title": "?layer",
-          "content": "?layer=addresses",
-          "type": "String"
-        },
-        {
-          "title": "?name",
-          "content": "?name=city",
-          "type": "String"
-        },
-        {
-          "title": "?point",
-          "content": "?point=<lng>,<lat>",
-          "type": "String"
-        }
-      ]
+      }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"size\": 65325432,\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Data"
@@ -292,7 +579,7 @@ define({ "api": [
     "url": "/api/data/:data",
     "title": "Get Data",
     "version": "1.0.0",
-    "name": "Single",
+    "name": "SingleData",
     "group": "Data",
     "permission": [
       {
@@ -301,6 +588,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return all information about a specific data segment</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -315,13 +603,94 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"size\": 4326432,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Data"
@@ -331,7 +700,7 @@ define({ "api": [
     "url": "/api/data/:data/history",
     "title": "Return Data History",
     "version": "1.0.0",
-    "name": "SingleHistory",
+    "name": "SingleHistoryData",
     "group": "Data",
     "permission": [
       {
@@ -340,6 +709,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return the job history for a given data component</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -354,13 +724,100 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"jobs\": [{\n        \"id\": 1,\n        \"created\": \"2020-04-20T06:31:11.689Z\",\n        \"status\": \"Success\"\n        \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n        \"output\": {\n            \"cache\": true,\n            \"output\": true,\n            \"preview\": true\n        },\n        \"count\": 123,\n        \"stats\": {\n            \"counts\": {\n            }\n        },\n        \"run\": 1\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "jobs.status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.s3",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.preview",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.stats",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Data"
@@ -397,14 +854,19 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return a simple count of the current number of job errors</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"count\": 123\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "JobError"
@@ -423,6 +885,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new Job Error in response to a live job that Failed or Warned</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -444,13 +907,24 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"job\": 123,\n    \"message\": \"Failed to download source\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "JobError"
@@ -469,6 +943,61 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>All jobs that fail as part of a live run are entered into the JobError API This API powers a page that allows for human review of failing jobs Note: Job Errors are cleared with every subsequent full cache</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Status",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "JobError"
   },
@@ -477,7 +1006,7 @@ define({ "api": [
     "url": "/api/job/error/:job",
     "title": "Resolve Job Error",
     "version": "1.0.0",
-    "name": "ErrorManager",
+    "name": "ErrorModerate",
     "group": "JobError",
     "permission": [
       {
@@ -486,6 +1015,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Mark a job error as resolved</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -495,6 +1025,50 @@ define({ "api": [
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"confirm\"",
+              "\"reject\""
+            ],
+            "optional": false,
+            "field": "moderate",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"confirm\"",
+              "\"reject\""
+            ],
+            "optional": false,
+            "field": "moderate",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -516,6 +1090,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Update a job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -525,6 +1100,222 @@ define({ "api": [
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number[]",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Stats",
+            "optional": false,
+            "field": "stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -546,6 +1337,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Submit a job for reprocessing - often useful for network errors</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -559,6 +1351,26 @@ define({ "api": [
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -567,7 +1379,7 @@ define({ "api": [
     "url": "/api/job",
     "title": "List Jobs",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListJobs",
     "group": "Job",
     "permission": [
       {
@@ -576,102 +1388,192 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return information about a given subset of jobs</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "query": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "query",
+            "type": "Integer",
+            "size": "-∞ - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned jobs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "query",
+            "type": "Integer",
             "optional": true,
             "field": "run",
-            "description": "<p>Only show job associated with a given ID</p>"
+            "description": "<p>Only show run associated with a given ID</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
             "optional": true,
             "field": "status",
-            "defaultValue": "Success,Fail,Pending,Warn",
-            "description": "<p>Only show job with one of the given statuses</p>"
+            "description": "<p>The current status</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
+            "allowedValues": [
+              "\"all\"",
+              "\"true\"",
+              "\"false\""
+            ],
             "optional": true,
             "field": "live",
-            "defaultValue": "All",
-            "description": "<p>Only show jobs associated with a live run</p>"
+            "defaultValue": "all",
+            "description": "<p>undefined</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
             "optional": true,
             "field": "before",
-            "defaultValue": "",
-            "description": "<p>Only show jobs before the given date</p>"
+            "description": "<p>Only show runs before the given date</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
             "optional": true,
             "field": "after",
-            "defaultValue": "",
-            "description": "<p>Only show jobs after the given date</p>"
+            "description": "<p>Only show runs after the given date</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
             "optional": true,
-            "field": "source",
+            "field": "filter",
             "description": "<p>Filter results by source name</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?run",
-          "content": "?run=12",
-          "type": "String"
-        },
-        {
-          "title": "?status",
-          "content": "?status=Warn\n?status=Warn,Pending\n?status=Success,Fail,Pending,Warn",
-          "type": "String"
-        },
-        {
-          "title": "?env",
-          "content": "?env=true\n?env=false",
-          "type": "String"
-        },
-        {
-          "title": "?before",
-          "content": "?before=2020-01-01\n?before=2020-12-01",
-          "type": "String"
-        },
-        {
-          "title": "?after",
-          "content": "?after=2020-01-01\n?after=2020-12-01",
-          "type": "String"
-        },
-        {
-          "title": "?source",
-          "content": "?source=us/ca",
-          "type": "String"
-        }
-      ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Job"
@@ -721,6 +1623,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return all information about a given job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -735,13 +1638,149 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"run\": 187\n    \"size\": 4325643264,\n    \"map\": null;\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"source_name\":\"us/wy/lincoln\",\n    \"source\":\"https://raw.githubusercontent.com/openaddresses/openaddresses/0f2888ba5bd572f844991f8ea0bef9c39fa39ada/sources/us/wy/lincoln.json\",\n    \"layer\":\"addresses\",\n    \"name\":\"country\",\n    \"output\":{\n        \"cache\":true,\n        \"output\":true,\n        \"preview\":true\n    },\n    \"loglink\":\"batch-staging-job/default/bfdd23b5-9575-4344-93d3-bf9cacd4761c\",\n    \"status\":\"Success\",\n    \"version\":\"1.0.0\",\n    \"count\":4257,\n    \"bounds\":{\"type\":\"Polygon\",\"coordinates\": [\"..geojson coords here..\"],\n    \"stats\":{\n        \"counts\":{\n            \"city\":0,\n            \"unit\":0,\n            \"number\":4244,\n            \"region\":0,\n            \"street\":4257,\n            \"district\":0,\n            \"postcode\":0\n        }\n    }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Stats",
+            "optional": false,
+            "field": "stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Job"
@@ -760,6 +1799,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Compare the stats of the given job against the current live data job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -773,7 +1813,138 @@ define({ "api": [
         ]
       }
     },
-    "description": "<p>Compare the stats of the given job against the current live data job</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "compare.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "compare.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare.bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "compare.bounds.area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "compare.bounds.geom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "master.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "master.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master.bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "master.bounds.area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "master.bounds.geom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "delta.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta.bounds",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -791,6 +1962,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return the batch-machine processing log for a given job Note: These are stored in AWS CloudWatch and <em>do</em> expire The presence of a loglink on a job, does not guarentree log retention</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -800,6 +1972,33 @@ define({ "api": [
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "timestamp",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -883,6 +2082,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return the preview image for a given job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -901,6 +2101,89 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/login",
+    "title": "Create Session",
+    "version": "1.0.0",
+    "name": "CreateLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Log a user into the service and create an authenticated cookie</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>username</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "flags",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "post",
     "url": "/api/login/forgot",
     "title": "Forgot Login",
     "version": "1.0.0",
@@ -916,25 +2199,99 @@ define({ "api": [
     "description": "<p>If a user has forgotten their password, send them a password reset link to their email</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "String",
             "optional": false,
-            "field": "user",
-            "description": "<p>Username or Email of account</p>"
+            "field": "username",
+            "description": "<p>username or email to reset password of</p>"
           }
         ]
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Password Email Sent\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "get",
+    "url": "/api/login",
+    "title": "Session Info",
+    "version": "1.0.0",
+    "name": "GetLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return information about the currently logged in user</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "flags",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Login"
@@ -956,86 +2313,43 @@ define({ "api": [
     "description": "<p>Once a user has obtained a password reset by email via the Forgot Login API, use the token to reset the password</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "String",
             "optional": false,
             "field": "token",
-            "description": "<p>Password reset token</p>"
+            "description": "<p>Email provided reset token</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "String",
             "optional": false,
             "field": "password",
-            "description": "<p>New password</p>"
+            "description": "<p>The new user password</p>"
           }
         ]
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Password Email Sent\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Login"
-  },
-  {
-    "type": "get",
-    "url": "/api/login",
-    "title": "Session Info",
-    "version": "1.0.0",
-    "name": "get",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
       }
-    ],
-    "description": "<p>Return information about the currently logged in user</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Login"
-  },
-  {
-    "type": "post",
-    "url": "/api/login",
-    "title": "Create Session",
-    "version": "1.0.0",
-    "name": "login",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Log a user into the service and create an authenticated cookie</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n}",
-          "type": "json"
-        }
-      ]
     },
     "filename": "./index.js",
     "groupTitle": "Login"
@@ -1054,6 +2368,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Data required for map initialization</p>",
     "filename": "./index.js",
     "groupTitle": "Map"
   },
@@ -1071,6 +2386,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Retrive coverage Mapbox Vector Tiles</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1106,7 +2422,7 @@ define({ "api": [
     "url": "/api/run",
     "title": "Create Run",
     "version": "1.0.0",
-    "name": "Create",
+    "name": "CreateRun",
     "group": "Run",
     "permission": [
       {
@@ -1115,50 +2431,92 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new run to hold a batch of jobs</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "Boolean",
             "optional": false,
             "field": "live",
-            "description": "<p>If the job succeeds, should it replace the current data entry</p>"
+            "description": "<p>undefined</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Body",
+            "type": "Null/Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "github",
-            "description": "<p>If not live, information about the GitHub CI reference</p>"
+            "description": "<p>Used by the data-pls CI tool</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "github.ref",
             "description": "<p>Git reference (branch) of the given run</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "github.sha",
             "description": "<p>Git SHA of the given run</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "github.url",
             "description": "<p>Github URL to the specific commit</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Success 200",
+            "type": "Integer",
             "optional": false,
             "field": "github.check",
             "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1171,7 +2529,7 @@ define({ "api": [
     "url": "/api/run",
     "title": "List Runs",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListRuns",
     "group": "Run",
     "permission": [
       {
@@ -1180,86 +2538,153 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Runs are container objects that contain jobs that were started at the same time or by the same process</p>",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
             "type": "Number",
+            "optional": false,
+            "field": ":data",
+            "description": "<p>Data ID</p>"
+          }
+        ],
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned runs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
             "optional": true,
             "field": "run",
             "description": "<p>Only show run associated with a given ID</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
             "optional": true,
             "field": "status",
-            "defaultValue": "Success,Fail,Pending,Warn",
-            "description": "<p>Only show runs with one of the given statuses</p>"
+            "description": "<p>The current status</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "before",
-            "defaultValue": "",
             "description": "<p>Only show runs before the given date</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "after",
-            "defaultValue": "",
             "description": "<p>Only show runs after the given date</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?run",
-          "content": "?run=12",
-          "type": "String"
-        },
-        {
-          "title": "?status",
-          "content": "?status=Warn\n?status=Warn,Pending\n?status=Success,Fail,Pending,Warn",
-          "type": "String"
-        },
-        {
-          "title": "?before",
-          "content": "?before=2020-01-01\n?before=2020-12-01",
-          "type": "String"
-        },
-        {
-          "title": "?after",
-          "content": "?after=2020-01-01\n?after=2020-12-01",
-          "type": "String"
-        }
-      ]
+      }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 1,\n    \"live\": true,\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"github\": {},\n    \"closed\": true,\n    \"status\": \"Fail\",\n    \"jobs\": 1\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>If true, successful jobs immediately become the most recent live data</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": "<p>Is the Run still accepting jobs</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>The number of jobs in this run</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1293,13 +2718,52 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"run\": 1,\n    \"status\": {\n        \"Warn\": 1\n        \"Success\": 3,\n        \"Pending\": 2,\n        \"Fail\": 0\n    }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Warn",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Success",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Pending",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Fail",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1332,13 +2796,73 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 1,\n    \"live\": true,\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"github\": {},\n    \"closed\": true\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1357,6 +2881,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return all jobs for a given run</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1366,6 +2891,165 @@ define({ "api": [
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "jobs.source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "jobs.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "jobs.output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "jobs.status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Stats",
+            "optional": false,
+            "field": "jobs.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Number[]",
+            "optional": false,
+            "field": "jobs.bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.size",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1397,23 +3081,29 @@ define({ "api": [
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "json",
-            "optional": false,
-            "field": "jobs",
-            "description": "<p>Jobs to attach to run</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "jobs",
-          "content": "['https://github.com/path_to_source', {\n    \"source\": \"https://github/path_to_source\",\n    \"layer\": \"addresses\",\n    \"name\": \"dcgis\"\n}]",
-          "type": "json"
-        }
-      ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1432,6 +3122,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Update an existing run</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1441,6 +3132,98 @@ define({ "api": [
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "live",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "closed",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object",
+            "optional": true,
+            "field": "github",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1462,15 +3245,40 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Internal function to allow scheduled lambdas to kick off events</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"collect\"",
+              "\"sources\""
+            ],
             "optional": false,
             "field": "type",
-            "description": "<p>Type of lambda scheduled event to respond to. One of &quot;sources&quot; or &quot;collect&quot;</p>"
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1494,13 +3302,24 @@ define({ "api": [
     ],
     "description": "<p>AWS ELB Healthcheck for the server</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"healthy\": true,\n    \"message\": \"I work all day, I work all night to get the open the data!\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "healthy",
+            "description": "<p>Is the service healthy?</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>The service on how it is doing</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Server"
@@ -1521,13 +3340,17 @@ define({ "api": [
     ],
     "description": "<p>Return basic metadata about server configuration</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>The version of the API</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Server"
@@ -1546,6 +3369,54 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new API token for programatic access</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1563,6 +3434,27 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Delete a user's API Token</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1580,6 +3472,48 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>List all tokens associated with the requester's account</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "tokens",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tokens.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tokens.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tokens.name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1606,7 +3540,7 @@ define({ "api": [
     "url": "/api/user",
     "title": "Create User",
     "version": "1.0.0",
-    "name": "Create",
+    "name": "CreateUser",
     "group": "User",
     "permission": [
       {
@@ -1616,6 +3550,92 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new user</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>username</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>password</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>email</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "User"
   },
@@ -1624,7 +3644,7 @@ define({ "api": [
     "url": "/api/user",
     "title": "List Users",
     "version": "1.0.0",
-    "name": "list",
+    "name": "ListUsers",
     "group": "User",
     "permission": [
       {
@@ -1633,27 +3653,29 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return a list of users that have registered with the service</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Query": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned runs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
             "optional": true,
             "field": "page",
-            "defaultValue": "0",
+            "defaultValue": "100",
             "description": "<p>The offset based on limit to return</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "filter",
@@ -1661,52 +3683,66 @@ define({ "api": [
             "description": "<p>Filter a complete or partial username/email</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?page",
-          "content": "?page=0",
-          "type": "String"
-        },
-        {
-          "title": "?filter",
-          "content": "?filter=person@example.com",
-          "type": "String"
-        }
-      ]
-    },
-    "description": "<p>Return a list of users that have registered with the service</p>",
-    "filename": "./index.js",
-    "groupTitle": "User"
-  },
-  {
-    "type": "get",
-    "url": "/api/user/me",
-    "title": "Get User Session Metadata",
-    "version": "1.0.0",
-    "name": "self",
-    "group": "User",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
-    ],
-    "description": "<p>Return basic user information about the currently authenticated user</p>",
+    },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "User"
@@ -1716,7 +3752,7 @@ define({ "api": [
     "url": "/api/user/:id",
     "title": "Update User",
     "version": "1.0.0",
-    "name": "self",
+    "name": "PatchUser",
     "group": "User",
     "permission": [
       {
@@ -1735,6 +3771,85 @@ define({ "api": [
             "optional": false,
             "field": ":id",
             "description": "<p>The UID of the user to update</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "flags",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": true,
+            "field": "access",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": "<p>undefined</p>"
           }
         ]
       }

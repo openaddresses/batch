@@ -108,11 +108,12 @@ test('AuthToken#list', async (t) => {
             type: 'session'
         });
 
-        t.equals(tokens.length, 1, 'tokens.length: 1');
-        t.deepLooseEqual(Object.keys(tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
-        t.notOk(tokens[0].token, 'tokens[0].token: <undefined>');
-        t.equals(tokens[0].id, 1, 'tokens[0].id: 1');
-        t.ok(tokens[0].created, 'tokens[0].created: <date>');
+        t.equals(tokens.total, 1, 'tokens.total: 1');
+        t.equals(tokens.tokens.length,  1, 'tokens.tokens.length: 1');
+        t.deepLooseEqual(Object.keys(tokens.tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
+        t.notOk(tokens.tokens[0].token, 'tokens[0].token: <undefined>');
+        t.equals(tokens.tokens[0].id, 1, 'tokens[0].id: 1');
+        t.ok(tokens.tokens[0].created, 'tokens[0].created: <date>');
     } catch (err) {
         t.error(err, 'no errors');
     }

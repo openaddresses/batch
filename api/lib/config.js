@@ -7,7 +7,6 @@ const { Octokit } = require('@octokit/rest');
 
 class Config {
     static async env() {
-
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
                 console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');

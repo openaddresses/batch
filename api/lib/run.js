@@ -16,7 +16,7 @@ class Run {
         this.closed = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = ['github', 'closed', 'live'];
+        this.attrs = Object.keys(require('../schema/req.body.PatchRun.json').properties);
     }
 
     /**
@@ -266,6 +266,7 @@ class Run {
             return pgres.rows.map((job) => {
                 job.id = parseInt(job.id);
                 job.run = parseInt(job.run);
+                job.size = parseInt(job.size);
 
                 return job;
             });

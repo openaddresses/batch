@@ -1,0 +1,27 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "type": "integer",
+            "default": 100,
+            "maximum": 100,
+            "description": "Limit number of returned runs"
+        },
+        "run": {
+            "type": "integer",
+            "description": "Only show run associated with a given ID"
+        },
+        "status": {
+            "$ref": "./util/status.json"
+        },
+        "before": {
+            "type": "string",
+            "description": "Only show runs before the given date"
+        },
+        "after": {
+            "type": "string",
+            "description": "Only show runs after the given date"
+        }
+    }
+}

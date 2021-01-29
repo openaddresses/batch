@@ -1,0 +1,38 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "size": {
+            "type": "integer"
+        },
+        "map": {
+            "type": "integer"
+        },
+        "output": {
+            "type": "object"
+        },
+        "loglink": {
+            "type": "string"
+        },
+        "status": {
+            "$ref": "./util/status.json"
+        },
+        "version": {
+            "type": "string"
+        },
+        "stats": {
+            "type": "object"
+        },
+        "count": {
+            "type": "integer"
+        },
+        "bounds": {
+            "type": "array",
+            "minLength": 4,
+            "maxLength": 4,
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}

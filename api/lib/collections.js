@@ -26,11 +26,7 @@ class Collection {
         this.s3 = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = [
-            'created',
-            'sources',
-            'size'
-        ];
+        this.attrs = Object.keys(require('../schema/req.body.PatchCollection.json').properties);
     }
 
     json() {
@@ -137,7 +133,7 @@ class Collection {
             `, [
                 this.name,
                 JSON.stringify(this.sources),
-                this.size
+                this.size || 0
             ]);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);

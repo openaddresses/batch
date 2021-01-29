@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "source": {
+            "type": "string",
+            "description": "Filter results by source name"
+        },
+        "layer": {
+            "type": "string",
+            "description": "Filter results by layer type"
+        },
+        "name": {
+            "type": "string",
+            "description": "Filter results by layer name"
+        },
+        "point": {
+            "type": "string",
+            "description": "Filter results by geographic point '{lng},{lat}'"
+        }
+    }
+}

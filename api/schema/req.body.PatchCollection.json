@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "created": {
+            "type": "string"
+        },
+        "sources": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "size": {
+            "type": "number",
+            "description": "Size of collection in bytes"
+        }
+    }
+}

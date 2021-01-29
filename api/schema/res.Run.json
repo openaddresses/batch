@@ -1,0 +1,54 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "live",
+        "created",
+        "github",
+        "closed"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "live": {
+            "type": "boolean"
+        },
+        "created": {
+            "type": "string"
+        },
+        "github": {
+            "type": "object",
+            "description": "Used by the data-pls CI tool",
+            "required": [
+                "ref",
+                "sha",
+                "url",
+                "check"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "ref": {
+                    "type": "string",
+                    "description": "Git reference (branch) of the given run"
+                },
+                "sha": {
+                    "type": "string",
+                    "description": "Git SHA of the given run"
+                },
+                "url": {
+                    "type": "string",
+                    "description": "Github URL to the specific commit"
+                },
+                "check": {
+                    "type": "integer",
+                    "description": "Github check ID to update"
+                }
+            }
+        },
+        "closed": {
+            "type": "boolean"
+        }
+    }
+}

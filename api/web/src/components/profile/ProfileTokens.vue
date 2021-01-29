@@ -154,7 +154,7 @@ export default {
                 }
                 return res.json();
             }).then((res) => {
-                this.tokens = res;
+                this.tokens = res.tokens;
                 this.loading = false;
             }).catch((err) => {
                 this.$emit('err', err);

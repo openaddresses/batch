@@ -1,0 +1,109 @@
+{
+    "type": "object",
+    "required": [
+        "compare",
+        "master",
+        "delta"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "compare": {
+            "type": "object",
+            "required": [
+                "id",
+                "count",
+                "stats",
+                "bounds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "stats": {
+                    "type": "object"
+                },
+                "bounds": {
+                    "type": "object",
+                    "required": [
+                        "id",
+                        "count",
+                        "stats",
+                        "bounds"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "area": {
+                            "type": "number"
+                        },
+                        "geom": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "master": {
+            "type": "object",
+            "required": [
+                "id",
+                "count",
+                "stats",
+                "bounds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "stats": {
+                    "type": "object"
+                },
+                "bounds": {
+                    "type": "object",
+                    "required": [
+                        "id",
+                        "count",
+                        "stats",
+                        "bounds"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "area": {
+                            "type": "number"
+                        },
+                        "geom": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "delta": {
+            "type": "object",
+            "required": [
+                "count",
+                "stats",
+                "bounds"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "stats": {
+                    "type": "object"
+                },
+                "bounds": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}

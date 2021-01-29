@@ -1,0 +1,94 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "run",
+        "map",
+        "created",
+        "source",
+        "source_name",
+        "layer",
+        "name",
+        "output",
+        "loglink",
+        "status",
+        "stats",
+        "count",
+        "bounds",
+        "version",
+        "size"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "run": {
+            "type": "integer"
+        },
+        "map": {
+            "type": ["null", "integer"]
+        },
+        "created": {
+            "type": "string"
+        },
+        "source": {
+            "type": "string"
+        },
+        "source_name": {
+            "type": "source_name"
+        },
+        "layer": {
+            "type": "string"
+        },
+        "name": {
+            "type": "name"
+        },
+        "output": {
+            "type": "object",
+            "required": [
+                "cache",
+                "output",
+                "preview"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "cache": {
+                    "type": "boolean"
+                },
+                "output": {
+                    "type": "boolean"
+                },
+                "preview:": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "loglink": {
+            "type": "string"
+        },
+        "status": {
+            "$ref": "./util/status.json"
+        },
+        "stats": {
+            "type": "stats"
+        },
+        "count": {
+            "type": ["null", "integer"]
+        },
+        "bounds": {
+            "type": ["null", "array"],
+            "minLength": 4,
+            "maxLength": 4,
+            "items": {
+                "type": "number"
+            }
+        },
+        "version": {
+            "type": "string"
+        },
+        "size": {
+            "type": "integer"
+        }
+    }
+}

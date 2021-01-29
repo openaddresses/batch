@@ -4,7 +4,7 @@
     "url": "/api/dash/collections",
     "title": "Collection Counts",
     "version": "1.0.0",
-    "name": "collections",
+    "name": "CollectionsAnalytics",
     "group": "Analytics",
     "permission": [
       {
@@ -13,6 +13,27 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Report anonymouns traffic data about the number of collection downloads</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Analytics"
   },
@@ -21,7 +42,7 @@
     "url": "/api/dash/traffic",
     "title": "Session Counts",
     "version": "1.0.0",
-    "name": "traffic",
+    "name": "TrafficAnalytics",
     "group": "Analytics",
     "permission": [
       {
@@ -32,13 +53,52 @@
     ],
     "description": "<p>Report anonymouns traffic data about the number of user session created in a given day.</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"datasets\": [{\n        \"label\": \"Unique Daily Sessions\" ,\n        \"data\": [{\n            \"x\": \"2020-08-19T06:00:00.000Z\",\n            \"y\": 145\n        }]\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": true,
+            "field": "type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.label",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "items.data",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.data.x",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.data.y",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Analytics"
@@ -66,14 +126,14 @@
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
             "type": "String[]",
             "optional": false,
             "field": "sources",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Body",
@@ -93,7 +153,7 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -107,7 +167,7 @@
             "type": "String[]",
             "optional": false,
             "field": "sources",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Success 200",
@@ -196,14 +256,14 @@
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -234,7 +294,7 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -248,28 +308,28 @@
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "s3",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "sources",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -309,14 +369,14 @@
             "type": "String",
             "optional": true,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
             "type": "String[]",
             "optional": true,
             "field": "sources",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Body",
@@ -336,7 +396,7 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -350,7 +410,7 @@
             "type": "String[]",
             "optional": false,
             "field": "sources",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Success 200",
@@ -429,84 +489,84 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "source",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "updated",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "layer",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "job",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "s3",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "output.cache",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "output.output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "output.preview",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -550,84 +610,84 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "source",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "updated",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "layer",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "job",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "s3",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "output.cache",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "output.output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "output.preview",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -671,28 +731,28 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "jobs",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "jobs.id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -712,49 +772,49 @@
             "type": "String",
             "optional": false,
             "field": "jobs.s3",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "jobs.output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "jobs.output.cache",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "jobs.output.output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "jobs.output.preview",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "jobs.count",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "jobs.stats",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -794,14 +854,19 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return a simple count of the current number of job errors</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"count\": 123\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "JobError"
@@ -820,6 +885,7 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new Job Error in response to a live job that Failed or Warned</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -841,13 +907,24 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"job\": 123,\n    \"message\": \"Failed to download source\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "JobError"
@@ -866,6 +943,61 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>All jobs that fail as part of a live run are entered into the JobError API This API powers a page that allows for human review of failing jobs Note: Job Errors are cleared with every subsequent full cache</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Status",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "JobError"
   },
@@ -874,7 +1006,7 @@
     "url": "/api/job/error/:job",
     "title": "Resolve Job Error",
     "version": "1.0.0",
-    "name": "ErrorManager",
+    "name": "ErrorModerate",
     "group": "JobError",
     "permission": [
       {
@@ -883,6 +1015,7 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Mark a job error as resolved</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -892,6 +1025,50 @@
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"confirm\"",
+              "\"reject\""
+            ],
+            "optional": false,
+            "field": "moderate",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"confirm\"",
+              "\"reject\""
+            ],
+            "optional": false,
+            "field": "moderate",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -913,6 +1090,7 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Update a job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -922,6 +1100,222 @@
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number[]",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Stats",
+            "optional": false,
+            "field": "stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -943,6 +1337,7 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Submit a job for reprocessing - often useful for network errors</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -956,6 +1351,26 @@
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -964,7 +1379,7 @@
     "url": "/api/job",
     "title": "List Jobs",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListJobs",
     "group": "Job",
     "permission": [
       {
@@ -973,102 +1388,192 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return information about a given subset of jobs</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "query": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "query",
+            "type": "Integer",
+            "size": "-∞ - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned jobs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "query",
+            "type": "Integer",
             "optional": true,
             "field": "run",
-            "description": "<p>Only show job associated with a given ID</p>"
+            "description": "<p>Only show run associated with a given ID</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
             "optional": true,
             "field": "status",
-            "defaultValue": "Success,Fail,Pending,Warn",
-            "description": "<p>Only show job with one of the given statuses</p>"
+            "description": "<p>The current status</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
+            "allowedValues": [
+              "\"all\"",
+              "\"true\"",
+              "\"false\""
+            ],
             "optional": true,
             "field": "live",
-            "defaultValue": "All",
-            "description": "<p>Only show jobs associated with a live run</p>"
+            "defaultValue": "all",
+            "description": "<p>undefined</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
             "optional": true,
             "field": "before",
-            "defaultValue": "",
-            "description": "<p>Only show jobs before the given date</p>"
+            "description": "<p>Only show runs before the given date</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
             "optional": true,
             "field": "after",
-            "defaultValue": "",
-            "description": "<p>Only show jobs after the given date</p>"
+            "description": "<p>Only show runs after the given date</p>"
           },
           {
-            "group": "Parameter",
+            "group": "query",
             "type": "String",
             "optional": true,
-            "field": "source",
+            "field": "filter",
             "description": "<p>Filter results by source name</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?run",
-          "content": "?run=12",
-          "type": "String"
-        },
-        {
-          "title": "?status",
-          "content": "?status=Warn\n?status=Warn,Pending\n?status=Success,Fail,Pending,Warn",
-          "type": "String"
-        },
-        {
-          "title": "?env",
-          "content": "?env=true\n?env=false",
-          "type": "String"
-        },
-        {
-          "title": "?before",
-          "content": "?before=2020-01-01\n?before=2020-12-01",
-          "type": "String"
-        },
-        {
-          "title": "?after",
-          "content": "?after=2020-01-01\n?after=2020-12-01",
-          "type": "String"
-        },
-        {
-          "title": "?source",
-          "content": "?source=us/ca",
-          "type": "String"
-        }
-      ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Job"
@@ -1118,6 +1623,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return all information about a given job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1132,13 +1638,149 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"run\": 187\n    \"size\": 4325643264,\n    \"map\": null;\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"source_name\":\"us/wy/lincoln\",\n    \"source\":\"https://raw.githubusercontent.com/openaddresses/openaddresses/0f2888ba5bd572f844991f8ea0bef9c39fa39ada/sources/us/wy/lincoln.json\",\n    \"layer\":\"addresses\",\n    \"name\":\"country\",\n    \"output\":{\n        \"cache\":true,\n        \"output\":true,\n        \"preview\":true\n    },\n    \"loglink\":\"batch-staging-job/default/bfdd23b5-9575-4344-93d3-bf9cacd4761c\",\n    \"status\":\"Success\",\n    \"version\":\"1.0.0\",\n    \"count\":4257,\n    \"bounds\":{\"type\":\"Polygon\",\"coordinates\": [\"..geojson coords here..\"],\n    \"stats\":{\n        \"counts\":{\n            \"city\":0,\n            \"unit\":0,\n            \"number\":4244,\n            \"region\":0,\n            \"street\":4257,\n            \"district\":0,\n            \"postcode\":0\n        }\n    }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "output.preview:",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Stats",
+            "optional": false,
+            "field": "stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Job"
@@ -1157,6 +1799,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Compare the stats of the given job against the current live data job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1170,7 +1813,138 @@
         ]
       }
     },
-    "description": "<p>Compare the stats of the given job against the current live data job</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "compare.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "compare.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare.bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "compare.bounds.area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "compare.bounds.geom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "master.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "master.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master.bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "master.bounds.area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "master.bounds.geom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "delta.count",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta.stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta.bounds",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },
@@ -1188,6 +1962,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return the batch-machine processing log for a given job Note: These are stored in AWS CloudWatch and <em>do</em> expire The presence of a loglink on a job, does not guarentree log retention</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1197,6 +1972,33 @@
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "timestamp",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1280,6 +2082,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return the preview image for a given job</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1339,21 +2142,21 @@
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "username",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "email",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -1364,14 +2167,14 @@
             ],
             "optional": false,
             "field": "access",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "flags",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1415,14 +2218,14 @@
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1453,21 +2256,21 @@
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "username",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "email",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -1478,14 +2281,14 @@
             ],
             "optional": false,
             "field": "access",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "flags",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1536,14 +2339,14 @@
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1637,14 +2440,14 @@
             "type": "Boolean",
             "optional": false,
             "field": "live",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
             "type": "Null/Object",
             "optional": false,
             "field": "github",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1657,21 +2460,21 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "live",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -1713,7 +2516,7 @@
             "type": "Boolean",
             "optional": false,
             "field": "closed",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1802,7 +2605,7 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -1816,7 +2619,7 @@
             "type": "String",
             "optional": false,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -1922,42 +2725,42 @@
             "type": "Integer",
             "optional": false,
             "field": "run",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "status",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "status.Warn",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "status.Success",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "status.Pending",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "status.Fail",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2000,21 +2803,21 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "live",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -2056,7 +2859,7 @@
             "type": "Boolean",
             "optional": false,
             "field": "closed",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2100,105 +2903,105 @@
             "type": "Integer",
             "optional": false,
             "field": "run",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "jobs",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "jobs.id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "jobs.run",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Null/Integer",
             "optional": false,
             "field": "jobs.map",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.source",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Source_name",
             "optional": false,
             "field": "jobs.source_name",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.layer",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Name",
             "optional": false,
             "field": "jobs.name",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "jobs.output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "jobs.output.cache",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "jobs.output.output",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": true,
             "field": "jobs.output.preview:",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.loglink",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -2218,35 +3021,35 @@
             "type": "Stats",
             "optional": false,
             "field": "jobs.stats",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Null/Integer",
             "optional": false,
             "field": "jobs.count",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
-            "type": "Null",
+            "type": "Null/Number[]",
             "optional": false,
             "field": "jobs.bounds",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.version",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "jobs.size",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2290,14 +3093,14 @@
             "type": "Integer",
             "optional": false,
             "field": "run",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "jobs",
-            "description": ""
+            "description": "<p>undefined undefined</p>"
           }
         ]
       }
@@ -2337,21 +3140,21 @@
             "type": "Boolean",
             "optional": true,
             "field": "live",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
             "type": "Boolean",
             "optional": true,
             "field": "closed",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
             "type": "Null/Object",
             "optional": true,
             "field": "github",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2364,21 +3167,21 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "live",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -2420,7 +3223,7 @@
             "type": "Boolean",
             "optional": false,
             "field": "closed",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2455,7 +3258,7 @@
             ],
             "optional": false,
             "field": "type",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2468,14 +3271,14 @@
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2588,7 +3391,7 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -2602,14 +3405,14 @@
             "type": "String",
             "optional": false,
             "field": "token",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "created",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2640,14 +3443,14 @@
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2685,28 +3488,28 @@
             "type": "Object",
             "optional": false,
             "field": "tokens",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "tokens.id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "tokens.created",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "tokens.name",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2787,30 +3590,30 @@
           {
             "group": "Success 200",
             "type": "Object",
-            "optional": true,
+            "optional": false,
             "field": "users",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "users.id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.username",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.email",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -2821,14 +3624,14 @@
             ],
             "optional": false,
             "field": "users.access",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "users.flags",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2897,28 +3700,28 @@
             "type": "Object",
             "optional": false,
             "field": "users",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "users.id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.username",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.email",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -2929,14 +3732,14 @@
             ],
             "optional": false,
             "field": "users.access",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "users.flags",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -2976,7 +3779,7 @@
             "type": "Object",
             "optional": true,
             "field": "flags",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
@@ -2987,7 +3790,7 @@
             ],
             "optional": true,
             "field": "access",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -3005,30 +3808,30 @@
           {
             "group": "Success 200",
             "type": "Object",
-            "optional": true,
+            "optional": false,
             "field": "users",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "users.id",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.username",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.email",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
@@ -3039,14 +3842,14 @@
             ],
             "optional": false,
             "field": "users.access",
-            "description": ""
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "users.flags",
-            "description": ""
+            "description": "<p>undefined</p>"
           }
         ]
       }

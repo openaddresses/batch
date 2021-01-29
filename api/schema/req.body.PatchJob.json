@@ -15,7 +15,7 @@
             "type": "string"
         },
         "status": {
-            "$ref": "./util/status"
+            "$ref": "./util/status.json"
         },
         "version": {
             "type": "string"

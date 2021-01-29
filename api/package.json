@@ -41,11 +41,12 @@
         "split": "^1.0.1"
     },
     "devDependencies": {
-        "apidoc-plugin-schema": "^0.1.8",
         "apidoc": "^0.25.0",
+        "apidoc-plugin-schema": "^0.1.8",
         "codecov": "^3.8.0",
         "eslint": "^7.12.1",
         "eslint-plugin-node": "^11.0.0",
+        "glob": "7.1.x",
         "nock": "^13.0.2",
         "nodemon": "^2.0.7",
         "nyc": "^15.1.0",

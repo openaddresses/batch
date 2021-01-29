@@ -77,7 +77,7 @@
             "type": ["null", "integer"]
         },
         "bounds": {
-            "type": "null", "array",
+            "type": ["null", "array"],
             "minLength": 4,
             "maxLength": 4,
             "items": {

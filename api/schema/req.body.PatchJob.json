@@ -12,7 +12,7 @@
             "type": "object"
         },
         "loglink": {
-            "type": ""string"
+            "type": "string"
         },
         "status": {
             "$ref": "./util/status"

@@ -17,11 +17,12 @@ RUN curl 'https://nodejs.org/dist/v14.15.4/node-v14.15.4-linux-x64.tar.gz' | tar
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
 RUN npm install -g npm@7 \
+    && yarn install \
     && npm install \
     && npm run doc
 
 RUN cd web \
-    && npm install \
+    && yarn install \
     && npm run build \
     && cd ..
 

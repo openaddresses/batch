@@ -6,7 +6,7 @@ const Err = require('./error');
 
 class Status {
     static list() {
-        return require('../schema/util/Status.json').enum;
+        return require('../schema/util/status.json').enum;
     }
 
     static verify(statuses) {

@@ -345,7 +345,7 @@ class Auth {
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
         try {
-            const uhash = await hash(user.password, 10)
+            const uhash = await hash(user.password, 10);
 
             const pgres = await this.pool.query(`
                 INSERT INTO users (
@@ -364,7 +364,7 @@ class Auth {
             `, [
                 user.username,
                 user.email,
-                hash
+                uhash
             ]);
 
             const row = pgres.rows[0];

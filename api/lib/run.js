@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const Err = require('./error');
 const moment = require('moment');
 const Job = require('./job');

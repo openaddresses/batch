@@ -12,7 +12,7 @@ RUN apt-get update \
 
 RUN curl 'https://nodejs.org/dist/v10.15.3/node-v10.15.3-linux-x64.tar.gz' | tar -xzv \
     && cp ./node-v10.15.3-linux-x64/bin/node /usr/bin/ \
-    && ./node-v10.15.3-linux-x64/bin/npm install -g npm \
+    && ./node-v10.15.3-linux-x64/bin/npm install -g npm
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 

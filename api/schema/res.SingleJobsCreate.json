@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "required": [
+        "run",
+        "jobs"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "run": {
+            "type": "integer"
+        },
+        "jobs": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        }
+    }
+}

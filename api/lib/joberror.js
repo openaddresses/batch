@@ -131,7 +131,11 @@ class JobError {
             throw new Err(404, null, 'No job errors found');
         }
 
-        return pgres.rows;
+        return pgres.rows.map((row) => {
+            row.id = parseInt(row.id);
+
+            return row;
+        });
     }
 
     static async count(pool) {

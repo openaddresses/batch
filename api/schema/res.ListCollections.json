@@ -1,0 +1,35 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "id",
+            "size",
+            "name",
+            "created",
+            "s3",
+            "sources"
+        ],
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "size": {
+                "type": "integer",
+                "description": "Download size in bytes"
+            },
+            "name": {
+                "type": "string"
+            },
+            "created": {
+                "type": "string"
+            },
+            "s3": {
+                "type": "string"
+            },
+            "sources": {
+            }
+        }
+    }
+}

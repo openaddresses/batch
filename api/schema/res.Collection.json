@@ -1,0 +1,34 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "name",
+        "sources",
+        "created",
+        "size"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the collection"
+        },
+        "sources": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "created": {
+            "type": "string",
+            "description": "The date on which this collection was uploaded"
+        },
+        "size": {
+            "type": "integer",
+            "description": "The size of the collection in bytes"
+        }
+    }
+}

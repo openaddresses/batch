@@ -1,0 +1,37 @@
+{
+    "type": "object",
+    "required": [
+        "run",
+        "status"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "run": {
+            "type": "integer"
+        },
+        "status": {
+            "type": "object",
+            "required": [
+                "Warn",
+                "Success",
+                "Pending",
+                "Fail"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "Warn": {
+                    "type": "integer"
+                },
+                "Success": {
+                    "type": "integer"
+                },
+                "Pending": {
+                    "type": "integer"
+                },
+                "Fail": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

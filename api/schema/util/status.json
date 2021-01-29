@@ -1,0 +1,10 @@
+{
+    "type": "string",
+    "enum": [
+        "Pending",
+        "Success",
+        "Fail",
+        "Warn"
+    ],
+    "description": "The current status"
+}

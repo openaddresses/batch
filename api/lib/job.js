@@ -46,17 +46,7 @@ class Job {
         this.s3 = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = [
-            'size',
-            'map',
-            'output',
-            'loglink',
-            'status',
-            'version',
-            'stats',
-            'count',
-            'bounds'
-        ];
+        this.attrs = Object.keys(require('../schema/req.body.PatchJob.json').properties)
 
         this.raw = false;
     }

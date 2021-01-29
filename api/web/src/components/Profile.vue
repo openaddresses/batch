@@ -88,10 +88,10 @@ export default {
     },
     methods: {
         refresh: function() {
-            this.getUser();
+            this.getLogin();
         },
-        getUser: function() {
-            const url = new URL(`${window.location.origin}/api/user/me`);
+        getLogin: function() {
+            const url = new URL(`${window.location.origin}/api/login`);
 
             fetch(url, {
                 method: 'GET'

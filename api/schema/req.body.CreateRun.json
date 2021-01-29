@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "required": [
+        "live",
+        "github"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "live": {
+            "type": "boolean"
+        },
+        "github": {
+            "type": ["null", "object" ]
+        }
+    }
+}

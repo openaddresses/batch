@@ -1,0 +1,68 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "id",
+            "live",
+            "created",
+            "github",
+            "closed",
+            "status",
+            "jobs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "live": {
+                "type": "boolean",
+                "description": "If true, successful jobs immediately become the most recent live data"
+            },
+            "created": {
+                "type": "string"
+            },
+            "github": {
+                "type": "object",
+                "description": "Used by the data-pls CI tool",
+                "required": [
+                    "ref",
+                    "sha",
+                    "url",
+                    "check"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "ref": {
+                        "type": "string",
+                        "description": "Git reference (branch) of the given run"
+                    },
+                    "sha": {
+                        "type": "string",
+                        "description": "Git SHA of the given run"
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "Github URL to the specific commit"
+                    },
+                    "check": {
+                        "type": "integer",
+                        "description": "Github check ID to update"
+                    }
+                }
+            },
+            "closed": {
+                "type": "boolean",
+                "description": "Is the Run still accepting jobs"
+            },
+            "status": {
+                "$ref": "./util/status.json"
+            },
+            "jobs": {
+                "type": "integer",
+                "description": "The number of jobs in this run"
+            }
+        }
+    }
+}

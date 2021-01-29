@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "live": {
+            "type": "boolean"
+        },
+        "closed": {
+            "type": "boolean"
+        },
+        "github": {
+            "type": ["null", "object" ]
+        }
+    }
+}

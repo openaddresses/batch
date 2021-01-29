@@ -1,0 +1,64 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "id",
+            "source",
+            "updated",
+            "layer",
+            "name",
+            "job",
+            "s3",
+            "size",
+            "output"
+        ],
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "source": {
+                "type": "string"
+            },
+            "updated": {
+                "type": "string"
+            },
+            "layer": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string"
+            },
+            "job": {
+                "type": "integer"
+            },
+            "s3": {
+                "type": "string"
+            },
+            "size": {
+                "type": "integer"
+            },
+            "output": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "cache",
+                    "output",
+                    "preview"
+                ],
+                "properties": {
+                    "cache": {
+                        "type": "boolean"
+                    },
+                    "output": {
+                        "type": "boolean"
+                    },
+                    "preview": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        }
+    }
+}

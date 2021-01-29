@@ -1,0 +1,23 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "id",
+            "timestamp",
+            "message"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "timestamp": {
+                "type": "integer"
+            },
+            "message": {
+                "type": "string"
+            }
+        }
+    }
+}

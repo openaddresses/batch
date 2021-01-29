@@ -13,17 +13,16 @@ RUN apt-get update \
 RUN curl 'https://nodejs.org/dist/v10.15.3/node-v10.15.3-linux-x64.tar.gz' | tar -xzv \
     && cp ./node-v10.15.3-linux-x64/bin/node /usr/bin/ \
     && ./node-v10.15.3-linux-x64/bin/npm install -g npm \
-    && npm install -g yarn
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
-RUN yarn install \
-    && yarn doc
+RUN npm install \
+    && npm run doc
 
 RUN cd web \
-    && yarn install \
-    && yarn build \
+    && npm install \
+    && npm run build \
     && cd ..
 
 CMD service nginx restart \
-    && yarn start
+    && npm run start

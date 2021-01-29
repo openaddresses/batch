@@ -1,0 +1,76 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "id",
+            "run",
+            "map",
+            "created",
+            "source",
+            "source_name",
+            "layer",
+            "name",
+            "output",
+            "loglink",
+            "status",
+            "size"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "run": {
+                "type": "integer"
+            },
+            "map": {
+                "type": ["null", "integer"]
+            },
+            "created": {
+                "type": "string"
+            },
+            "source": {
+                "type": "string"
+            },
+            "source_name": {
+                "type": "source_name"
+            },
+            "layer": {
+                "type": "string"
+            },
+            "name": {
+                "type": "name"
+            },
+            "output": {
+                "type": "object",
+                "required": [
+                    "cache",
+                    "output",
+                    "preview"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "cache": {
+                        "type": "boolean"
+                    },
+                    "output": {
+                        "type": "boolean"
+                    },
+                    "preview:": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "loglink": {
+                "type": "string"
+            },
+            "status": {
+                "$ref": "./util/status.json"
+            },
+            "size": {
+                "type": "integer"
+            }
+        }
+    }
+}

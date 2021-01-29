@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "required": [
+        "type"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "collect",
+                "sources"
+            ]
+        }
+    }
+}

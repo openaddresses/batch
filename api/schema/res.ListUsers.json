@@ -1,0 +1,46 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "users"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of users with the service"
+        },
+        "users": {
+            "type": "object",
+            "required": [
+                "id",
+                "username",
+                "email",
+                "access",
+                "flags"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "access": {
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "admin"
+                    ]
+                },
+                "flags": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}

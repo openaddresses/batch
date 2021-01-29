@@ -1,0 +1,19 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "count",
+            "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "count": {
+                "type": "integer"
+            },
+            "name": {
+                "type": "string"
+            }
+        }
+    }
+}

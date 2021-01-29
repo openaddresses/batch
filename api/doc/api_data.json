@@ -48,7 +48,7 @@
     "url": "/api/collections",
     "title": "Create Collection",
     "version": "1.0.0",
-    "name": "Create",
+    "name": "CreateCollection",
     "group": "Collections",
     "permission": [
       {
@@ -57,14 +57,74 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new collection</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": true,
+            "field": "size",
+            "description": "<p>Size of collection in bytes</p>"
+          }
+        ]
+      }
+    },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"size\": 0,\n    \"name\": \"global\",\n    \"sources\": [\"**\"]\n    \"created\": \"2020-07-30T11:56:37.405Z\",\n    \"s3\": \"s3://v2.openaddresses.io/test/collection-global.zip\",\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the collection</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The date on which this collection was uploaded</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the collection in bytes</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -74,7 +134,7 @@
     "url": "/api/collections/:collection/data",
     "title": "Get Collection Data",
     "version": "1.0.0",
-    "name": "Data",
+    "name": "DataCollection",
     "group": "Collections",
     "permission": [
       {
@@ -105,7 +165,7 @@
     "url": "/api/collections/:collection",
     "title": "Delete Collection",
     "version": "1.0.0",
-    "name": "Delete",
+    "name": "DeleteCollection",
     "group": "Collections",
     "permission": [
       {
@@ -114,6 +174,7 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Delete a collection (This should not be done lightly)</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -128,13 +189,24 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\ntrue",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -144,7 +216,7 @@
     "url": "/api/collections",
     "title": "List Collections",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListCollections",
     "group": "Collections",
     "permission": [
       {
@@ -155,13 +227,52 @@
     ],
     "description": "<p>Return a list of all collections and their glob rules</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 1,\n    \"size\": 1234,\n    \"name\": \"us-northeast\",\n    \"created\": \"2020-08-12T04:17:45.063Z\"\",\n    \"s3\": \"s3://v2.openaddresses.io/test/collection-us-northeast.zip\",\n    \"sources\": [\n        \"us/ri/**\",\n        \"us/ct/**\",\n        \"us/ma/**\"\n        \"us/nh/**\"\n        \"us/vt/**\"\n        \"us/me/**\"*\n    ]\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>Download size in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -169,9 +280,9 @@
   {
     "type": "patch",
     "url": "/api/collections/:collection",
-    "title": "Update Collection",
+    "title": "Patch Collection",
     "version": "1.0.0",
-    "name": "Update",
+    "name": "PatchCollection",
     "group": "Collections",
     "permission": [
       {
@@ -180,6 +291,7 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Update a collection</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -190,17 +302,72 @@
             "field": ":collection",
             "description": "<p>Collection ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "created",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String[]",
+            "optional": true,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": true,
+            "field": "size",
+            "description": "<p>Size of collection in bytes</p>"
+          }
         ]
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"global\",\n    \"size\": 1234,\n    \"sources\": [\"**\"]\n    \"created\": \"2020-07-30T11:56:37.405Z\",\n    \"s3\": \"s3://v2.openaddresses.io/test/collection-global.zip\",\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the collection</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The date on which this collection was uploaded</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the collection in bytes</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Collections"
@@ -210,7 +377,7 @@
     "url": "/api/data",
     "title": "List Data",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListData",
     "group": "Data",
     "permission": [
       {
@@ -219,70 +386,130 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Get the latest successful run of a given geographic area</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Query": [
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "source",
             "description": "<p>Filter results by source name</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "layer",
             "description": "<p>Filter results by layer type</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "name",
             "description": "<p>Filter results by layer name</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "point",
-            "description": "<p>Filter results by geographic point</p>"
+            "description": "<p>Filter results by geographic point '{lng},{lat}'</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?source",
-          "content": "?source=us/ca",
-          "type": "String"
-        },
-        {
-          "title": "?layer",
-          "content": "?layer=addresses",
-          "type": "String"
-        },
-        {
-          "title": "?name",
-          "content": "?name=city",
-          "type": "String"
-        },
-        {
-          "title": "?point",
-          "content": "?point=<lng>,<lat>",
-          "type": "String"
-        }
-      ]
+      }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"size\": 65325432,\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "updated",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Data"
@@ -292,7 +519,7 @@
     "url": "/api/data/:data",
     "title": "Get Data",
     "version": "1.0.0",
-    "name": "Single",
+    "name": "SingleData",
     "group": "Data",
     "permission": [
       {
@@ -301,6 +528,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return all information about a specific data segment</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -315,13 +543,94 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 271,\n    \"source\": \"pl/lubelskie\",\n    \"updated\": \"2020-07-30T11:56:37.405Z\",\n    \"layer\": \"addresses\",\n    \"name\": \"country\",\n    \"job\": 635,\n    \"size\": 4326432,\n    \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n    \"output\": {\n        \"cache\": true,\n        \"output\": true,\n        \"preview\": true\n    }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "updated",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Data"
@@ -331,7 +640,7 @@
     "url": "/api/data/:data/history",
     "title": "Return Data History",
     "version": "1.0.0",
-    "name": "SingleHistory",
+    "name": "SingleHistoryData",
     "group": "Data",
     "permission": [
       {
@@ -340,6 +649,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return the job history for a given data component</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -354,13 +664,100 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"jobs\": [{\n        \"id\": 1,\n        \"created\": \"2020-04-20T06:31:11.689Z\",\n        \"status\": \"Success\"\n        \"s3\": \"s3://v2.openaddresses.io/test/job/1/source.geojson.gz\",\n        \"output\": {\n            \"cache\": true,\n            \"output\": true,\n            \"preview\": true\n        },\n        \"count\": 123,\n        \"stats\": {\n            \"counts\": {\n            }\n        },\n        \"run\": 1\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "jobs.status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.preview",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.stats",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Data"
@@ -901,6 +1298,89 @@
   },
   {
     "type": "post",
+    "url": "/api/login",
+    "title": "Create Session",
+    "version": "1.0.0",
+    "name": "CreateLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Log a user into the service and create an authenticated cookie</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>username</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "flags",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "post",
     "url": "/api/login/forgot",
     "title": "Forgot Login",
     "version": "1.0.0",
@@ -916,25 +1396,99 @@
     "description": "<p>If a user has forgotten their password, send them a password reset link to their email</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "String",
             "optional": false,
-            "field": "user",
-            "description": "<p>Username or Email of account</p>"
+            "field": "username",
+            "description": "<p>username or email to reset password of</p>"
           }
         ]
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Password Email Sent\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "get",
+    "url": "/api/login",
+    "title": "Session Info",
+    "version": "1.0.0",
+    "name": "GetLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return information about the currently logged in user</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "flags",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Login"
@@ -956,86 +1510,43 @@
     "description": "<p>Once a user has obtained a password reset by email via the Forgot Login API, use the token to reset the password</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "String",
             "optional": false,
             "field": "token",
-            "description": "<p>Password reset token</p>"
+            "description": "<p>Email provided reset token</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "String",
             "optional": false,
             "field": "password",
-            "description": "<p>New password</p>"
+            "description": "<p>The new user password</p>"
           }
         ]
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Password Email Sent\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Login"
-  },
-  {
-    "type": "get",
-    "url": "/api/login",
-    "title": "Session Info",
-    "version": "1.0.0",
-    "name": "get",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
       }
-    ],
-    "description": "<p>Return information about the currently logged in user</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Login"
-  },
-  {
-    "type": "post",
-    "url": "/api/login",
-    "title": "Create Session",
-    "version": "1.0.0",
-    "name": "login",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Log a user into the service and create an authenticated cookie</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n}",
-          "type": "json"
-        }
-      ]
     },
     "filename": "./index.js",
     "groupTitle": "Login"
@@ -1054,6 +1565,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Data required for map initialization</p>",
     "filename": "./index.js",
     "groupTitle": "Map"
   },
@@ -1071,6 +1583,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Retrive coverage Mapbox Vector Tiles</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1106,7 +1619,7 @@
     "url": "/api/run",
     "title": "Create Run",
     "version": "1.0.0",
-    "name": "Create",
+    "name": "CreateRun",
     "group": "Run",
     "permission": [
       {
@@ -1115,50 +1628,92 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new run to hold a batch of jobs</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
+            "group": "Body",
             "type": "Boolean",
             "optional": false,
             "field": "live",
-            "description": "<p>If the job succeeds, should it replace the current data entry</p>"
+            "description": ""
           },
           {
-            "group": "Parameter",
+            "group": "Body",
+            "type": "Null/Object",
+            "optional": false,
+            "field": "github",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "github",
-            "description": "<p>If not live, information about the GitHub CI reference</p>"
+            "description": "<p>Used by the data-pls CI tool</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "github.ref",
             "description": "<p>Git reference (branch) of the given run</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "github.sha",
             "description": "<p>Git SHA of the given run</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "github.url",
             "description": "<p>Github URL to the specific commit</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Success 200",
+            "type": "Integer",
             "optional": false,
             "field": "github.check",
             "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": ""
           }
         ]
       }
@@ -1171,7 +1726,7 @@
     "url": "/api/run",
     "title": "List Runs",
     "version": "1.0.0",
-    "name": "List",
+    "name": "ListRuns",
     "group": "Run",
     "permission": [
       {
@@ -1180,86 +1735,153 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Runs are container objects that contain jobs that were started at the same time or by the same process</p>",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
             "type": "Number",
+            "optional": false,
+            "field": ":data",
+            "description": "<p>Data ID</p>"
+          }
+        ],
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned runs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
             "optional": true,
             "field": "run",
             "description": "<p>Only show run associated with a given ID</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
             "optional": true,
             "field": "status",
-            "defaultValue": "Success,Fail,Pending,Warn",
-            "description": "<p>Only show runs with one of the given statuses</p>"
+            "description": "<p>The current status</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "before",
-            "defaultValue": "",
             "description": "<p>Only show runs before the given date</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "after",
-            "defaultValue": "",
             "description": "<p>Only show runs after the given date</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?run",
-          "content": "?run=12",
-          "type": "String"
-        },
-        {
-          "title": "?status",
-          "content": "?status=Warn\n?status=Warn,Pending\n?status=Success,Fail,Pending,Warn",
-          "type": "String"
-        },
-        {
-          "title": "?before",
-          "content": "?before=2020-01-01\n?before=2020-12-01",
-          "type": "String"
-        },
-        {
-          "title": "?after",
-          "content": "?after=2020-01-01\n?after=2020-12-01",
-          "type": "String"
-        }
-      ]
+      }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 1,\n    \"live\": true,\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"github\": {},\n    \"closed\": true,\n    \"status\": \"Fail\",\n    \"jobs\": 1\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>If true, successful jobs immediately become the most recent live data</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": "<p>Is the Run still accepting jobs</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>The number of jobs in this run</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1293,13 +1915,52 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"run\": 1,\n    \"status\": {\n        \"Warn\": 1\n        \"Success\": 3,\n        \"Pending\": 2,\n        \"Fail\": 0\n    }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Warn",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Success",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Pending",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Fail",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1332,13 +1993,73 @@
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n[{\n    \"id\": 1,\n    \"live\": true,\n    \"created\": \"2020-08-03T17:37:47.036Z\",\n    \"github\": {},\n    \"closed\": true\n}]",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1357,6 +2078,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Return all jobs for a given run</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1366,6 +2088,165 @@
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.map",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Source_name",
+            "optional": false,
+            "field": "jobs.source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Name",
+            "optional": false,
+            "field": "jobs.name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": true,
+            "field": "jobs.output.preview:",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.loglink",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "jobs.status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Stats",
+            "optional": false,
+            "field": "jobs.stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null",
+            "optional": false,
+            "field": "jobs.bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.version",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.size",
+            "description": ""
           }
         ]
       }
@@ -1397,23 +2278,29 @@
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "json",
-            "optional": false,
-            "field": "jobs",
-            "description": "<p>Jobs to attach to run</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "jobs",
-          "content": "['https://github.com/path_to_source', {\n    \"source\": \"https://github/path_to_source\",\n    \"layer\": \"addresses\",\n    \"name\": \"dcgis\"\n}]",
-          "type": "json"
-        }
-      ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Run"
@@ -1432,6 +2319,7 @@
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
+    "description": "<p>Update an existing run</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1441,6 +2329,98 @@
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "closed",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object",
+            "optional": true,
+            "field": "github",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": ""
           }
         ]
       }
@@ -1462,15 +2442,40 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Internal function to allow scheduled lambdas to kick off events</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Body": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"collect\"",
+              "\"sources\""
+            ],
             "optional": false,
             "field": "type",
-            "description": "<p>Type of lambda scheduled event to respond to. One of &quot;sources&quot; or &quot;collect&quot;</p>"
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
           }
         ]
       }
@@ -1494,13 +2499,24 @@
     ],
     "description": "<p>AWS ELB Healthcheck for the server</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"healthy\": true,\n    \"message\": \"I work all day, I work all night to get the open the data!\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "healthy",
+            "description": "<p>Is the service healthy?</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>The service on how it is doing</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Server"
@@ -1521,13 +2537,17 @@
     ],
     "description": "<p>Return basic metadata about server configuration</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>The version of the API</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Server"
@@ -1546,6 +2566,54 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new API token for programatic access</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": ""
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1563,6 +2631,27 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Delete a user's API Token</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1580,6 +2669,48 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>List all tokens associated with the requester's account</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "tokens",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tokens.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tokens.created",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tokens.name",
+            "description": ""
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -1606,7 +2737,7 @@
     "url": "/api/user",
     "title": "Create User",
     "version": "1.0.0",
-    "name": "Create",
+    "name": "CreateUser",
     "group": "User",
     "permission": [
       {
@@ -1616,6 +2747,92 @@
       }
     ],
     "description": "<p>Create a new user</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>username</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>password</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>email</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "users",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": ""
+          }
+        ]
+      }
+    },
     "filename": "./index.js",
     "groupTitle": "User"
   },
@@ -1624,7 +2841,7 @@
     "url": "/api/user",
     "title": "List Users",
     "version": "1.0.0",
-    "name": "list",
+    "name": "ListUsers",
     "group": "User",
     "permission": [
       {
@@ -1633,27 +2850,29 @@
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return a list of users that have registered with the service</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Query": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned runs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
             "optional": true,
             "field": "page",
-            "defaultValue": "0",
+            "defaultValue": "100",
             "description": "<p>The offset based on limit to return</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "filter",
@@ -1661,52 +2880,66 @@
             "description": "<p>Filter a complete or partial username/email</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?page",
-          "content": "?page=0",
-          "type": "String"
-        },
-        {
-          "title": "?filter",
-          "content": "?filter=person@example.com",
-          "type": "String"
-        }
-      ]
-    },
-    "description": "<p>Return a list of users that have registered with the service</p>",
-    "filename": "./index.js",
-    "groupTitle": "User"
-  },
-  {
-    "type": "get",
-    "url": "/api/user/me",
-    "title": "Get User Session Metadata",
-    "version": "1.0.0",
-    "name": "self",
-    "group": "User",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
-    ],
-    "description": "<p>Return basic user information about the currently authenticated user</p>",
+    },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": ""
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "User"
@@ -1716,7 +2949,7 @@
     "url": "/api/user/:id",
     "title": "Update User",
     "version": "1.0.0",
-    "name": "self",
+    "name": "PatchUser",
     "group": "User",
     "permission": [
       {
@@ -1735,6 +2968,85 @@
             "optional": false,
             "field": ":id",
             "description": "<p>The UID of the user to update</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "flags",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": true,
+            "field": "access",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "users",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": ""
           }
         ]
       }

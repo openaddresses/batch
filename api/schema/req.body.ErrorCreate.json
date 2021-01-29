@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "required": [
+        "job",
+        "message"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "job": {
+            "type": "integer"
+        },
+        "message": {
+            "type": "string"
+        }
+    }
+}

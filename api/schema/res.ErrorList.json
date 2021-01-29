@@ -1,0 +1,35 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "id",
+            "status",
+            "message",
+            "source_name",
+            "layer",
+            "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "status": {
+                "$ref": "./util/status.json"
+            },
+            "message": {
+                "type": "status"
+            },
+            "source_name": {
+                "type": "string"
+            },
+            "layer": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string"
+            }
+        }
+    }
+}

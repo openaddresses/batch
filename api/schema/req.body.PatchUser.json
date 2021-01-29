@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "flags": {
+            "type": "object"
+        },
+        "access": {
+            "type": "string",
+            "enum": [
+                "user",
+                "admin"
+            ]
+        }
+    }
+}

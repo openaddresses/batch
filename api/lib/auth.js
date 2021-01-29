@@ -6,15 +6,13 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const hash = promisify(bcrypt.hash);
+const compare = promisify(bcrypt.compare);
 
 class Auth {
     constructor(pool) {
         this.pool = pool;
 
-        this.attrs = [
-            'flags',
-            'access'
-        ];
+        this.attrs = Object.keys(require('../schema/req.body.PatchUser.json').properties);
     }
 
     async is_auth(req) {
@@ -283,6 +281,7 @@ class Auth {
         }
 
         return {
+            uid: parseInt(pgres.rows[0].id),
             username: pgres.rows[0].username,
             email: pgres.rows[0].email,
             access: pgres.rows[0].access,
@@ -322,20 +321,20 @@ class Auth {
             throw new Error(403, null, 'Invalid Username or Pass');
         }
 
-        return new Promise((resolve, reject) => {
-            bcrypt.compare(user.password, pgres.rows[0].password, (err, res) => {
-                if (err) return reject(new Err(500, err, 'Internal Login Error'));
-                if (!res) return reject(new Error(403, null, 'Invalid Username or Pass'));
+        try {
+            const res = await compare(user.password, pgres.rows[0].password);
+            if (!res) return new Error(403, null, 'Invalid Username or Pass');
+        } catch (err) {
+            return new Err(500, err, 'Internal Login Error');
+        }
 
-                return resolve({
-                    uid: parseInt(pgres.rows[0].id),
-                    username: pgres.rows[0].username,
-                    access: pgres.rows[0].access,
-                    email: pgres.rows[0].email,
-                    flags: pgres.rows[0].flags
-                });
-            });
-        });
+        return {
+            uid: parseInt(pgres.rows[0].id),
+            username: pgres.rows[0].username,
+            access: pgres.rows[0].access,
+            email: pgres.rows[0].email,
+            flags: pgres.rows[0].flags
+        };
     }
 
     async register(user) {
@@ -345,38 +344,41 @@ class Auth {
 
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
-        return new Promise((resolve, reject) => {
-            bcrypt.hash(user.password, 10, (err, hash) => {
-                if (err) return reject(new Err(500, err, 'Failed to hash password'));
+        try {
+            const uhash = await hash(user.password, 10)
 
-                this.pool.query(`
-                    INSERT INTO users (
-                        username,
-                        email,
-                        password,
-                        access,
-                        flags
-                    ) VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        'user',
-                        '{}'::JSONB
-                    )
-                `, [
-                    user.username,
-                    user.email,
-                    hash
-                ], (err) => {
-                    if (err) return reject(new Err(500, err, 'Failed to create user'));
+            const pgres = await this.pool.query(`
+                INSERT INTO users (
+                    username,
+                    email,
+                    password,
+                    access,
+                    flags
+                ) VALUES (
+                    $1,
+                    $2,
+                    $3,
+                    'user',
+                    '{}'::JSONB
+                ) RETURNING *
+            `, [
+                user.username,
+                user.email,
+                hash
+            ]);
 
-                    return resolve({
-                        status: 200,
-                        message: 'User Created'
-                    });
-                });
-            });
-        });
+            const row = pgres.rows[0];
+
+            return {
+                id: parseInt(row.id),
+                username: row.username,
+                email: row.email,
+                access: row.access,
+                flags: row.flags
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to register user');
+        }
     }
 }
 
@@ -471,11 +473,14 @@ class AuthToken {
                 auth.uid
             ]);
 
-            return pgres.rows.map((token) => {
-                token.id = parseInt(token.id);
+            return {
+                total: pgres.rows.length,
+                tokens: pgres.rows.map((token) => {
+                    token.id = parseInt(token.id);
 
-                return token;
-            });
+                    return token;
+                })
+            };
         } catch (err) {
             throw new Err(500, err, 'Failed to list tokens');
         }

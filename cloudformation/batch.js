@@ -103,10 +103,10 @@ const stack = {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeEnvironmentName: cf.join('-', ['batch', cf.ref('AWS::StackName')]),
                 ComputeResources: {
-                    AllocationStrategy: 'SPOT_CAPACITY_OPTIMIZED',
+                    AllocationStrategy: 'BEST_FIT_PROGRESSIVE',
                     BidPercentage: 80,
                     ImageId: 'ami-056807e883f197989',
-                    MaxvCpus: 128,
+                    MaxvCpus: 2,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],

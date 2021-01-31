@@ -18,11 +18,18 @@ const args = require('minimist')(process.argv, {
 });
 
 const pgSession = require('connect-pg-simple')(session);
+const { Validator, ValidationError } = require('express-json-validator-middleware');
 
 const Param = util.Param;
 const router = express.Router();
 const app = express();
 const { Pool } = require('pg');
+
+const validator = new Validator({
+    allErrors: true
+});
+
+const validate = validator.validate;
 
 const Config = require('./lib/config');
 
@@ -285,13 +292,17 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.CreateUser.json} apiParam
      * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
      */
-    router.post('/user', async (req, res) => {
-        try {
-            res.json(await auth.register(req.body));
-        } catch (err) {
-            return Err.respond(err, res);
+    router.post(
+        '/user',
+        validate({ body: require('./schema/req.body.CreateUser.json') }),
+        async (req, res) => {
+            try {
+                res.json(await auth.register(req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {patch} /api/user/:id Update User
@@ -308,17 +319,21 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.PatchUser.json} apiParam
      * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
      */
-    router.patch('/user/:id', async (req, res) => {
-        Param.int(req, res, 'id');
+    router.patch(
+        '/user/:id',
+        validate({ body: require('./schema/req.body.PatchUser.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'id');
 
-        try {
-            await auth.is_admin(req);
+            try {
+                await auth.is_admin(req);
 
-            res.json(await auth.patch(req.params.id, req.body));
-        } catch (err) {
-            return Err.respond(err, res);
+                res.json(await auth.patch(req.params.id, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/login Session Info
@@ -362,26 +377,30 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.CreateLogin.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
      */
-    router.post('/login', async (req, res) => {
-        try {
-            const user = await auth.login({
-                username: req.body.username,
-                password: req.body.password
-            });
+    router.post(
+        '/login',
+        validate({ body: require('./schema/req.body.CreateLogin.json') }),
+        async (req, res) => {
+            try {
+                const user = await auth.login({
+                    username: req.body.username,
+                    password: req.body.password
+                });
 
-            req.session.auth = user;
+                req.session.auth = user;
 
-            return res.json({
-                uid: req.session.auth.uid,
-                username: req.session.auth.username,
-                email: req.session.auth.email,
-                access: req.session.auth.access,
-                flags: req.session.auth.flags
-            });
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json({
+                    uid: req.session.auth.uid,
+                    username: req.session.auth.username,
+                    email: req.session.auth.email,
+                    access: req.session.auth.access,
+                    flags: req.session.auth.flags
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/login/forgot Forgot Login
@@ -1448,6 +1467,20 @@ async function server(args, config, cb) {
             }
         } catch (err) {
             return Err.respond(err, res);
+        }
+    });
+
+    router.use((err, req, res, next) => {
+        if (err instanceof ValidationError) {
+            return Err.respond(
+                new Err(400, null, 'validation error'),
+                res,
+                err.validationErrors.body.map((e) => {
+                    return { message: e.message };
+                })
+            );
+        } else {
+            next(err);
         }
     });
 

@@ -2,10 +2,11 @@
 
 const Run = require('../lib/run');
 const test = require('tape');
-const { init } = require('./init');
+const Flight = require('./init');
 const { Pool } = require('pg');
 
-init(test);
+const flight = new Flight();
+flight.init(test);
 
 test('Run()', (t) => {
     const run = new Run();

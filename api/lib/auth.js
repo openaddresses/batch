@@ -5,8 +5,6 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
-const hash = promisify(bcrypt.hash);
-const compare = promisify(bcrypt.compare);
 
 class Auth {
     constructor(pool) {
@@ -49,7 +47,7 @@ class Auth {
         const uid = pgres.rows[0].uid;
 
         try {
-            const userhash = await hash(user.password, 10);
+            const userhash = await bcrypt.hash(user.password, 10);
 
             await this.pool.query(`
                 UPDATE users
@@ -318,14 +316,11 @@ class Auth {
         }
 
         if (pgres.rows.length === 0) {
-            throw new Error(403, null, 'Invalid Username or Pass');
+            throw new Err(403, null, 'Invalid Username or Pass');
         }
 
-        try {
-            const res = await compare(user.password, pgres.rows[0].password);
-            if (!res) return new Error(403, null, 'Invalid Username or Pass');
-        } catch (err) {
-            return new Err(500, err, 'Internal Login Error');
+        if (!await bcrypt.compare(user.password, pgres.rows[0].password)) {
+            throw new Err(403, null, 'Invalid Username or Pass');
         }
 
         return {
@@ -345,7 +340,7 @@ class Auth {
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
         try {
-            const uhash = await hash(user.password, 10);
+            const uhash = await bcrypt.hash(user.password, 10);
 
             const pgres = await this.pool.query(`
                 INSERT INTO users (

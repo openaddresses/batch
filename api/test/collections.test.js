@@ -4,10 +4,11 @@ const test = require('tape');
 
 const { Pool } = require('pg');
 const Collection = require('../lib/collections');
-const { init } = require('./init');
+const Flight = require('./init');
 const Err = require('../lib/error');
 
-init(test);
+const flight = new Flight();
+flight.init(test);
 
 test('Collecton()', (t) => {
     t.throws(() => {

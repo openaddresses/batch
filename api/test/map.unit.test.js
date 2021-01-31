@@ -4,8 +4,10 @@ const Map = require('../lib/map');
 const Job = require('../lib/job');
 const { Pool } = require('pg');
 const test = require('tape');
-const { init } = require('./init');
+const Flight = require('./init');
 const nock = require('nock');
+
+const flight = new Flight();
 
 test('nocks', (t) => {
     nock.disableNetConnect();
@@ -57,7 +59,7 @@ test('nocks', (t) => {
     t.end();
 });
 
-init(test);
+flight.init(test);
 
 test('Map#get_feature - country', async (t) => {
     const pool = new Pool({

@@ -3,9 +3,11 @@
 const { Auth, AuthToken } = require('../lib/auth');
 const test = require('tape');
 const { Pool } = require('pg');
-const { init } = require('./init');
+const Flight = require('./init');
 
-init(test);
+const flight = new Flight();
+
+flight.init(test);
 
 let TOKEN = '';
 

@@ -1,6 +1,5 @@
 'use strict';
 
-const pkg = require('../package.json');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
@@ -26,7 +25,7 @@ test('GET: api/user (no auth)', (t) => {
         url: 'http://localhost:4999/api/user',
         method: 'GET',
         json: true,
-        jar: session,
+        jar: session
     }, (err, res) => {
         t.error(err, 'no error');
 
@@ -71,7 +70,7 @@ test('POST: api/login (failed)', (t) => {
         jar: session,
         body: {
             username: 'ingalls',
-            password: 'password124',
+            password: 'password124'
         }
     }, (err, res) => {
         t.error(err, 'no error');
@@ -90,7 +89,7 @@ test('POST: api/login (success)', (t) => {
         jar: session,
         body: {
             username: 'ingalls',
-            password: 'password123',
+            password: 'password123'
         }
     }, (err, res) => {
         t.error(err, 'no error');
@@ -109,7 +108,7 @@ test('GET: api/login', (t) => {
         jar: session,
         body: {
             username: 'ingalls',
-            password: 'password123',
+            password: 'password123'
         }
     }, (err, res) => {
         t.error(err, 'no error');

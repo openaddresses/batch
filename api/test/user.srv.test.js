@@ -3,22 +3,13 @@
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
-const { init } = require('./init');
-let app, pool;
+const Flight = require('./init');
 
-init(test);
+const flight = new Flight();
+flight.init(test);
+flight.takeoff(test);
 
 const session = request.jar();
-
-test('start: server', (t) => {
-    srv({
-        postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-    }, (a, p) => {
-        app = a;
-        pool = p;
-        t.end();
-    });
-});
 
 test('GET: api/user (no auth)', (t) => {
     request({
@@ -127,8 +118,4 @@ test('GET: api/login', (t) => {
     });
 });
 
-test('stop', (t) => {
-    pool.end();
-    app.close();
-    t.end();
-});
+flight.landing(test);

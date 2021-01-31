@@ -4,20 +4,12 @@ const pkg = require('../package.json');
 const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
-const { init } = require('./init');
-let app, pool;
+const Flight = require('./init');
 
-init(test);
+const flight = new Flight();
 
-test('start: server', (t) => {
-    srv({
-        postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-    }, (a, p) => {
-        app = a;
-        pool = p;
-        t.end();
-    });
-});
+flight.init(test);
+flight.takeoff(test);
 
 test('POST: api/run', (t) => {
     request({
@@ -167,8 +159,4 @@ test('GET: api/data', (t) => {
     });
 });
 
-test('stop', (t) => {
-    pool.end();
-    app.close();
-    t.end();
-});
+flight.landing(test);

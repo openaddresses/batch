@@ -21,15 +21,7 @@ const pgSession = require('connect-pg-simple')(session);
 const { Validator, ValidationError } = require('express-json-validator-middleware');
 
 const Param = util.Param;
-const router = express.Router();
-const app = express();
 const { Pool } = require('pg');
-
-const validator = new Validator({
-    allErrors: true
-});
-
-const validate = validator.validate;
 
 const Config = require('./lib/config');
 
@@ -84,6 +76,12 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
+    const validator = new Validator({
+        allErrors: true
+    });
+
+    const validate = validator.validate;
+
     const pool = new Pool({
         connectionString: postgres
     });
@@ -103,6 +101,9 @@ async function server(args, config, cb) {
     const auth = new (require('./lib/auth').Auth)(pool);
     const email = new (require('./lib/email'))();
     const authtoken = new (require('./lib/auth').AuthToken)(pool);
+
+    const app = express();
+    const router = express.Router();
 
     app.disable('x-powered-by');
     app.use(minify());

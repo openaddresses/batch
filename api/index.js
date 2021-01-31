@@ -416,18 +416,22 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.ForgotLogin.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
-    router.post('/login/forgot', async (req, res) => {
-        try {
-            const reset = await auth.forgot(req.body.user); // Username or email
+    router.post(
+        '/login/forgot',
+        validate({ body: require('./schema/req.body.ForgotLogin.json') }),
+        async (req, res) => {
+            try {
+                const reset = await auth.forgot(req.body.user); // Username or email
 
-            await email.forgot(reset);
+                await email.forgot(reset);
 
-            // To avoid email scraping - this will always return true, regardless of success
-            return res.json({ status: 200, message: 'Password Email Sent' });
-        } catch (err) {
-            return Err.respond(err, res);
+                // To avoid email scraping - this will always return true, regardless of success
+                return res.json({ status: 200, message: 'Password Email Sent' });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/login/reset Reset Login
@@ -443,17 +447,21 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.ResetLogin.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
-    router.post('/login/reset', async (req, res) => {
-        try {
-            return res.json(await auth.reset({
-                token: req.body.token,
-                password: req.body.password
-            }));
+    router.post(
+        '/login/reset',
+        validate({ body: require('./schema/req.body.ResetLogin.json') }),
+        async (req, res) => {
+            try {
+                return res.json(await auth.reset({
+                    token: req.body.token,
+                    password: req.body.password
+                }));
 
-        } catch (err) {
-            return Err.respond(err, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/token List Tokens
@@ -490,15 +498,19 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.CreateToken.json} apiParam
      * @apiSchema {jsonschema=./schema/res.CreateToken.json} apiSuccess
      */
-    router.post('/token', async (req, res) => {
-        try {
-            await auth.is_auth(req);
+    router.post(
+        '/token',
+        validate({ body: require('./schema/req.body.CreateToken.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
 
-            return res.json(await authtoken.generate(req.auth, req.body.name));
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await authtoken.generate(req.auth, req.body.name));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {delete} /api/token/:id Delete Token
@@ -537,20 +549,24 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.Schedule.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
-    router.post('/schedule', async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.post(
+        '/schedule',
+        validate({ body: require('./schema/req.body.Schedule.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            await Schedule.event(pool, req.body);
+                await Schedule.event(pool, req.body);
 
-            return res.json({
-                status: 200,
-                message: 'Schedule Event Started'
-            });
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json({
+                    status: 200,
+                    message: 'Schedule Event Started'
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/collections List Collections
@@ -650,19 +666,23 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.CreateCollection.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
      */
-    router.post('/collections', async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.post(
+        '/collections',
+        validate({ body: require('./schema/req.body.CreateCollection.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            const collection = new Collection(req.body.name, req.body.sources);
-            await collection.generate(pool);
+                const collection = new Collection(req.body.name, req.body.sources);
+                await collection.generate(pool);
 
-            return res.json(collection.json());
-        } catch (err) {
-            console.error('ERROR');
-            return Err.respond(err, res);
+                return res.json(collection.json());
+            } catch (err) {
+                console.error('ERROR');
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {patch} /api/collections/:collection Patch Collection
@@ -679,23 +699,27 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.PatchCollection.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
      */
-    router.patch('/collections/:collection', async (req, res) => {
-        Param.int(req, res, 'collection');
+    router.patch(
+        '/collections/:collection',
+        validate({ body: require('./schema/req.body.PatchCollection.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'collection');
 
-        try {
-            await auth.is_admin(req);
+            try {
+                await auth.is_admin(req);
 
-            const collection = await Collection.from(pool, req.params.collection);
+                const collection = await Collection.from(pool, req.params.collection);
 
-            collection.patch(req.body);
+                collection.patch(req.body);
 
-            await collection.commit(pool);
+                await collection.commit(pool);
 
-            return res.json(collection.json());
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(collection.json());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/map Coverage TileJSON
@@ -753,15 +777,19 @@ async function server(args, config, cb) {
      * @apiSchema (Query) {jsonschema=./schema/req.query.ListData.json} apiParam
      * @apiSchema {jsonschema=./schema/res.ListData.json} apiSuccess
      */
-    router.get('/data', async (req, res) => {
-        try {
-            const data = await Data.list(pool, req.query);
+    router.get(
+        '/data',
+        validate({ query: require('./schema/req.query.ListData.json') }),
+        async (req, res) => {
+            try {
+                const data = await Data.list(pool, req.query);
 
-            return res.json(data);
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(data);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/data/:data Get Data
@@ -828,16 +856,20 @@ async function server(args, config, cb) {
      * @apiSchema (Query) {jsonschema=./schema/req.query.ListRuns.json} apiParam
      * @apiSchema {jsonschema=./schema/res.ListRuns.json} apiSuccess
      */
-    router.get('/run', async (req, res) => {
-        try {
-            if (req.query.status) req.query.status = req.query.status.split(',');
-            const runs = await Run.list(pool, req.query);
+    router.get(
+        '/run',
+        validate({ body: require('./schema/req.query.ListRuns.json') }),
+        async (req, res) => {
+            try {
+                if (req.query.status) req.query.status = req.query.status.split(',');
+                const runs = await Run.list(pool, req.query);
 
-            return res.json(runs);
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(runs);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/run Create Run
@@ -852,17 +884,21 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.CreateRun.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
      */
-    router.post('/run', async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.post(
+        '/run',
+        validate({ body: require('./schema/req.body.CreateRun.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            const run = await Run.generate(pool, req.body);
+                const run = await Run.generate(pool, req.body);
 
-            return res.json(run.json());
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(run.json());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/run/:run Get Run
@@ -925,23 +961,27 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
      *
      */
-    router.patch('/run/:run', async (req, res) => {
-        Param.int(req, res, 'run');
+    router.patch(
+        '/run/:run',
+        validate({ body: require('./schema/req.body.PatchRun.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'run');
 
-        try {
-            await auth.is_admin(req);
+            try {
+                await auth.is_admin(req);
 
-            const run = await Run.from(pool, req.params.run);
+                const run = await Run.from(pool, req.params.run);
 
-            run.patch(req.body);
+                run.patch(req.body);
 
-            await run.commit(pool);
+                await run.commit(pool);
 
-            return res.json(run.json());
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(run.json());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/run/:run/jobs Populate Run Jobs
@@ -962,26 +1002,30 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.SingleJobsCreate.json} apiParam
      * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
-    router.post('/run/:run/jobs', async (req, res) => {
-        Param.int(req, res, 'run');
+    router.post(
+        '/run/:run/jobs',
+        validate({ body: require('./schema/req.body.SingleJobsCreate.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'run');
 
-        if (!Array.isArray(req.body.jobs)) {
-            return res.status(400).send({
-                status: 400,
-                error: 'jobs body must be array'
-            });
+            if (!Array.isArray(req.body.jobs)) {
+                return res.status(400).send({
+                    status: 400,
+                    error: 'jobs body must be array'
+                });
+            }
+
+            try {
+                await auth.is_admin(req);
+
+                const jobs = await Run.populate(pool, req.params.run, req.body.jobs);
+
+                return res.json(jobs);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-
-        try {
-            await auth.is_admin(req);
-
-            const jobs = await Run.populate(pool, req.params.run, req.body.jobs);
-
-            return res.json(jobs);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
+    );
 
     /**
      * @api {get} /api/run/:run/jobs List Run Jobs
@@ -1025,14 +1069,18 @@ async function server(args, config, cb) {
      * @apiSchema (query) {jsonschema=./schema/req.query.ListJobs.json} apiParam
      * @apiSchema {jsonschema=./schema/res.ListJobs.json} apiSuccess
      */
-    router.get('/job', async (req, res) => {
-        try {
-            if (req.query.status) req.query.status = req.query.status.split(',');
-            return res.json(await Job.list(pool, req.query));
-        } catch (err) {
-            return Err.respond(err, res);
+    router.get(
+        '/job',
+        validate({ body: require('./schema/req.query.ListJobs.json') }),
+        async (req, res) => {
+            try {
+                if (req.query.status) req.query.status = req.query.status.split(',');
+                return res.json(await Job.list(pool, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/job/error Get Job Errors
@@ -1092,16 +1140,20 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonschema=./schema/res.ErrorCreate.json} apiSuccess
      */
-    router.post('/job/error', async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.post(
+        '/job/error',
+        validate({ body: require('./schema/req.body.ErrorCreate.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            const joberror = new JobError(req.body.job, req.body.message);
-            return res.json(await joberror.generate(pool));
-        } catch (err) {
-            return Err.respond(err, res);
+                const joberror = new JobError(req.body.job, req.body.message);
+                return res.json(await joberror.generate(pool));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/job/error/:job Resolve Job Error
@@ -1118,17 +1170,21 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/res.ErrorModerate.json} apiParam
      * @apiSchema {jsonschema=./schema/res.ErrorModerate.json} apiSuccess
      */
-    router.post('/job/error/:job', async (req, res) => {
-        Param.int(req, res, 'job');
+    router.post(
+        '/job/error/:job',
+        validate({ body: require('./schema/req.body.ErrorModerate.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'job');
 
-        try {
-            await auth.is_flag(req, 'moderator');
+            try {
+                await auth.is_flag(req, 'moderator');
 
-            res.json(JobError.moderate(pool, ci, req.params.job, req.body));
-        } catch (err) {
-            return Err.respond(err, res);
+                res.json(JobError.moderate(pool, ci, req.params.job, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/job/:job Get Job
@@ -1170,28 +1226,32 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
-    router.post('/job/:job/rerun', async (req, res) => {
-        Param.int(req, res, 'job');
+    router.post(
+        '/job/:job/rerun',
+        validate({ body: require('./schema/req.body.SinglejobsCreate.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'job');
 
-        try {
-            await auth.is_admin(req);
+            try {
+                await auth.is_admin(req);
 
-            const job = await Job.from(pool, req.params.job);
-            const run = await Run.from(pool, job.run);
+                const job = await Job.from(pool, req.params.job);
+                const run = await Run.from(pool, job.run);
 
-            const new_run = await Run.generate(pool, {
-                live: !!run.live
-            });
+                const new_run = await Run.generate(pool, {
+                    live: !!run.live
+                });
 
-            return res.json(await Run.populate(pool, new_run.id, [{
-                source: job.source,
-                layer: job.layer,
-                name: job.name
-            }]));
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await Run.populate(pool, new_run.id, [{
+                    source: job.source,
+                    layer: job.layer,
+                    name: job.name
+                }]));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/job/:job/delta Job Stats Comparison
@@ -1364,25 +1424,29 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.PatchJob.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Job.json} apiSuccess
      */
-    router.patch('/job/:job', async (req, res) => {
-        Param.int(req, res, 'job');
+    router.patch(
+        '/job/:job',
+        validate({ body: require('./schema/req.body.PatchJob.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'job');
 
-        try {
-            await auth.is_admin(req);
+            try {
+                await auth.is_admin(req);
 
-            const job = await Job.from(pool, req.params.job);
+                const job = await Job.from(pool, req.params.job);
 
-            job.patch(req.body);
+                job.patch(req.body);
 
-            await job.commit(pool, Run, Data, ci);
+                await job.commit(pool, Run, Data, ci);
 
-            await Run.ping(pool, ci, job);
+                await Run.ping(pool, ci, job);
 
-            return res.json(job.json());
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(job.json());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/dash/traffic Session Counts

@@ -1,6 +1,5 @@
 'use strict';
 
-const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
 const Flight = require('./init');

@@ -34,7 +34,7 @@ class Flight {
                 t.end();
             });
         });
-    } 
+    }
 
     /**
      * Clear and restore an empty database schema

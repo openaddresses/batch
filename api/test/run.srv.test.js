@@ -1,7 +1,6 @@
 'use strict';
 
 const pkg = require('../package.json');
-const srv = require('../index.js');
 const test = require('tape');
 const request = require('request');
 const Flight = require('./init');

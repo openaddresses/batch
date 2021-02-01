@@ -1,24 +1,33 @@
 {
-    "type": "array",
-    "items": {
-        "type": ["string", "object"],
-        "items": {
-            "type": "object",
-            "required": [
-                "source",
-                "layer",
-                "name"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "source": {
-                    "type": "string"
-                },
-                "layer": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
+    "type": "object",
+    "required": [
+        "jobs"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "jobs": { 
+            "type": "array",
+            "items": {
+                "type": ["string", "object"],
+                "items": {
+                    "type": "object",
+                    "required": [
+                        "source",
+                        "layer",
+                        "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "source": {
+                            "type": "string"
+                        },
+                        "layer": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         }

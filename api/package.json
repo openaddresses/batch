@@ -30,6 +30,7 @@
         "express-json-validator-middleware": "^2.1.1",
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
+        "json-schema-ref-parser": "^9.0.7",
         "mailgen": "^2.0.14",
         "mailgun.js": "^2.0.1",
         "minimist": "^1.2.2",

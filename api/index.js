@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const $RefParser = require('json-schema-ref-parser');
 const session = require('express-session');
 const { Webhooks } = require('@octokit/webhooks');
 const Busboy = require('busboy');
@@ -295,7 +296,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/user',
-        validate({ body: require('./schema/req.body.CreateUser.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.CreateUser.json') }),
         async (req, res) => {
             try {
                 res.json(await auth.register(req.body));
@@ -322,7 +323,7 @@ async function server(args, config, cb) {
      */
     router.patch(
         '/user/:id',
-        validate({ body: require('./schema/req.body.PatchUser.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.PatchUser.json') }),
         async (req, res) => {
             Param.int(req, res, 'id');
 
@@ -380,7 +381,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/login',
-        validate({ body: require('./schema/req.body.CreateLogin.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.CreateLogin.json') }),
         async (req, res) => {
             try {
                 const user = await auth.login({
@@ -418,7 +419,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/login/forgot',
-        validate({ body: require('./schema/req.body.ForgotLogin.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.ForgotLogin.json') }),
         async (req, res) => {
             try {
                 const reset = await auth.forgot(req.body.user); // Username or email
@@ -449,7 +450,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/login/reset',
-        validate({ body: require('./schema/req.body.ResetLogin.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.ResetLogin.json') }),
         async (req, res) => {
             try {
                 return res.json(await auth.reset({
@@ -500,7 +501,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/token',
-        validate({ body: require('./schema/req.body.CreateToken.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.CreateToken.json') }),
         async (req, res) => {
             try {
                 await auth.is_auth(req);
@@ -551,7 +552,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/schedule',
-        validate({ body: require('./schema/req.body.Schedule.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.Schedule.json') }),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -668,7 +669,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/collections',
-        validate({ body: require('./schema/req.body.CreateCollection.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.CreateCollection.json') }),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -701,7 +702,7 @@ async function server(args, config, cb) {
      */
     router.patch(
         '/collections/:collection',
-        validate({ body: require('./schema/req.body.PatchCollection.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.PatchCollection.json') }),
         async (req, res) => {
             Param.int(req, res, 'collection');
 
@@ -779,7 +780,7 @@ async function server(args, config, cb) {
      */
     router.get(
         '/data',
-        validate({ query: require('./schema/req.query.ListData.json') }),
+        validate({ query: await $RefParser.dereference('./schema/req.query.ListData.json') }),
         async (req, res) => {
             try {
                 const data = await Data.list(pool, req.query);
@@ -858,7 +859,7 @@ async function server(args, config, cb) {
      */
     router.get(
         '/run',
-        validate({ body: require('./schema/req.query.ListRuns.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.query.ListRuns.json') }),
         async (req, res) => {
             try {
                 if (req.query.status) req.query.status = req.query.status.split(',');
@@ -886,7 +887,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/run',
-        validate({ body: require('./schema/req.body.CreateRun.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.CreateRun.json') }),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -963,7 +964,7 @@ async function server(args, config, cb) {
      */
     router.patch(
         '/run/:run',
-        validate({ body: require('./schema/req.body.PatchRun.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.PatchRun.json') }),
         async (req, res) => {
             Param.int(req, res, 'run');
 
@@ -1004,7 +1005,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/run/:run/jobs',
-        validate({ body: require('./schema/req.body.SingleJobsCreate.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.SingleJobsCreate.json') }),
         async (req, res) => {
             Param.int(req, res, 'run');
 
@@ -1071,7 +1072,7 @@ async function server(args, config, cb) {
      */
     router.get(
         '/job',
-        validate({ body: require('./schema/req.query.ListJobs.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.query.ListJobs.json') }),
         async (req, res) => {
             try {
                 if (req.query.status) req.query.status = req.query.status.split(',');
@@ -1142,7 +1143,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/job/error',
-        validate({ body: require('./schema/req.body.ErrorCreate.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.ErrorCreate.json') }),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -1172,7 +1173,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/job/error/:job',
-        validate({ body: require('./schema/req.body.ErrorModerate.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.ErrorModerate.json') }),
         async (req, res) => {
             Param.int(req, res, 'job');
 
@@ -1228,7 +1229,7 @@ async function server(args, config, cb) {
      */
     router.post(
         '/job/:job/rerun',
-        validate({ body: require('./schema/req.body.SinglejobsCreate.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.SingleJobsCreate.json') }),
         async (req, res) => {
             Param.int(req, res, 'job');
 
@@ -1426,7 +1427,7 @@ async function server(args, config, cb) {
      */
     router.patch(
         '/job/:job',
-        validate({ body: require('./schema/req.body.PatchJob.json') }),
+        validate({ body: await $RefParser.dereference('./schema/req.body.PatchJob.json') }),
         async (req, res) => {
             Param.int(req, res, 'job');
 

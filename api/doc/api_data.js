@@ -2438,14 +2438,14 @@ define({ "api": [
           {
             "group": "Body",
             "type": "Boolean",
-            "optional": false,
+            "optional": true,
             "field": "live",
             "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
             "type": "Null/Object",
-            "optional": false,
+            "optional": true,
             "field": "github",
             "description": "<p>undefined</p>"
           }
@@ -3081,6 +3081,15 @@ define({ "api": [
             "optional": false,
             "field": ":run",
             "description": "<p>Run ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String/Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
           }
         ]
       }

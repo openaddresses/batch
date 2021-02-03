@@ -1224,12 +1224,9 @@ async function server(args, config, cb) {
      *     Submit a job for reprocessing - often useful for network errors
      *
      * @apiParam {Number} :job Job ID
-     *
-     * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
     router.post(
         '/job/:job/rerun',
-        validate({ body: await $RefParser.dereference('./schema/req.body.SingleJobsCreate.json') }),
         async (req, res) => {
             Param.int(req, res, 'job');
 

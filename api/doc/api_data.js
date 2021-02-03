@@ -1351,26 +1351,6 @@ define({ "api": [
         ]
       }
     },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "run",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "jobs",
-            "description": "<p>undefined undefined</p>"
-          }
-        ]
-      }
-    },
     "filename": "./index.js",
     "groupTitle": "Job"
   },

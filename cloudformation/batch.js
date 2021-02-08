@@ -106,7 +106,7 @@ const stack = {
                     AllocationStrategy: 'BEST_FIT_PROGRESSIVE',
                     BidPercentage: 80,
                     ImageId: 'ami-056807e883f197989',
-                    MaxvCpus: 2,
+                    MaxvCpus: 4,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
@@ -189,7 +189,7 @@ const stack = {
                     Privileged: true,
                     JobRoleArn: cf.getAtt('BatchJobRole', 'Arn'),
                     ReadonlyRootFilesystem: false,
-                    Vcpus: 2,
+                    Vcpus: 1,
                     Image: cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/batch:task-', cf.ref('GitSha')])
                 }
             }

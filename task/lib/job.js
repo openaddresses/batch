@@ -292,12 +292,16 @@ class Job {
 
     compare(api) {
         return new Promise((resolve, reject) => {
+            const url = `${api}/api/job/${this.job}/delta`;
+            console.error(`ok - GET: ${url}`);
+
             request({
-                url: `${api}/api/job/${this.job}/delta`,
+                url: url,
                 json: true,
                 method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);
+                console.error(res.body)
 
                 return resolve(res.body);
             });

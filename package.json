@@ -11,7 +11,7 @@
         "lint": "eslint cloudformation/**.js"
     },
     "dependencies": {
-        "@mapbox/cloudfriend": "^4.4.0",
+        "@mapbox/cloudfriend": "^5.0.1",
         "aws-sdk": "^2.783.0",
         "batch-alarms": "^1.1.0",
         "minimist": "^1.2.2",

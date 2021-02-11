@@ -1167,10 +1167,27 @@ define({ "api": [
           },
           {
             "group": "Body",
-            "type": "Number[]",
-            "optional": true,
+            "type": "Object",
+            "optional": false,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": "<p>undefined</p>"
           }
         ]
       }

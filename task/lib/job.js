@@ -301,7 +301,7 @@ class Job {
                 method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);
-                console.error(res.body)
+                console.error(res.body);
 
                 return resolve(res.body);
             });

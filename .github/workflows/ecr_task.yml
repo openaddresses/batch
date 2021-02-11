@@ -14,6 +14,8 @@ jobs:
         if: github.event.pull_request.draft == false
         steps:
             - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
 
             - name: Docker Build Task
               run: docker build -t task task/
@@ -30,7 +32,7 @@ jobs:
               uses: aws-actions/amazon-ecr-login@v1
 
             - name: Docker Tag Task
-              run: docker tag task ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${GITHUB_SHA}
+              run: docker tag task ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{github.event.pull_request.head.sha}}
 
             - name: Docker Push Task
-              run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${GITHUB_SHA}
+              run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{github.event.pull_request.head.sha}}

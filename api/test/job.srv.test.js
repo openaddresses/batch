@@ -70,7 +70,7 @@ test('PATCH: api/job/:job', (t) => {
             'shared-secret': '123'
         },
         body: {
-            status:"Success",
+            status:'Success',
             output: {
                 cache: true,
                 output: true,

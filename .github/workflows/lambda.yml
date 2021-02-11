@@ -13,7 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event.pull_request.draft == false
         steps:
-            - uses: actions/checkout@v1
+            - uses: actions/checkout@v2
 
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v1

@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const $RefParser = require('json-schema-ref-parser');
 const session = require('express-session');
 const { Webhooks } = require('@octokit/webhooks');
 const Busboy = require('busboy');
@@ -19,7 +18,6 @@ const args = require('minimist')(process.argv, {
 });
 
 const pgSession = require('connect-pg-simple')(session);
-const { Validator, ValidationError } = require('express-json-validator-middleware');
 
 const Param = util.Param;
 const { Pool } = require('pg');
@@ -68,6 +66,8 @@ async function server(args, config, cb) {
     const Upload = require('./lib/upload');
     const Schedule = require('./lib/schedule');
     const Collection = require('./lib/collections');
+    const schemas = new (require('./lib/schema'))();
+    await schemas.build();
 
     let postgres = process.env.POSTGRES;
 
@@ -76,12 +76,6 @@ async function server(args, config, cb) {
     } else if (!postgres) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
-
-    const validator = new Validator({
-        allErrors: true
-    });
-
-    const validate = validator.validate;
 
     const pool = new Pool({
         connectionString: postgres
@@ -220,6 +214,22 @@ async function server(args, config, cb) {
     });
 
     /**
+     * @api {get} /api/schema List Schemas
+     * @apiVersion 1.0.0
+     * @apiName ListSchemas
+     * @apiGroup Schemas
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     List all JSON Schemas in use
+     *
+     * @apiSchema {jsonschema=./schema/res.ListSchema.json} apiSuccess
+     */
+    router.get('/schema', async (req, res) => {
+        return res.json(schemas.list());
+    });
+
+    /**
      * @api {post} /api/upload Create Upload
      * @apiVersion 1.0.0
      * @apiName upload
@@ -295,8 +305,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
      */
     router.post(
-        '/user',
-        validate({ body: await $RefParser.dereference('./schema/req.body.CreateUser.json') }),
+        ...schemas.get('POST /user'),
         async (req, res) => {
             try {
                 res.json(await auth.register(req.body));
@@ -322,8 +331,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
      */
     router.patch(
-        '/user/:id',
-        validate({ body: await $RefParser.dereference('./schema/req.body.PatchUser.json') }),
+        ...schemas.get('PATCH /user/:id'),
         async (req, res) => {
             Param.int(req, res, 'id');
 
@@ -380,8 +388,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
      */
     router.post(
-        '/login',
-        validate({ body: await $RefParser.dereference('./schema/req.body.CreateLogin.json') }),
+        ...schemas.get('POST /login'),
         async (req, res) => {
             try {
                 const user = await auth.login({
@@ -418,8 +425,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.post(
-        '/login/forgot',
-        validate({ body: await $RefParser.dereference('./schema/req.body.ForgotLogin.json') }),
+        ...schemas.get('POST /login/forgot'),
         async (req, res) => {
             try {
                 const reset = await auth.forgot(req.body.user); // Username or email
@@ -449,8 +455,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.post(
-        '/login/reset',
-        validate({ body: await $RefParser.dereference('./schema/req.body.ResetLogin.json') }),
+        ...schemas.get('POST /login/reset'),
         async (req, res) => {
             try {
                 return res.json(await auth.reset({
@@ -500,8 +505,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.CreateToken.json} apiSuccess
      */
     router.post(
-        '/token',
-        validate({ body: await $RefParser.dereference('./schema/req.body.CreateToken.json') }),
+        ...schemas.get('POST /token'),
         async (req, res) => {
             try {
                 await auth.is_auth(req);
@@ -551,8 +555,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
      */
     router.post(
-        '/schedule',
-        validate({ body: await $RefParser.dereference('./schema/req.body.Schedule.json') }),
+        ...schemas.get('POST /schedule'),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -668,8 +671,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
      */
     router.post(
-        '/collections',
-        validate({ body: await $RefParser.dereference('./schema/req.body.CreateCollection.json') }),
+        ...schemas.get('POST /collections'),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -701,8 +703,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
      */
     router.patch(
-        '/collections/:collection',
-        validate({ body: await $RefParser.dereference('./schema/req.body.PatchCollection.json') }),
+        ...schemas.get('PATCH /collections/:collection'),
         async (req, res) => {
             Param.int(req, res, 'collection');
 
@@ -779,8 +780,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.ListData.json} apiSuccess
      */
     router.get(
-        '/data',
-        validate({ query: await $RefParser.dereference('./schema/req.query.ListData.json') }),
+        ...schemas.get('GET /data'),
         async (req, res) => {
             try {
                 const data = await Data.list(pool, req.query);
@@ -858,8 +858,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.ListRuns.json} apiSuccess
      */
     router.get(
-        '/run',
-        validate({ body: await $RefParser.dereference('./schema/req.query.ListRuns.json') }),
+        ...schemas.get('GET /run'),
         async (req, res) => {
             try {
                 if (req.query.status) req.query.status = req.query.status.split(',');
@@ -886,8 +885,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
      */
     router.post(
-        '/run',
-        validate({ body: await $RefParser.dereference('./schema/req.body.CreateRun.json') }),
+        ...schemas.get('POST /run'),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -963,8 +961,7 @@ async function server(args, config, cb) {
      *
      */
     router.patch(
-        '/run/:run',
-        validate({ body: await $RefParser.dereference('./schema/req.body.PatchRun.json') }),
+        ...schemas.get('PATCH /run/:run'),
         async (req, res) => {
             Param.int(req, res, 'run');
 
@@ -1004,8 +1001,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
     router.post(
-        '/run/:run/jobs',
-        validate({ body: await $RefParser.dereference('./schema/req.body.SingleJobsCreate.json') }),
+        ...schemas.get('POST /run/:run/jobs'),
         async (req, res) => {
             Param.int(req, res, 'run');
 
@@ -1071,8 +1067,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.ListJobs.json} apiSuccess
      */
     router.get(
-        '/job',
-        validate({ body: await $RefParser.dereference('./schema/req.query.ListJobs.json') }),
+        ...schemas.get('GET /job'),
         async (req, res) => {
             try {
                 if (req.query.status) req.query.status = req.query.status.split(',');
@@ -1142,8 +1137,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.ErrorCreate.json} apiSuccess
      */
     router.post(
-        '/job/error',
-        validate({ body: await $RefParser.dereference('./schema/req.body.ErrorCreate.json') }),
+        ...schemas.get('POST /job/error'),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -1172,8 +1166,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.ErrorModerate.json} apiSuccess
      */
     router.post(
-        '/job/error/:job',
-        validate({ body: await $RefParser.dereference('./schema/req.body.ErrorModerate.json') }),
+        ...schemas.get('POST /job/error/:job'),
         async (req, res) => {
             Param.int(req, res, 'job');
 
@@ -1423,8 +1416,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonschema=./schema/res.Job.json} apiSuccess
      */
     router.patch(
-        '/job/:job',
-        validate({ body: await $RefParser.dereference('./schema/req.body.PatchJob.json') }),
+        ...schemas.get('PATCH /job/:job'),
         async (req, res) => {
             Param.int(req, res, 'job');
 

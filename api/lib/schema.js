@@ -2,6 +2,7 @@
 
 const { Validator, ValidationError } = require('express-json-validator-middleware');
 const $RefParser = require('json-schema-ref-parser');
+const path = require('path');
 const Err = require('./error');
 
 class Schemas {
@@ -16,61 +17,61 @@ class Schemas {
 
     async build() {
         this.schemas.set('GET /schema', {
-            query: './schema/req.query.ListSchema.json'
+            query: 'req.query.ListSchema.json'
         });
         this.schemas.set('POST /user', {
-            body: './schema/req.body.CreateUser.json'
+            body: 'req.body.CreateUser.json'
         });
         this.schemas.set('PATCH /user/:id', {
-            body: './schema/req.body.PatchUser.json'
+            body: 'req.body.PatchUser.json'
         });
         this.schemas.set('POST /login', {
-            body: './schema/req.body.CreateLogin.json'
+            body: 'req.body.CreateLogin.json'
         });
         this.schemas.set('POST /login/forgot', {
-            body: './schema/req.body.ForgotLogin.json'
+            body: 'req.body.ForgotLogin.json'
         });
         this.schemas.set('POST /login/reset', {
-            body: './schema/req.body.ResetLogin.json'
+            body: 'req.body.ResetLogin.json'
         });
         this.schemas.set('POST /token', {
-            body: './schema/req.body.CreateToken.json'
+            body: 'req.body.CreateToken.json'
         });
         this.schemas.set('POST /schedule', {
-            body: './schema/req.body.Schedule.json'
+            body: 'req.body.Schedule.json'
         });
         this.schemas.set('POST /collections', {
-            body: './schema/req.body.CreateCollection.json'
+            body: 'req.body.CreateCollection.json'
         });
         this.schemas.set('PATCH /collections/:collection', {
-            body: './schema/req.body.PatchCollection.json'
+            body: 'req.body.PatchCollection.json'
         });
         this.schemas.set('GET /data', {
-            query: './schema/req.query.ListData.json'
+            query: 'req.query.ListData.json'
         });
         this.schemas.set('GET /run', {
-            query: './schema/req.query.ListRuns.json'
+            query: 'req.query.ListRuns.json'
         });
         this.schemas.set('POST /run', {
-            body: './schema/req.body.CreateRun.json'
+            body: 'req.body.CreateRun.json'
         });
         this.schemas.set('PATCH /run/:run', {
-            body: './schema/req.body.PatchRun.json'
+            body: 'req.body.PatchRun.json'
         });
         this.schemas.set('POST /run/:run/jobs', {
-            body: './schema/req.body.SingleJobsCreate.json'
+            body: 'req.body.SingleJobsCreate.json'
         });
         this.schemas.set('GET /job', {
-            query: './schema/req.query.ListJobs.json'
+            query: 'req.query.ListJobs.json'
         });
         this.schemas.set('PATCH /job/:job', {
-            body: './schema/req.body.PatchJob.json'
+            body: 'req.body.PatchJob.json'
         });
         this.schemas.set('POST /job/error', {
-            body: './schema/req.body.ErrorCreate.json'
+            body: 'req.body.ErrorCreate.json'
         });
         this.schemas.set('POST /job/error/:job', {
-            body: './schema/req.body.ErrorModerate.json'
+            body: 'req.body.ErrorModerate.json'
         });
 
         for (const schema of this.schemas.keys()) {
@@ -78,7 +79,7 @@ class Schemas {
 
             for (const type of ['body', 'query']) {
                 if (!s[type]) continue;
-                s[type] = await $RefParser.dereference(s[type]);
+                s[type] = await $RefParser.dereference(path.resolve(__dirname, '../schema/', s[type]));
             }
         }
     }
@@ -88,8 +89,10 @@ class Schemas {
         if (parsed.length !== 2) throw new Error('schema.get() must be of format "<VERB> <URL>"')
 
         const info = this.schemas.get(url);
-
-        if (!info) return [parsed[1]]
+        if (!info) {
+            this.schemas.set(url, {});
+            return [parsed[1]]
+        }
 
         const opts = {};
         if (info.query) opts.query = info.query;
@@ -122,9 +125,16 @@ class Schemas {
      * Return a list of endpoints with schemas
      */
     list() {
-        return {
-            schemas: Array.from(this.schemas.keys())
+        const lite = {};
+
+        for (const key of this.schemas.keys()) {
+            lite[key] = {
+                body: !!this.schemas.get(key).body,
+                query: !!this.schemas.get(key).query
+            }
         }
+
+        return lite;
     }
 }
 

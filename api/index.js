@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const session = require('express-session');
+const { ValidationError } = require('express-json-validator-middleware');
 const { Webhooks } = require('@octokit/webhooks');
 const Busboy = require('busboy');
 const Analytics = require('./lib/analytics');
@@ -236,6 +237,8 @@ async function server(args, config, cb) {
             try {
                 if (req.query.url && req.query.method) {
                     res.json(schemas.query(req.query.method, req.query.url));
+                } else if (req.query.url || req.query.method) {
+                    throw new Err(400, null, 'url & method params must be used together');
                 } else {
                     return res.json(schemas.list());
                 }
@@ -1624,12 +1627,24 @@ async function server(args, config, cb) {
 
     router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
+            let errs = [];
+
+            if (err.validationErrors.body) {
+                errs = errs.concat(err.validationErrors.body.map((e) => {
+                    return { message: e.message };
+                }))
+            }
+
+            if (err.validationErrors.query) {
+                errs = errs.concat(err.validationErrors.query.map((e) => {
+                    return { message: e.message };
+                }))
+            }
+
             return Err.respond(
                 new Err(400, null, 'validation error'),
                 res,
-                err.validationErrors.body.map((e) => {
-                    return { message: e.message };
-                })
+                errs
             );
         } else {
             next(err);

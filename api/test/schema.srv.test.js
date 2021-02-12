@@ -34,4 +34,89 @@ test('GET: api/schema', (t) => {
     });
 });
 
+test('GET: api/schema?method=FAKE', (t) => {
+    request({
+        url: 'http://localhost:4999/api/schema?method=fake',
+        method: 'GET',
+        json: true,
+    }, (err, res) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 400, 'http: 400');
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'validation error',
+            messages: [{
+                message: 'should be equal to one of the allowed values'
+            }]
+        })
+
+        t.end();
+    });
+});
+
+test('GET: api/schema?method=GET', (t) => {
+    request({
+        url: 'http://localhost:4999/api/schema?method=GET',
+        method: 'GET',
+        json: true,
+    }, (err, res) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 400, 'http: 400');
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'url & method params must be used together',
+            messages: []
+        })
+
+        t.end();
+    });
+});
+
+test('GET: api/schema?url=123', (t) => {
+    request({
+        url: 'http://localhost:4999/api/schema?url=123',
+        method: 'GET',
+        json: true,
+    }, (err, res) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 400, 'http: 400');
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'url & method params must be used together',
+            messages: []
+        })
+
+        t.end();
+    });
+});
+
+test('GET: api/schema?method=POST&url=/login', (t) => {
+    request({
+        url: 'http://localhost:4999/api/schema?method=POST&url=/login',
+        method: 'GET',
+        json: true,
+    }, (err, res) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, 'http: 200');
+        t.deepEquals(res.body, {
+            body: {
+                type: 'object',
+                required: [ 'username', 'password' ],
+                additionalProperties: false,
+                properties: {
+                    username: { type: 'string', description: 'username' },
+                    password: { type: 'string', description: 'password' }
+                }
+           },
+           query: null
+       });
+
+        t.end();
+    });
+});
+
 flight.landing(test);

@@ -119,4 +119,33 @@ test('GET: api/schema?method=POST&url=/login', (t) => {
     });
 });
 
+test('POST: api/login', (t) => {
+    request({
+        url: 'http://localhost:4999/api/login',
+        method: 'POST',
+        json: true,
+        body: {
+            fake: 123,
+            username: 123
+        }
+    }, (err, res) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 400, 'http: 400');
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'validation error',
+            messages: [{
+                message: 'should NOT have additional properties'
+            },{
+                message: 'should be string'
+            },{
+                message: 'should have required property \'password\''
+            }]
+       });
+
+        t.end();
+    });
+});
+
 flight.landing(test);

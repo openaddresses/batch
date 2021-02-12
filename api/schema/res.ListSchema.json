@@ -6,11 +6,6 @@
     "additionalProperties": false,
     "properties": {
         "schemas": {
-            "type": "array",
-            "item": {
-                "type": "string",
-                "description": "'{VERB} {URL}' format of api urls with schemas"
-            }
         }
     }
 }

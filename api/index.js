@@ -222,12 +222,28 @@ async function server(args, config, cb) {
      *
      * @apiDescription
      *     List all JSON Schemas in use
+     *     With no parameters this API will return a list of all the endpoints that have a form of schema validation
+     *     If the url/method params are used, the schemas themselves are returned
      *
+     *     Note: If url or method params are used, they must be used together
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.ListSchema.json} apiParam
      * @apiSchema {jsonschema=./schema/res.ListSchema.json} apiSuccess
      */
-    router.get('/schema', async (req, res) => {
-        return res.json(schemas.list());
-    });
+    router.get(
+        ...schemas.get('GET /schema'),
+        async (req, res) => {
+            try {
+                if (req.query.url && req.query.method) {
+                    res.json(schemas.query(req.query.method, req.query.url));
+                } else {
+                    return res.json(schemas.list());
+                }
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {post} /api/upload Create Upload

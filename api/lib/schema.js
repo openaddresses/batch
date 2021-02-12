@@ -2,6 +2,7 @@
 
 const { Validator, ValidationError } = require('express-json-validator-middleware');
 const $RefParser = require('json-schema-ref-parser');
+const Err = require('./error');
 
 class Schemas {
     constructor() {
@@ -14,10 +15,12 @@ class Schemas {
     }
 
     async build() {
+        this.schemas.set('GET /schema', {
+            query: './schema/req.query.ListSchema.json'
+        });
         this.schemas.set('POST /user', {
             body: './schema/req.body.CreateUser.json'
         });
-
         this.schemas.set('PATCH /user/:id', {
             body: './schema/req.body.PatchUser.json'
         });
@@ -60,14 +63,14 @@ class Schemas {
         this.schemas.set('GET /job', {
             query: './schema/req.query.ListJobs.json'
         });
+        this.schemas.set('PATCH /job/:job', {
+            body: './schema/req.body.PatchJob.json'
+        });
         this.schemas.set('POST /job/error', {
             body: './schema/req.body.ErrorCreate.json'
         });
         this.schemas.set('POST /job/error/:job', {
             body: './schema/req.body.ErrorModerate.json'
-        });
-        this.schemas.set('PATCH /job/:job', {
-            body: './schema/req.body.PatchJob.json'
         });
 
         for (const schema of this.schemas.keys()) {
@@ -97,6 +100,27 @@ class Schemas {
         ]
     }
 
+    /**
+     * Return all schemas (body, query, etc) for a given method + url
+     *
+     * @param {String} method HTTP Method
+     * @param {String} url URL
+     */
+    query(method, url) {
+        if (!this.schemas.has(`${method} ${url}`)) {
+            return { body: null, schema: null };
+        }
+
+        const schema = JSON.parse(JSON.stringify(this.schemas.get(`${method} ${url}`)));
+        if (!schema.query) schema.query = null;
+        if (!schema.body) schema.body = null;
+
+        return schema;
+    }
+
+    /**
+     * Return a list of endpoints with schemas
+     */
     list() {
         return {
             schemas: Array.from(this.schemas.keys())

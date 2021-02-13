@@ -23,3 +23,23 @@ test('Job#compress', async (t) => {
 
     t.end();
 });
+
+test('Job#convert', async (t) => {
+    try {
+        const job = new Job(1, 'fake-url', 'addresses', 'state');
+
+        fs.writeFileSync(
+            path.resolve(job.tmp, 'out.csv'),
+            fs.readFileSync(path.resolve(__dirname, './fixtures/input.csv'))
+        )
+
+        const out = await job.convert();
+        t.ok(out, 'output file');
+
+        console.error(out)
+
+
+    } catch (err) {
+        t.error(err);
+    }
+});

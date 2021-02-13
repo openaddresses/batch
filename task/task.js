@@ -42,7 +42,7 @@ async function prompt() {
         type: 'text',
         name: 'Bucket',
         message: 'AWS S3 bucket to push results to',
-        initial: 'v2.openaddreses.io'
+        initial: 'v2.openaddresses.io'
     },{
         type: 'text',
         message: 'OA Job ID',

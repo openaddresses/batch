@@ -36,10 +36,43 @@ test('Job#convert', async (t) => {
         const out = await job.convert();
         t.ok(out, 'output file');
 
-        console.error(out)
+        const file = String(fs.readFileSync(out)).split('\n').filter((row) => {
+            return !!row.trim();
+        }).map((row) => {
+            return JSON.parse(row)
+        });
 
+        t.equals(file.length, 99, 'length');
 
+        file.forEach((row) => {
+            if (row.geometry.type !== 'Point') t.fail('Point');
+        });
+
+        t.equals(job.count, 99, 'job.count');
+        t.deepEquals(job.bounds, {
+            type: 'Polygon',
+            coordinates: [[
+                [ -64.2400062, 45.9678856 ],
+                [ -62.053746, 45.9678856 ],
+                [ -62.053746, 46.8613679 ],
+                [ -64.2400062, 46.8613679 ],
+                [ -64.2400062, 45.9678856 ]
+            ]]
+        }, 'job.bounds');
+        t.deepEquals(job.stats, {
+            counts: {
+                unit: 99,
+                number: 99,
+                street: 99,
+                city: 0,
+                district: 99,
+                region: 99,
+                postcode: 0
+            }
+        }, 'job.stats')
     } catch (err) {
         t.error(err);
     }
+
+    t.end();
 });

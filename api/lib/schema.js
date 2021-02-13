@@ -1,9 +1,8 @@
 'use strict';
 
-const { Validator, ValidationError } = require('express-json-validator-middleware');
+const { Validator } = require('express-json-validator-middleware');
 const $RefParser = require('json-schema-ref-parser');
 const path = require('path');
-const Err = require('./error');
 
 class Schemas {
     constructor() {
@@ -86,12 +85,12 @@ class Schemas {
 
     get(url) {
         const parsed = url.split(' ');
-        if (parsed.length !== 2) throw new Error('schema.get() must be of format "<VERB> <URL>"')
+        if (parsed.length !== 2) throw new Error('schema.get() must be of format "<VERB> <URL>"');
 
         const info = this.schemas.get(url);
         if (!info) {
             this.schemas.set(url, {});
-            return [parsed[1]]
+            return [parsed[1]];
         }
 
         const opts = {};
@@ -100,7 +99,7 @@ class Schemas {
         return [
             parsed[1],
             this.validate(opts)
-        ]
+        ];
     }
 
     /**
@@ -108,6 +107,8 @@ class Schemas {
      *
      * @param {String} method HTTP Method
      * @param {String} url URL
+     *
+     * @returns {Object}
      */
     query(method, url) {
         if (!this.schemas.has(`${method} ${url}`)) {
@@ -123,6 +124,8 @@ class Schemas {
 
     /**
      * Return a list of endpoints with schemas
+     *
+     * @returns {Object}
      */
     list() {
         const lite = {};
@@ -131,11 +134,11 @@ class Schemas {
             lite[key] = {
                 body: !!this.schemas.get(key).body,
                 query: !!this.schemas.get(key).query
-            }
+            };
         }
 
         return lite;
     }
 }
 
-module.exports = Schemas
+module.exports = Schemas;

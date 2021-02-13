@@ -17,7 +17,7 @@ test('GET: api/schema', (t) => {
     request({
         url: 'http://localhost:4999/api/schema',
         method: 'GET',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err, 'no error');
 
@@ -25,10 +25,10 @@ test('GET: api/schema', (t) => {
 
         const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
         if (UPDATE) {
-            fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4))
+            fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
 
-        t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)))
+        t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
 
         t.end();
     });
@@ -38,7 +38,7 @@ test('GET: api/schema?method=FAKE', (t) => {
     request({
         url: 'http://localhost:4999/api/schema?method=fake',
         method: 'GET',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err, 'no error');
 
@@ -49,7 +49,7 @@ test('GET: api/schema?method=FAKE', (t) => {
             messages: [{
                 message: 'should be equal to one of the allowed values'
             }]
-        })
+        });
 
         t.end();
     });
@@ -59,7 +59,7 @@ test('GET: api/schema?method=GET', (t) => {
     request({
         url: 'http://localhost:4999/api/schema?method=GET',
         method: 'GET',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err, 'no error');
 
@@ -68,7 +68,7 @@ test('GET: api/schema?method=GET', (t) => {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
-        })
+        });
 
         t.end();
     });
@@ -78,7 +78,7 @@ test('GET: api/schema?url=123', (t) => {
     request({
         url: 'http://localhost:4999/api/schema?url=123',
         method: 'GET',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err, 'no error');
 
@@ -87,7 +87,7 @@ test('GET: api/schema?url=123', (t) => {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
-        })
+        });
 
         t.end();
     });
@@ -97,7 +97,7 @@ test('GET: api/schema?method=POST&url=/login', (t) => {
     request({
         url: 'http://localhost:4999/api/schema?method=POST&url=/login',
         method: 'GET',
-        json: true,
+        json: true
     }, (err, res) => {
         t.error(err, 'no error');
 
@@ -105,15 +105,15 @@ test('GET: api/schema?method=POST&url=/login', (t) => {
         t.deepEquals(res.body, {
             body: {
                 type: 'object',
-                required: [ 'username', 'password' ],
+                required: ['username', 'password'],
                 additionalProperties: false,
                 properties: {
                     username: { type: 'string', description: 'username' },
                     password: { type: 'string', description: 'password' }
                 }
-           },
-           query: null
-       });
+            },
+            query: null
+        });
 
         t.end();
     });
@@ -142,7 +142,7 @@ test('POST: api/login', (t) => {
             },{
                 message: 'should have required property \'password\''
             }]
-       });
+        });
 
         t.end();
     });

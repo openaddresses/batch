@@ -1632,13 +1632,13 @@ async function server(args, config, cb) {
             if (err.validationErrors.body) {
                 errs = errs.concat(err.validationErrors.body.map((e) => {
                     return { message: e.message };
-                }))
+                }));
             }
 
             if (err.validationErrors.query) {
                 errs = errs.concat(err.validationErrors.query.map((e) => {
                     return { message: e.message };
-                }))
+                }));
             }
 
             return Err.respond(

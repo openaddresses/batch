@@ -1,6 +1,7 @@
 'use strict';
 
 const Ajv = require('ajv');
+const wkt = require('wellknown');
 const JobError = require('./joberror');
 const turf = require('@turf/turf');
 const gzip = require('zlib').createGzip;
@@ -138,30 +139,24 @@ class Job {
                     delimiter: ','
                 }),
                 transform(100, (data, cb) => {
-                    if (data[2] === 'NUMBER' && data[3] === 'STREET') {
+                    if (data[1] === 'NUMBER' && data[2] === 'STREET') {
                         return cb(null, '');
                     }
 
                     return cb(null, JSON.stringify({
                         type: 'Feature',
                         properties: {
-                            id: data[9],
-                            unit: data[4],
-                            number: data[2],
-                            street: data[3],
-                            city: data[5],
-                            district: data[6],
-                            region: data[7],
-                            postcode: data[8],
-                            hash: data[10]
+                            id: data[8],
+                            unit: data[3],
+                            number: data[1],
+                            street: data[2],
+                            city: data[4],
+                            district: data[5],
+                            region: data[6],
+                            postcode: data[7],
+                            hash: data[9]
                         },
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [
-                                Number(data[0]),
-                                Number(data[1])
-                            ]
-                        }
+                        geometry: wkt.parse(data[0])
                     }) + '\n');
                 }),
                 fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),

@@ -96,10 +96,30 @@ class Schemas {
         const opts = {};
         if (info.query) opts.query = info.query;
         if (info.body) opts.body = info.body;
-        return [
-            parsed[1],
-            this.validate(opts)
-        ];
+
+        const flow = [parsed[1], []];
+
+        if (info.query) flow[1].push(Schemas.query(info.query));
+
+        flow[1].push(this.validate(opts));
+
+        return flow;
+    }
+
+    /**
+     * Express middleware to identify query params that should be integers according to the schema
+     * and attempt to cast them as such to ensure they pass the schema
+     */
+    static query(schema) {
+        return function (req, res, next) {
+            for (const key of Object.keys(req.query)) {
+                if (schema.properties[key] && schema.properties[key].type === 'integer') {
+                    req.query[key] = parseInt(req.query[key]);
+                }
+            }
+
+            return next();
+        };
     }
 
     /**

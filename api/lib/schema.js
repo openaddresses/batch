@@ -97,7 +97,7 @@ class Schemas {
         if (info.query) opts.query = info.query;
         if (info.body) opts.body = info.body;
 
-        const flow = [ parsed[1], [] ]
+        const flow = [parsed[1], []];
 
         if (info.query) flow[1].push(Schemas.query(info.query));
 
@@ -119,7 +119,7 @@ class Schemas {
             }
 
             return next();
-        }
+        };
     }
 
     /**

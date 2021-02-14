@@ -31,7 +31,7 @@ test('Job#convert', async (t) => {
         fs.writeFileSync(
             path.resolve(job.tmp, 'out.csv'),
             fs.readFileSync(path.resolve(__dirname, './fixtures/input.csv'))
-        )
+        );
 
         const out = await job.convert();
         t.ok(out, 'output file');
@@ -39,7 +39,7 @@ test('Job#convert', async (t) => {
         const file = String(fs.readFileSync(out)).split('\n').filter((row) => {
             return !!row.trim();
         }).map((row) => {
-            return JSON.parse(row)
+            return JSON.parse(row);
         });
 
         t.equals(file.length, 99, 'length');
@@ -52,11 +52,11 @@ test('Job#convert', async (t) => {
         t.deepEquals(job.bounds, {
             type: 'Polygon',
             coordinates: [[
-                [ -64.2400062, 45.9678856 ],
-                [ -62.053746, 45.9678856 ],
-                [ -62.053746, 46.8613679 ],
-                [ -64.2400062, 46.8613679 ],
-                [ -64.2400062, 45.9678856 ]
+                [-64.2400062, 45.9678856],
+                [-62.053746, 45.9678856],
+                [-62.053746, 46.8613679],
+                [-64.2400062, 46.8613679],
+                [-64.2400062, 45.9678856]
             ]]
         }, 'job.bounds');
         t.deepEquals(job.stats, {
@@ -69,7 +69,7 @@ test('Job#convert', async (t) => {
                 region: 99,
                 postcode: 0
             }
-        }, 'job.stats')
+        }, 'job.stats');
     } catch (err) {
         t.error(err);
     }

@@ -35,15 +35,15 @@ class Stats {
         } else if (this.layer === 'buildings') {
             this.stats.buildings = {
                 counts: {}
-            }
+            };
         } else if (this.layer === 'parcels') {
             this.stats.parcels = {
                 counts: {}
-            }
+            };
         } else {
             this.stats[this.layer] = {
                 counts: {}
-            }
+            };
         }
     }
 

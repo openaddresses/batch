@@ -32,6 +32,18 @@ class Stats {
                     postcode: 0
                 }
             };
+        } else if (this.layer === 'buildings') {
+            this.stats.buildings = {
+                counts: {}
+            };
+        } else if (this.layer === 'parcels') {
+            this.stats.parcels = {
+                counts: {}
+            };
+        } else {
+            this.stats[this.layer] = {
+                counts: {}
+            };
         }
     }
 

@@ -8,6 +8,10 @@
         "test": "true",
         "lint": "eslint task.js lib/**.js test/**.js"
     },
+    "external": {
+        "tippecanoe": "1.35.0",
+        "batch-machine": "7.6.0"
+    },
     "dependencies": {
         "@mapbox/decrypt-kms-env": "^3.0.0",
         "@turf/turf": "^5.1.6",

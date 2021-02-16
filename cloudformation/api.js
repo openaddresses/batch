@@ -208,7 +208,7 @@ const stack = {
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
                         { Name: 'MAILGUN_API_KEY', Value: cf.ref('MailGun') },
-                        { Name: 'POSTGRES', Value: cf.join([ 'postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstance', 'Endpoint.Address'), ':5432/openaddresses' ]) },
+                        { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstance', 'Endpoint.Address'), ':5432/openaddresses']) },
                         { Name: 'SharedSecret', Value: cf.ref('SharedSecret') },
                         { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
                         { Name: 'Bucket', Value: cf.ref('Bucket') },

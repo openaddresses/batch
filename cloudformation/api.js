@@ -200,40 +200,21 @@ const stack = {
                     PortMappings: [{
                         ContainerPort: 5000
                     }],
-                    Environment: [{
-                        Name: 'ECS_LOG_LEVEL',
-                        Value: 'debug'
-                    },{
-                        Name: 'MAPBOX_TOKEN',
-                        Value: cf.ref('MapboxToken')
-                    },{
-                        Name: 'MAILGUN_API_KEY',
-                        Value: cf.ref('MailGun')
-                    },{
-                        Name: 'POSTGRES',
-                        Value: cf.join([
-                            'postgresql://openaddresses:',
-                            cf.ref('DatabasePassword'),
-                            '@',
-                            cf.getAtt('DBInstance', 'Endpoint.Address'),
-                            ':5432/openaddresses'
-                        ])
-                    },{
-                        Name: 'SharedSecret',
-                        Value: cf.ref('SharedSecret')
-                    },{
-                        Name: 'GithubSecret',
-                        Value: cf.ref('GithubSecret')
-                    },{
-                        Name: 'Bucket',
-                        Value: cf.ref('Bucket')
-                    },{
-                        Name: 'StackName',
-                        Value: cf.stackName
-                    },{
-                        Name: 'AWS_DEFAULT_REGION',
-                        Value: cf.region
-                    }],
+                    Environment: [
+                        { Name: 'JOB_DEFINITION', Value: cf.ref('BatchJobDefinition') },
+                        { Name: 'JOB_STD_QUEUE', Value:  cf.ref('BatchJobQueue') },
+                        { Name: 'JOB_MEGA_QUEUE', Value: cf.ref('BatchMegaJobQueue') },
+                        { Name: 'JOB_NAME', Value: 'lambda-trigger-job' },
+                        { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
+                        { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
+                        { Name: 'MAILGUN_API_KEY', Value: cf.ref('MailGun') },
+                        { Name: 'POSTGRES', Value: cf.join([ 'postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstance', 'Endpoint.Address'), ':5432/openaddresses' ]) },
+                        { Name: 'SharedSecret', Value: cf.ref('SharedSecret') },
+                        { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
+                        { Name: 'Bucket', Value: cf.ref('Bucket') },
+                        { Name: 'StackName', Value: cf.stackName },
+                        { Name: 'AWS_DEFAULT_REGION', Value: cf.region }
+                    ],
                     LogConfiguration: {
                         LogDriver: 'awslogs',
                         Options: {
@@ -288,15 +269,6 @@ const stack = {
                     FromPort: 5000,
                     ToPort: 5000
                 }]
-            }
-        },
-        APIPermissionToInvokeLambda: {
-            Type: 'AWS::Lambda::Permission',
-            Properties: {
-                FunctionName: cf.ref('BatchLambdaTriggerFunction'),
-                Action: 'lambda:InvokeFunction',
-                Principal: 'ecs-tasks.amazonaws.com',
-                SourceArn: cf.ref('APITaskDefinition')
             }
         }
     },

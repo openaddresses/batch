@@ -10,7 +10,11 @@
                 Errors
             </button></router-link>
 
+
+
             <span class='fr'>
+                <a href='mailto:hello@openaddresses.io' class='btn btn--stroke btn--s btn--gray round mr12'>Contact Us</a>
+
                 <router-link to='/upload'><button class='btn btn--stroke btn--s btn--gray round mr12 h24'>Contribute</button></router-link>
 
                 <button @click='internal("/docs/", true)' class='btn btn--stroke btn--s btn--gray round mr12'>Docs</button>

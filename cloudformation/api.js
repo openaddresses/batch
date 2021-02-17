@@ -112,8 +112,8 @@ const stack = {
                     PolicyDocument: {
                         Statement: [{
                             Effect: 'Allow',
-                            Action: 'lambda:InvokeFunction',
-                            Resource: cf.join(['arn:aws:lambda:', cf.region, ':', cf.accountId, ':function:', cf.stackName, '-invoke'])
+                              Action: ['batch:SubmitJob'],
+                              Resource: 'arn:aws:batch:*:*:*'
                         },{
                             Effect: 'Allow',
                             Action: [

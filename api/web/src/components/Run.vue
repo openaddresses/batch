@@ -62,15 +62,6 @@
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
-        <template v-else-if='!jobs.length && !loading.jobs'>
-            <div class='w-full flex-parent flex-parent--center-main'>
-                <div class='flex-child py24'>
-                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                </div>
-            </div>
-            <div class='w-full align-center txt-bold'>No Jobs Found</div>
-            <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
-        </template>
         <template v-else>
             <div class='col col--12 pt12'>
                 <h2 class='txt-h4 pb12 fl'>Dashboard:</h2>
@@ -82,7 +73,7 @@
                 </template>
                 <template v-else>
                     <div class='col col--12 grid border round border--gray-light'>
-                        <div class='col col--3'>
+                        <div @click='filterShortcut("Pending")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Pending'></div>
                             <div class='flex-parent flex-parent--center-main w-full'>
                                 <div class='flex-child'>
@@ -90,7 +81,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class='col col--3'>
+                        <div @click='filterShortcut("Warn")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Warn'></div>
                             <div class='flex-parent flex-parent--center-main w-full'>
                                 <div class='flex-child'>
@@ -98,7 +89,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class='col col--3'>
+                        <div @click='filterShortcut("Fail")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Fail'></div>
                             <div class='flex-parent flex-parent--center-main w-full'>
                                 <div class='flex-child'>
@@ -106,7 +97,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class='col col--3'>
+                        <div @click='filterShortcut("Success")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Success'></div>
                             <div class='flex-parent flex-parent--center-main w-full'>
                                 <div class='flex-child'>
@@ -122,22 +113,22 @@
                 <h2 class='txt-h4 pb12 fl'>Jobs:</h2>
             </div>
 
-            <div class='col col--1'>
-                Status
-            </div>
-            <div class='col col--4'>
-                Job ID
-            </div>
-            <div class='col col--7'>
-                Source
-            </div>
-
             <template v-if='loading.jobs'>
                 <div class='flex-parent flex-parent--center-main w-full'>
                     <div class='flex-child loading py24'></div>
                 </div>
             </template>
-            <template v-else>
+            <template v-else-if='jobs.length'>
+                <div class='col col--1'>
+                    Status
+                </div>
+                <div class='col col--4'>
+                    Job ID
+                </div>
+                <div class='col col--7'>
+                    Source
+                </div>
+
                 <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
                     <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                         <div class='col col--1'>
@@ -151,6 +142,15 @@
                         </div>
                     </div>
                 </div>
+            </template>
+            <template v-else-if='!jobs.length'>
+                <div class='w-full flex-parent flex-parent--center-main'>
+                    <div class='flex-child py24'>
+                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                    </div>
+                </div>
+                <div class='w-full align-center txt-bold'>No Jobs Found</div>
+                <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
             </template>
         </template>
     </div>
@@ -213,6 +213,12 @@ export default {
         }
     },
     methods: {
+        filterShortcut: function(filter) {
+            this.showFilter = true;
+            this.$nextTick(() => {
+                this.filter.status = filter;
+            });
+        },
         external: function(url) {
             window.open(url, "_blank");
         },

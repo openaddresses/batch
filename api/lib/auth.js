@@ -230,6 +230,8 @@ class Auth {
                     $1
                 OFFSET
                     $2
+                ORDER BY
+                    created DESC
             `, [
                 query.limit,
                 query.page,

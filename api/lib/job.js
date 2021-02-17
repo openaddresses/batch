@@ -11,7 +11,7 @@ const pkg  = require('../package.json');
 const { Status } = require('./util');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
+const batchjob = require('./batch');
 
 /**
  * @class Job
@@ -522,31 +522,24 @@ class Job {
         }
     }
 
-    batch() {
-        return new Promise((resolve, reject) => {
-            if (!this.id) return reject(new Err(400, null, 'Cannot batch a job without an ID'));
+    async batch() {
+        if (!this.id) throw new Err(400, null, 'Cannot batch a job without an ID');
 
-            if (process.env.StackName === 'test') {
-                return resolve(true);
-            } else {
-                lambda.invoke({
-                    FunctionName: `${process.env.StackName}-invoke`,
-                    InvocationType: 'Event',
-                    LogType: 'Tail',
-                    Payload: JSON.stringify({
-                        type: 'job',
-                        job: this.id,
-                        source: this.source,
-                        layer: this.layer,
-                        name: this.name
-                    })
-                }, (err, data) => {
-                    if (err) return reject(new Err(500, err, 'failed to submit job to batch'));
-
-                    return resolve(data);
+        if (process.env.StackName === 'test') {
+            return true;
+        } else {
+            try {
+                return await batchjob({
+                    type: 'job',
+                    job: this.id,
+                    source: this.source,
+                    layer: this.layer,
+                    name: this.name
                 });
+            } catch (err) {
+                throw new Err(500, err, 'failed to submit job to batch');
             }
-        });
+        }
     }
 }
 

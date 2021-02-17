@@ -13,4 +13,3 @@ test() {
 test .
 test api/
 test task/
-test lambda/

@@ -1,9 +1,8 @@
 'use strict';
 
-const AWS = require('aws-sdk');
 const Err = require('./error');
 const JobError = require('./joberror');
-const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION });
+const batchjob = require('./batch');
 
 /**
  * @class Schedule
@@ -27,39 +26,25 @@ class Schedule {
     }
 
     static async collect() {
-        return new Promise((resolve, reject) => {
-            lambda.invoke({
-                FunctionName: `${process.env.StackName}-invoke`,
-                InvocationType: 'Event',
-                LogType: 'Tail',
-                Payload: JSON.stringify({
-                    type: 'collect'
-                })
-            }, (err, data) => {
-                if (err) return reject(new Err(500, err, 'failed to submit collect job to batch'));
-
-                return resolve(data);
+        try {
+            return await batchjob({
+                type: 'collect'
             });
-        });
+        } catch (err) {
+            throw new Err(500, err, 'failed to submit collect job to batch');
+        }
     }
 
     static async sources(pool) {
         await JobError.clear(pool);
 
-        return new Promise((resolve, reject) => {
-            lambda.invoke({
-                FunctionName: `${process.env.StackName}-invoke`,
-                InvocationType: 'Event',
-                LogType: 'Tail',
-                Payload: JSON.stringify({
-                    type: 'sources'
-                })
-            }, (err, data) => {
-                if (err) return reject(new Err(500, err, 'failed to submit sources job to batch'));
-
-                return resolve(data);
+        try {
+            return await batchjob({
+                type: 'sources'
             });
-        });
+        }  catch (err) {
+            throw new Err(500, err, 'failed to submit sources job to batch');
+        }
     }
 }
 

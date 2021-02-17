@@ -49,23 +49,23 @@ class Tippecanoe {
             ];
 
             if (options.layer) {
-                base = base.concat([ '-l', options.layer ]);
+                base = base.concat(['-l', options.layer]);
             } else {
-                base = base.concat([ '-l', 'out' ]);
+                base = base.concat(['-l', 'out']);
             }
 
             if (options.zoom && options.zoom.max) {
-                base = base.concat([ '-z', options.zoom.max ]);
+                base = base.concat(['-z', options.zoom.max]);
             }
             if (options.zoom && options.zoom.min) {
-                base = base.concat([ '-Z', options.zoom.min ]);
+                base = base.concat(['-Z', options.zoom.min]);
             }
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env
             })
                 .on('error', reject)
-                .on('close', resolve)
+                .on('close', resolve);
 
             if (options.stdout) {
                 tippecanoe.stdout.pipe(process.stdout);

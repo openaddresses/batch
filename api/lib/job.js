@@ -11,7 +11,7 @@ const pkg  = require('../package.json');
 const { Status } = require('./util');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const batch = require('./batch');
+const batchjob = require('./batch');
 
 /**
  * @class Job
@@ -529,7 +529,7 @@ class Job {
             return resolve(true);
         } else {
             try {
-                await batch({
+                await batchjob({
                     type: 'job',
                     job: this.id,
                     source: this.source,

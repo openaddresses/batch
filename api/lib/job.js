@@ -523,24 +523,22 @@ class Job {
     }
 
     async batch() {
-        if (!this.id) return reject(new Err(400, null, 'Cannot batch a job without an ID'));
+        if (!this.id) throw new Err(400, null, 'Cannot batch a job without an ID');
 
         if (process.env.StackName === 'test') {
-            return resolve(true);
+            return true;
         } else {
             try {
-                await batchjob({
+                return await batchjob({
                     type: 'job',
                     job: this.id,
                     source: this.source,
                     layer: this.layer,
                     name: this.name
-                })
+                });
             } catch (err) {
                 throw new Err(500, err, 'failed to submit job to batch');
             }
-
-            return data;
         }
     }
 }

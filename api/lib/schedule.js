@@ -1,6 +1,5 @@
 'use strict';
 
-const AWS = require('aws-sdk');
 const Err = require('./error');
 const JobError = require('./joberror');
 const batchjob = require('./batch');
@@ -30,7 +29,7 @@ class Schedule {
         try {
             return await batchjob({
                 type: 'collect'
-            })
+            });
         } catch (err) {
             throw new Err(500, err, 'failed to submit collect job to batch');
         }
@@ -43,7 +42,7 @@ class Schedule {
             return await batchjob({
                 type: 'sources'
             });
-       }  catch (err) {
+        }  catch (err) {
             throw new Err(500, err, 'failed to submit sources job to batch');
         }
     }

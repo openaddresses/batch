@@ -112,8 +112,8 @@ const stack = {
                     PolicyDocument: {
                         Statement: [{
                             Effect: 'Allow',
-                              Action: ['batch:SubmitJob'],
-                              Resource: 'arn:aws:batch:*:*:*'
+                            Action: ['batch:SubmitJob'],
+                            Resource: 'arn:aws:batch:*:*:*'
                         },{
                             Effect: 'Allow',
                             Action: [

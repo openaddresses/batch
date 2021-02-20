@@ -86,7 +86,9 @@
                         <span v-text='job.created.match(/[0-9]{4}\-[0-9]{2}\-[0-9]{2}/)[0]'></span>
                     </div>
                     <div class='col col--3'>
-                        <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
+                        <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                        </span>
                     </div>
                 </div>
             </div>

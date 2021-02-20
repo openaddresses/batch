@@ -1,5 +1,19 @@
 <template>
     <div class='col col--12 grid pt12'>
+
+        <div v-if='joberror' class='border mb12 round col col--12' :class='{
+            "border--red": job.status === "Fail",
+            "bg-red-light": job.status === "Fail",
+            "border--orange": job.status === "Warn",
+            "bg-orange-light": job.status === "Warn"
+
+        }'>
+            <h2 v-if='job.status === "Fail"' class='txt-h4 align-center'>Active Job Error</h2>
+            <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
+
+            <div v-text='joberror.message' class='align-center'/>
+        </div>
+
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
                 <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
@@ -129,6 +143,7 @@ export default {
             sample: [],
             props: [],
             name: '',
+            joberror: false,
             delta: {
                 compare: false,
                 master: false,
@@ -168,26 +183,19 @@ export default {
         },
         refresh: function() {
             this.getJob();
+            this.getError();
             this.getDelta();
             this.getSample();
         },
         getError: function() {
-            fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
+            fetch(window.location.origin + `/api/job/error/${this.jobid}`, {
                 method: 'GET'
             }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job delta');
-                }
-
                 return res.json();
             }).then((res) => {
-                this.delta.master = res.master;
-                this.delta.compare = res.compare;
-                this.delta.delta = res.delta;
+                this.joberror = res;
             }).catch(() => {
-                this.delta = false;
+                this.joberror = false;
             });
         },
         getDelta: function() {

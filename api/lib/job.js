@@ -31,6 +31,7 @@ class Job {
         this.source_name = this.fullname();
         this.layer = layer;
         this.name = name;
+        this.license = false;
         this.output = {
             cache: false,
             output: false,
@@ -167,6 +168,7 @@ class Job {
             size: parseInt(this.size),
             s3: this.s3,
             run: parseInt(this.run),
+            license: this.license,
             map: this.map ? parseInt(this.map) : null,
             created: this.created,
             source_name: this.source_name,
@@ -484,7 +486,8 @@ class Job {
                     status,
                     version,
                     output,
-                    size
+                    size,
+                    license
                 ) VALUES (
                     $1,
                     NOW(),
@@ -506,7 +509,8 @@ class Job {
                 this.name,
                 this.version,
                 this.output,
-                this.size
+                this.size,
+                this.license
             ]);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);

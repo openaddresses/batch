@@ -823,6 +823,78 @@ define({ "api": [
     "groupTitle": "Data"
   },
   {
+    "type": "get",
+    "url": "/api/job/error/:job",
+    "title": "Get Job Error",
+    "version": "1.0.0",
+    "name": "ErrorList",
+    "group": "ErrorSingle",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return a single job error if one exists or 404 if not</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Status",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "ErrorSingle"
+  },
+  {
     "type": "post",
     "url": "/api/github/event",
     "title": "Github Webhook",
@@ -930,78 +1002,6 @@ define({ "api": [
     "groupTitle": "JobError"
   },
   {
-    "type": "get",
-    "url": "/api/job/error",
-    "title": "Get Job Errors",
-    "version": "1.0.0",
-    "name": "ErrorList",
-    "group": "JobError",
-    "permission": [
-      {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
-      }
-    ],
-    "description": "<p>All jobs that fail as part of a live run are entered into the JobError API This API powers a page that allows for human review of failing jobs Note: Job Errors are cleared with every subsequent full cache</p>",
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "\"Pending\"",
-              "\"Success\"",
-              "\"Fail\"",
-              "\"Warn\""
-            ],
-            "optional": false,
-            "field": "status",
-            "description": "<p>The current status</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Status",
-            "optional": false,
-            "field": "message",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "source_name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "layer",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./index.js",
-    "groupTitle": "JobError"
-  },
-  {
     "type": "post",
     "url": "/api/job/error/:job",
     "title": "Resolve Job Error",
@@ -1075,6 +1075,78 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "JobError"
+  },
+  {
+    "type": "get",
+    "url": "/api/job/error",
+    "title": "Get Job Errors",
+    "version": "1.0.0",
+    "name": "ErrorList",
+    "group": "JobErrors",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>All jobs that fail as part of a live run are entered into the JobError API This API powers a page that allows for human review of failing jobs Note: Job Errors are cleared with every subsequent full cache</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Status",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "JobErrors"
   },
   {
     "type": "patch",

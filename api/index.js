@@ -358,9 +358,9 @@ async function server(args, config, cb) {
     router.patch(
         ...schemas.get('PATCH /user/:id'),
         async (req, res) => {
-            Param.int(req, res, 'id');
-
             try {
+                await Param.int(req, 'id');
+
                 await auth.is_admin(req);
 
                 res.json(await auth.patch(req.params.id, req.body));
@@ -563,9 +563,9 @@ async function server(args, config, cb) {
     router.delete(
         ...schemas.get('DELETE /token/:id'),
         async (req, res) => {
-            Param.int(req, res, 'id');
-
             try {
+                await Param.int(req, 'id');
+
                 await auth.is_auth(req);
 
                 return res.json(await authtoken.delete(req.auth, req.params.id));
@@ -655,8 +655,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /collections/:collection/data'),
         async (req, res) => {
-            Param.int(req, res, 'collection');
             try {
+                await Param.int(req, 'collection');
+
                 await auth.is_auth(req);
 
                 Collection.data(pool, req.params.collection, res);
@@ -683,9 +684,9 @@ async function server(args, config, cb) {
     router.delete(
         ...schemas.get('DELETE /collections/:collection'),
         async (req, res) => {
-            Param.int(req, res, 'collection');
-
             try {
+                await Param.int(req, 'collection');
+
                 await auth.is_admin(req);
 
                 await Collection.delete(pool, req.params.collection);
@@ -748,9 +749,9 @@ async function server(args, config, cb) {
     router.patch(
         ...schemas.get('PATCH /collections/:collection'),
         async (req, res) => {
-            Param.int(req, res, 'collection');
-
             try {
+                await Param.int(req, 'collection');
+
                 await auth.is_admin(req);
 
                 const collection = await Collection.from(pool, req.params.collection);
@@ -800,11 +801,11 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /map/:z/:x/:y.mvt'),
         async (req, res) => {
-            Param.int(req, res, 'z');
-            Param.int(req, res, 'x');
-            Param.int(req, res, 'y');
-
             try {
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
+
                 const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
 
                 res.type('application/vnd.mapbox-vector-tile');
@@ -858,9 +859,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /data/:data'),
         async (req, res) => {
-            Param.int(req, res, 'data');
-
             try {
+                await Param.int(req, 'data');
+
                 const data = await Data.from(pool, req.params.data);
 
                 return res.json(data);
@@ -968,9 +969,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /run/:run'),
         async (req, res) => {
-            Param.int(req, res, 'run');
-
             try {
+                await Param.int(req, 'run');
+
                 res.json(await Run.from(pool, req.params.run));
             } catch (err) {
                 return Err.respond(err, res);
@@ -995,9 +996,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /run/:run/count'),
         async (req, res) => {
-            Param.int(req, res, 'run');
-
             try {
+                await Param.int(req, 'run');
+
                 res.json(await Run.stats(pool, req.params.run));
             } catch (err) {
                 return Err.respond(err, res);
@@ -1024,9 +1025,9 @@ async function server(args, config, cb) {
     router.patch(
         ...schemas.get('PATCH /run/:run'),
         async (req, res) => {
-            Param.int(req, res, 'run');
-
             try {
+                await Param.int(req, 'run');
+
                 await auth.is_admin(req);
 
                 const run = await Run.from(pool, req.params.run);
@@ -1064,16 +1065,9 @@ async function server(args, config, cb) {
     router.post(
         ...schemas.get('POST /run/:run/jobs'),
         async (req, res) => {
-            Param.int(req, res, 'run');
-
-            if (!Array.isArray(req.body.jobs)) {
-                return res.status(400).send({
-                    status: 400,
-                    error: 'jobs body must be array'
-                });
-            }
-
             try {
+                await Param.int(req, 'run');
+
                 await auth.is_admin(req);
 
                 const jobs = await Run.populate(pool, req.params.run, req.body.jobs);
@@ -1102,9 +1096,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /run/:run/jobs'),
         async (req, res) => {
-            Param.int(req, res, 'run');
-
             try {
+                await Param.int(req, 'run');
+
                 const jobs = await Run.jobs(pool, req.params.run);
 
                 res.json({
@@ -1146,7 +1140,7 @@ async function server(args, config, cb) {
      * @api {get} /api/job/error Get Job Errors
      * @apiVersion 1.0.0
      * @apiName ErrorList
-     * @apiGroup JobError
+     * @apiGroup JobErrors
      * @apiPermission public
      *
      * @apiDescription
@@ -1185,6 +1179,32 @@ async function server(args, config, cb) {
         async (req, res) => {
             try {
                 return res.json(await JobError.count(pool));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+
+    /**
+     * @api {get} /api/job/error/:job Get Job Error
+     * @apiVersion 1.0.0
+     * @apiName ErrorList
+     * @apiGroup ErrorSingle
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Return a single job error if one exists or 404 if not
+     *
+     * @apiSchema {jsonschema=./schema/res.ErrorSingle.json} apiSuccess
+     */
+    router.get(
+        ...schemas.get('GET /job/error/:job'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'job');
+
+                return res.json(await JobError.get(pool, req.params.job));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1238,9 +1258,9 @@ async function server(args, config, cb) {
     router.post(
         ...schemas.get('POST /job/error/:job'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 await auth.is_flag(req, 'moderator');
 
                 res.json(JobError.moderate(pool, ci, req.params.job, req.body));
@@ -1267,9 +1287,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 const job = await Job.from(pool, req.params.job);
 
                 return res.json(job.json());
@@ -1294,9 +1314,9 @@ async function server(args, config, cb) {
     router.post(
         ...schemas.get('POST /job/:job/rerun'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 await auth.is_admin(req);
 
                 const job = await Job.from(pool, req.params.job);
@@ -1334,9 +1354,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job/delta'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 const delta = await Job.delta(pool, req.params.job);
 
                 return res.json(delta);
@@ -1361,8 +1381,12 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job/output/source.png'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-            Job.preview(req.params.job, res);
+            try {
+                await Param.int(req, 'job');
+                Job.preview(req.params.job, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
     );
 
@@ -1388,9 +1412,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job/output/source.geojson.gz'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 await auth.is_auth(req);
 
                 await Job.data(pool, req.params.job, res);
@@ -1415,9 +1439,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job/output/sample'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 return res.json(await Job.sample(pool, req.params.job));
             } catch (err) {
                 return Err.respond(err, res);
@@ -1448,9 +1472,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job/output/cache.zip'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 await auth.is_auth(req);
 
                 Job.cache(req.params.job, res);
@@ -1479,9 +1503,9 @@ async function server(args, config, cb) {
     router.get(
         ...schemas.get('GET /job/:job/log'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 const job = await Job.from(pool, req.params.job);
 
                 return res.json(await job.log());
@@ -1509,9 +1533,9 @@ async function server(args, config, cb) {
     router.patch(
         ...schemas.get('PATCH /job/:job'),
         async (req, res) => {
-            Param.int(req, res, 'job');
-
             try {
+                await Param.int(req, 'job');
+
                 await auth.is_admin(req);
 
                 const job = await Job.from(pool, req.params.job);

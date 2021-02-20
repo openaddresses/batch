@@ -171,6 +171,25 @@ export default {
             this.getDelta();
             this.getSample();
         },
+        getError: function() {
+            fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
+                method: 'GET'
+            }).then((res) => {
+                if (!res.ok && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to get job delta');
+                }
+
+                return res.json();
+            }).then((res) => {
+                this.delta.master = res.master;
+                this.delta.compare = res.compare;
+                this.delta.delta = res.delta;
+            }).catch(() => {
+                this.delta = false;
+            });
+        },
         getDelta: function() {
             fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
                 method: 'GET'

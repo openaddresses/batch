@@ -23,9 +23,21 @@
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
 
-                <span v-on:click.stop.prevent='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
-                <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                <span v-on:click.stop.prevent='datapls' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                <span v-on:click.stop.prevent='datapls' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                </span>
+
+                <span v-if='job.license' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-license" /></svg>
+                </span>
+
+                <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                </span>
+
+                <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-notes" /></svg>
+                </span>
             </div>
         </div>
 

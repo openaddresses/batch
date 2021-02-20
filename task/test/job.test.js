@@ -61,12 +61,12 @@ test('Job#convert', async (t) => {
         }, 'job.bounds');
         t.deepEquals(job.stats, {
             counts: {
-                unit: 99,
+                unit: 0,
                 number: 99,
                 street: 99,
-                city: 0,
+                city: 99,
                 district: 99,
-                region: 99,
+                region: 0,
                 postcode: 0
             }
         }, 'job.stats');

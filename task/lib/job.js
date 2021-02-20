@@ -136,27 +136,21 @@ class Job {
             pipeline(
                 fs.createReadStream(output[0]),
                 csv({
+                    columns: true,
                     delimiter: ','
                 }),
                 transform(100, (data, cb) => {
-                    if (data[1] === 'NUMBER' && data[2] === 'STREET') {
-                        return cb(null, '');
+                    const geom = wkt.parse(data.GEOM);
+                    delete data.GEOM;
+                    const props = {};
+                    for (const prop of Object.keys(data)) {
+                        props[prop.toLowerCase()] = data[prop];
                     }
 
                     return cb(null, JSON.stringify({
                         type: 'Feature',
-                        properties: {
-                            id: data[8],
-                            unit: data[3],
-                            number: data[1],
-                            street: data[2],
-                            city: data[4],
-                            district: data[5],
-                            region: data[6],
-                            postcode: data[7],
-                            hash: data[9]
-                        },
-                        geometry: wkt.parse(data[0])
+                        properties: props,
+                        geometry: geom
                     }) + '\n');
                 }),
                 fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),

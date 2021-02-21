@@ -119,7 +119,10 @@
                             <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
                         </span>
 
-                        <span v-on:click.stop.prevent='emithistory(d)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
+                        <span v-on:click.stop.prevent='emithistory(d)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
+                        </span>
+
                         <span v-if='d.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(d.size)'></span>
                     </div>
                 </div>

@@ -118,20 +118,20 @@
                 </div>
                 <template v-if='d._open'>
                     <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                        <div @click='emitjob(d.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
+                        <div @click='emitjob(job.id)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
                             <div class='col col--5'>
-                                <span v-text='job.layer' class='mr6'/> - <span v-text='job.name'/>
+                                <span v-text='job.layer'/> - <span v-text='job.name'/>
 
                             </div>
                             <div class='col col--3'>
                                 <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                             </div>
                             <div class='col col--4'>
-                                <span v-on:click.stop.prevent='datapls(d)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                                <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
                                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
                                 </span>
 
-                                <span v-on:click.stop.prevent='emithistory(d)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
                                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
                                 </span>
 
@@ -199,12 +199,12 @@ export default {
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` })
         },
-        emithistory: function(d) {
-            this.$router.push({ path: `/data/${d.id}/history` })
+        emithistory: function(jobid) {
+            this.$router.push({ path: `/data/${jobid}/history` })
         },
-        datapls: function(d) {
+        datapls: function(jobid) {
             if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/job/${d.job}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
         },
         collectionpls: function(c) {
             if (!this.auth.username) return this.$emit('login');
@@ -266,6 +266,7 @@ export default {
                 }
 
                 const data = [];
+
                 for (const sourcename of Object.keys(dataname)) {
                     const d = {
                         _open: false,
@@ -281,9 +282,9 @@ export default {
                     for (const source of dataname[sourcename]) {
                         d.has[source.layer] = true;
                         d.sources.push(source);
-
-                        data.push(d);
                     }
+
+                    data.push(d);
                 }
 
                 this.datas = data;

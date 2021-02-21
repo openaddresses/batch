@@ -110,7 +110,7 @@
                     </div>
                     <div class='col col--3'>
                     </div>
-                    <div class='col col--4'>
+                    <div class='col col--4 color-gray'>
                         <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>
                         <span v-if='d.has.addresses'class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg></span>
                         <span v-if='d.has.parcels'class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg></span>

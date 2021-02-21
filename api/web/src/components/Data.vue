@@ -118,9 +118,9 @@
                 </div>
                 <template v-if='d._open'>
                     <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                        <div @click='emitjob(d.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
+                        <div @click='emitjob(job.id)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
                             <div class='col col--5'>
-                                <span v-text='job.layer' class='mr6'/> - <span v-text='job.name'/>
+                                <span v-text='job.layer'/> - <span v-text='job.name'/>
 
                             </div>
                             <div class='col col--3'>

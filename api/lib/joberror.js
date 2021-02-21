@@ -154,7 +154,7 @@ class JobError {
                         ON job_errors.job = job.id
                 WHERE
                     job_errors.job = $1
-            `, [ job_id ]);
+            `, [job_id]);
         } catch (err) {
             throw new Err(500, err, 'Failed to get job_error');
         }

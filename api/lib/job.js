@@ -499,7 +499,8 @@ class Job {
                     'Pending',
                     $6,
                     $7,
-                    $8
+                    $8,
+                    $9
                 ) RETURNING *
             `, [
                 this.run,

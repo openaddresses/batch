@@ -51,6 +51,7 @@ test('Job()', (t) => {
     t.equals(job.bounds, false, 'job.bounds: false');
     t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
     t.equals(job.name, 'city', 'job.name: city');
+    t.equals(job.license, false, 'job.license: null');
     t.equals(job.size, 0, 'job.size: 0');
     t.deepLooseEqual(job.output, {
         cache: false,
@@ -144,6 +145,7 @@ test('Job#json', (t) => {
             preview: false
         },
         loglink: false,
+        license: false,
         status: 'Pending',
         version: pkg.version,
         count: 0,

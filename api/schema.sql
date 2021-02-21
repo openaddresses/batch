@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS results (
 CREATE TABLE IF NOT EXISTS job (
     id          BIGSERIAL PRIMARY KEY,
     size        BIGINT,
+    license     TEXT,       -- SPDX License String or License URL
     run         BIGINT,     -- run ID
     map         BIGINT,     -- Map coverage ID
     created     TIMESTAMP,  -- Job submission timestamp

@@ -22,7 +22,10 @@
                         <span v-text='c.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                     </div>
                     <div class='col col--5'>
-                        <span class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
+                        <span class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                        </span>
+
                         <span class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(c.size)'></span>
                     </div>
                 </div>
@@ -77,14 +80,11 @@
         </div>
 
         <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--5'>
+            <div class='col col--9'>
                 Source
             </div>
-            <div class='col col--2'>
-                Updated
-            </div>
-            <div class='col col--5'>
-                <span class='fr'>Attributes</span>
+            <div class='col col--3'>
+                <span class='fr'>Data Layers</span>
             </div>
         </div>
 
@@ -103,20 +103,43 @@
             <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
         </template>
         <template v-else>
-            <div :key='d.id' v-for='d in datas' class='col col--12 grid'>
-                <div @click='emitjob(d.job)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+            <div :key='d.source' v-for='d in datas' class='col col--12 grid'>
+                <div @click='d._open = !d._open' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--5'>
                         <span class='ml12' v-text='d.source'/>
                     </div>
-                    <div class='col col--2'>
-                        <span v-text='d.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                    <div class='col col--3'>
                     </div>
-                    <div class='col col--5'>
-                        <span v-on:click.stop.prevent='datapls(d)' v-if='d.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Download</span>
-                        <span v-on:click.stop.prevent='emithistory(d)' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>History</span>
-                        <span class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(d.size)'></span>
+                    <div class='col col--4 color-gray'>
+                        <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>
+                        <span v-if='d.has.addresses' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg></span>
+                        <span v-if='d.has.parcels' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg></span>
                     </div>
                 </div>
+                <template v-if='d._open'>
+                    <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
+                        <div @click='emitjob(d.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
+                            <div class='col col--5'>
+                                <span v-text='job.layer' class='mr6'/> - <span v-text='job.name'/>
+
+                            </div>
+                            <div class='col col--3'>
+                                <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                            </div>
+                            <div class='col col--4'>
+                                <span v-on:click.stop.prevent='datapls(d)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                                </span>
+
+                                <span v-on:click.stop.prevent='emithistory(d)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
+                                </span>
+
+                                <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </template>
     </div>
@@ -232,7 +255,38 @@ export default {
 
                 return res.json();
             }).then((res) => {
-                this.datas = res;
+                const dataname = {};
+
+                for (const data of res) {
+                    if (dataname[data.source]) {
+                        dataname[data.source].push(data);
+                    } else {
+                        dataname[data.source] = [data];
+                    }
+                }
+
+                const data = [];
+                for (const sourcename of Object.keys(dataname)) {
+                    const d = {
+                        _open: false,
+                        source: sourcename,
+                        has: {
+                            addresses: false,
+                            buildings: false,
+                            parcels: false
+                        },
+                        sources: []
+                    };
+
+                    for (const source of dataname[sourcename]) {
+                        d.has[source.layer] = true;
+                        d.sources.push(source);
+
+                        data.push(d);
+                    }
+                }
+
+                this.datas = data;
 
                 this.loading.sources = false;
             }).catch((err) => {

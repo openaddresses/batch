@@ -1,7 +1,7 @@
 <template>
     <div class='col col--12 grid pt12'>
 
-        <div v-if='joberror' class='border mb12 round col col--12' :class='{
+        <div v-if='joberror' class='border mb24 round col col--12 py3' :class='{
             "border--red": job.status === "Fail",
             "bg-red-light": job.status === "Fail",
             "border--orange": job.status === "Warn",
@@ -12,6 +12,10 @@
             <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
 
             <div v-text='joberror.message' class='align-center'/>
+
+            <div class='flex-parent flex-parent--center-main'>
+                <ErrorsModerate @moderated='joberror = false' class='py12' :job='job'/>
+            </div>
         </div>
 
         <div class='col col--12 grid border-b border--gray-light'>
@@ -129,6 +133,7 @@
 
 <script>
 
+import ErrorsModerate from './ErrorsModerate.vue';
 import Status from './Status.vue';
 import JobStats from './job/JobStats.vue';
 import JobMap from './job/JobMap.vue';
@@ -168,6 +173,7 @@ export default {
     components: {
         JobMap,
         JobStats,
+        ErrorsModerate,
         Status
     },
     methods: {
@@ -193,6 +199,7 @@ export default {
             }).then((res) => {
                 return res.json();
             }).then((res) => {
+                if (res.status === 404) return;
                 this.joberror = res;
             }).catch(() => {
                 this.joberror = false;

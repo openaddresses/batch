@@ -25,7 +25,7 @@
         </template>
         <template v-else>
             <div @click='$router.push({ path: `/job/${job.id}` })' :key='job.id' v-for='(job, i) in problems' class='col col--12 grid'>
-                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
                         <Status :status='job.status'/>
                     </div>
@@ -36,16 +36,9 @@
                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--4'>
-                        <template v-if='job.status === "Warn"'>
-                            <button v-on:click.stop.prevent='mod(job.id, true, i)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
-                            <button v-on:click.stop.prevent='mod(job.id, false, i)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
-                        </template>
-                        <template v-else-if='job.status === "Fail"'>
-                            <button v-on:click.stop.prevent='mod(job.id, false, i)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Suppress</button>
-                            <button v-on:click.stop.prevent='createRerun(job.id)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Rerun</button>
-                        </template>
-                        <button v-on:click.stop.prevent='$router.push({ path: `/job/${job.id}/log` })' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Logs</button>
+                        <ErrorsModerate :job='job' @moderated="problems.splice(i, 1)"/>
                     </div>
+
                     <div class='col col--12 py3'>
                         <div class='align-center w-full' v-text='job.message'></div>
                     </div>
@@ -58,6 +51,7 @@
 
 <script>
 import Status from './Status.vue';
+import ErrorsModerate from './ErrorsModerate.vue';
 
 export default {
     name: 'Errors',
@@ -72,7 +66,8 @@ export default {
         this.refresh();
     },
     components: {
-        Status
+        Status,
+        ErrorsModerate
     },
     watch: {
         problems: function() {
@@ -82,29 +77,6 @@ export default {
     methods: {
         refresh: function() {
             this.getProblems();
-        },
-        mod: function(job_id, confirm, i) {
-            const url = new URL(`${window.location.origin}/api/job/error/${job_id}`);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    moderate: confirm ? 'confirm' : 'reject'
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get update job error');
-                }
-
-                this.problems.splice(i, 1);
-            }).catch((err) => {
-                this.$emit('err', err);
-            });
         },
         getProblems: function() {
             this.loading = true;
@@ -131,27 +103,6 @@ export default {
         },
         external: function(url) {
             window.open(url, "_blank");
-        },
-        createRerun: function(job_id) {
-            this.loading = true;
-
-            this.mod(job_id, false)
-
-            fetch(window.location.origin + `/api/job/${job_id}/rerun`, {
-                method: 'POST'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to rerun job');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.$router.push({ path: `/run/${res.run}` });
-            }).catch((err) => {
-                this.$emit('err', err);
-            });
         }
     }
 }

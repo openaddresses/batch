@@ -112,32 +112,34 @@
                     </div>
                     <div class='col col--4 color-gray'>
                         <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>
-                        <span v-if='d.has.addresses'class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg></span>
-                        <span v-if='d.has.parcels'class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg></span>
+                        <span v-if='d.has.addresses' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg></span>
+                        <span v-if='d.has.parcels' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg></span>
                     </div>
                 </div>
-                <div v-if='d._open' :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                    <div @click='emitjob(d.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
-                        <div class='col col--5'>
-                            <span v-text='job.layer' class='mr6'/> - <span v-text='job.name'/>
+                <template v-if='d._open'>
+                    <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
+                        <div @click='emitjob(d.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
+                            <div class='col col--5'>
+                                <span v-text='job.layer' class='mr6'/> - <span v-text='job.name'/>
 
-                        </div>
-                        <div class='col col--3'>
-                            <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
-                        </div>
-                        <div class='col col--4'>
-                            <span v-on:click.stop.prevent='datapls(d)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                                <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
-                            </span>
+                            </div>
+                            <div class='col col--3'>
+                                <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                            </div>
+                            <div class='col col--4'>
+                                <span v-on:click.stop.prevent='datapls(d)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                                </span>
 
-                            <span v-on:click.stop.prevent='emithistory(d)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
-                            </span>
+                                <span v-on:click.stop.prevent='emithistory(d)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
+                                </span>
 
-                            <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
+                                <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
         </template>
     </div>

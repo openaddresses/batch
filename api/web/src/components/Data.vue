@@ -266,7 +266,9 @@ export default {
                 }
 
                 const data = [];
+
                 for (const sourcename of Object.keys(dataname)) {
+                    if (sourcename.match(/dc/)) console.error(sourcename)
                     const d = {
                         _open: false,
                         source: sourcename,
@@ -281,9 +283,9 @@ export default {
                     for (const source of dataname[sourcename]) {
                         d.has[source.layer] = true;
                         d.sources.push(source);
-
-                        data.push(d);
                     }
+
+                    data.push(d);
                 }
 
                 this.datas = data;

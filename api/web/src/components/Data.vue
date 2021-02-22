@@ -118,7 +118,7 @@
                 </div>
                 <template v-if='d._open'>
                     <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                        <div @click='emitjob(job.id)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
+                        <div @click='emitjob(job.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
                             <div class='col col--5'>
                                 <span v-text='job.layer'/> - <span v-text='job.name'/>
 
@@ -127,7 +127,7 @@
                                 <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                             </div>
                             <div class='col col--4'>
-                                <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                                <span v-on:click.stop.prevent='datapls(job.job)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
                                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
                                 </span>
 

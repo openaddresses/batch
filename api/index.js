@@ -440,6 +440,37 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {delete} /api/login Delete Session
+     * @apiVersion 1.0.0
+     * @apiName DeleteLogin
+     * @apiGroup Login
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Log a user out of the service
+     *
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     */
+    router.delete(
+        ...schemas.get('DELETE /login'),
+        async (req, res) => {
+            req.session.destroy((err) => {
+                if (err) {
+                    return res.status(500).json({
+                        status: 500,
+                        message: 'Failed to logout user'
+                    });
+                }
+
+                return res.json({
+                    status: 200,
+                    message: 'The user has been logged ut'
+                });
+            });
+        }
+    );
+
+    /**
      * @api {post} /api/login/forgot Forgot Login
      * @apiVersion 1.0.0
      * @apiName ForgotLogin

@@ -63,7 +63,7 @@ export default {
         login: function() {
             this.$router.push('/login');
         },
-        register: function() {
+        register: async function() {
             this.attempted = true;
 
             if (!this.username.length) return;
@@ -71,30 +71,40 @@ export default {
             if (!this.email.length) return;
             this.loading = true;
 
-            fetch(window.location.origin + `/api/user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    username: this.username,
-                    email: this.email,
-                    password: this.password
-                })
-            }).then((res) => {
-                this.loading = false;
+            let res;
+            try {
+                res = await fetch(window.location.origin + `/api/user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        username: this.username,
+                        email: this.email,
+                        password: this.password
+                    })
+                });
+            } catch(err) {
+                return this.$emit('err', err);
+            }
 
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
+            this.loading = false;
+
+            try {
+                const body = await res.json();
+
+                if (!res.ok && body.message) {
+                    throw new Error(body.message);
                 } else if (!res.ok) {
                     throw new Error('Failed to register user');
                 }
 
-                this.success = true;
-            }).catch((err) => {
-                this.$emit('err', err);
-            });
+            } catch (err) {
+                return this.$emit('err', err);
+            }
+
+            this.success = true;
         }
     }
 }

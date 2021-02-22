@@ -41,9 +41,16 @@
                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--5 pr12'>
-                        <span v-on:click.stop.prevent='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
-                        <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                        <span v-on:click.stop.prevent='datapls(job)'  v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                        <span v-on:click.stop.prevent='datapls(job)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                        </span>
+                        <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                        </span>
+
+                        <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-notes" /></svg>
+                        </span>
                     </div>
                 </div>
             </div>

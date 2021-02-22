@@ -143,6 +143,10 @@
         "body": false,
         "query": false
     },
+    "GET /job/error/:job": {
+        "body": false,
+        "query": false
+    },
     "GET /job/:job": {
         "body": false,
         "query": false

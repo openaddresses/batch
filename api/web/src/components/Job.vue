@@ -1,5 +1,23 @@
 <template>
     <div class='col col--12 grid pt12'>
+
+        <div v-if='joberror' class='border mb24 round col col--12 py3' :class='{
+            "border--red": job.status === "Fail",
+            "bg-red-light": job.status === "Fail",
+            "border--orange": job.status === "Warn",
+            "bg-orange-light": job.status === "Warn"
+
+        }'>
+            <h2 v-if='job.status === "Fail"' class='txt-h4 align-center'>Active Job Error</h2>
+            <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
+
+            <div v-text='joberror.message' class='align-center'/>
+
+            <div class='flex-parent flex-parent--center-main'>
+                <ErrorsModerate @moderated='joberror = false' class='py12' :job='job'/>
+            </div>
+        </div>
+
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
                 <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
@@ -23,9 +41,21 @@
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
 
-                <span v-on:click.stop.prevent='external(job.source)' v-if='job.source' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Source</span>
-                <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Logs</span>
-                <span v-on:click.stop.prevent='datapls' v-if='job.output.output' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Data</span>
+                <span v-on:click.stop.prevent='datapls' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                </span>
+
+                <span v-if='job.license' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-license" /></svg>
+                </span>
+
+                <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                </span>
+
+                <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-notes" /></svg>
+                </span>
             </div>
         </div>
 
@@ -103,6 +133,7 @@
 
 <script>
 
+import ErrorsModerate from './ErrorsModerate.vue';
 import Status from './Status.vue';
 import JobStats from './job/JobStats.vue';
 import JobMap from './job/JobMap.vue';
@@ -117,6 +148,7 @@ export default {
             sample: [],
             props: [],
             name: '',
+            joberror: false,
             delta: {
                 compare: false,
                 master: false,
@@ -141,6 +173,7 @@ export default {
     components: {
         JobMap,
         JobStats,
+        ErrorsModerate,
         Status
     },
     methods: {
@@ -156,8 +189,21 @@ export default {
         },
         refresh: function() {
             this.getJob();
+            this.getError();
             this.getDelta();
             this.getSample();
+        },
+        getError: function() {
+            fetch(window.location.origin + `/api/job/error/${this.jobid}`, {
+                method: 'GET'
+            }).then((res) => {
+                return res.json();
+            }).then((res) => {
+                if (res.status === 404) return;
+                this.joberror = res;
+            }).catch(() => {
+                this.joberror = false;
+            });
         },
         getDelta: function() {
             fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {

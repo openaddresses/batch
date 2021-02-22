@@ -138,6 +138,42 @@ class JobError {
         });
     }
 
+    static async get(pool, job_id) {
+        let pgres;
+        try {
+            pgres = await pool.query(`
+                SELECT
+                    job.id,
+                    job.status,
+                    job_errors.message,
+                    job.source_name,
+                    job.layer,
+                    job.name
+                FROM
+                    job_errors INNER JOIN job
+                        ON job_errors.job = job.id
+                WHERE
+                    job_errors.job = $1
+            `, [job_id]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get job_error');
+        }
+
+        if (pgres.rows.length === 0) {
+            throw new Err(404, null, 'No job errors found');
+        }
+
+        const row = pgres.rows[0];
+        return {
+            id: parseInt(row.id),
+            status: row.status,
+            message: row.message,
+            source_name: row.source_name,
+            layer: row.layer,
+            name: row.name
+        };
+    }
+
     static async count(pool) {
         let pgres;
         try {

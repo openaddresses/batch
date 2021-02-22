@@ -203,6 +203,7 @@ const stack = {
                     Environment: [
                         { Name: 'JOB_DEFINITION', Value: cf.ref('BatchJobDefinition') },
                         { Name: 'JOB_STD_QUEUE', Value:  cf.ref('BatchJobQueue') },
+                        { Name: 'JOB_STD_CI_QUEUE', Value:  cf.ref('BatchCIJobQueue') },
                         { Name: 'JOB_MEGA_QUEUE', Value: cf.ref('BatchMegaJobQueue') },
                         { Name: 'JOB_NAME', Value: 'lambda-trigger-job' },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },

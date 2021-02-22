@@ -19,10 +19,9 @@ function trigger(event) {
     return new Promise((resolve, reject) => {
         const jobDefinition = process.env.JOB_DEFINITION;
         const jobStdQueue = process.env.JOB_STD_QUEUE;
+        const jobStdCIQueue = process.env.JOB_STD_CI_QUEUE;
         const jobMegaQueue = process.env.JOB_MEGA_QUEUE;
         const jobName = process.env.JOB_NAME;
-
-        console.error('EVENT: ', JSON.stringify(event));
 
         if (typeof event !== 'object' || Array.isArray(event)) {
             return reject(new Error('event must be Key/Value pairs'));
@@ -31,7 +30,7 @@ function trigger(event) {
         if (!event.type) return reject(new Error('Event Type Required'));
         let params;
 
-        if (event.type === 'job') {
+        if (event.type === 'job' || event.type === 'job-ci') {
             if (!event.job) return reject(new Error('Job ID required'));
             if (!event.source) return reject(new Error('URL of source required'));
             if (!event.layer) return reject(new Error('Layer of source required'));
@@ -39,7 +38,7 @@ function trigger(event) {
 
             params = {
                 jobDefinition: jobDefinition,
-                jobQueue: jobStdQueue,
+                jobQueue: event.type === 'job' ? jobStdQueue : jobStdCIQueue,
                 jobName: jobName,
                 containerOverrides: {
                     command: ['./task.js'],

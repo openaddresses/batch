@@ -87,6 +87,10 @@
         "body": false,
         "query": false
     },
+    "DELETE /login": {
+        "body": false,
+        "query": false
+    },
     "GET /token": {
         "body": false,
         "query": false

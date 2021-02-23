@@ -214,6 +214,18 @@ const stack = {
                 'JobQueueName': cf.join('-', [cf.stackName, 'std-queue'])
             }
         },
+        BatchCIJobQueue: {
+            'Type': 'AWS::Batch::JobQueue',
+            'Properties': {
+                'ComputeEnvironmentOrder': [{
+                    'Order': 1,
+                    'ComputeEnvironment': cf.ref('BatchComputeEnvironment')
+                }],
+                'State': 'ENABLED',
+                'Priority': 2,
+                'JobQueueName': cf.join('-', [cf.stackName, 'std-ci-queue'])
+            }
+        },
         BatchMegaJobQueue: {
             'Type': 'AWS::Batch::JobQueue',
             'Properties': {

@@ -374,6 +374,10 @@ class Auth {
                 flags: row.flags
             };
         } catch (err) {
+            if (err.code && err.code === '23505') {
+                throw new Err(400, null, 'User already exists');
+            }
+
             throw new Err(500, err, 'Failed to register user');
         }
     }

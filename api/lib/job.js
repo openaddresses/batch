@@ -527,7 +527,12 @@ class Job {
         }
     }
 
-    async batch() {
+    /**
+     * Submit the Job to AWS Batch for processing
+     *
+     * @param {Boolean} ci Should the job be submit to the CI queue (faster) or the default
+     */
+    async batch(ci) {
         if (!this.id) throw new Err(400, null, 'Cannot batch a job without an ID');
 
         if (process.env.StackName === 'test') {
@@ -535,7 +540,7 @@ class Job {
         } else {
             try {
                 return await batchjob({
-                    type: 'job',
+                    type: ci ? 'job-ci' : 'job',
                     job: this.id,
                     source: this.source,
                     layer: this.layer,

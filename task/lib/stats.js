@@ -30,19 +30,32 @@ class Stats {
                     district: 0,
                     region: 0,
                     postcode: 0
+                },
+                validity: {
+                    valid: 0,
+                    coordinates: 0,
+                    failures: {
+                        number: 0,
+                        street: 0,
+                        parse: 0,
+                        other: 0
+                    }
                 }
             };
         } else if (this.layer === 'buildings') {
             this.stats.buildings = {
-                counts: {}
+                counts: {},
+                validity: {}
             };
         } else if (this.layer === 'parcels') {
             this.stats.parcels = {
-                counts: {}
+                counts: {},
+                validity: {}
             };
         } else {
             this.stats[this.layer] = {
-                counts: {}
+                counts: {},
+                validity: {}
             };
         }
     }

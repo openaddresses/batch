@@ -6,6 +6,7 @@ const split = require('split');
 const turf = require('@turf/turf');
 const { pipeline } = require('stream');
 const transform = require('parallel-transform');
+const Validator = require('./validator');
 
 class Stats {
     constructor(file, layer) {
@@ -31,36 +32,29 @@ class Stats {
                     region: 0,
                     postcode: 0
                 },
-                validity: {
-                    valid: 0,
-                    coordinates: 0,
-                    failures: {
-                        number: 0,
-                        street: 0,
-                        parse: 0,
-                        other: 0
-                    }
-                }
+                validity: false
             };
         } else if (this.layer === 'buildings') {
             this.stats.buildings = {
                 counts: {},
-                validity: {}
+                validity: false
             };
         } else if (this.layer === 'parcels') {
             this.stats.parcels = {
                 counts: {},
-                validity: {}
+                validity: false
             };
         } else {
             this.stats[this.layer] = {
                 counts: {},
-                validity: {}
+                validity: false
             };
         }
     }
 
-    calc() {
+    calc(layer) {
+        const validator = new Validator(layer);
+
         return new Promise((resolve, reject) => {
             pipeline(
                 fs.createReadStream(path.resolve(this.file)),
@@ -79,6 +73,8 @@ class Stats {
 
                     this.bounds(feat);
 
+                    validator.test(feat);
+
                     if (this.layer === 'addresses') {
                         this.addresses(feat);
                     }
@@ -89,6 +85,7 @@ class Stats {
                 (err) => {
                     if (err) return reject(err);
 
+                    this.stats.validity = validator.stats;
                     return resolve(this.stats);
                 }
             );

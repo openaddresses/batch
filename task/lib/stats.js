@@ -21,6 +21,8 @@ class Stats {
             bounds: []
         };
 
+        this.validator = new Validator(this.layer);
+
         if (this.layer === 'addresses') {
             this.stats.addresses = {
                 counts: {
@@ -32,29 +34,27 @@ class Stats {
                     region: 0,
                     postcode: 0
                 },
-                validity: false
+                validity: this.validator.stats
             };
         } else if (this.layer === 'buildings') {
             this.stats.buildings = {
                 counts: {},
-                validity: false
+                validity: this.validator.stats
             };
         } else if (this.layer === 'parcels') {
             this.stats.parcels = {
                 counts: {},
-                validity: false
+                validity: this.validator.stats
             };
         } else {
             this.stats[this.layer] = {
                 counts: {},
-                validity: false
+                validity: this.validator.stats
             };
         }
     }
 
-    calc(layer) {
-        const validator = new Validator(layer);
-
+    calc() {
         return new Promise((resolve, reject) => {
             pipeline(
                 fs.createReadStream(path.resolve(this.file)),
@@ -73,7 +73,7 @@ class Stats {
 
                     this.bounds(feat);
 
-                    validator.test(feat);
+                    this.validator.test(feat);
 
                     if (this.layer === 'addresses') {
                         this.addresses(feat);
@@ -85,7 +85,6 @@ class Stats {
                 (err) => {
                     if (err) return reject(err);
 
-                    this.stats.validity = validator.stats;
                     return resolve(this.stats);
                 }
             );

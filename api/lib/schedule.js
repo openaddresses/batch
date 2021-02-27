@@ -17,11 +17,7 @@ class Schedule {
         } else if (event.type === 'sources') {
             await Schedule.sources(pool);
         } else if (event.type === 'close') {
-            // TODO actuall close old jobs and runs
-            return {
-                status: 200,
-                message: 'Closed old jobs/runs'
-            };
+            await Schedule.close(pool);
         }
     }
 
@@ -45,6 +41,15 @@ class Schedule {
         }  catch (err) {
             throw new Err(500, err, 'failed to submit sources job to batch');
         }
+    }
+
+    static async close(pool) {
+        await pool.query(`
+            DELETE FROM
+                users_reset
+            WHERE
+                expires < NOW()
+        `);
     }
 }
 

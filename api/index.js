@@ -395,7 +395,7 @@ async function server(args, config, cb) {
         ...schemas.get('GET /login/verify'),
         async (req, res) => {
             try {
-                res.json(await auth.verify(req.query));
+                res.json(await auth.verify(req.query.token));
             } catch (err) {
                 return Err.respond(err, res);
             }

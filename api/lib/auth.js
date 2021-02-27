@@ -21,9 +21,8 @@ class Auth {
         return true;
     }
 
-    async verify(user) {
-        if (!user.token) throw new Err(400, null, 'token required');
-        if (!user.password) throw new Err(400, null, 'password required');
+    async verify(token) {
+        if (!token) throw new Err(400, null, 'token required');
 
         let pgres;
         try {
@@ -36,7 +35,7 @@ class Auth {
                     expires > NOW()
                     AND token = $1
                     AND action = 'verify'
-            `, [user.token]);
+            `, [token]);
         } catch (err) {
             throw new Err(500, err, 'User Verify Error');
         }

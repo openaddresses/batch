@@ -335,6 +335,8 @@ async function server(args, config, cb) {
             try {
                 const user = await auth.register(req.body);
 
+                auth.forgot(user.username, 'verify');
+
                 if (args.email) await email.verify(req.body);
 
                 res.json(user);

@@ -129,11 +129,14 @@ class Auth {
     }
 
     /**
-     * Given a username or email, generate a password reset email
+     * Given a username or email, generate a password reset or validation email
+     *
      * @param {string} user username or email to reset
+     * @param {string} [action=reset] 'reset' or 'verify'
      */
-    async forgot(user) {
+    async forgot(user, action) {
         if (!user || !user.length) throw new Err(400, null, 'user must not be empty');
+        if (!action) action = 'reset';
 
         let pgres;
         try {
@@ -162,8 +165,8 @@ class Auth {
                     users_reset
                 WHERE
                     uid = $1
-                    AND action = 'reset'
-            `, [u.id]);
+                    AND action = $2
+            `, [u.id, action]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -178,9 +181,9 @@ class Auth {
                     $1,
                     NOW() + interval '1 hour',
                     $2,
-                    'reset'
+                    $3
                 )
-            `, [u.id, buffer.toString('hex')]);
+            `, [u.id, buffer.toString('hex'), action]);
 
             return {
                 uid: u.id,

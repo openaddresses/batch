@@ -45,32 +45,47 @@ export default {
         }
     },
     methods: {
-        login: function() {
+        login: async function() {
             this.attempted = true;
 
             if (!this.username.length) return;
             if (!this.password.length) return;
             this.loading = true;
 
-            fetch(window.location.origin + `/api/login`, {
-                method: 'post',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    username: this.username,
-                    password: this.password
-                })
-            }).then((res) => {
-                this.loading = false;
-                if (!res.ok) throw new Error('Incorrect username or password');
+            let res;
+            try {
+                res = await fetch(window.location.origin + `/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password
+                    })
+                });
+            } catch(err) {
+                return this.$emit('err', err);
+            }
 
-                this.$emit('auth');
-                this.$router.push('/data')
-            }).catch((err) => {
-                this.$emit('err', err);
-            });
+            this.loading = false;
+
+            try {
+                const body = await res.json();
+
+                if (!res.ok && body.message) {
+                    throw new Error(body.message);
+                } else if (!res.ok) {
+                    throw new Error('Failed to login');
+                }
+
+            } catch (err) {
+                return this.$emit('err', err);
+            }
+
+            this.$emit('auth');
+            this.$router.push('/data')
         }
     }
 }

@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS users (
     flags       JSONB NOT NULL,
     username    TEXT UNIQUE NOT NULL,
     email       TEXT UNIQUE NOT NULL,
-    password    TEXT NOT NULL
+    password    TEXT NOT NULL,
+    validated   BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS users_tokens (
@@ -100,6 +101,7 @@ CREATE TABLE IF NOT EXISTS runs (
 CREATE TABLE IF NOT EXISTS users_reset (
     uid         BIGINT,
     expires     TIMESTAMP,
-    token       TEXT
+    token       TEXT,
+    action      TEXT
 );
 

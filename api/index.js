@@ -14,7 +14,7 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate'],
+    boolean: ['help', 'populate', 'email'],
     string: ['postgres']
 });
 
@@ -333,7 +333,17 @@ async function server(args, config, cb) {
         ...schemas.get('POST /user'),
         async (req, res) => {
             try {
-                res.json(await auth.register(req.body));
+                const user = await auth.register(req.body);
+
+                const forgot = await auth.forgot(user.username, 'verify');
+
+                if (args.email) await email.verify({
+                    username: user.username,
+                    email: user.email,
+                    token: forgot.token
+                });
+
+                res.json(user);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -369,6 +379,30 @@ async function server(args, config, cb) {
             }
         }
     );
+
+    /**
+     * @api {post} /api/login/verify Verify User
+     * @apiVersion 1.0.0
+     * @apiName VerifyLogin
+     * @apiGroup Login
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Email Verification of new user
+     *
+     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     */
+    router.get(
+        ...schemas.get('GET /login/verify'),
+        async (req, res) => {
+            try {
+                res.json(await auth.verify(req.query.token));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
 
     /**
      * @api {get} /api/login Session Info
@@ -489,7 +523,7 @@ async function server(args, config, cb) {
             try {
                 const reset = await auth.forgot(req.body.user); // Username or email
 
-                await email.forgot(reset);
+                if (args.email) await email.forgot(reset);
 
                 // To avoid email scraping - this will always return true, regardless of success
                 return res.json({ status: 200, message: 'Password Email Sent' });

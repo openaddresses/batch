@@ -15,6 +15,10 @@
         "body": true,
         "query": false
     },
+    "GET /login/verify": {
+        "body": false,
+        "query": true
+    },
     "POST /login/forgot": {
         "body": true,
         "query": false

@@ -21,6 +21,50 @@ class Auth {
         return true;
     }
 
+    async verify(token) {
+        if (!token) throw new Err(400, null, 'token required');
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    uid
+                FROM
+                    users_reset
+                WHERE
+                    expires > NOW()
+                    AND token = $1
+                    AND action = 'verify'
+            `, [token]);
+        } catch (err) {
+            throw new Err(500, err, 'User Verify Error');
+        }
+
+        if (pgres.rows.length !== 1) {
+            throw new Err(401, null, 'Invalid or Expired Verify Token');
+        }
+
+        try {
+            await this.pool.query(`
+                DELETE FROM users_reset
+                    WHERE uid = $1
+            `, [pgres.rows[0].uid]);
+
+            await this.pool.query(`
+                UPDATE users
+                    SET validated = True
+                    WHERE id = $1
+            `, [pgres.rows[0].uid]);
+
+            return {
+                status: 200,
+                message: 'User Verified'
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to verify user');
+        }
+    }
+
     async reset(user) {
         if (!user.token) throw new Err(400, null, 'token required');
         if (!user.password) throw new Err(400, null, 'password required');
@@ -35,6 +79,7 @@ class Auth {
                 WHERE
                     expires > NOW()
                     AND token = $1
+                    AND action = 'reset'
             `, [user.token]);
         } catch (err) {
             throw new Err(500, err, 'User Reset Error');
@@ -52,7 +97,9 @@ class Auth {
             await this.pool.query(`
                 UPDATE users
                     SET
-                        password = $1
+                        password = $1,
+                        validated = True
+
                     WHERE
                         id = $2
             `, [
@@ -72,16 +119,19 @@ class Auth {
                 message: 'User Reset'
             };
         } catch (err) {
-            throw new Err(500, err, 'Failed to create user');
+            throw new Err(500, err, 'Failed to reset user\'s password');
         }
     }
 
     /**
-     * Given a username or email, generate a password reset email
+     * Given a username or email, generate a password reset or validation email
+     *
      * @param {string} user username or email to reset
+     * @param {string} [action=reset] 'reset' or 'verify'
      */
-    async forgot(user) {
+    async forgot(user, action) {
         if (!user || !user.length) throw new Err(400, null, 'user must not be empty');
+        if (!action) action = 'reset';
 
         let pgres;
         try {
@@ -110,7 +160,8 @@ class Auth {
                     users_reset
                 WHERE
                     uid = $1
-            `, [u.id]);
+                    AND action = $2
+            `, [u.id, action]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -120,13 +171,14 @@ class Auth {
 
             await this.pool.query(`
                 INSERT INTO
-                    users_reset (uid, expires, token)
+                    users_reset (uid, expires, token, action)
                 VALUES (
                     $1,
                     NOW() + interval '1 hour',
-                    $2
+                    $2,
+                    $3
                 )
-            `, [u.id, buffer.toString('hex')]);
+            `, [u.id, buffer.toString('hex'), action]);
 
             return {
                 uid: u.id,
@@ -304,7 +356,8 @@ class Auth {
                     access,
                     email,
                     password,
-                    flags
+                    flags,
+                    validated
                 FROM
                     users
                 WHERE
@@ -323,6 +376,10 @@ class Auth {
 
         if (!await bcrypt.compare(user.password, pgres.rows[0].password)) {
             throw new Err(403, null, 'Invalid Username or Pass');
+        }
+
+        if (!pgres.rows[0].validated) {
+            throw new Err(403, null, 'User has not confirmed email');
         }
 
         return {

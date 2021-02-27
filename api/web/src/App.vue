@@ -25,7 +25,7 @@
                         <svg class='inline pt3 icon'><use xlink:href='#icon-user'/></svg><span v-text='auth.username'/>
 
                         <div class='round dropdown-content'>
-                            <div @click='logout' class='round bg-gray-faint-on-hover'>Logout</div>
+                            <div v-on:click.stop.prevent='logout' class='round bg-gray-faint-on-hover'>Logout</div>
                         </div>
                     </button>
                 </router-link>

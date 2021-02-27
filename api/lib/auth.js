@@ -48,13 +48,13 @@ class Auth {
             await this.pool.query(`
                 DELETE FROM users_reset
                     WHERE uid = $1
-            `, [ pgres.rows[0].uid ]);
+            `, [pgres.rows[0].uid]);
 
             await this.pool.query(`
-                UPDATE user
+                UPDATE users
                     SET validated = True
                     WHERE id = $1
-            `, [ pgres.rows[0].uid ]);
+            `, [pgres.rows[0].uid]);
 
             return {
                 status: 200,
@@ -97,19 +97,15 @@ class Auth {
             await this.pool.query(`
                 UPDATE users
                     SET
-                        password = $1
+                        password = $1,
+                        validated = True
+
                     WHERE
                         id = $2
             `, [
                 userhash,
                 uid
             ]);
-
-            await this.pool.query(`
-                UPDATE user
-                    SET validated = True
-                    WHERE id = $1
-            `, [ uid ]);
 
             await this.pool.query(`
                 DELETE FROM users_reset

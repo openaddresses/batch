@@ -15,6 +15,7 @@ import Upload from './components/Upload.vue';
 import Errors from './components/Errors.vue';
 import Login from './components/Login.vue';
 import Forgot from './components/Forgot.vue';
+import Verify from './components/Verify.vue';
 import Reset from './components/Reset.vue';
 import History from './components/History.vue';
 import Data from './components/Data.vue';
@@ -44,6 +45,7 @@ const router = new VueRouter({
         { path: '/data/:dataid/history', component: History, props: true },
 
         { path: '/login', component: Login },
+        { path: '/login/verify', component: Verify },
         { path: '/login/forgot', component: Forgot },
         { path: '/login/reset', component: Reset },
         { path: '/profile', component: Profile },

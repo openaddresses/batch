@@ -34,6 +34,7 @@ class Email {
      *
      * @param {Object} user
      * @param {String} user.username
+     * @param {String} user.email
      * @param {String} user.token
      */
     async verify(user) {

@@ -1,5 +1,31 @@
 <template>
     <div class='col col--12 pt12'>
+
+        <div class='round border border--green pb12 mb12'>
+            <h3 class='align-center pb12'>New Features</h3>
+
+            <div class='grid'>
+                <div class='col col--4 flex-parent flex-parent--center-main'>
+                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg>
+                    Buildings
+                </div>
+                <div class='col col--4 flex-parent flex-parent--center-main'>
+                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg>
+                    Addresses
+                </div>
+                <div class='col col--4 flex-parent flex-parent--center-main'>
+                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg>
+                    Parcels
+                </div>
+                <div class='col col--12'>
+                    <div class='align-center pt12'>
+                        After many months of work, we've expanded the project to include parcels and building polygons.
+                        Look for the symbols above in the data sources to download the new layers
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class='col col--12'>
             <div class='col col--12 grid border-b border--gray-light mb12'>
                 <div class='col col--12'>

@@ -2,6 +2,7 @@
 
 'use strict';
 const glob = require('glob');
+const OA = require('lib-oa');
 const os = require('os');
 const {Unzip} = require('zlib');
 const split = require('split');
@@ -41,6 +42,11 @@ const s3 = new AWS.S3({
 async function fetch() {
     let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
 
+    const oa = new OA({
+        url: process.env.OA_API,
+        secret: process.env.SharedSecret
+    });
+
     try {
         fs.stat(DRIVE)
 
@@ -53,9 +59,9 @@ async function fetch() {
     console.error(`ok - TMP: ${tmp}`);
 
     try {
-        const collections = await fetch_collections();
+        const collections = await oa.cmd('collection', 'list');
         console.error('ok - got collections list');
-        const datas = await fetch_datas();
+        const datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
         const stats = await sources(tmp, datas);
@@ -215,35 +221,5 @@ function zip_datas(tmp, datas, name) {
         });
 
         archive.finalize();
-    });
-}
-
-function fetch_collections() {
-    return new Promise((resolve, reject) => {
-        request({
-            url: `${process.env.OA_API}/api/collections`,
-            json: true,
-            method: 'GET'
-        }, (err, res) => {
-            if (err) return reject(err);
-
-            if (res.statusCode !== 200) throw new Error(res.body);
-
-            return resolve(res.body);
-        });
-    });
-}
-
-function fetch_datas() {
-    return new Promise((resolve, reject) => {
-        request({
-            url: `${process.env.OA_API}/api/data`,
-            json: true,
-            method: 'GET'
-        }, (err, res) => {
-            if (err) return reject(err);
-
-            return resolve(res.body);
-        });
     });
 }

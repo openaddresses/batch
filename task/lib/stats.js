@@ -6,6 +6,7 @@ const split = require('split');
 const turf = require('@turf/turf');
 const { pipeline } = require('stream');
 const transform = require('parallel-transform');
+const Validator = require('./validator');
 
 class Stats {
     constructor(file, layer) {
@@ -20,6 +21,8 @@ class Stats {
             bounds: []
         };
 
+        this.validator = new Validator(this.layer);
+
         if (this.layer === 'addresses') {
             this.stats.addresses = {
                 counts: {
@@ -30,19 +33,23 @@ class Stats {
                     district: 0,
                     region: 0,
                     postcode: 0
-                }
+                },
+                validity: this.validator.stats
             };
         } else if (this.layer === 'buildings') {
             this.stats.buildings = {
-                counts: {}
+                counts: {},
+                validity: this.validator.stats
             };
         } else if (this.layer === 'parcels') {
             this.stats.parcels = {
-                counts: {}
+                counts: {},
+                validity: this.validator.stats
             };
         } else {
             this.stats[this.layer] = {
-                counts: {}
+                counts: {},
+                validity: this.validator.stats
             };
         }
     }
@@ -65,6 +72,8 @@ class Stats {
                     this.stats.count++;
 
                     this.bounds(feat);
+
+                    this.validator.test(feat);
 
                     if (this.layer === 'addresses') {
                         this.addresses(feat);

@@ -15,7 +15,7 @@ test('Stats()', (t) => {
 
     const stats = new Stats(path.resolve(__dirname, './fixtures/addresses.geojson'), 'addresses');
 
-    t.ok(/batch\/task\/test\/fixtures\/addresses.geojson/.test(stats.file), 'stats.file: <geojson>');
+    t.ok(/\/fixtures\/addresses.geojson/.test(stats.file), 'stats.file: <geojson>');
     t.deepEquals(stats.stats, {
         count: 0,
         bounds: [],
@@ -28,6 +28,14 @@ test('Stats()', (t) => {
                 district: 0,
                 region: 0,
                 postcode: 0
+            },
+            validity: {
+                valid: 0,
+                failures: {
+                    geometry: 0,
+                    number: 0,
+                    street: 0
+                }
             }
         }
     }, 'stats.stats: { ... }');
@@ -56,6 +64,14 @@ test('Stats#calc', async (t) => {
             district: 0,
             region: 0,
             postcode: 0
+        },
+        validity: {
+            valid: 83,
+            failures: {
+                geometry: 0,
+                number: 17,
+                street: 0
+            }
         }
     }, 'stats.stats.addresses: { ... }');
 

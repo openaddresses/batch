@@ -68,6 +68,14 @@ test('Job#convert', async (t) => {
                 district: 99,
                 region: 0,
                 postcode: 0
+            },
+            validity: {
+                valid: 99,
+                failures: {
+                    geometry: 0,
+                    number: 0,
+                    street: 0
+                }
             }
         }, 'job.stats');
     } catch (err) {

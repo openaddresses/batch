@@ -224,7 +224,7 @@ class Run {
 
             try {
                 await jobs[i].generate(pool);
-                await jobs[i].batch();
+                await jobs[i].batch(run.github && run.github.check);
             } catch (err) {
                 // TODO return list of successful ids
                 throw new Err(400, err, 'jobs only partially queued');

@@ -26,7 +26,7 @@ class Validator {
                 failures: {
                     geometry: 0
                 }
-            }
+            };
         } else if (layer === 'parcels') {
             this.validate = false;
 
@@ -35,7 +35,7 @@ class Validator {
                 failures: {
                     geometry: 0
                 }
-            }
+            };
         } else {
             this.validate = false;
 
@@ -44,7 +44,7 @@ class Validator {
                 failures: {
                     geometry: 0
                 }
-            }
+            };
         }
     }
 
@@ -106,9 +106,9 @@ class Validator {
         if (isNaN(Number(feat.geometry.coordinates[0])) || feat.geometry.coordinates[0] < -180 || feat.geometry.coordinates[0] > 180) errs.geometry.push('Feat exceeds +/-180deg coord bounds');
         if (isNaN(Number(feat.geometry.coordinates[1])) || feat.geometry.coordinates[1] < -85 || feat.geometry.coordinates[1] > 85) errs.geometry.push('Feat exceeds +/-85deg coord bounds');
 
-        if (errs.geometry.length) ++this.stats.failures.geometry
-        if (errs.street.length) ++this.stats.failures.street
-        if (errs.number.length) ++this.stats.failures.number
+        if (errs.geometry.length) ++this.stats.failures.geometry;
+        if (errs.street.length) ++this.stats.failures.street;
+        if (errs.number.length) ++this.stats.failures.number;
         if (!errs.geometry.length && !errs.street.length && !errs.number.length) {
             ++this.stats.valid;
         }

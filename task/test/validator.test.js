@@ -13,7 +13,7 @@ test('Valid Feature', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -39,7 +39,7 @@ test('Missing Number', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -66,7 +66,7 @@ test('Empty Number', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -93,7 +93,7 @@ test('Whitespace Number', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -120,7 +120,7 @@ test('Too Large Number', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -146,7 +146,7 @@ test('Missing Street', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -173,7 +173,7 @@ test('Empty Street', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -182,7 +182,7 @@ test('Empty Street', (t) => {
         failures: {
             geometry: 0,
             number: 0,
-            street: 1,
+            street: 1
         }
     }, 'expected stats');
 
@@ -200,7 +200,7 @@ test('Invalid Coords - Lng', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ -181, 43.43245 ]
+            coordinates: [-181, 43.43245]
         }
     });
 
@@ -209,7 +209,7 @@ test('Invalid Coords - Lng', (t) => {
         failures: {
             geometry: 1,
             number: 0,
-            street: 0,
+            street: 0
         }
     }, 'expected stats');
 
@@ -227,7 +227,7 @@ test('Invalid Coords - Lat', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ -180, -91 ]
+            coordinates: [-180, -91]
         }
     });
 
@@ -236,7 +236,7 @@ test('Invalid Coords - Lat', (t) => {
         failures: {
             geometry: 1,
             number: 0,
-            street: 0,
+            street: 0
         }
     }, 'expected stats');
 
@@ -254,8 +254,8 @@ test('Multi Features', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
-        },
+            coordinates: [13.43232, 43.43245]
+        }
     });
 
     validator.test({
@@ -266,7 +266,7 @@ test('Multi Features', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 
@@ -278,7 +278,7 @@ test('Multi Features', (t) => {
         },
         geometry: {
             type: 'Point',
-            coordinates: [ 13.43232, 43.43245 ]
+            coordinates: [13.43232, 43.43245]
         }
     });
 

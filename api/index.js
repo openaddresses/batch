@@ -335,9 +335,12 @@ async function server(args, config, cb) {
             try {
                 const user = await auth.register(req.body);
 
-                auth.forgot(user.username, 'verify');
+                const forgot = auth.forgot(user.username, 'verify');
 
-                if (args.email) await email.verify(req.body);
+                if (args.email) await email.verify({
+                    user.username,
+                    forgot.token
+                });
 
                 res.json(user);
             } catch (err) {

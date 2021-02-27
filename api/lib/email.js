@@ -29,6 +29,13 @@ class Email {
         }
     }
 
+    /**
+     * Send an email verification to the user
+     *
+     * @param {Object} user
+     * @param {String} user.username
+     * @param {String} user.token
+     */
     async verify(user) {
         if (!this.mg) return;
 

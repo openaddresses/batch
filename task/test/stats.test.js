@@ -15,7 +15,7 @@ test('Stats()', (t) => {
 
     const stats = new Stats(path.resolve(__dirname, './fixtures/addresses.geojson'), 'addresses');
 
-    t.ok(/batch\/task\/test\/fixtures\/addresses.geojson/.test(stats.file), 'stats.file: <geojson>');
+    t.ok(/\/fixtures\/addresses.geojson/.test(stats.file), 'stats.file: <geojson>');
     t.deepEquals(stats.stats, {
         count: 0,
         bounds: [],

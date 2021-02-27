@@ -8,7 +8,8 @@
         <template v-else-if='success'>
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <h3 class='flex-child txt-h4 py6'>Successfully Registered!</h3>
-
+            </div>
+            <div class='col col--12 flex-parent flex-parent--center-main'>
                 <p class='flex-child txt-h4 py6'>Please check your email for a verification link!</p>
             </div>
             <div class='col col--12 flex-parent flex-parent--center-main'>

@@ -338,8 +338,8 @@ async function server(args, config, cb) {
                 const forgot = auth.forgot(user.username, 'verify');
 
                 if (args.email) await email.verify({
-                    user.username,
-                    forgot.token
+                    username: user.username,
+                    token: forgot.token
                 });
 
                 res.json(user);

@@ -27,6 +27,9 @@ class Schemas {
         this.schemas.set('POST /login', {
             body: 'req.body.CreateLogin.json'
         });
+        this.schemas.set('GET /login/verify', {
+            query: 'req.query.VerifyLogin.json'
+        });
         this.schemas.set('POST /login/forgot', {
             body: 'req.body.ForgotLogin.json'
         });

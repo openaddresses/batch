@@ -53,7 +53,7 @@ class Auth {
 
             await this.pool.query(`
                 UPDATE user
-                    SET verified = True
+                    SET validated = True
                     WHERE id = $1
             `, [ pgres.rows[0].uid ]);
 
@@ -105,6 +105,12 @@ class Auth {
                 userhash,
                 uid
             ]);
+
+            await this.pool.query(`
+                UPDATE user
+                    SET validated = True
+                    WHERE id = $1
+            `, [ uid ]);
 
             await this.pool.query(`
                 DELETE FROM users_reset

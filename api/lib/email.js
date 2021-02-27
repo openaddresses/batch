@@ -29,7 +29,7 @@ class Email {
         }
     }
 
-    async validate(user) {
+    async verify(user) {
         if (!this.mg) return;
 
         const email = {

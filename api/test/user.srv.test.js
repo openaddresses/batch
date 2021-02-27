@@ -71,6 +71,36 @@ test('POST: api/login (failed)', (t) => {
     });
 });
 
+test('POST: api/login (not confirmed)', (t) => {
+    request({
+        url: 'http://localhost:4999/api/login',
+        method: 'POST',
+        json: true,
+        jar: session,
+        body: {
+            username: 'ingalls',
+            password: 'password123'
+        }
+    }, (err, res) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 403, 'http: 403');
+        t.deepEquals(res.body, {
+            status: 403, message: 'User has not confirmed email', messages: []
+        });
+
+        t.end();
+    });
+});
+
+test('META: Validate User', async (t) => {
+    await flight.pool.query(`
+        UPDATE users SET validated = True;
+    `);
+
+    t.end();
+});
+
 test('POST: api/login (success)', (t) => {
     request({
         url: 'http://localhost:4999/api/login',
@@ -85,6 +115,13 @@ test('POST: api/login (success)', (t) => {
         t.error(err, 'no error');
 
         t.equals(res.statusCode, 200, 'http: 200');
+        t.deepEquals(res.body, {
+            uid: 1,
+            username: 'ingalls',
+            email: 'ingalls@example.com',
+            access: 'user',
+            flags: {}
+        });
 
         t.end();
     });
@@ -93,13 +130,9 @@ test('POST: api/login (success)', (t) => {
 test('GET: api/login', (t) => {
     request({
         url: 'http://localhost:4999/api/login',
-        method: 'POST',
+        method: 'GET',
         json: true,
-        jar: session,
-        body: {
-            username: 'ingalls',
-            password: 'password123'
-        }
+        jar: session
     }, (err, res) => {
         t.error(err, 'no error');
 

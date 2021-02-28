@@ -278,12 +278,12 @@ class Auth {
                 WHERE
                     username iLIKE '%'||$3||'%'
                     OR email iLIKE '%'||$3||'%'
+                ORDER BY
+                    created DESC
                 LIMIT
                     $1
                 OFFSET
                     $2
-                ORDER BY
-                    created DESC
             `, [
                 query.limit,
                 query.page,

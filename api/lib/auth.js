@@ -14,7 +14,7 @@ class Auth {
     }
 
     async is_auth(req) {
-        if (!req.auth || !req.auth.access || !['session', 'token'].includes(req.auth.type)) {
+        if (!req.auth || !req.auth.access || !['session', 'token', 'secret'].includes(req.auth.type)) {
             throw new Err(401, null, 'Authentication Required');
         }
 
@@ -194,7 +194,7 @@ class Auth {
     async is_flag(req, flag) {
         await this.is_auth(req);
 
-        if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin') {
+        if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin' && req.auth.type !== 'secret') {
             throw new Err(401, null, `${flag} flag required`);
         }
 

@@ -7,10 +7,15 @@
     "additionalProperties": false,
     "properties": {
         "job": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The Job ID of the error"
         },
         "message": {
-            "type": "string"
+            "type": "array",
+            "description": "An Array of Error messages related to a given Job ID",
+            "items": {
+                "type": "string"
+            }
         }
     }
 }

@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS users_tokens (
 
 -- Store recent live job errors (reset on every scheduled run)
 CREATE TABLE IF NOT EXISTS job_errors (
-    job         BIGINT UNIQUE NOT NULL, -- Job ID reference
+    job         BIGINT NOT NULL,        -- Job ID reference
     message     TEXT NOT NULL           -- Human readable failure message
 );
 

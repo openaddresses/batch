@@ -8,9 +8,6 @@
         "test": "tape test/**.test.js",
         "lint": "eslint task.js lib/**.js test/**.js"
     },
-    "external": {
-        "batch-machine": "7.7.0"
-    },
     "dependencies": {
         "@mapbox/decrypt-kms-env": "^3.0.0",
         "@turf/turf": "^5.1.6",

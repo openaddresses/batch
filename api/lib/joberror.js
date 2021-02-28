@@ -113,13 +113,15 @@ class JobError {
                 SELECT
                     job.id,
                     job.status,
-                    job_errors.message,
+                    JSON_AGG(job_errors.message) AS messages,
                     job.source_name,
                     job.layer,
                     job.name
                 FROM
                     job_errors INNER JOIN job
                         ON job_errors.job = job.id
+                GROUP BY
+                    job.id
                 ORDER BY
                     job.created DESC
             `);
@@ -145,7 +147,7 @@ class JobError {
                 SELECT
                     job.id,
                     job.status,
-                    job_errors.message,
+                    JSON_AGG(job_errors.message) AS messages,
                     job.source_name,
                     job.layer,
                     job.name
@@ -154,6 +156,8 @@ class JobError {
                         ON job_errors.job = job.id
                 WHERE
                     job_errors.job = $1
+                GROUP BY
+                    job.id
             `, [job_id]);
         } catch (err) {
             throw new Err(500, err, 'Failed to get job_error');
@@ -167,7 +171,7 @@ class JobError {
         return {
             id: parseInt(row.id),
             status: row.status,
-            message: row.message,
+            messages: row.messages,
             source_name: row.source_name,
             layer: row.layer,
             name: row.name

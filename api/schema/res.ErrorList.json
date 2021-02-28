@@ -5,7 +5,7 @@
         "required": [
             "id",
             "status",
-            "message",
+            "messages",
             "source_name",
             "layer",
             "name"
@@ -18,7 +18,7 @@
             "status": {
                 "$ref": "./util/status.json"
             },
-            "message": {
+            "messages": {
                 "type": "status"
             },
             "source_name": {

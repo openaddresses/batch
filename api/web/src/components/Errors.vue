@@ -40,7 +40,7 @@
                     </div>
 
                     <div class='col col--12 py3'>
-                        <div class='align-center w-full' v-text='job.message'></div>
+                        <div :key='message' v-for='message in job.messages' class='align-center w-full' v-text='message'></div>
                     </div>
                 </div>
             </div>

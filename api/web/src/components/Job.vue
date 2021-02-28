@@ -11,7 +11,7 @@
             <h2 v-if='job.status === "Fail"' class='txt-h4 align-center'>Active Job Error</h2>
             <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
 
-            <div v-text='joberror.message' class='align-center'/>
+            <div :key='message' v-for='message in joberror.messages' class='align-center w-full' v-text='message'></div>
 
             <div class='flex-parent flex-parent--center-main'>
                 <ErrorsModerate @moderated='joberror = false' class='py12' :job='job'/>

@@ -225,7 +225,6 @@ class Auth {
                     SET
                         flags = $2,
                         access = $3
-
                     WHERE
                         id = $1
                     RETURNING *
@@ -242,6 +241,7 @@ class Auth {
 
         return {
             id: parseInt(row.id),
+            level:  row.level,
             username: row.username,
             email: row.email,
             access: row.access,
@@ -270,6 +270,7 @@ class Auth {
                     count(*) OVER() AS count,
                     id,
                     username,
+                    level,
                     access,
                     email,
                     flags
@@ -298,6 +299,7 @@ class Auth {
             users: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    level: row.level,
                     username: row.username,
                     email: row.email,
                     access: row.access,
@@ -313,6 +315,7 @@ class Auth {
             pgres = await this.pool.query(`
                 SELECT
                     id,
+                    level,
                     username,
                     access,
                     email,
@@ -334,6 +337,7 @@ class Auth {
 
         return {
             uid: parseInt(pgres.rows[0].id),
+            level: pgres.rows[0].level,
             username: pgres.rows[0].username,
             email: pgres.rows[0].email,
             access: pgres.rows[0].access,
@@ -353,6 +357,7 @@ class Auth {
                 SELECT
                     id,
                     username,
+                    level,
                     access,
                     email,
                     password,
@@ -384,6 +389,7 @@ class Auth {
 
         return {
             uid: parseInt(pgres.rows[0].id),
+            level: pgres.rows[0].level,
             username: pgres.rows[0].username,
             access: pgres.rows[0].access,
             email: pgres.rows[0].email,
@@ -482,6 +488,7 @@ class AuthToken {
             pgres = await this.pool.query(`
                 SELECT
                     users.id AS uid,
+                    users.level,
                     users.username,
                     users.access,
                     users.email,
@@ -506,6 +513,7 @@ class AuthToken {
 
         return {
             uid: parseInt(pgres.rows[0].uid),
+            level: pgres.rows[0].level,
             username: pgres.rows[0].username,
             access: pgres.rows[0].access,
             email: pgres.rows[0].email

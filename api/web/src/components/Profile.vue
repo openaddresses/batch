@@ -37,6 +37,45 @@
                         <button disabled class='btn btn--stroke btn--gray btn--s round fr'>Update</button>
                     </div>
                 </div>
+
+                <div class='col col--12 grid border-b border--gray-light'>
+                    <h2 class='txt-h4 ml12 pb12 fl'>Contribution:</h2>
+                </div>
+
+                <div class='col col--12 grid pt12'>
+                    <div class='col col--4 round-tl round-bl' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
+                        "cursor-pointer": profile.level !== "basic"
+                    }'>
+                        <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-user" /></svg>
+
+                        <div class='align-center'>Basic</div>
+
+                        <svg v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
+                        <svg v-else-if='hover === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
+                        <svg v-else='!hover' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                    </div>
+                    <div class='col col--4' @mouseover="hover = 'donor'" @mouseleave="hover = false" :class='{
+                        "cursor-pointer": profile.level !== "donor"
+                    }'>
+                        <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-coin" /></svg>
+                        <div class='align-center'>Donor</div>
+
+                        <svg v-if='profile.level === "donor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
+                        <svg v-else-if='hover === "donor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
+                        <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                    </div>
+                    <div class='col col--4  round-tr round-br' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
+                        "cursor-pointer": profile.level !== "sponsor"
+                    }'>
+                        <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-trophy" /></svg>
+                        <div class='align-center'>Sponsor</div>
+
+                        <svg v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
+                        <svg v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
+                        <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                    </div>
+                </div>
+
             </template>
 
             <ProfileTokens @err='$emit("err", $event)'/>
@@ -73,6 +112,7 @@ export default {
     data: function() {
         return {
             mode: 'profile',
+            hover: 'none',
             profile: {
                 username: '',
                 access: '',

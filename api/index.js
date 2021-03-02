@@ -186,6 +186,7 @@ async function server(args, config, cb) {
                 req.auth = {
                     uid: false,
                     type: 'secret',
+                    level: 'sponsor',
                     username: false,
                     access: 'admin',
                     email: false,
@@ -422,6 +423,7 @@ async function server(args, config, cb) {
             if (req.session && req.session.auth && req.session.auth.username) {
                 return res.json({
                     uid: req.session.auth.uid,
+                    level: req.session.auth.level,
                     username: req.session.auth.username,
                     email: req.session.auth.email,
                     access: req.session.auth.access,
@@ -462,6 +464,7 @@ async function server(args, config, cb) {
 
                 return res.json({
                     uid: req.session.auth.uid,
+                    level: req.session.auth.level,
                     username: req.session.auth.username,
                     email: req.session.auth.email,
                     access: req.session.auth.access,

@@ -43,36 +43,48 @@
                 </div>
 
                 <div class='col col--12 grid pt12'>
-                    <div class='col col--4 round-tl round-bl' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
-                        "cursor-pointer": profile.level !== "basic"
+                    <div class='col col--4 round' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
+                        "cursor-pointer": profile.level !== "basic",
+                        "border border--gray-light": profile.level === "basic",
                     }'>
                         <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-user" /></svg>
 
                         <div class='align-center'>Basic</div>
+                        <div class='align-center txt-s'>free</div>
 
-                        <svg v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                        <svg v-else-if='hover === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                        <svg v-else='!hover' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                        <div class='col col--12 pt12'>
+                            <svg v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
+                            <svg v-else-if='hover === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
+                            <svg v-else='!hover' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                        </div>
                     </div>
-                    <div class='col col--4' @mouseover="hover = 'donor'" @mouseleave="hover = false" :class='{
-                        "cursor-pointer": profile.level !== "donor"
+                    <div class='col col--4 round' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
+                        "cursor-pointer": profile.level !== "backer",
+                        "border border--gray-light": profile.level === "backer",
                     }'>
                         <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-coin" /></svg>
-                        <div class='align-center'>Donor</div>
+                        <div class='align-center'>Backer</div>
+                        <div class='align-center txt-s'>&gt; $5</div>
 
-                        <svg v-if='profile.level === "donor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                        <svg v-else-if='hover === "donor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                        <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                        <div class='col col--12 pt12'>
+                            <svg v-if='profile.level === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
+                            <svg v-else-if='hover === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
+                            <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                        </div>
                     </div>
-                    <div class='col col--4  round-tr round-br' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
-                        "cursor-pointer": profile.level !== "sponsor"
+                    <div class='col col--4 round' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
+                        "cursor-pointer": profile.level !== "sponsor",
+                        "border border--gray-light": profile.level === "sponsor",
                     }'>
                         <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-trophy" /></svg>
                         <div class='align-center'>Sponsor</div>
+                        <div class='align-center txt-s'>&gt; $100</div>
 
-                        <svg v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                        <svg v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                        <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                        <div class='col col--12 pt12'>
+                            <svg v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
+                            <svg v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
+                            <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                        </div>
                     </div>
                 </div>
 

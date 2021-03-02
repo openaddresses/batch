@@ -1675,8 +1675,8 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/github/event Github Webhook
      * @apiVersion 1.0.0
-     * @apiName Event
-     * @apiGroup Github
+     * @apiName Github
+     * @apiGroup Webhooks
      * @apiPermission admin
      *
      * @apiDescription
@@ -1711,6 +1711,30 @@ async function server(args, config, cb) {
                 } else {
                     res.status(200).send('Accepted but ignored');
                 }
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/opencollective/event OpenCollective
+     * @apiVersion 1.0.0
+     * @apiName OpenCollective
+     * @apiGroup Webhooks
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
+     */
+    router.post(
+        ...schemas.get('POST /opencollective/event'),
+        async (req, res) => {
+            try {
+                console.error(req.headers);
+                console.error(req.body);
+
+                res.status(200).send('Accepted but ignored');
             } catch (err) {
                 return Err.respond(err, res);
             }

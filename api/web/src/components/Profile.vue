@@ -40,7 +40,14 @@
 
                 <div class='col col--12 grid border-b border--gray-light'>
                     <h2 class='txt-h4 ml12 pb12 fl'>Contribution:</h2>
+
                 </div>
+                    <div class='col col--12 align-center'>
+                        OpenAddresses operates on a very small budget
+                    </div>
+                    <div class='col col--12 align-center'>
+                        Please consider contributing to support to keep the lights on as well as support future development of the project.
+                    </div>
 
                 <div class='col col--12 grid'>
                     <div @click='oc("basic")' class='col col--4 round py12 my12' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{

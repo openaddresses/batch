@@ -14,6 +14,8 @@ const batch = new AWS.Batch({
  * @param {String} event.source
  * @param {String} event.layer
  * @param {String} event.name
+ *
+ * @returns {Promise}
  */
 function trigger(event) {
     return new Promise((resolve, reject) => {

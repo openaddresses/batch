@@ -189,6 +189,13 @@ class Run {
         }
     }
 
+    /**
+     * Once a Run has been created, populate the Run with Jobs
+     *
+     * @param {Pool} pool Postgres Pool instance
+     * @param {Number} run_id Run ID of the job to populate
+     * @param {Array} rawjobs Jobs to populate run with
+     */
     static async populate(pool, run_id, rawjobs) {
         let jobs = [];
 

@@ -1,7 +1,9 @@
 'use strict';
 
+const assert = require('assert');
 const Run = require('./run');
-const request = require('request');
+const { promisify } = require('util');
+const request = promisify(require('request'));
 const Err = require('./error');
 const pkg = require('../package.json');
 
@@ -18,10 +20,23 @@ class GH {
         this.jobs = [];
     }
 
-    add_job(source_url) {
-        this.jobs.push(source_url);
+    /**
+     * Add a job to the GH Jobs queue
+     *
+     * @param {Object} job_object Job to add
+     * @param {String} job_object.source
+     * @param {String} job_object.layer
+     * @param {String} job_object.name
+     */
+    add_job(job_object) {
+        this.jobs.push(job_object);
     }
 
+    /**
+     * Return the JSON that will be stored in the run.json field of the db
+     *
+     * @returns {Object}
+     */
     json() {
         return {
             url: this.url,
@@ -114,9 +129,9 @@ class CI {
                 files = await this.filediff(ref.replace(/refs\/heads\//, ''));
             }
 
-            CI.fileprep(files, gh.sha).forEach((file) => {
-                console.error(`ok - GH:Push:${sha}: Job: ${file}`);
-                gh.add_job(file);
+            (await CI.internaldiff(files)).forEach((job) => {
+                console.error(`ok - GH:Push:${sha}: Job: ${job.source}-${job.layer}-${job.name}`);
+                gh.add_job(job);
             });
 
             console.error(`ok - GH:Push:${sha}: ${gh.jobs.length} Jobs`);
@@ -222,40 +237,104 @@ class CI {
     }
 
     /**
-     * Accept git repo relative file paths and convert them into github.com paths
+     * Calculate the individual filenames & patches that changed in a PR
      *
-     * @param {string[]} files List of files to prep
-     * @param {string} sha GitSha of files to prep
-     *
-     * @returns {string[]} Deduped list of github.com file paths
+     * @param {String} ref Github Ref
      */
-    static fileprep(files, sha) {
-        return Array.from(new Set(files.filter((file) => {
-            if (!/sources\//.test(file) || !/\.json$/.test(file)) return false;
-            return true;
-        }).map((file) => {
-            file = `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/${file}`;
-            return file;
-        }))).sort();
+    async filediff(ref) {
+        const res = await request({
+            url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
+            json: true,
+            headers: {
+                'User-Agent': `OpenAddresses v${pkg.version}`
+            },
+            method: 'GET'
+        });
+
+        return res.body.files.map((file) => {
+            return {
+                file: file.filename,
+                raw: file.raw_url
+            };
+        });
     }
 
-    async filediff(ref) {
-        return new Promise((resolve, reject) => {
-            request({
-                url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
-                json: true,
-                headers: {
-                    'User-Agent': `OpenAddresses v${pkg.version}`
-                },
-                method: 'GET'
-            }, (err, res) => {
-                if (err) return reject(err);
+    /**
+     * Given a list of filediffs, calculate what sources in the JSON file changed
+     * @param {Object[]} files
+     */
+    static async internaldiff(files) {
+        const jobs = [];
 
-                return resolve(res.body.files.map((file) => {
-                    return file.filename;
-                }));
-            });
-        });
+        for (const file of files) {
+            const branch_sources = {};
+            const master_sources = {};
+
+            try {
+                const master_res = await request({
+                    url: `https://raw.githubusercontent.com/openaddresses/openaddresses/master/${file.filename}`,
+                    headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
+                    method: 'GET'
+                });
+
+                let master_body = '{}';
+                if (master_res.statusCode === 200) {
+                    master_body = master_res.body;
+                }
+
+                const master_json = JSON.parse(master_body);
+
+                if (master_json.layers) {
+                    for (const layertype of Object.keys(master_json.layers)) {
+                        for (const source of master_json.layers[layertype]) {
+                            source._layer = layertype;
+                            master_sources[`${layertype}-${source.name}`] = source;
+                        }
+                    }
+                }
+
+                const branch_json = JSON.parse((await request({
+                    url: file.raw,
+                    headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
+                    method: 'GET'
+                })).body);
+
+                for (const layertype of Object.keys(branch_json.layers)) {
+                    for (const source of branch_json.layers[layertype]) {
+                        source._layer = layertype;
+                        branch_sources[`${layertype}-${source.name}`] = source;
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                continue;
+            }
+
+            for (const branch of Object.keys(branch_sources)) {
+                if (!master_sources[branch]) {
+                    jobs.push({
+                        source: file.raw,
+                        layer: branch_sources[branch]._layer,
+                        name: branch_sources[branch].name
+                    });
+
+                    continue;
+                }
+
+                try {
+                    assert.deepEqual(master_sources[branch], branch_sources[branch]);
+                } catch (err) {
+                    jobs.push({
+                        source: file.raw,
+                        layer: branch_sources[branch]._layer,
+                        name: branch_sources[branch].name
+                    });
+                }
+            }
+        }
+
+        return jobs;
     }
 
     /**

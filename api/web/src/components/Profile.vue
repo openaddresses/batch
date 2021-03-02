@@ -42,8 +42,8 @@
                     <h2 class='txt-h4 ml12 pb12 fl'>Contribution:</h2>
                 </div>
 
-                <div class='col col--12 grid pt12'>
-                    <div @click='oc("basic")' class='col col--4 round' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
+                <div class='col col--12 grid'>
+                    <div @click='oc("basic")' class='col col--4 round py12 my12' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "basic",
                         "border border--gray-light": profile.level === "basic",
                     }'>
@@ -58,7 +58,7 @@
                             <svg v-else='!hover' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
                         </div>
                     </div>
-                    <div @click='oc("backer")' class='col col--4 round' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
+                    <div @click='oc("backer")' class='col col--4 round py12 my12' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "backer",
                         "border border--gray-light": profile.level === "backer",
                     }'>
@@ -72,7 +72,7 @@
                             <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
                         </div>
                     </div>
-                    <div @click='oc("sponsor")' class='col col--4 round' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
+                    <div @click='oc("sponsor")' class='col col--4 round py12 my12' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "sponsor",
                         "border border--gray-light": profile.level === "sponsor",
                     }'>
@@ -85,6 +85,30 @@
                             <svg v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
                             <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
                         </div>
+                    </div>
+
+                    <div class='col col--4'>
+                        <div class='txt-s align-center'>Basic Open Data</div>
+                        <div class='txt-s align-center'>Rate Limited CDN</div>
+                    </div>
+
+                    <div class='col col--4'>
+                        <div class='align-center'>
+                            <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
+                        </div>
+
+                        <div class='txt-s align-center'>All Basic Features</div>
+                        <div class='txt-s align-center'>CSV/Shapefile Export</div>
+                    </div>
+
+                    <div class='col col--4'>
+                        <div class='align-center'>
+                            <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
+                        </div>
+
+                        <div class='txt-s align-center'>All Backer Features</div>
+                        <div class='txt-s align-center'>Fastest Data Access</div>
+                        <div class='txt-s align-center'>Validated Data</div>
                     </div>
                 </div>
 

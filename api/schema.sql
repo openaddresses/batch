@@ -20,6 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_session_expire ON session ("expire");
 CREATE TABLE IF NOT EXISTS users (
     id          BIGSERIAL PRIMARY KEY,
     created     TIMESTAMP DEFAULT NOW(),
+    level       TEXT NOT NULL DEFAULT 'basic',
     access      TEXT NOT NULL,
     flags       JSONB NOT NULL,
     username    TEXT UNIQUE NOT NULL,

@@ -43,7 +43,7 @@
                 </div>
 
                 <div class='col col--12 grid pt12'>
-                    <div class='col col--4 round' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
+                    <div @click='oc("basic")' class='col col--4 round' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "basic",
                         "border border--gray-light": profile.level === "basic",
                     }'>
@@ -58,7 +58,7 @@
                             <svg v-else='!hover' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
                         </div>
                     </div>
-                    <div class='col col--4 round' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
+                    <div @click='oc("backer")' class='col col--4 round' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "backer",
                         "border border--gray-light": profile.level === "backer",
                     }'>
@@ -72,7 +72,7 @@
                             <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
                         </div>
                     </div>
-                    <div class='col col--4 round' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
+                    <div @click='oc("sponsor")' class='col col--4 round' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "sponsor",
                         "border border--gray-light": profile.level === "sponsor",
                     }'>
@@ -128,7 +128,8 @@ export default {
             profile: {
                 username: '',
                 access: '',
-                email: ''
+                email: '',
+                level: ''
             },
             loading: {
                 profile: false,
@@ -139,6 +140,10 @@ export default {
         this.refresh();
     },
     methods: {
+        oc: function(level) {
+            if (this.profile.level === level) return;
+            window.open('https://opencollective.com/openaddresses/contribute', "_blank");
+        },
         refresh: function() {
             this.getLogin();
         },

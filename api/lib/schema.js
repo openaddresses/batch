@@ -112,6 +112,10 @@ class Schemas {
     /**
      * Express middleware to identify query params that should be integers according to the schema
      * and attempt to cast them as such to ensure they pass the schema
+     *
+     * @param {Object} schema JSON Schema
+     *
+     * @returns {Function}
      */
     static query(schema) {
         return function (req, res, next) {

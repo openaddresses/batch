@@ -11,14 +11,14 @@ test('CI()', (t) => {
 test('CI#internaldiff - No File On Master', async (t) => {
     nock('https://raw.githubusercontent.com')
         .get('/openaddresses/openaddresses/123/sources/us/mt/statewide.json')
-            .reply(200, JSON.stringify({
-                schema: 2,
-                layers: {
-                    addresses: [{ name: 'state' }]
-                }
-            }))
+        .reply(200, JSON.stringify({
+            schema: 2,
+            layers: {
+                addresses: [{ name: 'state' }]
+            }
+        }))
         .get('/openaddresses/openaddresses/master/sources/us/mt/statewide.json')
-            .reply(404, 'NOT FOUND');
+        .reply(404, 'NOT FOUND');
 
     const jobs = await CI.internaldiff([{
         filename: 'sources/us/mt/statewide.json',
@@ -37,20 +37,20 @@ test('CI#internaldiff - No File On Master', async (t) => {
 test('CI#internaldiff - Internal Diff', async (t) => {
     nock('https://raw.githubusercontent.com')
         .get('/openaddresses/openaddresses/123/sources/us/mt/statewide.json')
-            .reply(200, JSON.stringify({
-                schema: 2,
-                layers: {
-                    addresses: [{ name: 'state' }, { name: 'state-other' }, { name: 'no-diff' }],
-                    parcels: [{ name: 'state' }]
-                }
-            }))
+        .reply(200, JSON.stringify({
+            schema: 2,
+            layers: {
+                addresses: [{ name: 'state' }, { name: 'state-other' }, { name: 'no-diff' }],
+                parcels: [{ name: 'state' }]
+            }
+        }))
         .get('/openaddresses/openaddresses/master/sources/us/mt/statewide.json')
-            .reply(200, JSON.stringify({
-                schema: 2,
-                layers: {
-                    addresses: [{ name: 'state', diff: true }, { name: 'no-diff' }]
-                }
-            }))
+        .reply(200, JSON.stringify({
+            schema: 2,
+            layers: {
+                addresses: [{ name: 'state', diff: true }, { name: 'no-diff' }]
+            }
+        }));
 
     const jobs = await CI.internaldiff([{
         filename: 'sources/us/mt/statewide.json',

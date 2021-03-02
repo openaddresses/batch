@@ -129,9 +129,7 @@ class CI {
                 files = await this.filediff(ref.replace(/refs\/heads\//, ''));
             }
 
-            jobs = await this.internaldiff(files)
-
-            jobs.forEach((job) => {
+            (await this.internaldiff(files)).forEach((job) => {
                 console.error(`ok - GH:Push:${sha}: Job: ${job.source}-${job.layer}-${job.name}`);
                 gh.add_job(job);
             });
@@ -257,7 +255,7 @@ class CI {
             return {
                 file: file.filename,
                 raw: file.raw_url
-            }
+            };
         });
     }
 
@@ -282,7 +280,7 @@ class CI {
                 let master_body = '{}';
                 if (master_res.statusCode === 200) {
                     master_body = master_res.body;
-                };
+                }
 
                 const master_json = JSON.parse(master_body);
 

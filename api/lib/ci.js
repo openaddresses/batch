@@ -129,7 +129,7 @@ class CI {
                 files = await this.filediff(ref.replace(/refs\/heads\//, ''));
             }
 
-            (await this.internaldiff(files)).forEach((job) => {
+            (await CI.internaldiff(files)).forEach((job) => {
                 console.error(`ok - GH:Push:${sha}: Job: ${job.source}-${job.layer}-${job.name}`);
                 gh.add_job(job);
             });

@@ -27,7 +27,7 @@ function trigger(event) {
         const jobName = process.env.JOB_NAME;
 
         let timeout = 60 * 60 * 6; // 6 Hours
-        if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout
+        if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout;
 
         if (typeof event !== 'object' || Array.isArray(event)) {
             return reject(new Error('event must be Key/Value pairs'));

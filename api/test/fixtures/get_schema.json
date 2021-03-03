@@ -198,5 +198,9 @@
     "POST /github/event": {
         "body": false,
         "query": false
+    },
+    "POST /opencollective/event": {
+        "body": false,
+        "query": false
     }
 }

@@ -118,6 +118,7 @@ test('POST: api/login (success)', (t) => {
         t.deepEquals(res.body, {
             uid: 1,
             username: 'ingalls',
+            level: 'basic',
             email: 'ingalls@example.com',
             access: 'user',
             flags: {}
@@ -141,6 +142,7 @@ test('GET: api/login', (t) => {
         t.deepEquals(res.body, {
             uid: 1,
             username: 'ingalls'    ,
+            level: 'basic',
             email: 'ingalls@example.com',
             access: 'user',
             flags: {}

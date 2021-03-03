@@ -14,6 +14,7 @@ const batch = new AWS.Batch({
  * @param {String} event.source
  * @param {String} event.layer
  * @param {String} event.name
+ * @param {Number} event.timeout optional timeout value for "job" and "job-ci" types in seconds
  *
  * @returns {Promise}
  */
@@ -24,6 +25,9 @@ function trigger(event) {
         const jobStdCIQueue = process.env.JOB_STD_CI_QUEUE;
         const jobMegaQueue = process.env.JOB_MEGA_QUEUE;
         const jobName = process.env.JOB_NAME;
+
+        let timeout = 60 * 60 * 6; // 6 Hours
+        if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout
 
         if (typeof event !== 'object' || Array.isArray(event)) {
             return reject(new Error('event must be Key/Value pairs'));
@@ -50,6 +54,9 @@ function trigger(event) {
                         { name: 'OA_SOURCE_LAYER', value: event.layer },
                         { name: 'OA_SOURCE_LAYER_NAME', value: event.name }
                     ]
+                },
+                timeout: {
+                    attemptDurationSeconds: timeout
                 }
             };
         } else if (event.type === 'collect') {

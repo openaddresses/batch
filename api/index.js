@@ -334,17 +334,17 @@ async function server(args, config, cb) {
         ...schemas.get('POST /user'),
         async (req, res) => {
             try {
-                const user = await user.register(req.body);
+                const usr = await user.register(req.body);
 
-                const forgot = await user.forgot(user.username, 'verify');
+                const forgot = await user.forgot(usr.username, 'verify');
 
                 if (args.email) await email.verify({
-                    username: user.username,
-                    email: user.email,
+                    username: usr.username,
+                    email: usr.email,
                     token: forgot.token
                 });
 
-                res.json(user);
+                res.json(usr);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -455,12 +455,10 @@ async function server(args, config, cb) {
         ...schemas.get('POST /login'),
         async (req, res) => {
             try {
-                const user = await auth.login({
+                res.session.auth = await user.login({
                     username: req.body.username,
                     password: req.body.password
                 });
-
-                req.session.auth = user;
 
                 return res.json({
                     uid: req.session.auth.uid,

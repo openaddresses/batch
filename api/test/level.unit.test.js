@@ -1,3 +1,5 @@
+'use strict';
+
 const test = require('tape');
 const Level = require('../lib/level');
 
@@ -9,4 +11,6 @@ test('Level#get_user', async (t) =>  {
     });
 
     console.error(res);
+
+    t.end();
 });

@@ -1,3 +1,5 @@
+'use strict';
+
 const { promisify } = require('util');
 const request = promisify(require('request'));
 
@@ -7,10 +9,8 @@ const request = promisify(require('request'));
 class Level {
     /**
      * @constructor
-     *
-     * @param {Config} config Server config
      */
-    constructor(config) {
+    constructor() {
         this.OpenCollective = process.env.OPENCOLLECTIVE_API_KEY;
         this.base = 'https://api.opencollective.com/graphql/v2';
     }

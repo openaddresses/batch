@@ -2,6 +2,7 @@
 
 const { promisify } = require('util');
 const request = promisify(require('request'));
+const User = require('./user');
 
 /**
  * @class Level
@@ -10,9 +11,10 @@ class Level {
     /**
      * @constructor
      */
-    constructor() {
+    constructor(pool) {
         this.OpenCollective = process.env.OPENCOLLECTIVE_API_KEY;
         this.base = 'https://api.opencollective.com/graphql/v2';
+        this.user = new User(pool);
     }
 
     /**
@@ -21,10 +23,9 @@ class Level {
      * TODO: https://github.com/opencollective/opencollective-api/pull/5561
      *      will allow us to only have to query for a single user instead of a list
      *
-     * @param {User} user
      * @param {String} email
      */
-    async user(user, email) {
+    async single(email) {
         const res = await request({
             url: this.base,
             method: 'POST',
@@ -50,7 +51,7 @@ class Level {
                     }
                   }
                 }`
-             }
+            }
         });
 
         // TODO this will eventually be removed
@@ -61,15 +62,13 @@ class Level {
         if (!usrs.length) return;
 
         if (!['BACKER', 'SPONSOR'].includes(usrs[0].role)) return;
-        await user.level(usrs[0].account.email, usrs[0].role.toLowerCase());
+        await this.user.level(usrs[0].account.email, usrs[0].role.toLowerCase());
     }
 
     /**
      * Refresh the entire user list
-     *
-     * @param {User} user
      */
-    async all(user) {
+    async all() {
         const res = await request({
             url: this.base,
             method: 'POST',
@@ -95,12 +94,12 @@ class Level {
                     }
                   }
                 }`
-             }
+            }
         });
 
         for (const node of res.body.data.account.members.nodes) {
             if (!['BACKER', 'SPONSOR'].includes(node.role)) continue;
-            await user.level(node.account.email, node.role.toLowerCase());
+            await this.user.level(node.account.email, node.role.toLowerCase());
         }
     }
 }

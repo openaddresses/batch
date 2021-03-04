@@ -2,7 +2,6 @@
 
 const test = require('tape');
 const Level = require('../lib/level');
-const User = require('../lib/user');
 const Flight = require('./init');
 const nock = require('nock');
 const { promisify } = require('util');
@@ -16,27 +15,26 @@ flight.takeoff(test);
 test('Level#all', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
-            .reply(200, {
-                "data": {
-                    "account": {
-                        "members": {
-                            "nodes": [{
-                                "id": "fake",
-                                "role": "SPONSOR",
-                                "account": {
-                                    "id": "fake",
-                                    "slug": "test",
-                                    "email": "test-all@openaddresses.io"
-                                }
-                            }]
-                        }
+        .reply(200, {
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [{
+                            'id': 'fake',
+                            'role': 'SPONSOR',
+                            'account': {
+                                'id': 'fake',
+                                'slug': 'test',
+                                'email': 'test-all@openaddresses.io'
+                            }
+                        }]
                     }
                 }
-            });
+            }
+        });
 
 
-    const level = new Level();
-    const user = new User(flight.pool);
+    const level = new Level(flight.pool);
 
     try {
         const usr = await flight.token('test-all');
@@ -57,7 +55,7 @@ test('Level#all', async (t) =>  {
             flags: {}
         });
 
-        await level.all(user);
+        await level.all();
 
         const usr_post = await request({
             url: 'http://localhost:4999/api/login',
@@ -84,27 +82,26 @@ test('Level#all', async (t) =>  {
 test('Level#user', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
-            .reply(200, {
-                "data": {
-                    "account": {
-                        "members": {
-                            "nodes": [{
-                                "id": "fake",
-                                "role": "BACKER",
-                                "account": {
-                                    "id": "fake",
-                                    "slug": "test",
-                                    "email": "test-single@openaddresses.io"
-                                }
-                            }]
-                        }
+        .reply(200, {
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [{
+                            'id': 'fake',
+                            'role': 'BACKER',
+                            'account': {
+                                'id': 'fake',
+                                'slug': 'test',
+                                'email': 'test-single@openaddresses.io'
+                            }
+                        }]
                     }
                 }
-            });
+            }
+        });
 
 
-    const level = new Level();
-    const user = new User(flight.pool);
+    const level = new Level(flight.pool);
 
     try {
         const usr = await flight.token('test-single');
@@ -125,7 +122,7 @@ test('Level#user', async (t) =>  {
             flags: {}
         });
 
-        await level.user(user);
+        await level.single(usr.email);
 
         const usr_post = await request({
             url: 'http://localhost:4999/api/login',

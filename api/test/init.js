@@ -20,6 +20,7 @@ class Flight {
      * Clear and restore an empty database schema
      *
      * @param {Tape} test Tape test instance
+     * @param {Boolean} keep_open Should the database connection remain open
      */
     init(test, keep_open = false) {
         test('start: database', async (t) => {
@@ -130,7 +131,7 @@ class Flight {
             jar: jar,
             user: new_user,
             token: new_token
-        }
+        };
     }
 
     /**

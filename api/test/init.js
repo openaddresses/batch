@@ -4,7 +4,8 @@ process.env.StackName = 'test';
 
 const fs = require('fs');
 const path = require('path');
-const request = require('request');
+const { promisify } = require('util');
+const request = promisify(require('request'));
 const { Pool } = require('pg');
 const api = require('../index');
 
@@ -20,7 +21,7 @@ class Flight {
      *
      * @param {Tape} test Tape test instance
      */
-    init(test) {
+    init(test, keep_open = false) {
         test('start: database', async (t) => {
             let pool = new Pool({
                 connectionString: 'postgres://postgres@localhost:5432/postgres'
@@ -44,7 +45,12 @@ class Flight {
                 t.error(err);
             }
 
-            pool.end();
+            if (keep_open) {
+                this.pool = pool;
+            } else {
+                pool.end();
+            }
+
             t.end();
         });
     }
@@ -74,36 +80,57 @@ class Flight {
      * Create a new user and return an API token for that user
      */
     async token() {
-        return new Promise((resolve, reject) => {
-            request({
-                url: 'http://localhost:5000/api/user',
-                json: true,
-                method: 'POST',
-                body: {
-                    username: 'test',
-                    password: 'test',
-                    email: 'test@openaddresses.io'
-                }
-            }, (err, res) => {
-                if (err) return reject(err);
-                if (res.statusCode !== 200) return reject(res.body);
+        const jar = request.jar();
 
-                request({
-                    url: 'http://localhost:5000/api/login',
-                    json: true,
-                    method: 'POST',
-                    body: {
-                        username: 'test',
-                        password: 'test'
-                    }
-                }, (err, res) => {
-                    if (err) return reject(err);
-                    if (res.statusCode !== 200) return reject(res.body);
-
-                    console.error(res.headers);
-                });
-            });
+        const new_user = await request({
+            url: 'http://localhost:5000/api/user',
+            json: true,
+            jar: jar,
+            method: 'POST',
+            body: {
+                username: 'test',
+                password: 'test',
+                email: 'test@openaddresses.io'
+            }
         });
+
+        if (new_user.statusCode !== 200) throw new Error(new_user.body);
+
+        await this.pool.query(`
+             UPDATE users
+                SET validated = True
+        `);
+
+        const new_login = await request({
+            url: 'http://localhost:5000/api/login',
+            json: true,
+            method: 'POST',
+            jar: jar,
+            body: {
+                username: 'test',
+                password: 'test'
+            }
+        });
+
+        if (new_login.statusCode !== 200) throw new Error(new_login.body);
+
+        const new_token = await request({
+            url: 'http://localhost:5000/api/token',
+            json: true,
+            method: 'POST',
+            jar: jar,
+            body: {
+                name: 'test'
+            }
+        });
+
+        if (new_token.statusCode !== 200) throw new Error(new_token.body);
+
+        return {
+            jar: jar,
+            user: new_user,
+            token: new_token
+        }
     }
 
     /**

@@ -97,7 +97,7 @@ class Level {
 
         for (const node of res.body.data.account.members.nodes) {
             if (!['BACKER', 'SPONSOR'].includes(node.role)) continue;
-            await user.level(node.email, node.role.toLowerCase());
+            await user.level(node.account.email, node.role.toLowerCase());
         }
     }
 }

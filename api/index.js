@@ -421,14 +421,7 @@ async function server(args, config, cb) {
         ...schemas.get('GET /login'),
         async (req, res) => {
             if (req.session && req.session.auth && req.session.auth.username) {
-                return res.json({
-                    uid: req.session.auth.uid,
-                    level: req.session.auth.level,
-                    username: req.session.auth.username,
-                    email: req.session.auth.email,
-                    access: req.session.auth.access,
-                    flags: req.session.auth.flags
-                });
+                return res.json(await user.user(req.session.auth.uid));
             } else {
                 return res.status(401).json({
                     status: 401,
@@ -455,7 +448,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /login'),
         async (req, res) => {
             try {
-                res.session.auth = await user.login({
+                req.session.auth = await user.login({
                     username: req.body.username,
                     password: req.body.password
                 });

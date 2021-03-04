@@ -22,8 +22,9 @@ class Level {
      *      will allow us to only have to query for a single user instead of a list
      *
      * @param {User} user
+     * @param {String} email
      */
-    async get_user(user) {
+    async get_user(user, email) {
         const res = await request({
             url: this.base,
             method: 'POST',
@@ -51,12 +52,21 @@ class Level {
                 }`
              }
         });
+
+        // TODO this will eventually be removed
+        const users = res.body.data.account.members.nodes.filter((node) => {
+            return node.account.email === email;
+        });
+
+        console.error(users)
     }
 
     /**
      * Refresh the entire user list
+     *
+     * @param {User} user
      */
-    async all() {
+    async all(user) {
         const res = await request({
             url: this.base,
             method: 'POST',
@@ -84,6 +94,11 @@ class Level {
                 }`
              }
         });
+
+        for (const node of res.body.data.account.members.nodes) {
+            if (!['BACKER', 'SPONSOR'].includes(node.role)) continue;
+            await user.level(node.email, node.role.toLowerCase());
+        }
     }
 }
 

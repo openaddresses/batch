@@ -16,27 +16,6 @@ class Flight {
     }
 
     /**
-     * Bootstrap a new server test instance
-     *
-     * @param {Tape} test tape instance to run takeoff action on
-     */
-    takeoff(test) {
-        test('test server takeoff', (t) => {
-            api({
-                postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-            }, (srv, pool) => {
-                t.ok(srv, 'server object returned');
-                t.ok(pool, 'pool object returned');
-
-                this.srv = srv;
-                this.pool = pool;
-
-                t.end();
-            });
-        });
-    }
-
-    /**
      * Clear and restore an empty database schema
      *
      * @param {Tape} test Tape test instance
@@ -70,6 +49,30 @@ class Flight {
         });
     }
 
+    /**
+     * Bootstrap a new server test instance
+     *
+     * @param {Tape} test tape instance to run takeoff action on
+     */
+    takeoff(test) {
+        test('test server takeoff', (t) => {
+            api({
+                postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
+            }, (srv, pool) => {
+                t.ok(srv, 'server object returned');
+                t.ok(pool, 'pool object returned');
+
+                this.srv = srv;
+                this.pool = pool;
+
+                t.end();
+            });
+        });
+    }
+
+    /**
+     * Create a new user and return an API token for that user
+     */
     async token() {
         return new Promise((resolve, reject) => {
             request({
@@ -110,11 +113,13 @@ class Flight {
      */
     landing(test) {
         test('test server landing - api', async (t) => {
-            t.ok(this.srv, 'server object returned');
-            t.ok(this.pool, 'pool object returned');
+            if (this.srv) {
+                t.ok(this.srv, 'server object returned');
+                await this.srv.close();
+            }
 
+            t.ok(this.pool, 'pool object returned');
             await this.pool.end();
-            await this.srv.close();
 
             t.end();
         });

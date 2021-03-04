@@ -209,6 +209,26 @@ class User {
         return true;
     }
 
+    async level(email, level) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                UPDATE users
+                    SET
+                        level = $2
+                    WHERE
+                        email = $1
+            `, [
+                email,
+                level
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        return !!pgres.rows.length;
+    }
+
     async patch(uid, patch) {
         const user = await this.user(uid);
 

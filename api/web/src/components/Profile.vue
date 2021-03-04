@@ -170,7 +170,7 @@ export default {
                 level: ''
             },
             loading: {
-                profile: false,
+                profile: true,
             }
         };
     },
@@ -186,6 +186,8 @@ export default {
             this.getLogin();
         },
         getLogin: function() {
+            this.loading.profile = true;
+
             const url = new URL(`${window.location.origin}/api/login`);
             url.searchParams.append('level', 'true');
 
@@ -200,6 +202,7 @@ export default {
                 return res.json();
             }).then((res) => {
                 this.profile = res;
+                this.loading.profile = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });

@@ -24,7 +24,7 @@ class Level {
      * @param {User} user
      * @param {String} email
      */
-    async get_user(user, email) {
+    async user(user, email) {
         const res = await request({
             url: this.base,
             method: 'POST',

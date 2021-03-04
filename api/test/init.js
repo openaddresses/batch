@@ -79,7 +79,7 @@ class Flight {
     /**
      * Create a new user and return an API token for that user
      */
-    async token() {
+    async token(username) {
         const jar = request.jar();
 
         const new_user = await request({
@@ -88,9 +88,9 @@ class Flight {
             jar: jar,
             method: 'POST',
             body: {
-                username: 'test',
+                username: username,
                 password: 'test',
-                email: 'test@openaddresses.io'
+                email: `${username}@openaddresses.io`
             }
         });
 
@@ -107,7 +107,7 @@ class Flight {
             method: 'POST',
             jar: jar,
             body: {
-                username: 'test',
+                username: username,
                 password: 'test'
             }
         });

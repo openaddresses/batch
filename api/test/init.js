@@ -79,6 +79,8 @@ class Flight {
 
     /**
      * Create a new user and return an API token for that user
+     *
+     * @param {String} username Username for user to create
      */
     async token(username) {
         const jar = request.jar();

@@ -83,6 +83,7 @@ async function server(args, config, cb) {
     });
 
     const analytics = new Analytics(pool);
+    const level = new (require('./lib/level'))(pool);
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -415,13 +416,19 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return information about the currently logged in user
      *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.GetLogin.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
      */
     router.get(
         ...schemas.get('GET /login'),
         async (req, res) => {
             if (req.session && req.session.auth && req.session.auth.username) {
-                return res.json(await user.user(req.session.auth.uid));
+                try {
+                    if (req.params.level) await level.single(req.session.auth.email)
+                    res.json(await user.user(req.session.auth.uid));
+                } catch (err) {
+                    return Err.respond(err, res);
+                }
             } else {
                 return res.status(401).json({
                     status: 401,

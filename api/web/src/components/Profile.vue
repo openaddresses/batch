@@ -38,9 +38,16 @@
                     </div>
                 </div>
 
-                <div class='col col--12 grid border-b border--gray-light'>
-                    <h2 class='txt-h4 ml12 pb12 fl'>Contribution:</h2>
+                <div class='col col--12 grid border-b border--gray-light pb12 pt24'>
+                    <div class='col col--12 clearfix'>
+                        <h2 class='fl txt-h4 ml12'>Contribution:</h2>
 
+                        <div class='fr'>
+                            <button @click='getLogin' class='btn round btn--stroke color-gray mx3'>
+                                <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                     <div class='col col--12 align-center'>
                         OpenAddresses operates on a very small budget
@@ -180,6 +187,7 @@ export default {
         },
         getLogin: function() {
             const url = new URL(`${window.location.origin}/api/login`);
+            url.searchParams.append('level', 'true');
 
             fetch(url, {
                 method: 'GET'

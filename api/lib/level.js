@@ -1,6 +1,7 @@
 'use strict';
 
 const { promisify } = require('util');
+const pkg = require('../package.json');
 const request = promisify(require('request'));
 const User = require('./user');
 
@@ -31,7 +32,8 @@ class Level {
             method: 'POST',
             json: true,
             headers: {
-                'Api-Key': this.OpenCollective
+                'Api-Key': this.OpenCollective,
+                'User-Agent': `OpenAddresses v${pkg.version}`
             },
             body: {
                 query: `{
@@ -74,7 +76,8 @@ class Level {
             method: 'POST',
             json: true,
             headers: {
-                'Api-Key': this.OpenCollective
+                'Api-Key': this.OpenCollective,
+                'User-Agent': `OpenAddresses v${pkg.version}`
             },
             body: {
                 query: `{

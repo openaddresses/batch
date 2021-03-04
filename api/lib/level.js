@@ -54,11 +54,14 @@ class Level {
         });
 
         // TODO this will eventually be removed
-        const users = res.body.data.account.members.nodes.filter((node) => {
-            return node.account.email === email;
+        const usrs = res.body.data.account.members.nodes.filter((node) => {
+            return node.account.email !== email;
         });
 
-        console.error(users)
+        if (!usrs.length) return;
+
+        if (!['BACKER', 'SPONSOR'].includes(usrs[0].role)) return;
+        await user.level(usrs[0].account.email, usrs[0].role.toLowerCase());
     }
 
     /**

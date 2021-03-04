@@ -125,7 +125,7 @@ test('Level#user', async (t) =>  {
             flags: {}
         });
 
-        await level.all(user);
+        await level.user(user);
 
         const usr_post = await request({
             url: 'http://localhost:4999/api/login',

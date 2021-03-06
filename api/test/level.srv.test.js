@@ -17,28 +17,28 @@ test('Level#all', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
-            "data": {
-                "account": {
-                    "members": {
-                        "nodes": [
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [
                             {
-                                "id": "1a47byg9-nxozdp8b-kwvpmjlv-03rek5w8",
-                                "role": "BACKER",
-                                "account": {
-                                    "id": "dmvrwng4-kj03dpbj-4e9qz57o-yl9e8xba",
-                                    "slug": "test-single",
-                                    "transactions": {
-                                        "nodes": [
+                                'id': '1a47byg9-nxozdp8b-kwvpmjlv-03rek5w8',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'dmvrwng4-kj03dpbj-4e9qz57o-yl9e8xba',
+                                    'slug': 'test-single',
+                                    'transactions': {
+                                        'nodes': [
                                             {
-                                                "createdAt": moment().subtract(10, 'days').format('YYYY-MM-DD'),
-                                                "netAmount": {
-                                                    "value": -500,
-                                                    "currency": "USD"
+                                                'createdAt': moment().subtract(10, 'days').format('YYYY-MM-DD'),
+                                                'netAmount': {
+                                                    'value': -500,
+                                                    'currency': 'USD'
                                                 }
                                             }
                                         ]
                                     },
-                                    "email": "test-all@openaddresses.io"
+                                    'email': 'test-all@openaddresses.io'
                                 }
                             }
                         ]
@@ -97,28 +97,28 @@ test('Level#user', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
-            "data": {
-                "account": {
-                    "members": {
-                        "nodes": [
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [
                             {
-                                "id": "1a47byg9-nxozdp8b-kwvpmjlv-03rek5w8",
-                                "role": "BACKER",
-                                "account": {
-                                    "id": "dmvrwng4-kj03dpbj-4e9qz57o-yl9e8xba",
-                                    "slug": "test-single",
-                                    "transactions": {
-                                        "nodes": [
+                                'id': '1a47byg9-nxozdp8b-kwvpmjlv-03rek5w8',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'dmvrwng4-kj03dpbj-4e9qz57o-yl9e8xba',
+                                    'slug': 'test-single',
+                                    'transactions': {
+                                        'nodes': [
                                             {
-                                                "createdAt": moment().subtract(10, 'days').format('YYYY-MM-DD'),
-                                                "netAmount": {
-                                                    "value": -50,
-                                                    "currency": "USD"
+                                                'createdAt': moment().subtract(10, 'days').format('YYYY-MM-DD'),
+                                                'netAmount': {
+                                                    'value': -50,
+                                                    'currency': 'USD'
                                                 }
                                             }
                                         ]
                                     },
-                                    "email": "test-single@openaddresses.io"
+                                    'email': 'test-single@openaddresses.io'
                                 }
                             }
                         ]
@@ -177,20 +177,20 @@ test('Level#user - no contrib', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
-            "data": {
-                "account": {
-                    "members": {
-                        "nodes": [
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [
                             {
-                                "id": "1a47byg9-nxozdp8b-kwvpmjlv-03rek5w8",
-                                "role": "BACKER",
-                                "account": {
-                                    "id": "dmvrwng4-kj03dpbj-4e9qz57o-yl9e8xba",
-                                    "slug": "test-single1",
-                                    "transactions": {
-                                        "nodes": []
+                                'id': '1a47byg9-nxozdp8b-kwvpmjlv-03rek5w8',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'dmvrwng4-kj03dpbj-4e9qz57o-yl9e8xba',
+                                    'slug': 'test-single1',
+                                    'transactions': {
+                                        'nodes': []
                                     },
-                                    "email": "test-single1@openaddresses.io"
+                                    'email': 'test-single1@openaddresses.io'
                                 }
                             }
                         ]
@@ -249,10 +249,10 @@ test('Level#user - no match', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
-            "data": {
-                "account": {
-                    "members": {
-                        "nodes": []
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': []
                     }
                 }
             }

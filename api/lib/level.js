@@ -12,6 +12,8 @@ const User = require('./user');
 class Level {
     /**
      * @constructor
+     *
+     * @param {Pool} pool PG Pool Instance
      */
     constructor(pool) {
         this.OpenCollective = process.env.OPENCOLLECTIVE_API_KEY;
@@ -71,7 +73,7 @@ class Level {
                 variables: {
                     slug: 'openaddresses',
                     email: email,
-                    roles: ["BACKER"]
+                    roles: ['BACKER']
                 }
             }
         });
@@ -139,7 +141,7 @@ class Level {
                 }`,
                 variables: {
                     slug: 'openaddresses',
-                    roles: ["BACKER"]
+                    roles: ['BACKER']
                 }
             }
         });

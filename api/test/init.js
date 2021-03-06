@@ -86,7 +86,7 @@ class Flight {
         const jar = request.jar();
 
         const new_user = await request({
-            url: 'http://localhost:5000/api/user',
+            url: 'http://localhost:4999/api/user',
             json: true,
             jar: jar,
             method: 'POST',
@@ -105,7 +105,7 @@ class Flight {
         `);
 
         const new_login = await request({
-            url: 'http://localhost:5000/api/login',
+            url: 'http://localhost:4999/api/login',
             json: true,
             method: 'POST',
             jar: jar,
@@ -131,8 +131,8 @@ class Flight {
 
         return {
             jar: jar,
-            user: new_user,
-            token: new_token
+            user: new_user.body,
+            token: new_token.body
         };
     }
 

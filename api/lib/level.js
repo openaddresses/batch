@@ -3,6 +3,7 @@
 const { promisify } = require('util');
 const pkg = require('../package.json');
 const request = promisify(require('request'));
+const moment = require('moment');
 const User = require('./user');
 
 /**
@@ -36,35 +37,60 @@ class Level {
                 'User-Agent': `OpenAddresses v${pkg.version}`
             },
             body: {
-                query: `{
-                    account(slug: "openaddresses") {
-                      members {
+                query: `
+                  query account($slug: String, $email: EmailAddress, $roles: [MemberRole]) {
+                    account(slug: $slug) {
+                      members(email: $email, role: $roles) {
                         nodes {
                           id
                           role
                           account {
                             id
                             slug
-                            ... on Individual {
-                              email
+                            transactions (limit:1, orderBy: {
+                              field:CREATED_AT,
+                              direction: DESC
+
+                            }) {
+                              nodes {
+                                createdAt
+                                netAmount {
+                                  value
+                                  currency
+                              }
                             }
-                         }
+                          }
+                          ... on Individual {
+                            email
+                          }
+                        }
                       }
                     }
                   }
-                }`
+                }`,
+                variables: {
+                    slug: 'openaddresses',
+                    email: email,
+                    roles: ["BACKER"]
+                }
             }
         });
 
-        // TODO this will eventually be removed
         const usrs = res.body.data.account.members.nodes.filter((node) => {
             return node.account.email !== email;
         });
 
         if (!usrs.length) return;
 
-        if (!['BACKER', 'SPONSOR'].includes(usrs[0].role)) return;
-        await this.user.level(usrs[0].account.email, usrs[0].role.toLowerCase());
+        // No user exists on OC
+        const account = usrs[0].account;
+
+        // The user has never made a transaction
+        if (!account.transactions.nodes.length) return;
+        if (!account.email) return;
+
+        const level = Level.calc(account.transactions.nodes[0]);
+        await this.user.level(account.email, level);
     }
 
     /**
@@ -81,8 +107,9 @@ class Level {
             },
             body: {
                 query: `{
-                    account(slug: "openaddresses") {
-                      members {
+                  query account($slug: String, $roles: [MemberRole]) {
+                    account(slug: $slug) {
+                      members(role: $roles) {
                         nodes {
                           id
                           role
@@ -92,18 +119,67 @@ class Level {
                             ... on Individual {
                               email
                             }
-                         }
+                            transactions (limit:1, orderBy: {
+                              field:CREATED_AT,
+                              direction: DESC
+
+                            }) {
+                              nodes {
+                                createdAt
+                                netAmount {
+                                  value
+                                  currency
+                              }
+                            }
+                          }
+                        }
                       }
                     }
                   }
-                }`
+                }`,
+                variables: {
+                    slug: 'openaddresses',
+                    roles: ["BACKER"]
+                }
             }
         });
 
-        for (const node of res.body.data.account.members.nodes) {
-            if (!['BACKER', 'SPONSOR'].includes(node.role)) continue;
-            await this.user.level(node.account.email, node.role.toLowerCase());
+        const usrs = res.body.data.account.members.nodes;
+        if (!usrs.length) return;
+
+        for (const usr of usrs) {
+            // The user has never made a transaction
+            if (!usr.account.transactions.nodes.length) return;
+            if (!usr.account.email) return;
+
+            const level = Level.calc(usr.account.transactions.nodes[0]);
+            await this.user.level(usr.account.email, level);
         }
+    }
+
+    /**
+     * Retrun the level given an OpenCollective transaction
+     *
+     * @param {Object}  transaction
+     * @param {Date}    transaction.createdAt
+     * @param {Object}  transaction.netAmount
+     * @param {Number}  transaction.netAmount.value
+     * @param {String}  transaction.netAmount.currency
+     *
+     * @returns {String} Level basic/backer/sponsor
+     */
+    static calc(transaction) {
+        const created = moment(transaction.createdAt).add(1, 'month');
+
+        if (created < moment()) {
+            return 'basic';
+        } else if (transaction.netAmount.value <= -100) {
+            return 'sponsor';
+        } else if (transaction.netAmount.value <= -5) {
+            return 'backer';
+        }
+
+        return 'basic';
     }
 }
 

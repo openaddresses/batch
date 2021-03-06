@@ -118,7 +118,7 @@ class Flight {
         if (new_login.statusCode !== 200) throw new Error(new_login.body);
 
         const new_token = await request({
-            url: 'http://localhost:5000/api/token',
+            url: 'http://localhost:4999/api/token',
             json: true,
             method: 'POST',
             jar: jar,

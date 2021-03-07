@@ -23,7 +23,7 @@ class Schemas {
             schemas[type] = await $RefParser.dereference(path.resolve(__dirname, '../schema/', schemas[type]));
         }
 
-        this.schemas.set(parsed, schemas);
+        this.schemas.set(parsed.join(' '), schemas);
 
         if (!schemas.body && !schemas.query) {
             return [parsed[1]];

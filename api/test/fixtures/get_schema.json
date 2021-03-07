@@ -1,206 +1,257 @@
 {
     "GET /schema": {
-        "body": false,
-        "query": true
-    },
-    "POST /user": {
         "body": true,
-        "query": false
-    },
-    "PATCH /user/:id": {
-        "body": true,
-        "query": false
-    },
-    "POST /login": {
-        "body": true,
-        "query": false
-    },
-    "GET /login": {
-        "body": false,
-        "query": true
-    },
-    "GET /login/verify": {
-        "body": false,
-        "query": true
-    },
-    "POST /login/forgot": {
-        "body": true,
-        "query": false
-    },
-    "POST /login/reset": {
-        "body": true,
-        "query": false
-    },
-    "POST /token": {
-        "body": true,
-        "query": false
-    },
-    "POST /schedule": {
-        "body": true,
-        "query": false
-    },
-    "POST /collections": {
-        "body": true,
-        "query": false
-    },
-    "PATCH /collections/:collection": {
-        "body": true,
-        "query": false
-    },
-    "GET /data": {
-        "body": false,
-        "query": true
-    },
-    "GET /run": {
-        "body": false,
-        "query": true
-    },
-    "POST /run": {
-        "body": true,
-        "query": false
-    },
-    "PATCH /run/:run": {
-        "body": true,
-        "query": false
-    },
-    "POST /run/:run/jobs": {
-        "body": true,
-        "query": false
-    },
-    "GET /job": {
-        "body": false,
-        "query": true
-    },
-    "PATCH /job/:job": {
-        "body": true,
-        "query": false
-    },
-    "POST /job/error": {
-        "body": true,
-        "query": false
-    },
-    "POST /job/error/:job": {
-        "body": true,
-        "query": false
+        "query": true,
+        "res": false
     },
     "POST /upload": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "GET /user": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "POST /user": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /user/:id": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /login/verify": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /login": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /login": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "DELETE /login": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "POST /login/forgot": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /login/reset": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /token": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "POST /token": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "DELETE /token/:id": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "POST /schedule": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /collections": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /collections/:collection/data": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "DELETE /collections/:collection": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "POST /collections": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /collections/:collection": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /map": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "GET /map/:z/:x/:y.mvt": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
+    },
+    "GET /data": {
+        "body": false,
+        "query": true,
+        "res": true
     },
     "GET /data/:data": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /data/:data/history": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "GET /run": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /run": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /run/:run": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /run/:run/count": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "PATCH /run/:run": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /run/:run/jobs": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /run/:run/jobs": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "GET /job": {
+        "body": false,
+        "query": true,
+        "res": true
     },
     "GET /job/error": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /job/error/count": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /job/error/:job": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "POST /job/error": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /job/error/:job": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /job/:job": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "POST /job/:job/rerun": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /job/:job/delta": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /job/:job/output/source.png": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "GET /job/:job/output/source.geojson.gz": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "GET /job/:job/output/sample": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "GET /job/:job/output/cache.zip": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "GET /job/:job/log": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
+    },
+    "PATCH /job/:job": {
+        "body": true,
+        "query": false,
+        "res": true
     },
     "GET /dash/traffic": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "GET /dash/collections": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": true
     },
     "POST /github/event": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     },
     "POST /opencollective/event": {
         "body": false,
-        "query": false
+        "query": false,
+        "res": false
     }
 }

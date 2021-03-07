@@ -35,7 +35,7 @@
             "type": "string"
         },
         "size": {
-            "type": "integer"
+            "$ref": "./util/size.json"
         },
         "output": {
             "type": "object",

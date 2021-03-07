@@ -63,13 +63,13 @@
                 }
             },
             "loglink": {
-                "type": "string"
+                "$ref": "./util/loglink.json"
             },
             "status": {
                 "$ref": "./util/status.json"
             },
             "size": {
-                "type": "integer"
+                "$ref": "./util/size.json"
             }
         }
     }

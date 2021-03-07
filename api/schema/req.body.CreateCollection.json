@@ -16,8 +16,7 @@
             }
         },
         "size": {
-            "type": "number",
-            "description": "Size of collection in bytes"
+            "$ref": "./util/size.json"
         }
     }
 }

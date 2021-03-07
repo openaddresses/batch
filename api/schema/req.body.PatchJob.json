@@ -3,7 +3,7 @@
     "additionalProperties": false,
     "properties": {
         "size": {
-            "type": "integer"
+            "$ref": "./util/size.json"
         },
         "map": {
             "type": "integer"
@@ -12,7 +12,7 @@
             "type": "object"
         },
         "loglink": {
-            "type": "string"
+            "$ref": "./util/loglink.json"
         },
         "status": {
             "$ref": "./util/status.json"

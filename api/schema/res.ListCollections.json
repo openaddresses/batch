@@ -16,8 +16,7 @@
                 "type": "integer"
             },
             "size": {
-                "type": "integer",
-                "description": "Download size in bytes"
+                "$ref": "./util/size.json"
             },
             "name": {
                 "type": "string"

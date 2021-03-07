@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "required": [
+        "job_id",
+        "format"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "job_id": {
+            "type": "integer",
+            "description": "The Job ID to start an export task for"
+        },
+        "format": {
+            "$ref": "./util/format.json"
+        }
+    }
+}

@@ -1771,6 +1771,37 @@ async function server(args, config, cb) {
         }
     );
 
+    /**
+     * @api {post} /api/export Create Export
+     * @apiVersion 1.0.0
+     * @apiName CreateExport
+     * @apiGroup Exports
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *   Create a new export task
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateExport.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Export.json} apiSuccess
+     */
+    router.post(
+        ...await schemas.get('POST /export', {
+            body: 'req.body.CreateExport.json',
+            res: 'res.Export.json'
+        }),
+        async (req, res) => {
+            try {
+                await user.is_auth(req);
+
+                //TODO Add uid to body, generate export
+
+                //return res.json(export.json());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
 
     /**
      * @api {post} /api/github/event Github Webhook

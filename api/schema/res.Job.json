@@ -65,7 +65,7 @@
             }
         },
         "loglink": {
-            "type": "string"
+            "$ref": "./util/loglink.json"
         },
         "status": {
             "$ref": "./util/status.json"
@@ -77,18 +77,14 @@
             "type": ["null", "integer"]
         },
         "bounds": {
-            "type": ["null", "array"],
-            "minLength": 4,
-            "maxLength": 4,
-            "items": {
-                "type": "number"
-            }
+            "$ref": "./util/bounds.json"
         },
         "version": {
-            "type": "string"
+            "type": "string",
+            "description": "The SemVer of the task processor for this job"
         },
         "size": {
-            "type": "integer"
+            "$ref": "./util/size.json"
         }
     }
 }

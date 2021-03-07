@@ -137,10 +137,10 @@ define({ "api": [
           },
           {
             "group": "Body",
-            "type": "Number",
+            "type": "Integer",
             "optional": true,
             "field": "size",
-            "description": "<p>Size of collection in bytes</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -181,7 +181,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>The size of the collection in bytes</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -301,7 +301,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>Download size in bytes</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           },
           {
             "group": "Success 200",
@@ -380,10 +380,10 @@ define({ "api": [
           },
           {
             "group": "Body",
-            "type": "Number",
+            "type": "Integer",
             "optional": true,
             "field": "size",
-            "description": "<p>Size of collection in bytes</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -424,7 +424,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>The size of the collection in bytes</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -538,7 +538,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           },
           {
             "group": "Success 200",
@@ -659,7 +659,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           },
           {
             "group": "Success 200",
@@ -759,13 +759,14 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "jobs.status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -852,13 +853,14 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -893,6 +895,128 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "ErrorSingle"
+  },
+  {
+    "type": "post",
+    "url": "/api/export",
+    "title": "Create Export",
+    "version": "1.0.0",
+    "name": "CreateExport",
+    "group": "Exports",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new export task</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID to start an export task for</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the export was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Exports"
   },
   {
     "type": "get",
@@ -1090,13 +1214,14 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -1164,7 +1289,7 @@ define({ "api": [
             "type": "Integer",
             "optional": true,
             "field": "size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           },
           {
             "group": "Body",
@@ -1185,20 +1310,21 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "loglink",
-            "description": "<p>undefined</p>"
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           },
           {
             "group": "Body",
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": true,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Body",
@@ -1340,20 +1466,21 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "loglink",
-            "description": "<p>undefined</p>"
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -1374,21 +1501,21 @@ define({ "api": [
             "type": "Null/Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": "<p>The WGS84 bounds covered by the asset</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "version",
-            "description": "<p>undefined</p>"
+            "description": "<p>The SemVer of the task processor for this job</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -1486,13 +1613,14 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": true,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "query",
@@ -1623,27 +1751,28 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "loglink",
-            "description": "<p>undefined</p>"
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -1802,20 +1931,21 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "loglink",
-            "description": "<p>undefined</p>"
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -1836,21 +1966,21 @@ define({ "api": [
             "type": "Null/Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": "<p>The WGS84 bounds covered by the asset</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "version",
-            "description": "<p>undefined</p>"
+            "description": "<p>The SemVer of the task processor for this job</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }
@@ -2734,13 +2864,14 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": true,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Query",
@@ -2830,13 +2961,14 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -3163,20 +3295,21 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "jobs.loglink",
-            "description": "<p>undefined</p>"
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
+              "\"Running\"",
               "\"Success\"",
               "\"Fail\"",
               "\"Warn\""
             ],
             "optional": false,
             "field": "jobs.status",
-            "description": "<p>The current status</p>"
+            "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
@@ -3197,21 +3330,21 @@ define({ "api": [
             "type": "Null/Number[]",
             "optional": false,
             "field": "jobs.bounds",
-            "description": "<p>undefined</p>"
+            "description": "<p>The WGS84 bounds covered by the asset</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "jobs.version",
-            "description": "<p>undefined</p>"
+            "description": "<p>The SemVer of the task processor for this job</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "jobs.size",
-            "description": "<p>undefined</p>"
+            "description": "<p>The size of the asset in bytes</p>"
           }
         ]
       }

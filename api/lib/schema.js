@@ -18,7 +18,7 @@ class Schemas {
         const parsed = url.split(' ');
         if (parsed.length !== 2) throw new Error('schema.get() must be of format "<VERB> <URL>"');
 
-        for (const type of ['body', 'query']) {
+        for (const type of ['body', 'query', 'res']) {
             if (!schemas[type]) continue;
             schemas[type] = await $RefParser.dereference(path.resolve(__dirname, '../schema/', schemas[type]));
         }

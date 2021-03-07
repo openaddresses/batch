@@ -10,13 +10,16 @@
         "additionalProperties": false,
         "properties": {
             "id": {
-                "type": "integer"
+                "type": "integer",
+                "description": "The linenumber of the log message"
             },
             "timestamp": {
-                "type": "integer"
+                "type": "integer",
+                "description": "The time at which the particular line was generated"
             },
             "message": {
-                "type": "string"
+                "type": "string",
+                "description": "The log line itself"
             }
         }
     }

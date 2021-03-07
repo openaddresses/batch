@@ -79,7 +79,7 @@ class Level {
         });
 
         const usrs = res.body.data.account.members.nodes.filter((node) => {
-            return node.account.email !== email;
+            return node.account.email === email;
         });
 
         if (!usrs.length) return;

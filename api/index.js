@@ -424,7 +424,7 @@ async function server(args, config, cb) {
         async (req, res) => {
             if (req.session && req.session.auth && req.session.auth.username) {
                 try {
-                    if (req.params.level) await level.single(req.session.auth.email);
+                    if (req.query.level) await level.single(req.session.auth.email);
                     res.json(await user.user(req.session.auth.uid));
                 } catch (err) {
                     return Err.respond(err, res);

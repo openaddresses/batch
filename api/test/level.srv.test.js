@@ -149,7 +149,7 @@ test('Level#user', async (t) =>  {
             flags: {}
         });
 
-        await level.single(usr.email);
+        await level.single(usr.user.email);
 
         const usr_post = await request({
             url: 'http://localhost:4999/api/login',
@@ -221,7 +221,7 @@ test('Level#user - no contrib', async (t) =>  {
             flags: {}
         });
 
-        await level.single(usr.email);
+        await level.single(usr.user.email);
 
         const usr_post = await request({
             url: 'http://localhost:4999/api/login',
@@ -280,7 +280,7 @@ test('Level#user - no match', async (t) =>  {
             flags: {}
         });
 
-        await level.single(usr.email);
+        await level.single(usr.user.email);
 
         const usr_post = await request({
             url: 'http://localhost:4999/api/login',

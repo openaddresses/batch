@@ -115,15 +115,15 @@ test('GET: api/schema?method=POST&url=/login', (t) => {
             query: null,
             res: {
                 type: 'object',
-                required: [ 'uid', 'username', 'email', 'access', 'flags' ],
+                required: ['uid', 'username', 'email', 'access', 'flags'],
                 additionalProperties: false,
                 properties: {
                     uid: { type: 'integer' },
                     username: { type: 'string' },
                     email: { type: 'string' },
-                    access: { type: 'string', enum: [ 'user', 'admin' ]
-                },
-                flags: { type: 'object' } }
+                    access: { type: 'string', enum: ['user', 'admin']
+                    },
+                    flags: { type: 'object' } }
             }
         });
 

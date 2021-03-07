@@ -256,14 +256,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -2408,14 +2408,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -2459,14 +2459,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -2593,14 +2593,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -2631,14 +2631,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -3577,14 +3577,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -3811,14 +3811,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }

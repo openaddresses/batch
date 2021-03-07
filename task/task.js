@@ -114,7 +114,7 @@ async function flow(api, job) {
 
     try {
         const update = {
-            status: 'Pending',
+            status: 'Running',
             version: config.version,
             output: job.assets
         };

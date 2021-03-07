@@ -30,6 +30,7 @@
                             <select v-model='filter.status' class='select'>
                                 <option>All</option>
                                 <option>Pending</option>
+                                <option>Running</option>
                                 <option>Success</option>
                                 <option>Warn</option>
                                 <option>Fail</option>

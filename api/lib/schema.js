@@ -14,98 +14,28 @@ class Schemas {
         this.validate = this.validator.validate;
     }
 
-    async build() {
-        this.schemas.set('GET /schema', {
-            query: 'req.query.ListSchema.json'
-        });
-        this.schemas.set('POST /user', {
-            body: 'req.body.CreateUser.json'
-        });
-        this.schemas.set('PATCH /user/:id', {
-            body: 'req.body.PatchUser.json'
-        });
-        this.schemas.set('POST /login', {
-            body: 'req.body.CreateLogin.json'
-        });
-        this.schemas.set('GET /login', {
-            query: 'req.query.GetLogin.json'
-        });
-        this.schemas.set('GET /login/verify', {
-            query: 'req.query.VerifyLogin.json'
-        });
-        this.schemas.set('POST /login/forgot', {
-            body: 'req.body.ForgotLogin.json'
-        });
-        this.schemas.set('POST /login/reset', {
-            body: 'req.body.ResetLogin.json'
-        });
-        this.schemas.set('POST /token', {
-            body: 'req.body.CreateToken.json'
-        });
-        this.schemas.set('POST /schedule', {
-            body: 'req.body.Schedule.json'
-        });
-        this.schemas.set('POST /collections', {
-            body: 'req.body.CreateCollection.json'
-        });
-        this.schemas.set('PATCH /collections/:collection', {
-            body: 'req.body.PatchCollection.json'
-        });
-        this.schemas.set('GET /data', {
-            query: 'req.query.ListData.json'
-        });
-        this.schemas.set('GET /run', {
-            query: 'req.query.ListRuns.json'
-        });
-        this.schemas.set('POST /run', {
-            body: 'req.body.CreateRun.json'
-        });
-        this.schemas.set('PATCH /run/:run', {
-            body: 'req.body.PatchRun.json'
-        });
-        this.schemas.set('POST /run/:run/jobs', {
-            body: 'req.body.SingleJobsCreate.json'
-        });
-        this.schemas.set('GET /job', {
-            query: 'req.query.ListJobs.json'
-        });
-        this.schemas.set('PATCH /job/:job', {
-            body: 'req.body.PatchJob.json'
-        });
-        this.schemas.set('POST /job/error', {
-            body: 'req.body.ErrorCreate.json'
-        });
-        this.schemas.set('POST /job/error/:job', {
-            body: 'req.body.ErrorModerate.json'
-        });
-
-        for (const schema of this.schemas.keys()) {
-            const s = this.schemas.get(schema);
-
-            for (const type of ['body', 'query']) {
-                if (!s[type]) continue;
-                s[type] = await $RefParser.dereference(path.resolve(__dirname, '../schema/', s[type]));
-            }
-        }
-    }
-
-    get(url) {
+    async get(url, schemas = {}) {
         const parsed = url.split(' ');
         if (parsed.length !== 2) throw new Error('schema.get() must be of format "<VERB> <URL>"');
 
-        const info = this.schemas.get(url);
-        if (!info) {
-            this.schemas.set(url, {});
+        for (const type of ['body', 'query']) {
+            if (!schemas[type]) continue;
+            schemas[type] = await $RefParser.dereference(path.resolve(__dirname, '../schema/', schemas[type]));
+        }
+
+        this.schemas.set(parsed, schemas);
+
+        if (!schemas.body && !schemas.query) {
             return [parsed[1]];
         }
 
         const opts = {};
-        if (info.query) opts.query = info.query;
-        if (info.body) opts.body = info.body;
+        if (schemas.query) opts.query = schemas.query;
+        if (schemas.body) opts.body = schemas.body;
 
         const flow = [parsed[1], []];
 
-        if (info.query) flow[1].push(Schemas.query(info.query));
+        if (schemas.query) flow[1].push(Schemas.query(schemas.query));
 
         flow[1].push(this.validate(opts));
 
@@ -154,6 +84,7 @@ class Schemas {
         const schema = JSON.parse(JSON.stringify(this.schemas.get(`${method} ${url}`)));
         if (!schema.query) schema.query = null;
         if (!schema.body) schema.body = null;
+        if (!schema.res) schema.res = null;
 
         return schema;
     }
@@ -169,7 +100,8 @@ class Schemas {
         for (const key of this.schemas.keys()) {
             lite[key] = {
                 body: !!this.schemas.get(key).body,
-                query: !!this.schemas.get(key).query
+                query: !!this.schemas.get(key).query,
+                res: !!this.schemas.get(key).res
             };
         }
 

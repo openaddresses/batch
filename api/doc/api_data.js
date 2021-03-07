@@ -864,7 +864,7 @@ define({ "api": [
             "group": "Success 200",
             "type": "Status",
             "optional": false,
-            "field": "message",
+            "field": "messages",
             "description": "<p>undefined</p>"
           },
           {
@@ -893,24 +893,6 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "ErrorSingle"
-  },
-  {
-    "type": "post",
-    "url": "/api/github/event",
-    "title": "Github Webhook",
-    "version": "1.0.0",
-    "name": "Event",
-    "group": "Github",
-    "permission": [
-      {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Callback endpoint for GitHub Webhooks. Should not be called by user functions</p>",
-    "filename": "./index.js",
-    "groupTitle": "Github"
   },
   {
     "type": "get",
@@ -975,6 +957,22 @@ define({ "api": [
             "field": "message",
             "description": "<p>Text representation of the error</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
         ]
       }
     },
@@ -986,14 +984,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "job",
-            "description": "<p>undefined</p>"
+            "description": "<p>The Job ID of the error</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "String[]",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>An Array of Error messages related to a given Job ID undefined</p>"
           }
         ]
       }
@@ -1030,13 +1028,6 @@ define({ "api": [
         "Body": [
           {
             "group": "Body",
-            "type": "Integer",
-            "optional": false,
-            "field": "job",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
             "type": "String",
             "allowedValues": [
               "\"confirm\"",
@@ -1052,13 +1043,6 @@ define({ "api": [
     "success": {
       "fields": {
         "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "job",
-            "description": "<p>undefined</p>"
-          },
           {
             "group": "Success 200",
             "type": "String",
@@ -1118,7 +1102,7 @@ define({ "api": [
             "group": "Success 200",
             "type": "Status",
             "optional": false,
-            "field": "message",
+            "field": "messages",
             "description": "<p>undefined</p>"
           },
           {
@@ -1436,6 +1420,26 @@ define({ "api": [
             "optional": false,
             "field": ":job",
             "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>undefined undefined</p>"
           }
         ]
       }
@@ -2252,6 +2256,44 @@ define({ "api": [
     "groupTitle": "Login"
   },
   {
+    "type": "delete",
+    "url": "/api/login",
+    "title": "Delete Session",
+    "version": "1.0.0",
+    "name": "DeleteLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Log a user out of the service</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
     "type": "post",
     "url": "/api/login/forgot",
     "title": "Forgot Login",
@@ -2273,7 +2315,7 @@ define({ "api": [
             "group": "Body",
             "type": "String",
             "optional": false,
-            "field": "username",
+            "field": "user",
             "description": "<p>username or email to reset password of</p>"
           }
         ]
@@ -2317,6 +2359,19 @@ define({ "api": [
       }
     ],
     "description": "<p>Return information about the currently logged in user</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "level",
+            "description": "<p>If true, refresh the user's level from OpenCollective</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "Success 200": [
@@ -2400,6 +2455,44 @@ define({ "api": [
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "post",
+    "url": "/api/login/verify",
+    "title": "Verify User",
+    "version": "1.0.0",
+    "name": "VerifyLogin",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Email Verification of new user</p>",
     "success": {
       "fields": {
         "Success 200": [
@@ -3331,6 +3424,8 @@ define({ "api": [
             "group": "Body",
             "type": "String",
             "allowedValues": [
+              "\"close\"",
+              "\"level\"",
               "\"collect\"",
               "\"sources\""
             ],
@@ -3416,7 +3511,7 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "Unknown",
-            "optional": false,
+            "optional": true,
             "field": "schemas",
             "description": "<p>undefined</p>"
           }
@@ -3996,5 +4091,41 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "User"
+  },
+  {
+    "type": "post",
+    "url": "/api/github/event",
+    "title": "Github Webhook",
+    "version": "1.0.0",
+    "name": "Github",
+    "group": "Webhooks",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Callback endpoint for GitHub Webhooks. Should not be called by user functions</p>",
+    "filename": "./index.js",
+    "groupTitle": "Webhooks"
+  },
+  {
+    "type": "post",
+    "url": "/api/opencollective/event",
+    "title": "OpenCollective",
+    "version": "1.0.0",
+    "name": "OpenCollective",
+    "group": "Webhooks",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Callback endpoint for GitHub Webhooks. Should not be called by user functions</p>",
+    "filename": "./index.js",
+    "groupTitle": "Webhooks"
   }
 ] });

@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "size": {
+            "type": "integer",
+            "description": "The size of the asset in bytes"
+        },
+        "status": {
+            "$ref": "./util/status.json"
+        },
+        "loglink": {
+            "type": "string",
+            "description": "The AWS Cloudwatch Log ID of the logs - note these logs expire"
+        }
+    }
+}

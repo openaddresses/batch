@@ -1,6 +1,7 @@
 'use strict';
 
-const { Auth, AuthToken } = require('../lib/auth');
+const User = require('../lib/user');
+const Token = require('../lib/token');
 const test = require('tape');
 const { Pool } = require('pg');
 const Flight = require('./init');
@@ -11,12 +12,12 @@ flight.init(test);
 
 let TOKEN = '';
 
-test('AuthToken#generate', async (t) => {
+test('Token#generate', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
 
-    const authtoken = new AuthToken(pool);
+    const authtoken = new Token(pool);
 
     try {
         await authtoken.generate({
@@ -59,7 +60,7 @@ test('AuthToken#generate', async (t) => {
     }
 
     try {
-        const auth = new Auth(pool);
+        const auth = new User(pool);
         await auth.register({
             username: 'test',
             password: 'test',
@@ -84,12 +85,12 @@ test('AuthToken#generate', async (t) => {
     t.end();
 });
 
-test('AuthToken#list', async (t) => {
+test('Token#list', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
 
-    const authtoken = new AuthToken(pool);
+    const authtoken = new Token(pool);
 
     try {
         await authtoken.list({
@@ -124,12 +125,12 @@ test('AuthToken#list', async (t) => {
     t.end();
 });
 
-test('AuthToken#validate', async (t) => {
+test('Token#validate', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
 
-    const authtoken = new AuthToken(pool);
+    const authtoken = new Token(pool);
 
     try {
         await authtoken.validate('test');
@@ -171,12 +172,12 @@ test('AuthToken#validate', async (t) => {
     t.end();
 });
 
-test('AuthToken#delete', async (t) => {
+test('Token#delete', async (t) => {
     const pool = new Pool({
         connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
     });
 
-    const authtoken = new AuthToken(pool);
+    const authtoken = new Token(pool);
 
     try {
         await authtoken.delete({

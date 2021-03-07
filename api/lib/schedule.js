@@ -3,21 +3,21 @@
 const Err = require('./error');
 const JobError = require('./joberror');
 const batchjob = require('./batch');
+const Level = require('./level');
 
 /**
  * @class Schedule
  */
 class Schedule {
     static async event(pool, event) {
-        if (!event.type) throw new Err(400, null, 'Event.type must be a string');
-        if (!['collect', 'sources'].includes(event.type)) throw new Err(400, null, 'Event.body is not a recognized event');
-
         if (event.type === 'collect') {
             await Schedule.collect();
         } else if (event.type === 'sources') {
             await Schedule.sources(pool);
         } else if (event.type === 'close') {
             await Schedule.close(pool);
+        } else if (event.type === 'level') {
+            await Schedule.level(pool);
         }
     }
 
@@ -28,6 +28,16 @@ class Schedule {
             });
         } catch (err) {
             throw new Err(500, err, 'failed to submit collect job to batch');
+        }
+    }
+
+    static async level(pool) {
+        const level = new Level(pool);
+
+        try {
+            await level.all();
+        } catch (err) {
+            throw new Err(500, err, 'Failed to level all users');
         }
     }
 

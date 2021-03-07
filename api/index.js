@@ -83,6 +83,7 @@ async function server(args, config, cb) {
     });
 
     const analytics = new Analytics(pool);
+    const level = new (require('./lib/level'))(pool);
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -94,9 +95,9 @@ async function server(args, config, cb) {
         throw new Error(err);
     }
 
-    const auth = new (require('./lib/auth').Auth)(pool);
+    const user = new (require('./lib/user'))(pool);
     const email = new (require('./lib/email'))();
-    const authtoken = new (require('./lib/auth').AuthToken)(pool);
+    const token = new (require('./lib/token'))(pool);
 
     const app = express();
     const router = express.Router();
@@ -186,6 +187,7 @@ async function server(args, config, cb) {
                 req.auth = {
                     uid: false,
                     type: 'secret',
+                    level: 'sponsor',
                     username: false,
                     access: 'admin',
                     email: false,
@@ -202,7 +204,7 @@ async function server(args, config, cb) {
             }
 
             try {
-                req.auth = await authtoken.validate(authorization[1]);
+                req.auth = await token.validate(authorization[1]);
                 req.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
@@ -265,7 +267,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /upload'),
         async (req, res) => {
             try {
-                await auth.is_flag(req, 'upload');
+                await user.is_flag(req, 'upload');
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -307,9 +309,9 @@ async function server(args, config, cb) {
         ...schemas.get('GET /user'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
-                res.json(await auth.list(req.query));
+                res.json(await user.list(req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -333,17 +335,17 @@ async function server(args, config, cb) {
         ...schemas.get('POST /user'),
         async (req, res) => {
             try {
-                const user = await auth.register(req.body);
+                const usr = await user.register(req.body);
 
-                const forgot = await auth.forgot(user.username, 'verify');
+                const forgot = await user.forgot(usr.username, 'verify');
 
                 if (args.email) await email.verify({
-                    username: user.username,
-                    email: user.email,
+                    username: usr.username,
+                    email: usr.email,
                     token: forgot.token
                 });
 
-                res.json(user);
+                res.json(usr);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -371,9 +373,9 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'id');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
-                res.json(await auth.patch(req.params.id, req.body));
+                res.json(await user.patch(req.params.id, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -396,7 +398,7 @@ async function server(args, config, cb) {
         ...schemas.get('GET /login/verify'),
         async (req, res) => {
             try {
-                res.json(await auth.verify(req.query.token));
+                res.json(await user.verify(req.query.token));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -414,19 +416,19 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return information about the currently logged in user
      *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.GetLogin.json} apiParam
      * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
      */
     router.get(
         ...schemas.get('GET /login'),
         async (req, res) => {
             if (req.session && req.session.auth && req.session.auth.username) {
-                return res.json({
-                    uid: req.session.auth.uid,
-                    username: req.session.auth.username,
-                    email: req.session.auth.email,
-                    access: req.session.auth.access,
-                    flags: req.session.auth.flags
-                });
+                try {
+                    if (req.query.level) await level.single(req.session.auth.email);
+                    res.json(await user.user(req.session.auth.uid));
+                } catch (err) {
+                    return Err.respond(err, res);
+                }
             } else {
                 return res.status(401).json({
                     status: 401,
@@ -453,15 +455,14 @@ async function server(args, config, cb) {
         ...schemas.get('POST /login'),
         async (req, res) => {
             try {
-                const user = await auth.login({
+                req.session.auth = await user.login({
                     username: req.body.username,
                     password: req.body.password
                 });
 
-                req.session.auth = user;
-
                 return res.json({
                     uid: req.session.auth.uid,
+                    level: req.session.auth.level,
                     username: req.session.auth.username,
                     email: req.session.auth.email,
                     access: req.session.auth.access,
@@ -521,7 +522,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /login/forgot'),
         async (req, res) => {
             try {
-                const reset = await auth.forgot(req.body.user); // Username or email
+                const reset = await user.forgot(req.body.user); // Username or email
 
                 if (args.email) await email.forgot(reset);
 
@@ -551,7 +552,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /login/reset'),
         async (req, res) => {
             try {
-                return res.json(await auth.reset({
+                return res.json(await user.reset({
                     token: req.body.token,
                     password: req.body.password
                 }));
@@ -578,9 +579,9 @@ async function server(args, config, cb) {
         ...schemas.get('GET /token'),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
+                await user.is_auth(req);
 
-                return res.json(await authtoken.list(req.auth));
+                return res.json(await token.list(req.auth));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -604,9 +605,9 @@ async function server(args, config, cb) {
         ...schemas.get('POST /token'),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
+                await user.is_auth(req);
 
-                return res.json(await authtoken.generate(req.auth, req.body.name));
+                return res.json(await token.generate(req.auth, req.body.name));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -631,9 +632,9 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'id');
 
-                await auth.is_auth(req);
+                await user.is_auth(req);
 
-                return res.json(await authtoken.delete(req.auth, req.params.id));
+                return res.json(await token.delete(req.auth, req.params.id));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -657,7 +658,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /schedule'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 await Schedule.event(pool, req.body);
 
@@ -723,7 +724,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'collection');
 
-                await auth.is_auth(req);
+                await user.is_auth(req);
 
                 Collection.data(pool, req.params.collection, res);
             } catch (err) {
@@ -752,7 +753,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'collection');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 await Collection.delete(pool, req.params.collection);
 
@@ -783,7 +784,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /collections'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const collection = new Collection(req.body.name, req.body.sources);
                 await collection.generate(pool);
@@ -817,7 +818,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'collection');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const collection = await Collection.from(pool, req.params.collection);
 
@@ -1009,7 +1010,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /run'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const run = await Run.generate(pool, req.body);
 
@@ -1093,7 +1094,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'run');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const run = await Run.from(pool, req.params.run);
 
@@ -1133,7 +1134,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'run');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const jobs = await Run.populate(pool, req.params.run, req.body.jobs);
 
@@ -1295,7 +1296,7 @@ async function server(args, config, cb) {
         ...schemas.get('POST /job/error'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const joberror = new JobError(req.body.job, req.body.message);
                 return res.json(await joberror.generate(pool));
@@ -1326,7 +1327,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await auth.is_flag(req, 'moderator');
+                await user.is_flag(req, 'moderator');
 
                 res.json(JobError.moderate(pool, ci, req.params.job, req.body));
             } catch (err) {
@@ -1382,7 +1383,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const job = await Job.from(pool, req.params.job);
                 const run = await Run.from(pool, job.run);
@@ -1480,7 +1481,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await auth.is_auth(req);
+                await user.is_auth(req);
 
                 await Job.data(pool, req.params.job, res);
             } catch (err) {
@@ -1540,7 +1541,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await auth.is_auth(req);
+                await user.is_auth(req);
 
                 Job.cache(req.params.job, res);
             } catch (err) {
@@ -1601,7 +1602,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 const job = await Job.from(pool, req.params.job);
 
@@ -1634,7 +1635,7 @@ async function server(args, config, cb) {
         ...schemas.get('GET /dash/traffic'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 res.json(await analytics.traffic());
             } catch (err) {
@@ -1659,7 +1660,7 @@ async function server(args, config, cb) {
         ...schemas.get('GET /dash/collections'),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
+                await user.is_admin(req);
 
                 res.json(await analytics.collections());
             } catch (err) {
@@ -1672,8 +1673,8 @@ async function server(args, config, cb) {
     /**
      * @api {post} /api/github/event Github Webhook
      * @apiVersion 1.0.0
-     * @apiName Event
-     * @apiGroup Github
+     * @apiName Github
+     * @apiGroup Webhooks
      * @apiPermission admin
      *
      * @apiDescription
@@ -1708,6 +1709,30 @@ async function server(args, config, cb) {
                 } else {
                     res.status(200).send('Accepted but ignored');
                 }
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/opencollective/event OpenCollective
+     * @apiVersion 1.0.0
+     * @apiName OpenCollective
+     * @apiGroup Webhooks
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
+     */
+    router.post(
+        ...schemas.get('POST /opencollective/event'),
+        async (req, res) => {
+            try {
+                console.error(req.headers);
+                console.error(req.body);
+
+                res.status(200).send('Accepted but ignored');
             } catch (err) {
                 return Err.respond(err, res);
             }

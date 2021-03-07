@@ -49,7 +49,9 @@ module.exports = cf.merge(
         targetgroup: cf.getAtt('APITargetGroup', 'TargetGroupFullName')
 
     }),
+    // Every Friday
     schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),
     schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
+    schedule('level',   'cron(0 10 * * ? *)', 'Ensure all accounts have proper levels'),
     schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs')
 );

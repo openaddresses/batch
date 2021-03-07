@@ -27,6 +27,9 @@ class Schemas {
         this.schemas.set('POST /login', {
             body: 'req.body.CreateLogin.json'
         });
+        this.schemas.set('GET /login', {
+            query: 'req.query.GetLogin.json'
+        });
         this.schemas.set('GET /login/verify', {
             query: 'req.query.VerifyLogin.json'
         });
@@ -110,7 +113,7 @@ class Schemas {
     }
 
     /**
-     * Express middleware to identify query params that should be integers according to the schema
+     * Express middleware to identify query params that should be integers/booleans according to the schema
      * and attempt to cast them as such to ensure they pass the schema
      *
      * @param {Object} schema JSON Schema
@@ -122,6 +125,12 @@ class Schemas {
             for (const key of Object.keys(req.query)) {
                 if (schema.properties[key] && schema.properties[key].type === 'integer') {
                     req.query[key] = parseInt(req.query[key]);
+                } else if (schema.properties[key] && schema.properties[key].type === 'boolean') {
+                    if (['true', '1'].includes(req.query[key])) {
+                        req.query[key] = true;
+                    } else if (['false', '0', null, undefined].includes(req.query[key])) {
+                        req.query[key] = false;
+                    }
                 }
             }
 

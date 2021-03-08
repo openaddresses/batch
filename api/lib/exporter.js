@@ -20,6 +20,19 @@ class Exporter {
         this.attrs = Object.keys(require('../schema/req.body.PatchExport.json').properties);
     }
 
+    json() {
+        return {
+            id: this.id,
+            uid: this.uid,
+            job_id: this.job_id,
+            created: this.created,
+            expiry: this.expiry,
+            size: this.size,
+            status: this.status,
+            loglink: this.loglink
+        }
+    }
+
     /**
      * List & Filter Exports
      *
@@ -164,11 +177,11 @@ class Exporter {
     static async generate(pool, params = {}) {
         let pgres;
         try {
-            pgres = pool.query(`
+            pgres = await pool.query(`
                 INSERT INTO exports (
                     uid,
                     job_id,
-                    format,
+                    format
                 ) VALUES (
                     $1,
                     $2,

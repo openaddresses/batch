@@ -32,7 +32,7 @@ class User {
             return true;
         }
 
-        return false;
+        throw new Err(401, null, 'Please donate to use this feature');
     }
 
     async is_flag(req, flag) {

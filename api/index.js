@@ -67,8 +67,8 @@ async function server(args, config, cb) {
     const Upload = require('./lib/upload');
     const Schedule = require('./lib/schedule');
     const Collection = require('./lib/collections');
+    const Exporter = require('./lib/exporter');
     const schemas = new (require('./lib/schema'))();
-    const exporter = new (require('./lib/exporter'))();
 
     let postgres = process.env.POSTGRES;
 
@@ -1794,10 +1794,11 @@ async function server(args, config, cb) {
             try {
                 await user.is_level(req, 'backer');
 
-                await job.from(req.body.job_id);
+                await Job.from(pool, req.body.job_id);
 
                 req.body.uid = req.auth.uid;
-                const exp = exporter.generate(req.body);
+                const exp = await Exporter.generate(pool, req.body);
+
                 return res.json(exp.json());
             } catch (err) {
                 return Err.respond(err, res);

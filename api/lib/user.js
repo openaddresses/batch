@@ -312,8 +312,8 @@ class User {
                 FROM
                     users
                 WHERE
-                    username iLIKE '%'||$3||'%'
-                    OR email iLIKE '%'||$3||'%'
+                    username ~ $3
+                    OR email ~ $3
                 ORDER BY
                     created DESC
                 LIMIT

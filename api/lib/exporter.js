@@ -2,6 +2,8 @@
 
 const Err = require('./error');
 const { Status } = require('./util');
+const batchjob = require('./batch');
+const moment = require('moment');
 
 class Exporter {
     constructor() {
@@ -56,7 +58,7 @@ class Exporter {
         }
 
         if (query.status) {
-            where.push(`${query.status.join(',')}}'::TEXT[] @> ARRAY[exports.status]`)
+            where.push(`${query.status.join(',')}}'::TEXT[] @> ARRAY[exports.status]`);
         }
 
         let pgres;
@@ -153,9 +155,11 @@ class Exporter {
     /**
      * Create a new Export
      *
-     * @param {Number} uid User ID that created the export
-     * @param {Number} job_id Job to export
-     * @param {String} format Format to export to
+     * @param {Pool} pool Postgres Pool Instance
+     * @param {Object} params
+     * @param {Number} params.uid User ID that created the export
+     * @param {Number} params.job_id Job to export
+     * @param {String} params.format Format to export to
      */
     static async generate(pool, params = {}) {
         let pgres;
@@ -188,6 +192,29 @@ class Exporter {
 
         return exp;
     }
+
+    /**
+     * Submit the Export to AWS Batch for processing
+     */
+    async batch() {
+        if (!this.id) throw new Err(400, null, 'Cannot batch an export without an ID');
+
+        if (process.env.StackName === 'test') {
+            return true;
+        } else {
+            try {
+                return await batchjob({
+                    type: 'export',
+                    id: this.id,
+                    job: this.job_id,
+                    format: this.format
+                });
+            } catch (err) {
+                throw new Err(500, err, 'failed to submit export to batch');
+            }
+        }
+    }
+
 }
 
 module.exports = Exporter;

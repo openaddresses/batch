@@ -390,7 +390,7 @@ class Run {
                     SET
                         github = $1,
                         closed = $2
-           `, [this.github, this.closed])
+           `, [this.github, this.closed]);
         } catch (err) {
             throw new Err(500, err, 'failed to save run');
         }

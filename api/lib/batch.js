@@ -59,6 +59,27 @@ function trigger(event) {
                     attemptDurationSeconds: timeout
                 }
             };
+        } else if (event.type === 'export') {
+            if (!event.id) return reject(new Error('Export ID required'));
+            if (!event.job) return reject(new Error('Job ID required'));
+            if (!event.format) return reject(new Error('Export Format required'));
+
+            params = {
+                jobDefinition: jobDefinition,
+                jobQueue: jobStdCIQueue,
+                jobName: jobName,
+                containerOverrides: {
+                    command: ['./export.js'],
+                    environment: [
+                        { name: 'OA_EXPORT_ID', value: String(event.id) },
+                        { name: 'OA_JOB', value: String(event.job) },
+                        { name: 'OA_FORMAT', value: event.format }
+                    ]
+                },
+                timeout: {
+                    attemptDurationSeconds: timeout
+                }
+            };
         } else if (event.type === 'collect') {
             params = {
                 jobDefinition: jobDefinition,

@@ -10,7 +10,7 @@ const flight = new Flight();
 flight.init(test);
 flight.takeoff(test);
 
-test('POST: api/run', (t) => {
+test('POST: /api/run', (t) => {
     request({
         url: 'http://localhost:4999/api/run',
         method: 'POST',
@@ -35,7 +35,7 @@ test('POST: api/run', (t) => {
     });
 });
 
-test('POST: api/run/:run/jobs', (t) => {
+test('POST: /api/run/:run/jobs', (t) => {
     request({
         url: 'http://localhost:4999/api/run/1/jobs',
         method: 'POST',
@@ -61,7 +61,7 @@ test('POST: api/run/:run/jobs', (t) => {
     });
 });
 
-test('PATCH: api/job/:job', (t) => {
+test('PATCH: /api/job/:job', (t) => {
     request({
         url: 'http://localhost:4999/api/job/1',
         method: 'PATCH',

@@ -22,12 +22,12 @@ class Exporter {
 
     json() {
         return {
-            id: this.id,
-            uid: this.uid,
-            job_id: this.job_id,
+            id: parseInt(this.id),
+            uid: parseInt(this.uid),
+            job_id: parseInt(this.job_id),
             created: this.created,
             expiry: this.expiry,
-            size: this.size,
+            size: parseInt(this.size),
             status: this.status,
             loglink: this.loglink
         }

@@ -1797,8 +1797,8 @@ async function server(args, config, cb) {
                 await Job.from(pool, req.body.job_id);
 
                 req.body.uid = req.auth.uid;
-                const exp = await Exporter.generate(pool, req.body);
 
+                const exp = await Exporter.generate(pool, req.body);
                 return res.json(exp.json());
             } catch (err) {
                 return Err.respond(err, res);

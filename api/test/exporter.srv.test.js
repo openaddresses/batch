@@ -96,6 +96,43 @@ test('POST /export - no donor level', async (t) =>  {
     t.end();
 });
 
+test('POST /export - backer', async (t) =>  {
+    try {
+        const usr = await flight.token('test-backer', {
+            level: 'backer'
+        });
+
+        const exp = await request({
+            url: 'http://localhost:4999/api/export',
+            method: 'post',
+            json: true,
+            jar: usr.jar,
+            body: {
+                job_id: 1,
+                format: 'csv'
+            }
+        });
+
+        t.ok(exp.body.created, '.created: <date>');
+        delete exp.body.created;
+        t.ok(exp.body.expiry, '.expiry: <date>');
+        delete exp.body.expiry;
+
+        t.deepEquals(exp.body, {
+            id: 1,
+            uid: 2,
+            job_id: 1,
+            size: null,
+            status: 'Pending',
+            loglink: null
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
 
 test('close', (t) => {

@@ -52,7 +52,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
                 'shared-secret': '123'
             },
             body: {
-                jobs: [ 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json' ]
+                jobs: ['https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json']
             }
         });
 

@@ -32,7 +32,7 @@ class Exporter {
             size: parseInt(this.size),
             status: this.status,
             loglink: this.loglink
-        }
+        };
     }
 
     /**

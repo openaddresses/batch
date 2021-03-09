@@ -1777,7 +1777,7 @@ async function server(args, config, cb) {
      * @apiVersion 1.0.0
      * @apiName CreateExport
      * @apiGroup Exports
-     * @apiPermission admin
+     * @apiPermission user
      *
      * @apiDescription
      *   Create a new export task
@@ -1800,6 +1800,35 @@ async function server(args, config, cb) {
 
                 const exp = await Exporter.generate(pool, req.body);
                 return res.json(exp.json());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/export List Export
+     * @apiVersion 1.0.0
+     * @apiName ListExport
+     * @apiGroup Exports
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   List existing exports
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.ListExport.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListExport.json} apiSuccess
+     */
+    router.get(
+        ...await schemas.get('GET /export', {
+            query: 'req.query.ListExport.json',
+            res: 'res.ListExport.json'
+        }),
+        async (req, res) => {
+            try {
+                if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
+
+                res.json(await Exporter.list(pool, req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }

@@ -12,6 +12,7 @@ class Exporter {
         this.job_id = false;
         this.created = false;
         this.expiry = false;
+        this.format = false;
         this.size = 0;
         this.status = false;
         this.loglink = false;
@@ -25,6 +26,7 @@ class Exporter {
             id: parseInt(this.id),
             uid: parseInt(this.uid),
             job_id: parseInt(this.job_id),
+            format: this.format,
             created: this.created,
             expiry: this.expiry,
             size: parseInt(this.size),
@@ -42,6 +44,7 @@ class Exporter {
      * @param {String} [query.before=undefined] - Only show exports before the given date
      * @param {String} [query.after=undefined] - Only show exports after the given date
      * @param {Number} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show exports with a given status
+     * @param {Number} query.uid - Only show exports for a given user
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -51,6 +54,10 @@ class Exporter {
         const where = [];
 
         Status.verify(query.status);
+
+        if (query.uid) {
+            where.push(`uid = ${query.uid}`);
+        }
 
         if (query.after) {
             try {
@@ -71,7 +78,7 @@ class Exporter {
         }
 
         if (query.status) {
-            where.push(`${query.status.join(',')}}'::TEXT[] @> ARRAY[exports.status]`);
+            where.push(`'{${query.status.join(',')}}'::TEXT[] @> ARRAY[exports.status]`);
         }
 
         let pgres;
@@ -79,19 +86,25 @@ class Exporter {
             pgres = await pool.query(`
                 SELECT
                     exports.id,
+                    exports.job_id,
+                    exports.uid,
                     exports.status,
                     exports.format,
                     exports.created,
+                    exports.expiry,
                     exports.loglink,
-                    exports.size
+                    exports.size,
+                    job.source_name,
+                    job.layer,
+                    job.name
                 FROM
                     exports,
                     job
                 WHERE
-                    True
+                    job.id = exports.job_id
                     ${where.length ? ' AND ' + where.join(' AND ') : ''}
                 ORDER BY
-                    runs.id DESC
+                    exports.id DESC
                 LIMIT $1
             `, [
                 query.limit

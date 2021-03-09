@@ -75,7 +75,7 @@ test('POST /export - no donor level', async (t) =>  {
 
         const exp = await request({
             url: 'http://localhost:4999/api/export',
-            method: 'post',
+            method: 'POST',
             json: true,
             jar: usr.jar,
             body: {
@@ -96,15 +96,17 @@ test('POST /export - no donor level', async (t) =>  {
     t.end();
 });
 
+let usr;
+
 test('POST /export - backer', async (t) =>  {
     try {
-        const usr = await flight.token('test-backer', {
+        usr = await flight.token('test-backer', {
             level: 'backer'
         });
 
         const exp = await request({
             url: 'http://localhost:4999/api/export',
-            method: 'post',
+            method: 'POST',
             json: true,
             jar: usr.jar,
             body: {
@@ -124,8 +126,42 @@ test('POST /export - backer', async (t) =>  {
             job_id: 1,
             size: null,
             status: 'Pending',
+            format: 'csv',
             loglink: null
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /export - backer', async (t) =>  {
+    try {
+        const exp = await request({
+            url: 'http://localhost:4999/api/export',
+            method: 'GET',
+            json: true,
+            jar: usr.jar
+        });
+
+        t.ok(exp.body[0].created, '[0].created: <date>');
+        delete exp.body[0].created;
+        t.ok(exp.body[0].expiry, '[0].expiry: <date>');
+        delete exp.body[0].expiry;
+
+        t.deepEquals(exp.body, [{
+            id: 1,
+            uid: 2,
+            job_id: 1,
+            size: null,
+            status: 'Pending',
+            loglink: null,
+            source_name: 'us/dc/statewide',
+            layer: 'addresses',
+            format: 'csv',
+            name: 'dcgis'
+        }]);
     } catch (err) {
         t.error(err, 'no errors');
     }

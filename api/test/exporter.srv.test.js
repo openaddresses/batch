@@ -169,6 +169,90 @@ test('GET /export - backer', async (t) =>  {
     t.end();
 });
 
+test('GET /export/100 - backer', async (t) =>  {
+    try {
+        const exp = await request({
+            url: 'http://localhost:4999/api/export/100',
+            method: 'GET',
+            json: true,
+            jar: usr.jar
+        });
+
+        t.deepEquals(exp.body, { status: 404, message: 'no exports by that id', messages: [] });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /export/1 - backer', async (t) =>  {
+    try {
+        const exp = await request({
+            url: 'http://localhost:4999/api/export/1',
+            method: 'PATCH',
+            json: true,
+            headers: {
+                'shared-secret': '123'
+            },
+            body: {
+                size: 2134,
+                status: 'Success',
+                loglink: 'i-am-a-loglink'
+            }
+        });
+
+        t.ok(exp.body.created, '.created: <date>');
+        delete exp.body.created;
+        t.ok(exp.body.expiry, '.expiry: <date>');
+        delete exp.body.expiry;
+
+        t.deepEquals(exp.body, {
+            id: 1,
+            uid: 2,
+            job_id: 1,
+            format: 'csv',
+            size: 2134,
+            status: 'Success',
+            loglink: 'i-am-a-loglink'
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /export/1 - backer', async (t) =>  {
+    try {
+        const exp = await request({
+            url: 'http://localhost:4999/api/export/1',
+            method: 'GET',
+            json: true,
+            jar: usr.jar
+        });
+
+        t.ok(exp.body.created, '.created: <date>');
+        delete exp.body.created;
+        t.ok(exp.body.expiry, '.expiry: <date>');
+        delete exp.body.expiry;
+
+        t.deepEquals(exp.body, {
+            id: 1,
+            uid: 2,
+            job_id: 1,
+            format: 'csv',
+            size: 2134,
+            status: 'Success',
+            loglink: 'i-am-a-loglink'
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
 
 test('close', (t) => {

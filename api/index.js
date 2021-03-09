@@ -1704,9 +1704,7 @@ async function server(args, config, cb) {
                 await user.is_admin(req);
 
                 const job = await Job.from(pool, req.params.job);
-
                 job.patch(req.body);
-
                 await job.commit(pool, Run, Data, ci);
 
                 await Run.ping(pool, ci, job);
@@ -1829,6 +1827,70 @@ async function server(args, config, cb) {
                 if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
 
                 res.json(await Exporter.list(pool, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/export/:export Get Export
+     * @apiVersion 1.0.0
+     * @apiName GetExport
+     * @apiGroup Exports
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   Get a single export
+     *
+     * @apiSchema {jsonschema=./schema/res.Export.json} apiSuccess
+     */
+    router.get(
+        ...await schemas.get('GET /export/:exportid', {
+            res: 'res.Export.json'
+        }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'exportid');
+
+                const exp = (await Exporter.from(pool, req.params.exportid)).json();
+                if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(401, null, 'You didn\'t create that export');
+
+                res.json(exp);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {patch} /api/export/:export Patch Export
+     * @apiVersion 1.0.0
+     * @apiName PatchExport
+     * @apiGroup Exports
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *   Update a single export
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchExport.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Export.json} apiSuccess
+     */
+    router.patch(
+        ...await schemas.get('PATCH /export/:exportid', {
+            body: 'req.body.PatchExport.json',
+            res: 'res.Export.json'
+        }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'exportid');
+                await user.is_admin(req);
+
+                const exp = await Exporter.from(pool, req.params.exportid);
+                exp.patch(req.body);
+                await exp.commit(pool);
+
+                return res.json(exp.json());
             } catch (err) {
                 return Err.respond(err, res);
             }

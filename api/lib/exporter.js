@@ -123,8 +123,9 @@ class Exporter {
     }
 
     static async from(pool, id) {
+        let pgres;
         try {
-            const pgres = await pool.query(`
+            pgres = await pool.query(`
                 SELECT
                     *
                 FROM
@@ -132,21 +133,21 @@ class Exporter {
                 WHERE
                     id = $1
             `, [id]);
-
-            const exp = new Exporter();
-
-            if (!pgres.rows.length) {
-                throw new Err(404, null, 'no exports by that id');
-            }
-
-            for (const key of Object.keys(pgres.rows[0])) {
-                exp[key] = pgres.rows[0][key];
-            }
-
-            return exp;
         } catch (err) {
             throw new Err(500, err, 'failed to fetch export');
         }
+
+        const exp = new Exporter();
+
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'no exports by that id');
+        }
+
+        for (const key of Object.keys(pgres.rows[0])) {
+            exp[key] = pgres.rows[0][key];
+        }
+
+        return exp;
     }
 
     patch(patch) {

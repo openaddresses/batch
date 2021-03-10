@@ -33,7 +33,7 @@ async function prompt() {
     },{
         type: 'text',
         message: 'OA Format',
-        name: 'OA_FORMAT'
+        name: 'OA_FORMAT',
         initial: 'csv'
     },{
         type: 'text',
@@ -69,5 +69,11 @@ async function cli() {
         url: process.env.OA_API,
         secret: process.env.SharedSecret
     });
+
+    const job = await oa.cmd('job', 'get', {
+        ':job': process.env.OA_JOB
+    });
+
+    console.error(job)
 
 }

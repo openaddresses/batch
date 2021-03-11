@@ -28,7 +28,7 @@
                 <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
             <div class='col col--12 py12'>
-                <Log logtype='export' :id='exp.id'/>
+                <Log @err='$emit("err", $event)' logtype='export' :id='exp.id'/>
             </div>
         </template>
     </div>

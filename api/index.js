@@ -1829,8 +1829,8 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'exportid');
 
-                const exp = (await Exporter.from(pool, req.params.exportid)).json();
-                if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(401, null, 'You didn\'t create that export');
+                const exp = await Exporter.from(pool, req.params.exportid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(401, null, 'You didn\'t create that export');
 
                 return res.json(await exp.log());
             } catch (err) {

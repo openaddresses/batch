@@ -1792,7 +1792,8 @@ async function server(args, config, cb) {
             try {
                 await user.is_level(req, 'backer');
 
-                await Job.from(pool, req.body.job_id);
+                const job = await Job.from(pool, req.body.job_id);
+                if (job.status !== 'Success') throw new Err(400, null, 'Cannot export a job that was not successful');
 
                 req.body.uid = req.auth.uid;
 

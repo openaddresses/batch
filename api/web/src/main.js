@@ -11,6 +11,7 @@ Vue.use(VTooltip);
 
 import Register from './components/Register.vue';
 import Profile from './components/Profile.vue';
+import Export from './components/Export.vue';
 import Upload from './components/Upload.vue';
 import Errors from './components/Errors.vue';
 import Login from './components/Login.vue';
@@ -36,6 +37,8 @@ const router = new VueRouter({
 
         { path: '/run', component: Runs },
         { path: '/run/:runid', component: Run, props: true },
+
+        { path: '/export/:exportid', component: Export, props: true },
 
         { path: '/job', component: Jobs },
         { path: '/job/:jobid', component: Job, props: true },

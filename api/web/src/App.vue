@@ -38,6 +38,7 @@
                     :auth='auth'
                     @auth='getLogin'
                     @login='mustlogin = true'
+                    @perk='perk = $event || true'
                     @err='err = $event'
 
                     @errors='errors = $event'
@@ -51,6 +52,11 @@
             @err='err = $event'
         />
 
+        <Perk
+            v-if='perk'
+            @perk='perk = $event'
+        />
+
         <MustLogin
             v-if='mustlogin'
             @login='mustlogin = false'
@@ -61,6 +67,7 @@
 
 <script>
 import MustLogin from './components/MustLogin.vue'
+import Perk from './components/Perk.vue'
 import Err from './components/Err.vue'
 
 export default {
@@ -72,6 +79,7 @@ export default {
     data: function() {
         return {
             mustlogin: false,
+            perk: false,
             errors: 0, //Number of Job Errors
             err: false,
             auth: {
@@ -142,6 +150,7 @@ export default {
     },
     components: {
         MustLogin,
+        Perk,
         Err
     }
 }
@@ -157,7 +166,7 @@ export default {
 .dropdown-content {
     display: none;
     position: absolute;
-    top: 25px;
+    top: 24px;
     left: 0px;
     background-color: #f9f9f9;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);

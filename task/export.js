@@ -70,9 +70,12 @@ async function cli() {
         secret: process.env.SharedSecret
     });
 
-    const job = await oa.cmd('job', 'get', {
+    const job = await oa.cmd('job', 'patch', {
         ':job': process.env.OA_JOB
+        status: 'Running'
     });
+
+    console.error(job)
 
     console.error(job)
 

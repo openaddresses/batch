@@ -129,6 +129,10 @@
             </template>
 
             <ProfileTokens @err='$emit("err", $event)'/>
+
+            <template v-if='profile.level !== "basic"'>
+                <ProfileExports @err='$emit("err", $event)'/>
+            </template>
         </template>
         <template v-else-if='mode === "analytics"'>
             <ProfileAnalytics
@@ -155,6 +159,7 @@ import ProfileAnalytics from './profile/ProfileAnalytics.vue'
 import ProfileAdminUser from './profile/ProfileAdminUser.vue'
 import ProfileAdminCollections from './profile/ProfileAdminCollections.vue'
 import ProfileTokens from './profile/ProfileTokens.vue'
+import ProfileExports from './profile/ProfileExports.vue'
 
 export default {
     name: 'Profile',
@@ -212,7 +217,8 @@ export default {
         ProfileAnalytics,
         ProfileAdminUser,
         ProfileAdminCollections,
-        ProfileTokens
+        ProfileTokens,
+        ProfileExports
     }
 }
 </script>

@@ -153,15 +153,7 @@
                                 <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                             </div>
                             <div class='col col--4'>
-                                <span v-on:click.stop.prevent='datapls(job.job)' v-if='job.output.output' class='fr dropdown h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
-
-                                    <div class='round dropdown-content'>
-                                        <div v-on:click.stop.prevent='datapls(job.job)' class='round bg-gray-faint-on-hover'>GeoJSON</div>
-                                        <div v-on:click.stop.prevent='datapls(job.job, "shp")' class='round bg-gray-faint-on-hover'>ShapeFile</div>
-                                        <div v-on:click.stop.prevent='datapls(job.job, "csv")' class='round bg-gray-faint-on-hover'>CSV</div>
-                                    </div>
-                                </span>
+                                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
 
                                 <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
                                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
@@ -179,6 +171,7 @@
 
 <script>
 
+import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 
 export default {
@@ -333,7 +326,8 @@ export default {
         }
     },
     components: {
-        Coverage
+        Coverage,
+        Download
     }
 }
 </script>

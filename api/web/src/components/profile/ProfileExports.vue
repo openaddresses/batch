@@ -29,7 +29,7 @@
         </template>
         <template v-else>
             <div :key='exp.id' v-for='exp in exps' class='col col--12 grid bg-gray-light-on-hover cursor-default round px12 py12'>
-                <div class='col col--12' v-text='exp.source_name'></div>
+                <div @click='$router.push({ path: `/export/${exp.id}`})' class='col col--12 cursor-pointer' v-text='exp.source_name'></div>
             </div>
         </template>
     </div>
@@ -66,7 +66,7 @@ export default {
                 }
                 return res.json();
             }).then((res) => {
-                this.tokens = res.exports;
+                this.exps = res;
                 this.loading = false;
             }).catch((err) => {
                 this.$emit('err', err);

@@ -67,6 +67,9 @@ export default {
             this.getExport(false);
         }, 3000);
     },
+    destroyed: function() {
+        clearInterval(this.interval);
+    },
     methods: {
         refresh: function() {
             this.getExport(true);

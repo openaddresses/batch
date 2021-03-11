@@ -29,7 +29,10 @@
         </template>
         <template v-else>
             <div :key='exp.id' v-for='exp in exps' class='col col--12 grid bg-gray-light-on-hover cursor-default round px12 py12'>
-                <div @click='$router.push({ path: `/export/${exp.id}`})' class='col col--12 cursor-pointer' v-text='exp.source_name'></div>
+                <div @click='$router.push({ path: `/export/${exp.id}`})' class='col col--12 cursor-pointer'>
+                    <span v-text='"Job: #" + exp.job_id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/>
+                    <span class='fr' v-text='exp.format'/>
+                </div>
             </div>
         </template>
     </div>

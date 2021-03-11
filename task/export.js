@@ -75,6 +75,10 @@ async function cli() {
         ':exportid': process.env.OA_EXPORT_ID
     });
 
+    const job = await oa.cmd('job', 'get', {
+        ':job': exp.job_id
+    });
+
     await oa.cmd('export', 'update', {
         ':exportid': process.env.OA_EXPORT_ID,
         status: 'Running'
@@ -103,11 +107,22 @@ async function cli() {
             .stream()
             .pipe(fs.createWriteStream(path.resolve(tmp, 'export.zip')));
     } else if (exp.format === 'csv') {
-        output = ogr2ogr(loc)
-            .format('csv')
-            .skipfailures()
-            .stream()
-            .pipe(fs.createWriteStream(path.resolve(tmp, 'export.csv')));
+        if (job.layer === 'addresses') {
+            ogr2ogr(loc)
+                .format('csv')
+                .options(['-lco', 'GEOMETRY=AS_XY'])
+                .skipfailures()
+                .stream()
+                .pipe(fs.createWriteStream(path.resolve(tmp, 'export.csv')));
+        } else {
+            ogr2ogr(loc)
+                .format('csv')
+                .options(['-lco', 'GEOMETRY=AS_WKT'])
+                .skipfailures()
+                .stream()
+                .pipe(fs.createWriteStream(path.resolve(tmp, 'export.csv')));
+
+        }
     }
 }
 

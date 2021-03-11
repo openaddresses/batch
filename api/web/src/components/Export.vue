@@ -27,8 +27,16 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
-            <div class='col col--12 py12'>
+            <div v-if='exp.status !== "Pending"' class='col col--12 py12'>
                 <Log @err='$emit("err", $event)' logtype='export' :id='exp.id'/>
+            </div>
+            <div v-else class='col col--12 py12'>
+                <div class='flex-parent flex-parent--center-main w-full'>
+                    <div class='flex-child loading py24'></div>
+                </div>
+                <div class='col col--12 flex-parent flex-parent--center-main'>
+                    <h3 class='flex-child txt-h4 py6'>Your Export Is Pending</h3>
+                </div>
             </div>
         </template>
     </div>
@@ -45,6 +53,7 @@ export default {
     data: function() {
         return {
             loading: true,
+            interval: false,
             exp: {
                 status: 'Pending',
             },
@@ -53,16 +62,20 @@ export default {
     },
     mounted: function() {
         this.refresh();
+
+        this.interval = setInterval(() => {
+            this.getExport(false);
+        }, 3000);
     },
     methods: {
         refresh: function() {
-            this.getExport();
+            this.getExport(true);
         },
         external: function(url) {
             window.open(url, "_blank");
         },
-        getExport: function() {
-            this.loading = true;
+        getExport: function(loading) {
+            if (loading) this.loading = true;
             fetch(window.location.origin + `/api/export/${this.exportid}`, {
                 method: 'GET'
             }).then((res) => {

@@ -35,4 +35,4 @@ function log_link() {
     });
 }
 
-module.exports = loglink;
+module.exports = log_link;

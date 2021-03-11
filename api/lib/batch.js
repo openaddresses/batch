@@ -61,8 +61,6 @@ function trigger(event) {
             };
         } else if (event.type === 'export') {
             if (!event.id) return reject(new Error('Export ID required'));
-            if (!event.job) return reject(new Error('Job ID required'));
-            if (!event.format) return reject(new Error('Export Format required'));
 
             params = {
                 jobDefinition: jobDefinition,
@@ -71,9 +69,7 @@ function trigger(event) {
                 containerOverrides: {
                     command: ['./export.js'],
                     environment: [
-                        { name: 'OA_EXPORT_ID', value: String(event.id) },
-                        { name: 'OA_JOB', value: String(event.job) },
-                        { name: 'OA_FORMAT', value: event.format }
+                        { name: 'OA_EXPORT_ID', value: String(event.id) }
                     ]
                 },
                 timeout: {

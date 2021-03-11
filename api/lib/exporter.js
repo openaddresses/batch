@@ -4,6 +4,8 @@ const Err = require('./error');
 const { Status } = require('./util');
 const batchjob = require('./batch');
 const moment = require('moment');
+const AWS = require('aws-sdk');
+const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 
 class Exporter {
     constructor() {
@@ -240,6 +242,28 @@ class Exporter {
                 throw new Err(500, err, 'failed to submit export to batch');
             }
         }
+    }
+
+    log() {
+        return new Promise((resolve, reject) => {
+            if (!this.loglink) return reject(new Err(404, null, 'Export has not produced a log'));
+
+            cwl.getLogEvents({
+                logGroupName: '/aws/batch/job',
+                logStreamName: this.loglink
+            }, (err, res) => {
+                if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
+
+                let line = 0;
+                return resolve(res.events.map((event) => {
+                    return {
+                        id: ++line,
+                        timestamp: event.timestamp,
+                        message: event.message
+                    };
+                }));
+            });
+        });
     }
 
 }

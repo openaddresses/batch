@@ -897,6 +897,64 @@
     "groupTitle": "ErrorSingle"
   },
   {
+    "type": "get",
+    "url": "/api/export/:exportid/log",
+    "title": "Get Export Log",
+    "version": "1.0.0",
+    "name": "ExportSingleLog",
+    "group": "Export",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return the batch-machine processing log for a given export Note: These are stored in AWS CloudWatch and <em>do</em> expire The presence of a loglink on a export, does not guarentree log retention</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":exportid",
+            "description": "<p>Export ID</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The linenumber of the log message</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "timestamp",
+            "description": "<p>The time at which the particular line was generated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>The log line itself</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Export"
+  },
+  {
     "type": "post",
     "url": "/api/export",
     "title": "Create Export",
@@ -905,9 +963,9 @@
     "group": "Exports",
     "permission": [
       {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Create a new export task</p>",
@@ -931,6 +989,405 @@
             "optional": false,
             "field": "format",
             "description": "<p>Formats that can be exported to</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the export was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Exports"
+  },
+  {
+    "type": "get",
+    "url": "/api/export/:export",
+    "title": "Get Export",
+    "version": "1.0.0",
+    "name": "GetExport",
+    "group": "Exports",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get a single export</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the export was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Exports"
+  },
+  {
+    "type": "get",
+    "url": "/api/export",
+    "title": "List Export",
+    "version": "1.0.0",
+    "name": "ListExport",
+    "group": "Exports",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>List existing exports</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "description": "<p>Only show runs before the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "description": "<p>Only show runs after the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "uid",
+            "description": "<p>The User ID to show exports for - useful for admin only - user's can ownly see their own</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the export was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Exports"
+  },
+  {
+    "type": "patch",
+    "url": "/api/export/:export",
+    "title": "Patch Export",
+    "version": "1.0.0",
+    "name": "PatchExport",
+    "group": "Exports",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update a single export</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           }
         ]
       }
@@ -2187,21 +2644,21 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>The linenumber of the log message</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "timestamp",
-            "description": "<p>undefined</p>"
+            "description": "<p>The time at which the particular line was generated</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "message",
-            "description": "<p>undefined</p>"
+            "description": "<p>The log line itself</p>"
           }
         ]
       }

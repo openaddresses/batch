@@ -1806,6 +1806,40 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {get} /api/export/:exportid/log Get Export Log
+     * @apiVersion 1.0.0
+     * @apiName ExportSingleLog
+     * @apiGroup Export
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   Return the batch-machine processing log for a given export
+     *   Note: These are stored in AWS CloudWatch and *do* expire
+     *   The presence of a loglink on a export, does not guarentree log retention
+     *
+     * @apiParam {Number} :exportid Export ID
+     *
+     * @apiSchema {jsonschema=./schema/res.SingleLog.json} apiSuccess
+     */
+    router.get(
+        ...await schemas.get('GET /export/:exportid/log', {
+            res: 'res.SingleLog.json'
+        }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'exportid');
+
+                const exp = (await Exporter.from(pool, req.params.exportid)).json();
+                if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(401, null, 'You didn\'t create that export');
+
+                return res.json(await exp.log());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/export List Export
      * @apiVersion 1.0.0
      * @apiName ListExport

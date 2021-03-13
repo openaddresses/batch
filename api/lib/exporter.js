@@ -165,10 +165,13 @@ class Exporter {
             await pool.query(`
                 UPDATE exports
                     SET
-                        size = $1,
-                        status = $2,
-                        loglink = $3
+                        size = $2,
+                        status = $3,
+                        loglink = $4
+                    WHERE
+                        id = $1
            `, [
+                this.id,
                 this.size,
                 this.status,
                 this.loglink

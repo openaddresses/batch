@@ -27,16 +27,19 @@
             <div class='col col--12 flex-parent flex-parent--center-main'>
                 <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
-            <div v-if='exp.status !== "Pending"' class='col col--12 py12'>
-                <Log @err='$emit("err", $event)' logtype='export' :id='exp.id'/>
-            </div>
-            <div v-else class='col col--12 py12'>
+
+            <template v-if='!["Success", "Fail"].includes(exp.status)'>
                 <div class='flex-parent flex-parent--center-main w-full'>
                     <div class='flex-child loading py24'></div>
                 </div>
                 <div class='col col--12 flex-parent flex-parent--center-main'>
-                    <h3 class='flex-child txt-h4 py6'>Your Export Is Pending</h3>
+                    <h3 v-if='exp.status === "Pending"' class='flex-child txt-h4 py6'>Your Export Is Queued</h3>
+                    <h3 v-else-if='exp.status === "Running"' class='flex-child txt-h4 py6'>Your Export Is Running</h3>
                 </div>
+            </template>
+
+            <div v-if='exp.status !== "Pending" && exp.loglink' class='col col--12 py12'>
+                <Log @err='$emit("err", $event)' collapse='true' logtype='export' :id='exp.id'/>
             </div>
         </template>
     </div>

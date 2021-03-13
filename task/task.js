@@ -10,7 +10,6 @@ const JobError = require('./lib/joberror');
 const path = require('path');
 const CP = require('child_process');
 const fs = require('fs');
-const AWS = require('aws-sdk');
 const prompts = require('prompts');
 const loglink = require('./lib/loglink');
 const args = require('minimist')(process.argv, {

@@ -64,7 +64,7 @@ async function prompt() {
 }
 
 async function cli() {
-    if (!process.env.StackName) process.env.StackName = 'local';
+    if (!process.env.StackName) process.env.StackName = 'batch-prod';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
 
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
@@ -76,50 +76,61 @@ async function cli() {
         secret: process.env.SharedSecret
     });
 
-    const exp = await oa.cmd('export', 'get', {
-        ':exportid': process.env.OA_EXPORT_ID
-    });
+    try {
+        const exp = await oa.cmd('export', 'get', {
+            ':exportid': process.env.OA_EXPORT_ID
+        });
 
-    const job = await oa.cmd('job', 'get', {
-        ':job': exp.job_id
-    });
+        const job = await oa.cmd('job', 'get', {
+            ':job': exp.job_id
+        });
 
-    const update = {
-        ':exportid': process.env.OA_EXPORT_ID,
-        status: 'Running'
-    };
+        const update = {
+            ':exportid': process.env.OA_EXPORT_ID,
+            status: 'Running'
+        };
 
-    if (process.env.AWS_BATCH_JOB_ID) {
-        update.loglink = await loglink();
+        if (process.env.AWS_BATCH_JOB_ID) {
+            update.loglink = await loglink();
+        }
+
+        await oa.cmd('export', 'update', update)
+
+        const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
+        mkdirp(path.resolve(tmp));
+        mkdirp(path.resolve(tmp, './export'));
+
+        console.error(`ok - tmp: ${tmp}`);
+
+        console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${exp.job_id}/source.geojson.gz`);
+        const loc = await get_source(tmp, exp.job_id)
+        console.error(`ok - fetched: ${loc}`);
+
+        await convert(tmp, loc, exp, job)
+        console.error(`ok - converted`);
+
+        await s3.putObject({
+            ContentType: 'application/zip',
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/export/${exp.id}/export.zip`,
+            Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
+        }).promise();
+        console.error(`ok - uploaded: s3://${process.env.Bucket}/${process.env.StackName}/export/${exp.id}/export.zip`);
+
+        await oa.cmd('export', 'update', {
+            ':exportid': process.env.OA_EXPORT_ID,
+            status: 'Success'
+        });
+
+        console.error('ok - done');
+    } catch (err) {
+        await oa.cmd('export', 'update', {
+            ':exportid': process.env.OA_EXPORT_ID,
+            status: 'Fail'
+        });
+
+        throw err;
     }
-
-    await oa.cmd('export', 'update', update)
-
-    const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
-    mkdirp(path.resolve(tmp));
-    mkdirp(path.resolve(tmp, './export'));
-
-    console.error(`ok - tmp: ${tmp}`);
-    console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${exp.job_id}/source.geojson.gz`);
-
-    const loc = await get_source(tmp, exp.job_id)
-
-    await convert(tmp, exp)
-    const exp_fs = await archive(tmp)
-
-    await s3.putObject({
-        ContentType: 'application/zip',
-        Bucket: process.env.Bucket,
-        Key: `${process.env.StackName}/export/${exp.id}/export.zip`,
-        Body: fs.createReadStream(exp_fs)
-    }).promise();
-
-    console.error('ok - export.zip uploaded');
-
-    await oa.cmd('export', 'update', {
-        ':exportid': process.env.OA_EXPORT_ID,
-        status: 'Success'
-    });
 }
 
 function archive(tmp) {
@@ -139,24 +150,29 @@ function archive(tmp) {
         }).on('error', (err) => {
             return reject(err);
         });
-    });
 
-    archive.pipe(output);
-    for (const f of fs.readdirSync(path.resolve(tmp, './export'))) {
-        archive.file(path.resolve(path.resolve(tmp, './export', f)), {
-            name: f
+        arch.pipe(output);
+
+        for (const f of fs.readdirSync(path.resolve(tmp, './export'))) {
+            arch.file(path.resolve(path.resolve(tmp, './export', f)), {
+                name: f
+            });
+        }
+
+        arch.on('finish', () => {
+            return resolve(path.resolve(tmp, `export.zip`));
         });
-    }
 
-    archive.finalize();
+        arch.finalize();
+    });
 }
 
-function convert(tmp, exp) {
+function convert(tmp, loc, exp, job) {
     if (exp.format === 'shapefile') {
         return new Promise((resolve, reject) => {
             pipeline(
                 ogr2ogr(loc).format('ESRI Shapefile').skipfailures().stream(),
-                fs.createWriteStream(path.resolve(tmp, './export', 'export.zip')),
+                fs.createWriteStream(path.resolve(tmp, 'export.zip')),
                 (err) => {
                     if (err) return reject(err);
                     return resolve();
@@ -168,11 +184,18 @@ function convert(tmp, exp) {
         if (job.layer === 'addresses') {
             return new Promise((resolve, reject) => {
                 pipeline(
-                    ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_XY']).skipfailures().stream().
+                    ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_XY']).skipfailures().stream(),
                     fs.createWriteStream(path.resolve(tmp, './export', 'export.csv')),
-                    (err) => {
+                    async (err) => {
                         if (err) return reject(err);
-                        return resolve();
+
+                        try {
+                            await archive(tmp);
+
+                            return resolve();
+                        } catch (err) {
+                            return reject(err);
+                        }
                     }
                 );
             });
@@ -181,9 +204,16 @@ function convert(tmp, exp) {
                 pipeline(
                     ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_WKT']).skipfailures().stream(),
                     fs.createWriteStream(path.resolve(tmp, './export', 'export.csv')),
-                    (err) => {
+                    async (err) => {
                         if (err) return reject(err);
-                        return resolve();
+
+                        try {
+                            await archive(tmp);
+
+                            return resolve();
+                        } catch (err) {
+                            return reject(err);
+                        }
                     }
                 );
             });

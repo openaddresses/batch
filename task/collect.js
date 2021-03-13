@@ -216,6 +216,11 @@ function zip_datas(tmp, datas, name) {
             });
         }
 
+        archive.on('finish', () => {
+            resolve(path.resolve(tmp, `${name}.zip`));
+        });
+
+
         archive.finalize();
     });
 }

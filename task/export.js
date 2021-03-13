@@ -12,6 +12,11 @@ const path = require('path');
 const mkdirp = require('mkdirp').sync;
 const AWS = require('aws-sdk');
 const {Unzip} = require('zlib');
+const archiver = require('archiver');
+
+const s3 = new AWS.S3({
+    region: process.env.AWS_DEFAULT_REGION
+});
 
 const DRIVE = '/tmp';
 
@@ -79,58 +84,114 @@ async function cli() {
         ':job': exp.job_id
     });
 
-    await oa.cmd('export', 'update', {
+    const update = {
         ':exportid': process.env.OA_EXPORT_ID,
         status: 'Running'
-    });
+    };
 
     if (process.env.AWS_BATCH_JOB_ID) {
-        await oa.cmd('export', 'update', {
-            ':exportid': process.env.OA_EXPORT_ID,
-            loglink: await loglink()
-        });
+        update.loglink = await loglink();
     }
+
+    await oa.cmd('export', 'update', update)
 
     const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     mkdirp(path.resolve(tmp));
+    mkdirp(path.resolve(tmp, './export'));
 
     console.error(`ok - tmp: ${tmp}`);
     console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${exp.job_id}/source.geojson.gz`);
 
     const loc = await get_source(tmp, exp.job_id)
 
-    console.error(exp)
+    await convert(tmp, exp)
+    const exp_fs = await archive(tmp)
+
+    await s3.putObject({
+        ContentType: 'application/zip',
+        Bucket: process.env.Bucket,
+        Key: `${process.env.StackName}/export/${exp.id}/export.zip`,
+        Body: fs.createReadStream(exp_fs)
+    }).promise();
+
+    console.error('ok - export.zip uploaded');
+
+    await oa.cmd('export', 'update', {
+        ':exportid': process.env.OA_EXPORT_ID,
+        status: 'Success'
+    });
+}
+
+function archive(tmp) {
+    return new Promise((resolve, reject) => {
+        const output = fs.createWriteStream(path.resolve(tmp, `export.zip`))
+            .on('error', (err) => {
+                console.error('not ok - ' + err.message);
+                return reject(err)
+            }).on('close', () => {
+                return resolve(path.resolve(tmp, `export.zip`));
+            });
+
+        const arch = archiver('zip', {
+            zlib: { level: 9 }
+        }).on('warning', (err) => {
+            console.error('not ok - WARN: ' + err);
+        }).on('error', (err) => {
+            return reject(err);
+        });
+    });
+
+    archive.pipe(output);
+    for (const f of fs.readdirSync(path.resolve(tmp, './export'))) {
+        archive.file(path.resolve(path.resolve(tmp, './export', f)), {
+            name: f
+        });
+    }
+
+    archive.finalize();
+}
+
+function convert(tmp, exp) {
     if (exp.format === 'shapefile') {
-        ogr2ogr(loc)
-            .format('ESRI Shapefile')
-            .skipfailures()
-            .stream()
-            .pipe(fs.createWriteStream(path.resolve(tmp, 'export.zip')));
+        return new Promise((resolve, reject) => {
+            pipeline(
+                ogr2ogr(loc).format('ESRI Shapefile').skipfailures().stream(),
+                fs.createWriteStream(path.resolve(tmp, './export', 'export.zip')),
+                (err) => {
+                    if (err) return reject(err);
+                    return resolve();
+                }
+            );
+        });
+
     } else if (exp.format === 'csv') {
         if (job.layer === 'addresses') {
-            ogr2ogr(loc)
-                .format('csv')
-                .options(['-lco', 'GEOMETRY=AS_XY'])
-                .skipfailures()
-                .stream()
-                .pipe(fs.createWriteStream(path.resolve(tmp, 'export.csv')));
+            return new Promise((resolve, reject) => {
+                pipeline(
+                    ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_XY']).skipfailures().stream().
+                    fs.createWriteStream(path.resolve(tmp, './export', 'export.csv')),
+                    (err) => {
+                        if (err) return reject(err);
+                        return resolve();
+                    }
+                );
+            });
         } else {
-            ogr2ogr(loc)
-                .format('csv')
-                .options(['-lco', 'GEOMETRY=AS_WKT'])
-                .skipfailures()
-                .stream()
-                .pipe(fs.createWriteStream(path.resolve(tmp, 'export.csv')));
-
+            return new Promise((resolve, reject) => {
+                pipeline(
+                    ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_WKT']).skipfailures().stream(),
+                    fs.createWriteStream(path.resolve(tmp, './export', 'export.csv')),
+                    (err) => {
+                        if (err) return reject(err);
+                        return resolve();
+                    }
+                );
+            });
         }
     }
 }
 
 async function get_source(tmp, jobid) {
-    const s3 = new AWS.S3({
-        region: process.env.AWS_DEFAULT_REGION
-    });
-
     return new Promise((resolve, reject) => {
         pipeline(
             s3.getObject({

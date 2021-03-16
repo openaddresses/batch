@@ -37,8 +37,23 @@
                     <h3 v-else-if='exp.status === "Running"' class='flex-child txt-h4 py6'>Your Export Is Running</h3>
                 </div>
             </template>
+            <template v-else-if='exp.status === "Fail"'>
+                <div class='flex-parent flex-parent--center-main w-full'>
+                </div>
+                <div class='col col--12 flex-parent flex-parent--center-main'>
+                    <h3 class='flex-child txt-h4 py6'>Your Export Failed - Contact us to find out what went wrong</h3>
+                </div>
+            </template>
             <template v-else-if='exp.status === "Success"'>
-
+                <div class='flex-parent flex-parent--center-main w-full'>
+                    <button class='btn btn--stroke round btn--gray'>
+                        <div class='flex-parent flex-parent--center-main'>
+                            <svg class='flex-child icon h36 w36'><use xlink:href='#icon-arrow-down'/></svg>
+                        </div>
+                        <div class='align-center'>Download</div>
+                        <div class='align-center' v-text='exp.format'></div>
+                    </button>
+                </div>
             </template>
 
             <div v-if='exp.status !== "Pending" && exp.loglink' class='col col--12 py12'>

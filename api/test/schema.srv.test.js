@@ -121,8 +121,8 @@ test('GET: api/schema?method=POST&url=/login', (t) => {
                     uid: { type: 'integer' },
                     username: { type: 'string' },
                     email: { type: 'string' },
-                    access: { type: 'string', enum: [ 'user', 'admin' ], description: 'The access level of a given user' },
-                    level: { type: 'string', enum: [ 'basic', 'backer', 'sponsor' ], description: 'The level of donation of a given user' },
+                    access: { type: 'string', enum: ['user', 'admin'], description: 'The access level of a given user' },
+                    level: { type: 'string', enum: ['basic', 'backer', 'sponsor'], description: 'The level of donation of a given user' },
                     flags: { type: 'object' } }
             }
         });

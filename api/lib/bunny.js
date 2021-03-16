@@ -31,7 +31,7 @@ class Bunny {
         url.searchParams.append('token', token);
         url.searchParams.append('expires', expires);
 
-        return String(url)
+        return String(url);
     }
 }
 

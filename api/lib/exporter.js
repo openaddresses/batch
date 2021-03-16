@@ -132,6 +132,8 @@ class Exporter {
                 exp.uid = parseInt(exp.uid);
                 exp.job_id = parseInt(exp.job_id);
 
+                delete exp.count;
+
                 return exp;
             })
         };

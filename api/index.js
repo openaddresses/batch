@@ -1900,6 +1900,32 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {get} /api/export/:exportid/output/export.zip Get Export Data
+     * @apiVersion 1.0.0
+     * @apiName DataExport
+     * @apiGroup Exports
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   Download the data created in an export
+     *
+     * @apiParam {Number} :exportid Export ID
+     */
+    router.get(
+        ...await schemas.get('GET /api/export/:exportid/output/export.zip'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'exportid');
+                await user.is_auth(req);
+
+                await Export.data(pool, req.auth, req.params.exportid, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {patch} /api/export/:export Patch Export
      * @apiVersion 1.0.0
      * @apiName PatchExport

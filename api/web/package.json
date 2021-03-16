@@ -10,6 +10,9 @@
     "dependencies": {
         "@mapbox/assembly": "^0.26.0",
         "@tabler/icons": "^1.39.1",
+        "babel-plugin-polyfill-corejs2": "^0.1.10",
+        "babel-plugin-polyfill-corejs3": "^0.1.7",
+        "babel-plugin-polyfill-regenerator": "^0.1.6",
         "chart.js": "^2.9.4",
         "core-js": "^3.6.4",
         "mapbox-gl": "^2.0.1",

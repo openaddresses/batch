@@ -124,8 +124,18 @@ class Exporter {
         });
     }
 
-    static download(id) {
-        return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/export/${id}/export.zip`);
+    static async data(pool, auth, export_id, res) {
+        const exp = Export.from(export_id);
+
+        if (auth.access !== 'admin' && auth.uid !== exp.uid) throw new Error(401, null, 'Not Authorized to download');
+        if (exp.status !== 'Success') throw new Error(400, null, 'Cannot download an unsuccessful export');
+
+        const s3 = new S3({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/export/${export_id}/export.zip`
+        });
+
+        return s3.stream(res, `export-${export_id}.zip`);
     }
 
     static async from(pool, id) {

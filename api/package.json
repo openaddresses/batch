@@ -15,10 +15,10 @@
     },
     "dependencies": {
         "@mapbox/sphericalmercator": "^1.1.0",
-        "@octokit/auth-app": "^2.4.4",
+        "@octokit/auth-app": "^3.0.0",
         "@octokit/request": "^5.3.4",
         "@octokit/rest": "^18.0.4",
-        "@octokit/webhooks": "7.11.0",
+        "@octokit/webhooks": "8.5.3",
         "@turf/turf": "^5.1.6",
         "aws-sdk": "^2.851.0",
         "bcrypt": "^5.0.0",

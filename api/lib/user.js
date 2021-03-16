@@ -297,10 +297,12 @@ class User {
     async list(query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
-        if (!query.page) query.page = 1;
+        if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';
 
         const where = [];
+
+        query.page = query.page * query.limit;
 
         if (query.access) where.push(`access = '${query.access}'`);
         if (query.level) where.push(`level = '${query.level}'`);

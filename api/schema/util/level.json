@@ -2,7 +2,7 @@
     "type": "string",
     "enum": [
         "basic",
-        "doner",
+        "backer",
         "sponsor"
     ],
     "description": "The level of donation of a given user"

@@ -305,8 +305,6 @@ class User {
         if (query.access) where.push(`access = '${query.access}'`);
         if (query.level) where.push(`level = '${query.level}'`);
 
-        console.error(where)
-
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -321,8 +319,7 @@ class User {
                 FROM
                     users
                 WHERE
-                    username ~ $3
-                    OR email ~ $3
+                    (username ~ $3 OR email ~ $3)
                     ${where.length ? 'AND ' + where.join(' AND ') : ''}
                 ORDER BY
                     created DESC

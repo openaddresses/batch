@@ -45,7 +45,7 @@
                         <select v-model='filter.level' class='select'>
                             <option>all</option>
                             <option>basic</option>
-                            <option>donor</option>
+                            <option>backer</option>
                             <option>sponsor</option>
                         </select>
                         <div class='select-arrow'></div>

@@ -28,10 +28,11 @@
             </div>
         </template>
         <template v-else>
-            <div :key='exp.id' v-for='exp in exps' class='col col--12 grid bg-gray-light-on-hover cursor-default round px12 py12'>
+            <div :key='exp.id' v-for='exp in exps' class='col col--12 grid bg-gray-light-on-hover cursor-default round py12'>
                 <div @click='$router.push({ path: `/export/${exp.id}`})' class='col col--12 cursor-pointer'>
-                    <span v-text='"Job: #" + exp.job_id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/>
-                    <span class='fr' v-text='exp.format'/>
+                     <Status :status='exp.status'/>
+                    <span class='pl6' v-text='"Job #" + exp.job_id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/>
+                    <span class='fr pr12' v-text='exp.format'/>
                 </div>
             </div>
         </template>
@@ -42,6 +43,7 @@
 
 <script>
 import Pager from '../util/Pager.vue';
+import Status from '../Status.vue';
 
 export default {
     name: 'ProfileExports',
@@ -95,7 +97,8 @@ export default {
         }
     },
     components: {
-        Pager
+        Pager,
+        Status
     }
 }
 </script>

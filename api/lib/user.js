@@ -291,12 +291,21 @@ class User {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {String} [query.filter=] - Username or Email fragment to filter by
+     * @param {String} [query.level=] - Donor level to filter by
+     * @param {String} [query.access=] - User Access to filter by
      */
     async list(query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 1;
         if (!query.filter) query.filter = '';
+
+        const where = [];
+
+        if (query.access) where.push(`access = '${query.access}'`);
+        if (query.level) where.push(`level = '${query.level}'`);
+
+        console.error(where)
 
         let pgres;
         try {
@@ -314,6 +323,7 @@ class User {
                 WHERE
                     username ~ $3
                     OR email ~ $3
+                    ${where.length ? 'AND ' + where.join(' AND ') : ''}
                 ORDER BY
                     created DESC
                 LIMIT

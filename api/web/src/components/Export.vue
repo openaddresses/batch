@@ -37,6 +37,9 @@
                     <h3 v-else-if='exp.status === "Running"' class='flex-child txt-h4 py6'>Your Export Is Running</h3>
                 </div>
             </template>
+            <template v-else-if='exp.status === "Success"'>
+
+            </template>
 
             <div v-if='exp.status !== "Pending" && exp.loglink' class='col col--12 py12'>
                 <Log @err='$emit("err", $event)' collapse='true' logtype='export' :id='exp.id'/>

@@ -124,6 +124,10 @@ class Exporter {
         });
     }
 
+    static download(id) {
+        return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/export/${id}/export.zip`);
+    }
+
     static async from(pool, id) {
         let pgres;
         try {

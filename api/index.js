@@ -1912,13 +1912,13 @@ async function server(args, config, cb) {
      * @apiParam {Number} :exportid Export ID
      */
     router.get(
-        ...await schemas.get('GET /api/export/:exportid/output/export.zip'),
+        ...await schemas.get('GET /export/:exportid/output/export.zip'),
         async (req, res) => {
             try {
                 await Param.int(req, 'exportid');
                 await user.is_auth(req);
 
-                await Export.data(pool, req.auth, req.params.exportid, res);
+                await Exporter.data(pool, req.auth, req.params.exportid, res);
             } catch (err) {
                 return Err.respond(err, res);
             }

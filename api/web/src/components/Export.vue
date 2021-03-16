@@ -45,8 +45,8 @@
                 </div>
             </template>
             <template v-else-if='exp.status === "Success"'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <button class='btn btn--stroke round btn--gray'>
+                <div class='flex-parent flex-parent--center-main w-full py12'>
+                    <button @click='datapls' class='btn btn--stroke round btn--gray'>
                         <div class='flex-parent flex-parent--center-main'>
                             <svg class='flex-child icon h36 w36'><use xlink:href='#icon-arrow-down'/></svg>
                         </div>
@@ -92,6 +92,9 @@ export default {
         clearInterval(this.interval);
     },
     methods: {
+        datapls: function() {
+            this.external(`${window.location.origin}/api/export/${this.exp.id}/output/export.zip`);
+        },
         refresh: function() {
             this.getExport(true);
         },

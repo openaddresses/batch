@@ -5,6 +5,7 @@ const { Status } = require('./util');
 const batchjob = require('./batch');
 const moment = require('moment');
 const AWS = require('aws-sdk');
+const S3 = require('./s3');
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 
 class Exporter {
@@ -137,10 +138,10 @@ class Exporter {
     }
 
     static async data(pool, auth, export_id, res) {
-        const exp = Export.from(export_id);
+        const exp = await Exporter.from(pool, export_id);
 
-        if (auth.access !== 'admin' && auth.uid !== exp.uid) throw new Error(401, null, 'Not Authorized to download');
-        if (exp.status !== 'Success') throw new Error(400, null, 'Cannot download an unsuccessful export');
+        if (auth.access !== 'admin' && auth.uid !== exp.uid) throw new Err(401, null, 'Not Authorized to download');
+        if (exp.status !== 'Success') throw new Err(400, null, 'Cannot download an unsuccessful export');
 
         const s3 = new S3({
             Bucket: process.env.Bucket,

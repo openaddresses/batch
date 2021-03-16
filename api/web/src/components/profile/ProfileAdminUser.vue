@@ -128,7 +128,7 @@ export default {
             },
             showFilter: false,
             page: 0,
-            perpage: 10,
+            perpage: 100,
             total: 100,
             users: []
         };

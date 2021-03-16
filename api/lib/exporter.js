@@ -43,6 +43,7 @@ class Exporter {
      * @param {Pool} pool - Postgres Pool instance
      * @param {Object} query - Query object
      * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Current offset to return
      * @param {String} [query.before=undefined] - Only show exports before the given date
      * @param {String} [query.after=undefined] - Only show exports after the given date
      * @param {Number} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show exports with a given status
@@ -51,7 +52,10 @@ class Exporter {
     static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 0;
         if (!query.status) query.status = Status.list();
+
+        query.page = query.page * query.limit;
 
         const where = [];
 
@@ -87,6 +91,7 @@ class Exporter {
         try {
             pgres = await pool.query(`
                 SELECT
+                    count(*) OVER() AS count,
                     exports.id,
                     exports.job_id,
                     exports.uid,
@@ -106,22 +111,29 @@ class Exporter {
                     job.id = exports.job_id
                     ${where.length ? ' AND ' + where.join(' AND ') : ''}
                 ORDER BY
-                    exports.id DESC
-                LIMIT $1
+                    exports.created DESC
+                LIMIT
+                    $1
+                OFFSET
+                    $2
             `, [
-                query.limit
+                query.limit,
+                query.page
             ]);
         } catch (err) {
             throw new Err(500, err, 'failed to fetch runs');
         }
 
-        return pgres.rows.map((exp) => {
-            exp.id = parseInt(exp.id);
-            exp.uid = parseInt(exp.uid);
-            exp.job_id = parseInt(exp.job_id);
+        return {
+            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
+            'exports': pgres.rows.map((exp) => {
+                exp.id = parseInt(exp.id);
+                exp.uid = parseInt(exp.uid);
+                exp.job_id = parseInt(exp.job_id);
 
-            return exp;
-        });
+                return exp;
+            })
+        };
     }
 
     static async data(pool, auth, export_id, res) {

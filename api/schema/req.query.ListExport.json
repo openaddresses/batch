@@ -8,6 +8,10 @@
             "maximum": 100,
             "description": "Limit number of returned runs"
         },
+        "page": {
+            "type": "integer",
+            "description": "Page of results to return"
+        },
         "status": {
             "$ref": "./util/status.json"
         },

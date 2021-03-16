@@ -35,21 +35,33 @@
                 </div>
             </div>
         </template>
+
+        <Pager v-if='exps.length' @page='page = $event' :perpage='perpage' :total='total'/>
     </div>
 </template>
 
 <script>
+import Pager from '../util/Pager.vue';
+
 export default {
-    name: 'ProfileToken',
+    name: 'ProfileExports',
     props: [ ],
     data: function() {
         return {
             exps: [],
+            page: 0,
+            perpage: 2,
+            total: 100,
             loading: false
         };
     },
     mounted: function() {
         this.refresh();
+    },
+    watch: {
+        page: function() {
+            this.getExports();
+        },
     },
     methods: {
         refresh: function() {
@@ -58,7 +70,11 @@ export default {
         getExports: function() {
             this.loading = true;
 
-            fetch(`${window.location.origin}/api/export`, {
+            const url = new URL(`${window.location.origin}/api/export`);
+            url.searchParams.append('limit', this.perpage)
+            url.searchParams.append('page', this.page)
+
+            fetch(url, {
                 method: 'GET',
                 credentials: 'same-origin'
             }).then((res) => {
@@ -69,12 +85,17 @@ export default {
                 }
                 return res.json();
             }).then((res) => {
-                this.exps = res;
+                this.exps = res.exports;
+                this.total = res.total;
+
                 this.loading = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });
         }
+    },
+    components: {
+        Pager
     }
 }
 </script>

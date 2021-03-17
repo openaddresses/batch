@@ -1798,6 +1798,7 @@ async function server(args, config, cb) {
                 req.body.uid = req.auth.uid;
 
                 const exp = await Exporter.generate(pool, req.body);
+                await exp.batch();
                 return res.json(exp.json());
             } catch (err) {
                 return Err.respond(err, res);

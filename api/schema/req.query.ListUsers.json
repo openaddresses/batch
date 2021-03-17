@@ -17,6 +17,12 @@
             "type": "string",
             "default": "",
             "description": "Filter a complete or partial username/email"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        },
+        "level": {
+            "$ref": "./util/level.json"
         }
     }
 }

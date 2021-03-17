@@ -5,6 +5,7 @@
         "username",
         "email",
         "access",
+        "level",
         "flags"
     ],
     "additionalProperties": false,
@@ -19,11 +20,10 @@
             "type": "string"
         },
         "access": {
-            "type": "string",
-            "enum": [
-                "user",
-                "admin"
-            ]
+            "$ref": "./util/access.json"
+        },
+        "level": {
+            "$ref": "./util/level.json"
         },
         "flags": {
             "type": "object"

@@ -91,6 +91,18 @@ CREATE TABLE IF NOT EXISTS job (
     version     TEXT        -- Version of Batch to run the job
 );
 
+CREATE TABLE IF NOT EXISTS exports (
+    id          BIGSERIAL PRIMARY KEY,
+    uid         BIGINT NOT NULL,
+    job_id      BIGINT NOT NULL,
+    format      TEXT NOT NULL,
+    created     TIMESTAMP NOT NULL DEFAULT NOW(),   -- Job submission timestamp
+    expiry      TIMESTAMP NOT NULL DEFAULT NOW() + '1 week',
+    size        BIGINT,                             -- Size of file in bytes
+    status      TEXT NOT NULL DEFAULT 'Pending',    -- Pending, Success, Fail
+    loglink     TEXT                                -- LogLink to CloudWatch (expires)
+);
+
 CREATE TABLE IF NOT EXISTS runs (
     id          BIGSERIAL PRIMARY KEY,
     live        BOOLEAN,    -- If the run is a scheduled run, or the data has been merged into master

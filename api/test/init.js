@@ -81,8 +81,12 @@ class Flight {
      * Create a new user and return an API token for that user
      *
      * @param {String} username Username for user to create
+     * @param {Object} opts
+     * @param {String} opts.level
      */
-    async token(username) {
+    async token(username, opts = {}) {
+        if (!opts.level) opts.level = 'basic';
+
         const jar = request.jar();
 
         const new_user = await request({
@@ -101,8 +105,12 @@ class Flight {
 
         await this.pool.query(`
              UPDATE users
-                SET validated = True
-        `);
+                SET
+                    validated = True,
+                    level = $1
+        `, [
+            opts.level
+        ]);
 
         const new_login = await request({
             url: 'http://localhost:4999/api/login',

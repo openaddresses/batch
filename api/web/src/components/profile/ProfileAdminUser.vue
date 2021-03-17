@@ -24,9 +24,32 @@
             <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
                 <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
-                <div class='col col--12 px6'>
+                <div class='col col--6 px6'>
                     <label>Username/Email Filter</label>
-                    <input v-model='filter' class='input' placeholder='john-doe' />
+                    <input v-model='filter.name' class='input' placeholder='john-doe' />
+                </div>
+                <div class='col col--3 px6'>
+                    <label>Access</label>
+                    <div class='w-full select-container'>
+                        <select v-model='filter.access' class='select'>
+                            <option>all</option>
+                            <option>admin</option>
+                            <option>user</option>
+                        </select>
+                        <div class='select-arrow'></div>
+                    </div>
+                </div>
+                <div class='col col--3 px6'>
+                    <label>Level</label>
+                    <div class='w-full select-container'>
+                        <select v-model='filter.level' class='select'>
+                            <option>all</option>
+                            <option>basic</option>
+                            <option>backer</option>
+                            <option>sponsor</option>
+                        </select>
+                        <div class='select-arrow'></div>
+                    </div>
                 </div>
             </div>
         </template>
@@ -55,7 +78,8 @@
                         <span v-text='user.email'/>
                     </div>
                     <div class='col col--3'>
-                        <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                        <span class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                        <span v-if='user.level !== "basic"' class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='user.level'></span>
                     </div>
                 </div>
 
@@ -97,10 +121,14 @@ export default {
     data: function() {
         return {
             loading: false,
-            filter: '',
+            filter: {
+                name: '',
+                level: 'all',
+                access: 'all'
+            },
             showFilter: false,
             page: 0,
-            perpage: 10,
+            perpage: 100,
             total: 100,
             users: []
         };
@@ -112,7 +140,15 @@ export default {
         page: function() {
             this.getUsers();
         },
-        filter: function() {
+        'filter.name': function() {
+            this.page = 0;
+            this.getUsers();
+        },
+        'filter.level': function() {
+            this.page = 0;
+            this.getUsers();
+        },
+        'filter.access': function() {
             this.page = 0;
             this.getUsers();
         }
@@ -127,7 +163,10 @@ export default {
             const url = new URL(`${window.location.origin}/api/user`);
             url.searchParams.append('limit', this.perpage)
             url.searchParams.append('page', this.page)
-            url.searchParams.append('filter', this.filter)
+            url.searchParams.append('filter', this.filter.name)
+
+            if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
+            if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access)
 
             fetch(url, {
                 method: 'GET'

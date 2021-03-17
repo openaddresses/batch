@@ -41,9 +41,8 @@
                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                     </div>
                     <div class='col col--5 pr12'>
-                        <span v-on:click.stop.prevent='datapls(job)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
-                        </span>
+                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+
                         <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
                             <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
                         </span>
@@ -60,6 +59,7 @@
 
 <script>
 import Status from './Status.vue';
+import Download from './Download.vue';
 
 export default {
     name: 'Jobs',
@@ -74,6 +74,7 @@ export default {
         };
     },
     components: {
+        Download,
         Status
     },
     methods: {
@@ -88,10 +89,6 @@ export default {
         },
         refresh: function() {
             this.getJobs();
-        },
-        datapls: function(job) {
-            if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/job/${job.id}/output/source.geojson.gz`);
         },
         getJobs: function() {
             this.loading = true;

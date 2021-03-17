@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "size": {
+            "$ref": "./util/size.json"
+        },
+        "status": {
+            "$ref": "./util/status.json"
+        },
+        "loglink": {
+            "$ref": "./util/loglink.json"
+        }
+    }
+}

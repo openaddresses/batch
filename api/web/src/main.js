@@ -11,6 +11,7 @@ Vue.use(VTooltip);
 
 import Register from './components/Register.vue';
 import Profile from './components/Profile.vue';
+import Export from './components/Export.vue';
 import Upload from './components/Upload.vue';
 import Errors from './components/Errors.vue';
 import Login from './components/Login.vue';
@@ -23,7 +24,7 @@ import Runs from './components/Runs.vue';
 import Jobs from './components/Jobs.vue';
 import Job from './components/Job.vue';
 import Run from './components/Run.vue';
-import Log from './components/Log.vue';
+import JobLog from './components/JobLog.vue';
 
 // === Routes ===
 
@@ -37,9 +38,11 @@ const router = new VueRouter({
         { path: '/run', component: Runs },
         { path: '/run/:runid', component: Run, props: true },
 
+        { path: '/export/:exportid', component: Export, props: true },
+
         { path: '/job', component: Jobs },
         { path: '/job/:jobid', component: Job, props: true },
-        { path: '/job/:jobid/log', component: Log, props: true },
+        { path: '/job/:jobid/log', component: JobLog, props: true },
 
         { path: '/data', component: Data },
         { path: '/data/:dataid/history', component: History, props: true },

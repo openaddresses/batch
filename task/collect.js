@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
 'use strict';
+
+if (!process.env.AWS_DEFAULT_REGION) {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1';
+}
+
 const glob = require('glob');
 const OA = require('lib-oa');
 const os = require('os');
@@ -16,10 +21,6 @@ const AWS = require('aws-sdk');
 const archiver = require('archiver');
 
 const DRIVE = '/tmp';
-
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
 
 if (require.main == module) {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
@@ -219,6 +220,7 @@ function zip_datas(tmp, datas, name) {
         archive.on('finish', () => {
             resolve(path.resolve(tmp, `${name}.zip`));
         });
+
 
         archive.finalize();
     });

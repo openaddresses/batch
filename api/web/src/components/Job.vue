@@ -41,9 +41,7 @@
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
 
-                <span v-on:click.stop.prevent='datapls' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
-                </span>
+                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
 
                 <span v-if='job.license' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-license" /></svg>
@@ -134,6 +132,7 @@
 <script>
 
 import ErrorsModerate from './ErrorsModerate.vue';
+import Download from './Download.vue';
 import Status from './Status.vue';
 import JobStats from './job/JobStats.vue';
 import JobMap from './job/JobMap.vue';
@@ -172,6 +171,7 @@ export default {
     },
     components: {
         JobMap,
+        Download,
         JobStats,
         ErrorsModerate,
         Status

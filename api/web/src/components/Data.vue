@@ -131,12 +131,10 @@
         <template v-else>
             <div :key='d.source' v-for='d in datas' class='col col--12 grid'>
                 <div @click='d._open = !d._open' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--5'>
+                    <div class='col col--9'>
                         <span class='ml12' v-text='d.source'/>
                     </div>
-                    <div class='col col--3'>
-                    </div>
-                    <div class='col col--4 color-gray'>
+                    <div class='col col--3 color-gray'>
                         <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>
                         <span v-if='d.has.addresses' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg></span>
                         <span v-if='d.has.parcels' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg></span>
@@ -153,9 +151,7 @@
                                 <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                             </div>
                             <div class='col col--4'>
-                                <span v-on:click.stop.prevent='datapls(job.job)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
-                                </span>
+                                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
 
                                 <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
                                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
@@ -173,6 +169,7 @@
 
 <script>
 
+import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 
 export default {
@@ -228,8 +225,13 @@ export default {
         emithistory: function(jobid) {
             this.$router.push({ path: `/data/${jobid}/history` })
         },
-        datapls: function(jobid) {
+        datapls: function(jobid, fmt) {
             if (!this.auth.username) return this.$emit('login');
+
+            if (fmt && this.auth.level === 'basic') {
+                return this.$emit('perk');
+            }
+
             this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
         },
         collectionpls: function(c) {
@@ -322,7 +324,8 @@ export default {
         }
     },
     components: {
-        Coverage
+        Coverage,
+        Download
     }
 }
 </script>

@@ -21,6 +21,39 @@ class User {
         return true;
     }
 
+    async is_level(req, level) {
+        await this.is_auth(req);
+
+        if (level === 'basic') {
+            return true;
+        } else if (level === 'backer' && ['backer', 'sponsor'].includes(req.auth.level)) {
+            return true;
+        } else if (level === 'sponsor' && req.auth.level === 'sponsor') {
+            return true;
+        }
+
+        throw new Err(401, null, 'Please donate to use this feature');
+    }
+
+    async is_flag(req, flag) {
+        await this.is_auth(req);
+
+        if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin' && req.auth.type !== 'secret') {
+            throw new Err(401, null, `${flag} flag required`);
+        }
+
+        return true;
+    }
+
+    async is_admin(req) {
+        if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
+            throw new Err(401, null, 'Admin token required');
+        }
+
+        return true;
+    }
+
+
     async verify(token) {
         if (!token) throw new Err(400, null, 'token required');
 
@@ -191,24 +224,6 @@ class User {
         }
     }
 
-    async is_flag(req, flag) {
-        await this.is_auth(req);
-
-        if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin' && req.auth.type !== 'secret') {
-            throw new Err(401, null, `${flag} flag required`);
-        }
-
-        return true;
-    }
-
-    async is_admin(req) {
-        if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
-            throw new Err(401, null, 'Admin token required');
-        }
-
-        return true;
-    }
-
     async level(email, level) {
         let pgres;
         try {
@@ -276,12 +291,21 @@ class User {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {String} [query.filter=] - Username or Email fragment to filter by
+     * @param {String} [query.level=] - Donor level to filter by
+     * @param {String} [query.access=] - User Access to filter by
      */
     async list(query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
-        if (!query.page) query.page = 1;
+        if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';
+
+        const where = [];
+
+        query.page = query.page * query.limit;
+
+        if (query.access) where.push(`access = '${query.access}'`);
+        if (query.level) where.push(`level = '${query.level}'`);
 
         let pgres;
         try {
@@ -297,8 +321,8 @@ class User {
                 FROM
                     users
                 WHERE
-                    username ~ $3
-                    OR email ~ $3
+                    (username ~ $3 OR email ~ $3)
+                    ${where.length ? 'AND ' + where.join(' AND ') : ''}
                 ORDER BY
                     created DESC
                 LIMIT

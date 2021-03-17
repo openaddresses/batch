@@ -383,19 +383,19 @@ class Run {
         }
     }
 
-    commit(pool) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    async commit(pool) {
+        try {
+            await pool.query(`
                 UPDATE runs
                     SET
                         github = $1,
                         closed = $2
-           `, [this.github, this.closed], (err) => {
-                if (err) return reject(new Err(500, err, 'failed to save run'));
+           `, [this.github, this.closed]);
+        } catch (err) {
+            throw new Err(500, err, 'failed to save run');
+        }
 
-                return resolve(this);
-            });
-        });
+        return this;
     }
 
     static generate(pool, params = {}) {

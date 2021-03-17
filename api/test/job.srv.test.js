@@ -4,13 +4,14 @@ const pkg = require('../package.json');
 const test = require('tape');
 const request = require('request');
 const Flight = require('./init');
+const nock = require('nock');
 
 const flight = new Flight();
 
 flight.init(test);
 flight.takeoff(test);
 
-test('POST: api/run', (t) => {
+test('POST: /api/run', (t) => {
     request({
         url: 'http://localhost:4999/api/run',
         method: 'POST',
@@ -35,7 +36,11 @@ test('POST: api/run', (t) => {
     });
 });
 
-test('POST: api/run/:run/jobs', (t) => {
+test('POST: /api/run/:run/jobs', (t) => {
+    nock('https://raw.githubusercontent.com')
+        .get('/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json')
+        .reply(200, require('./fixtures/dc-statewide.json'));
+
     request({
         url: 'http://localhost:4999/api/run/1/jobs',
         method: 'POST',
@@ -61,7 +66,7 @@ test('POST: api/run/:run/jobs', (t) => {
     });
 });
 
-test('PATCH: api/job/:job', (t) => {
+test('PATCH: /api/job/:job', (t) => {
     request({
         url: 'http://localhost:4999/api/job/1',
         method: 'PATCH',
@@ -118,3 +123,10 @@ test('PATCH: api/job/:job', (t) => {
 });
 
 flight.landing(test);
+
+test('close', (t) => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+    t.end();
+});
+

@@ -27,8 +27,7 @@
             "description": "The date on which this collection was uploaded"
         },
         "size": {
-            "type": "integer",
-            "description": "The size of the collection in bytes"
+            "$ref": "./util/size.json"
         }
     }
 }

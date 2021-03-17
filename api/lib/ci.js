@@ -394,11 +394,11 @@ class CI {
         } else if (event.action === 'closed' && event.pull_request.merged_at) {
             const sha = event.pull_request.head.sha;
 
-            const run = Run.from_sha(pool, sha);
-            const jobs = Run.jobs(pool, run.id);
+            const run = await Run.from_sha(pool, sha);
+            const jobs = await Run.jobs(pool, run.id);
 
             for (const job of jobs) {
-                Run.ping(pool, this, job);
+                await Run.ping(pool, this, job);
             }
         }
 

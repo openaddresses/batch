@@ -119,7 +119,7 @@ async function cli() {
 
         await oa.cmd('export', 'update', {
             ':exportid': process.env.OA_EXPORT_ID,
-            size = fs.statSync(path.resolve(tmp, 'export.zip')).size,
+            size: fs.statSync(path.resolve(tmp, 'export.zip')).size,
             status: 'Success'
         });
 

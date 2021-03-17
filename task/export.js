@@ -193,6 +193,8 @@ function convert(tmp, loc, exp, job) {
                     await archive(tmp);
                     return resolve();
                 });
+
+                inp.pipe(out);
             });
         } else {
             return new Promise((resolve, reject) => {
@@ -205,6 +207,8 @@ function convert(tmp, loc, exp, job) {
                     await archive(tmp);
                     return resolve();
                 });
+
+                inp.pipe(out);
             });
         }
     }

@@ -2,6 +2,10 @@
 
 'use strict';
 
+if (!process.env.AWS_DEFAULT_REGION) {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1';
+}
+
 const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
@@ -9,10 +13,6 @@ const path = require('path');
 const request = require('request');
 const {pipeline} = require('stream');
 const unzipper = require('unzipper');
-
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
 
 if (require.main == module) {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');

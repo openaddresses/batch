@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
 'use strict';
+
+if (!process.env.AWS_DEFAULT_REGION) {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1';
+}
+
 const OA = require('lib-oa');
 const prompts = require('prompts');
 const loglink = require('./lib/loglink');
@@ -14,10 +19,6 @@ const AWS = require('aws-sdk');
 const {Unzip} = require('zlib');
 const archiver = require('archiver');
 
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
-
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
 });
@@ -30,10 +31,6 @@ const args = require('minimist')(process.argv, {
         interactive: 'i'
     }
 });
-
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
 
 if (require.main === module) {
     if (args.interactive) return prompt();

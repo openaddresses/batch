@@ -2,6 +2,10 @@
 
 'use strict';
 
+if (!process.env.AWS_DEFAULT_REGION) {
+    process.env.AWS_DEFAULT_REGION = 'us-east-1';
+}
+
 const config = require('./package.json');
 const dke = require('@mapbox/decrypt-kms-env');
 const Run = require('./lib/run');
@@ -18,10 +22,6 @@ const args = require('minimist')(process.argv, {
         interactive: 'i'
     }
 });
-
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
 
 if (require.main === module) {
     if (args.interactive) return prompt();

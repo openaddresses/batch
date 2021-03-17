@@ -188,7 +188,7 @@ class Job {
     /**
      * Create a Job object given a JSON blob
      */
-    from_json(json) {
+    static from_json(json) {
         const job = new Job(
             json.run,
             json.source,

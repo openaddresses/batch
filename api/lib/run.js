@@ -278,7 +278,7 @@ class Run {
                 job.run = parseInt(job.run);
                 job.size = parseInt(job.size);
 
-                return job;
+                return new Job.from_json(job);
             });
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');

@@ -186,6 +186,24 @@ class Job {
     }
 
     /**
+     * Create a Job object given a JSON blob
+     */
+    from_json(json) {
+        const job = new Job(
+            json.run,
+            json.source,
+            json.layer,
+            json.name
+        );
+
+        for (const key of Object.keys(json)) {
+            job[key] = json[key];
+        }
+
+        return job;
+    }
+
+    /**
      * List & Filter Jobs
      *
      * @param {Pool} pool - Postgres Pool instance

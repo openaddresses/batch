@@ -394,7 +394,7 @@ class CI {
         } else if (event.action === 'closed' && event.pull_request.merged_at) {
             const sha = event.pull_request.head.sha;
 
-            const run = Run.from_sha(sha);
+            const run = Run.from_sha(pool, sha);
             const jobs = Run.jobs(pool, run.id);
 
             for (const job of jobs) {

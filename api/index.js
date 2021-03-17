@@ -1795,7 +1795,6 @@ async function server(args, config, cb) {
                 res.status(400).send('Invalid X-Hub-Signature');
             }
 
-            console.error(req)
             try {
                 if (req.headers['x-github-event'] === 'push') {
                     await ci.push(pool, req.body);

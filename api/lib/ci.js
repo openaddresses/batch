@@ -103,6 +103,7 @@ class CI {
      * @param {Object} head_commit - Information about head commit
      */
     async create_check(pool, sha, ref, head_commit) {
+        console.error(sha, ref, head_commit);
         try {
             const check = await this.config.octo.checks.create({
                 owner: 'openaddresses',
@@ -344,6 +345,7 @@ class CI {
      * @param {Object} event - GitHub Event Object
      */
     async push(pool, event) {
+        console.error(event);
         // The push event was to merge/delete a given branch/pr
         if (event.after === '0000000000000000000000000000000000000000') {
             return true;

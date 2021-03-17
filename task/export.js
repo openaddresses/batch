@@ -172,52 +172,39 @@ function archive(tmp) {
 function convert(tmp, loc, exp, job) {
     if (exp.format === 'shapefile') {
         return new Promise((resolve, reject) => {
-            pipeline(
-                ogr2ogr(loc).format('ESRI Shapefile').skipfailures().stream(),
-                fs.createWriteStream(path.resolve(tmp, 'export.zip')),
-                (err) => {
-                    if (err) return reject(err);
-                    return resolve();
-                }
-            );
-        });
+            const inp = ogr2ogr(loc).format('ESRI Shapefile').skipfailures().stream();
+            const out = fs.createWriteStream(path.resolve(tmp, 'export.zip'));
 
+            out.on('error', reject);
+            inp.on('error', reject);
+            out.on('close', resolve);
+
+            inp.pipe(out);
+        });
     } else if (exp.format === 'csv') {
         if (job.layer === 'addresses') {
             return new Promise((resolve, reject) => {
-                pipeline(
-                    ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_XY']).skipfailures().stream(),
-                    fs.createWriteStream(path.resolve(tmp, './export', 'export.csv')),
-                    async (err) => {
-                        if (err) return reject(err);
+                const inp = ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_XY']).skipfailures().stream();
+                const out = fs.createWriteStream(path.resolve(tmp, './export', 'export.csv'));
 
-                        try {
-                            await archive(tmp);
-
-                            return resolve();
-                        } catch (err) {
-                            return reject(err);
-                        }
-                    }
-                );
+                out.on('error', reject);
+                inp.on('error', reject);
+                out.on('close', async () => {
+                    await archive(tmp);
+                    return resolve();
+                });
             });
         } else {
             return new Promise((resolve, reject) => {
-                pipeline(
-                    ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_WKT']).skipfailures().stream(),
-                    fs.createWriteStream(path.resolve(tmp, './export', 'export.csv')),
-                    async (err) => {
-                        if (err) return reject(err);
+                const inp = ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_WKT']).skipfailures().stream();
+                const out = fs.createWriteStream(path.resolve(tmp, './export', 'export.csv'));
 
-                        try {
-                            await archive(tmp);
-
-                            return resolve();
-                        } catch (err) {
-                            return reject(err);
-                        }
-                    }
-                );
+                out.on('error', reject);
+                inp.on('error', reject);
+                out.on('close', async () => {
+                    await archive(tmp);
+                    return resolve();
+                });
             });
         }
     }

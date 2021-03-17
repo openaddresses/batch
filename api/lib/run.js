@@ -259,6 +259,7 @@ class Run {
      *
      * @param {Object} pool Postgres Pool
      * @param {Number} run_id run id
+     *
      * @returns {Promise} promise
      */
     static async jobs(pool, run_id) {
@@ -376,22 +377,21 @@ class Run {
         }
     }
 
-    static close(pool, id) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    static async close(pool, id) {
+        try {
+            const pgres = await pool.query(`
                 UPDATE
                     runs
                 SET
                     closed = true
                 WHERE
                     id = $1
-            `, [id], (err) => {
-                if (err) return reject(new Err(500, err, 'failed to close run'));
+            `, [id]);
 
-                return resolve(true);
-            });
-        });
-
+            return true;
+        } catch (err) {
+            throw new Err(500, err, 'failed to close run');
+        }
     }
 
     json() {
@@ -417,9 +417,17 @@ class Run {
             await pool.query(`
                 UPDATE runs
                     SET
-                        github = $1,
-                        closed = $2
-           `, [this.github, this.closed]);
+                        github = $2,
+                        closed = $3,
+                        live = $4
+                    WHERE
+                        id = $1
+           `, [
+                this.id,
+                this.github,
+                this.closed,
+                this.live
+            ]);
         } catch (err) {
             throw new Err(500, err, 'failed to save run');
         }
@@ -427,12 +435,13 @@ class Run {
         return this;
     }
 
-    static generate(pool, params = {}) {
+    static async generate(pool, params = {}) {
         if (params.live !== true) params.live = false;
         if (!params.github) params.github = {};
 
-        return new Promise((resolve, reject) => {
-            pool.query(`
+        let pgres;
+        try {
+            pgres = await pool.query(`
                 INSERT INTO runs (
                     created,
                     live,
@@ -447,19 +456,19 @@ class Run {
             `, [
                 params.live,
                 params.github
-            ], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to generate run'));
+            ])
+        } catch (err) {
+            throw new Err(500, err, 'failed to generate run');
+        }
 
-                const run = new Run();
+        const run = new Run();
 
-                pgres.rows[0].id = parseInt(pgres.rows[0].id);
-                for (const key of Object.keys(pgres.rows[0])) {
-                    run[key] = pgres.rows[0][key];
-                }
+        pgres.rows[0].id = parseInt(pgres.rows[0].id);
+        for (const key of Object.keys(pgres.rows[0])) {
+            run[key] = pgres.rows[0][key];
+        }
 
-                return resolve(run);
-            });
-        });
+        return run;
     }
 }
 

@@ -379,7 +379,7 @@ class Run {
 
     static async close(pool, id) {
         try {
-            const pgres = await pool.query(`
+            await pool.query(`
                 UPDATE
                     runs
                 SET
@@ -392,6 +392,8 @@ class Run {
         } catch (err) {
             throw new Err(500, err, 'failed to close run');
         }
+
+        return true;
     }
 
     json() {
@@ -456,7 +458,7 @@ class Run {
             `, [
                 params.live,
                 params.github
-            ])
+            ]);
         } catch (err) {
             throw new Err(500, err, 'failed to generate run');
         }

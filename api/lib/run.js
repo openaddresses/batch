@@ -392,8 +392,6 @@ class Run {
         } catch (err) {
             throw new Err(500, err, 'failed to close run');
         }
-
-        return true;
     }
 
     json() {

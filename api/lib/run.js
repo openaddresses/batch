@@ -43,7 +43,9 @@ class Run {
                 await Data.update(pool, job);
             }
 
-            if (!run.github || !run.github.check) {
+            if (run.live) {
+                return true; // If run is in live mode, the GH checks are done or not present
+            } else if (!run.github || !run.github.check) {
                 console.error(`ok - run ${run.id} has no github check`);
                 return true;
             }
@@ -279,6 +281,33 @@ class Run {
             });
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
+        }
+    }
+
+    static async from_sha(pool, sha) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    *
+                FROM
+                    runs
+                WHERE
+                    github->>'sha' = $1
+            `, [sha]);
+
+            const run = new Run();
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'no run by that sha');
+            }
+
+            for (const key of Object.keys(pgres.rows[0])) {
+                run[key] = pgres.rows[0][key];
+            }
+
+            return run;
+        } catch (err) {
+            throw new Err(500, err, 'failed to fetch run from sha');
         }
     }
 

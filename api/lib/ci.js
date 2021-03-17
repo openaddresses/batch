@@ -379,6 +379,7 @@ class CI {
     async pull(pool, event) {
         console.error('PULL', JSON.stringify(event));
 
+        // Create a CheckSuite
         if (['opened', 'synchronize'].includes(event.action) && event.pull_request.head.repo.fork) {
             await this.create_check(
                 pool,
@@ -388,6 +389,17 @@ class CI {
                     url: `https://github.com/openaddresses/openaddresses/pull/${event.number}/commits/${event.pull_request.head.sha}`
                 }
             );
+
+        // Mark the Run as Live since the PR was merged into master
+        } else if (event.action === 'closed' && event.pull_request.merged_at) {
+            const sha = event.pull_request.head.sha;
+
+            const run = Run.from_sha(sha);
+            const jobs = Run.jobs(pool, run.id);
+
+            for (const job of jobs) {
+                Run.ping(pool, this, job);
+            }
         }
 
         return true;

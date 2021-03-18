@@ -266,7 +266,22 @@ class Run {
         try {
             const pgres = await pool.query(`
                 SELECT
-                    *
+                    id,
+                    run,
+                    map,
+                    created,
+                    source,
+                    source_name,
+                    layer,
+                    name,
+                    output,
+                    loglink,
+                    status,
+                    stats,
+                    count,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds,
+                    version,
+                    size
                 FROM
                     job
                 WHERE

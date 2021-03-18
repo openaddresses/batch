@@ -1474,7 +1474,7 @@ async function server(args, config, cb) {
 
                 const job = await Job.from(pool, req.params.job);
 
-                console.error(job.source)
+                console.error(job.source);
                 return res.json(await job.get_raw());
             } catch (err) {
                 return Err.respond(err, res);

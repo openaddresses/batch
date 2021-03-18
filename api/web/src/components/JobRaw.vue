@@ -12,12 +12,25 @@
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
 
-                <span v-if='job.source' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                <span v-if='raw.data' v-on:click.stop.prevent='external(job.sourcej)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                </span>
+
+                <span v-if='job.source' v-on:click.stop.prevent='external(raw.data)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-link" /></svg>
                 </span>
 
             </div>
         </div>
+
+        <template v-if='loading.job || loading.raw'>
+            <div class='flex-parent flex-parent--center-main w-full'>
+                <div class='flex-child loading py24'></div>
+            </div>
+        </template>
+        <template v-else>
+            <pre class='pre' v-text='JSON.stringify(raw, null, 4)'/>
+        </template>
 
     </div>
 </template>
@@ -34,6 +47,7 @@ export default {
                 raw: true
             },
             job: {},
+            coverage: false,
             raw: false
         }
     },
@@ -43,6 +57,9 @@ export default {
     methods: {
         refresh() {
             this.getJob();
+        },
+        external: function(url) {
+            window.open(url, "_blank");
         },
         getJob: function() {
             this.loading.job = true;
@@ -82,13 +99,16 @@ export default {
 
                 return res.json();
             }).then((res) => {
-                this.raw = res;
+                for (const l of res.layers[this.job.layer]) {
+                    if (l.name == this.job.name) this.raw = l;
+                }
+
+                this.coverage = res.coverage;
                 this.loading.raw = false;
             }).catch((err) => {
                 this.$emit('err', err);
             });
         },
-
     }
 }
 </script>

@@ -276,6 +276,8 @@ class Run {
             return pgres.rows.map((job) => {
                 job.id = parseInt(job.id);
                 job.run = parseInt(job.run);
+                job.map = job.map ? parseInt(job.map) : null;
+                job.count = isNaN(parseInt(job.count)) ? null : parseInt(job.count);
                 job.size = parseInt(job.size);
 
                 return Job.from_json(job);

@@ -19,6 +19,7 @@
                     <svg v-else class='icon'><use href='#icon-close'/></svg>
                 </button>
 
+                <span v-if='run.live' class='fr mx6 bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Live</span>
                 <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
 
                 <template v-if='showFilter'>

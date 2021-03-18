@@ -33,6 +33,7 @@
 
                         <div class='round dropdown-content'>
                             <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
+                            <div @click='getRaw' class='round bg-gray-faint-on-hover'>Raw Link</div>
                         </div>
                     </div>
                 </h2>
@@ -47,11 +48,11 @@
                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-license" /></svg>
                 </span>
 
-                <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                <span v-on:click.stop.prevent='$router.push({ path: `/job/${jobid}/raw` })' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-code" /></svg>
                 </span>
 
-                <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
+                <span v-on:click.stop.prevent='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-notes" /></svg>
                 </span>
             </div>

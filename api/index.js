@@ -1454,6 +1454,35 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {get} /api/job/:job/raw Raw Source
+     * @apiVersion 1.0.0
+     * @apiName RawSingle
+     * @apiGroup Job
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return the raw source from github - this API is not stable nor
+     *     will it always return a consistent result
+     *
+     * @apiParam {Number} :job Job ID
+     */
+    router.get(
+        ...await schemas.get('GET /job/:job/raw'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'job');
+
+                const job = await Job.from(pool, req.params.job);
+
+                console.error(job.source)
+                return res.json(await job.get_raw());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {post} /api/job/:job Rerun Job
      * @apiVersion 1.0.0
      * @apiName JobRerun

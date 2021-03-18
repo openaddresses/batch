@@ -40,7 +40,7 @@ class Config {
                     userAgent: `OpenAddresses v${pkg.version}`,
                     authStrategy: createAppAuth,
                     auth: {
-                        id: 56179,
+                        appId: 56179,
                         privateKey: github,
                         installationId: 7214840,
                         clientId: secrets.GitHubClientID,

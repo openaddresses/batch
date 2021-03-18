@@ -25,6 +25,7 @@ import Jobs from './components/Jobs.vue';
 import Job from './components/Job.vue';
 import Run from './components/Run.vue';
 import JobLog from './components/JobLog.vue';
+import JobRaw from './components/JobRaw.vue';
 
 // === Routes ===
 
@@ -43,6 +44,7 @@ const router = new VueRouter({
         { path: '/job', component: Jobs },
         { path: '/job/:jobid', component: Job, props: true },
         { path: '/job/:jobid/log', component: JobLog, props: true },
+        { path: '/job/:jobid/raw', component: JobRaw, props: true },
 
         { path: '/data', component: Data },
         { path: '/data/:dataid/history', component: History, props: true },

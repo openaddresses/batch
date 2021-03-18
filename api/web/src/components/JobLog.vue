@@ -5,7 +5,7 @@
                 <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
                     <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
                 </button>
-                <h2 class='txt-h4 ml12 pb12 fl'>Job #<spane v-text='jobid'/></h2>
+                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
             </div>
         </div>
 

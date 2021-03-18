@@ -7,6 +7,7 @@ if (!process.env.AWS_DEFAULT_REGION) {
 }
 
 const os = require('os');
+const pkg = require('./package.json');
 const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
@@ -37,13 +38,18 @@ async function run(tmp) {
     await fetch(tmp);
     console.error('ok - extracted repo');
 
+    console.error('ok - fetching latest sha');
+    const sha = await get_sha();
+    console.error(`ok - ${sha}`);
+
     console.error('ok - listing jobs');
-    const jobs = list(tmp)
+    const jobs = list(tmp, sha)
     console.error(`ok - ${jobs.length} jobs found`);
 
     console.error('ok - creating run');
     const r = await run_create();
     console.error(`ok - run: ${r.id} created`);
+
 
     console.error('ok - populating run');
     const p = await run_pop(r.id, jobs);
@@ -73,7 +79,7 @@ async function fetch(tmp) {
     });
 }
 
-function list(tmp) {
+function list(tmp, sha) {
     const dir = fs.readdirSync(path.resolve(tmp, `openaddresses`))[0];
     const globs = glob.sync(`**/*.json`, {
         nodir: true,
@@ -88,7 +94,7 @@ function list(tmp) {
         for (const layer of Object.keys(source.layers)) {
             for (const name of source.layers[layer]) {
                 jobs.push({
-                    source: `https://raw.githubusercontent.com/openaddresses/openaddresses/${process.env.OA_BRANCH}/sources/${glob}`,
+                    source: `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/sources/${glob}`,
                     layer: layer,
                     name: name.name
                 });
@@ -117,6 +123,24 @@ async function run_create() {
             if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
             if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to create run`));
             return resolve(res.body);
+        });
+    });
+}
+
+async function get_sha() {
+    return new Promise((resolve, reject) => {
+        request({
+            json: true,
+            url: `https://api.github.com/repos/openaddresses/openaddresses/commits/master`,
+            method: 'GET',
+            headers: {
+                'User-Agent': `OpenAddresses Task v${pkg.version}`
+            }
+        }, (err, res) => {
+            if (err) return reject(err);
+            if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
+            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
+            return resolve(res.body.sha);
         });
     });
 }

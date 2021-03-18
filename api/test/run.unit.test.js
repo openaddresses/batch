@@ -181,3 +181,22 @@ test('Run#list', async (t) => {
     pool.end();
     t.end();
 });
+
+test('Run#jobs', async (t) => {
+    const pool = new Pool({
+        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
+    });
+
+    try {
+        const jobs = await Run.jobs(pool, 1);
+
+        t.equals(jobs.length, 1, 'jobs.length: 1');
+        t.ok(jobs[0].created, 'jobs[0].created: <date>');
+        delete jobs[0].created;
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    pool.end();
+    t.end();
+});

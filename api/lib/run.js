@@ -43,7 +43,9 @@ class Run {
                 await Data.update(pool, job);
             }
 
-            if (!run.github || !run.github.check) {
+            if (run.live) {
+                return true; // If run is in live mode, the GH checks are done or not present
+            } else if (!run.github || !run.github.check) {
                 console.error(`ok - run ${run.id} has no github check`);
                 return true;
             }
@@ -257,13 +259,29 @@ class Run {
      *
      * @param {Object} pool Postgres Pool
      * @param {Number} run_id run id
+     *
      * @returns {Promise} promise
      */
     static async jobs(pool, run_id) {
         try {
             const pgres = await pool.query(`
                 SELECT
-                    *
+                    id,
+                    run,
+                    map,
+                    created,
+                    source,
+                    source_name,
+                    layer,
+                    name,
+                    output,
+                    loglink,
+                    status,
+                    stats,
+                    count,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds,
+                    version,
+                    size
                 FROM
                     job
                 WHERE
@@ -273,12 +291,41 @@ class Run {
             return pgres.rows.map((job) => {
                 job.id = parseInt(job.id);
                 job.run = parseInt(job.run);
+                job.map = job.map ? parseInt(job.map) : null;
+                job.count = isNaN(parseInt(job.count)) ? null : parseInt(job.count);
                 job.size = parseInt(job.size);
 
-                return job;
+                return Job.from_json(job);
             });
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
+        }
+    }
+
+    static async from_sha(pool, sha) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    *
+                FROM
+                    runs
+                WHERE
+                    github->>'sha' = $1
+            `, [sha]);
+
+            const run = new Run();
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'no run by that sha');
+            }
+
+            for (const key of Object.keys(pgres.rows[0])) {
+                run[key] = pgres.rows[0][key];
+            }
+
+            return run;
+        } catch (err) {
+            throw new Err(500, err, 'failed to fetch run from sha');
         }
     }
 
@@ -347,22 +394,21 @@ class Run {
         }
     }
 
-    static close(pool, id) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    static async close(pool, id) {
+        try {
+            await pool.query(`
                 UPDATE
                     runs
                 SET
                     closed = true
                 WHERE
                     id = $1
-            `, [id], (err) => {
-                if (err) return reject(new Err(500, err, 'failed to close run'));
+            `, [id]);
 
-                return resolve(true);
-            });
-        });
-
+            return true;
+        } catch (err) {
+            throw new Err(500, err, 'failed to close run');
+        }
     }
 
     json() {
@@ -388,9 +434,17 @@ class Run {
             await pool.query(`
                 UPDATE runs
                     SET
-                        github = $1,
-                        closed = $2
-           `, [this.github, this.closed]);
+                        github = $2,
+                        closed = $3,
+                        live = $4
+                    WHERE
+                        id = $1
+           `, [
+                this.id,
+                this.github,
+                this.closed,
+                this.live
+            ]);
         } catch (err) {
             throw new Err(500, err, 'failed to save run');
         }
@@ -398,12 +452,13 @@ class Run {
         return this;
     }
 
-    static generate(pool, params = {}) {
+    static async generate(pool, params = {}) {
         if (params.live !== true) params.live = false;
         if (!params.github) params.github = {};
 
-        return new Promise((resolve, reject) => {
-            pool.query(`
+        let pgres;
+        try {
+            pgres = await pool.query(`
                 INSERT INTO runs (
                     created,
                     live,
@@ -418,19 +473,19 @@ class Run {
             `, [
                 params.live,
                 params.github
-            ], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to generate run'));
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'failed to generate run');
+        }
 
-                const run = new Run();
+        const run = new Run();
 
-                pgres.rows[0].id = parseInt(pgres.rows[0].id);
-                for (const key of Object.keys(pgres.rows[0])) {
-                    run[key] = pgres.rows[0][key];
-                }
+        pgres.rows[0].id = parseInt(pgres.rows[0].id);
+        for (const key of Object.keys(pgres.rows[0])) {
+            run[key] = pgres.rows[0][key];
+        }
 
-                return resolve(run);
-            });
-        });
+        return run;
     }
 }
 

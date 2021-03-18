@@ -192,7 +192,7 @@ test('Run#jobs', async (t) => {
 
         t.equals(jobs.length, 1, 'jobs.length: 1');
         t.ok(jobs[0].created, 'jobs[0].created: <date>');
-        delete jobs[0].created
+        delete jobs[0].created;
     } catch (err) {
         t.error(err, 'no error');
     }

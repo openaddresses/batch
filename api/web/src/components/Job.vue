@@ -33,7 +33,6 @@
 
                         <div class='round dropdown-content'>
                             <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
-                            <div @click='getRaw' class='round bg-gray-faint-on-hover'>Raw Link</div>
                         </div>
                     </div>
                 </h2>

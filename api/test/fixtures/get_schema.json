@@ -194,6 +194,11 @@
         "query": false,
         "res": true
     },
+    "GET /job/:job/raw": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "POST /job/:job/rerun": {
         "body": false,
         "query": false,

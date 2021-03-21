@@ -927,9 +927,14 @@ async function server(args, config, cb) {
                 await Param.int(req, 'y');
 
                 if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
-                const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
+
+
+                const tile = await cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                    return await Map.tile(pool, req.params.z, req.params.x, req.params.y);
+                }, false);
 
                 res.type('application/vnd.mapbox-vector-tile');
+
                 return res.send(tile);
             } catch (err) {
                 return Err.respond(err, res);

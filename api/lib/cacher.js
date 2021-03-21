@@ -25,14 +25,16 @@ class Cacher {
             let cached = await this.cache.get(key);
 
             if (!cached.value) throw new Error('Miss');
-            if (isJSON) cached = JSON.parse(cached.value);
+            if (isJSON) {
+                cached = JSON.parse(cached.value);
+            } else {
+                cached = cached.value;
+            }
 
-            if (process.env.DEBUG) console.error(`ok - HIT: ${key}`);
             return cached;
         } catch (err) {
             if (res) return res;
 
-            if (process.env.DEBUG) console.error(`ok - MISS: ${key}`);
             const fresh = await miss();
 
             try {

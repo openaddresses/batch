@@ -6,7 +6,8 @@ const memjs = require('memjs');
  * @class Cacher
  */
 class Cacher {
-    constructor() {
+    constructor(nocache = false) {
+        this.nocache = nocache;
         this.cache = memjs.Client.create();
     }
 
@@ -22,7 +23,7 @@ class Cacher {
         let res;
 
         try {
-            if (!key) throw new Error('Miss');
+            if (!key || this.nocache) throw new Error('Miss');
 
             let cached = await this.cache.get(key);
 
@@ -40,7 +41,7 @@ class Cacher {
             const fresh = await miss();
 
             try {
-                if (key) {
+                if (key && !this.nocache) {
                     if (isJSON) {
                         await this.cache.set(key, JSON.stringify(fresh), {
                             expires: 604800

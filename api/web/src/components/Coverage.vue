@@ -116,12 +116,34 @@ export default {
                         maxzoom: 5
                     });
 
+                    this.map.addSource('borders', {
+                        type: 'vector',
+                        tiles: [
+                            `${window.location.origin}/api/map/borders/{z}/{x}/{y}.mvt`
+                        ],
+                        minzoom: 0,
+                        maxzoom: 5
+                    });
+
                     this.map.on('click', (e) => {
                         console.error(this.map.queryRenderedFeatures(e.point))
                         this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 
                     const base = '#0b6623';
+
+                    this.map.addLayer({
+                        id: `borders`,
+                        type: 'line',
+                        source: 'borders',
+                        'source-layer': 'data',
+                        layout: { },
+                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        paint: {
+                            'line-color': 'rgba(0, 0, 0, 1)',
+                            'line-width': 1
+                        }
+                    });
 
                     this.map.addLayer({
                         id: `coverage-poly`,

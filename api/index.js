@@ -16,7 +16,7 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate', 'email'],
+    boolean: ['help', 'populate', 'email', 'no-cache'],
     string: ['postgres']
 });
 
@@ -80,7 +80,7 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
-    const cacher = new Cacher();
+    const cacher = new Cacher(!args['no-cache']);
 
     const pool = new Pool({
         connectionString: postgres
@@ -901,6 +901,43 @@ async function server(args, config, cb) {
         ...await schemas.get('GET /map'),
         (req, res) => {
             return res.json(Map.map());
+        }
+    );
+
+    /**
+     * @api {get} /api/map/borders/:z/:x/:y.mvt Coverage MVT
+     * @apiVersion 1.0.0
+     * @apiName BorderVectorTile
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Retrive borders Mapbox Vector Tiles
+     *
+     * @apiParam {Number} z Z coordinate
+     * @apiParam {Number} x X coordinate
+     * @apiParam {Number} y Y coordinate
+     */
+    router.get(
+        ...await schemas.get('GET /map/borders/:z/:x/:y.mvt'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
+
+                if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
+
+                const tile = await cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                    return await Map.border_tile(pool, req.params.z, req.params.x, req.params.y);
+                }, false);
+
+                res.type('application/vnd.mapbox-vector-tile');
+
+                return res.send(tile);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
     );
 

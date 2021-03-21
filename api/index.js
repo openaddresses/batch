@@ -919,6 +919,7 @@ async function server(args, config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
+                if (z > 5) throw new Error(400, null, 'Up to z5 is supported');
                 const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
 
                 res.type('application/vnd.mapbox-vector-tile');

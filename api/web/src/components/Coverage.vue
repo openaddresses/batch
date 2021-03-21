@@ -113,7 +113,7 @@ export default {
                             `${window.location.origin}/api/map/{z}/{x}/{y}.mvt`
                         ],
                         minzoom: 0,
-                        maxzoom: 16
+                        maxzoom: 5
                     });
 
                     this.map.on('click', (e) => {

@@ -1,3 +1,5 @@
+'use strict';
+
 const memjs = require('memjs');
 
 /**
@@ -49,9 +51,11 @@ class Cacher {
                         });
                     }
                 }
-            } finally {
-                return fresh;
+            } catch (err) {
+                // Ignore cache errors
             }
+
+            return fresh;
         }
     }
 

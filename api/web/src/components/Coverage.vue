@@ -146,6 +146,17 @@ export default {
                     });
 
                     this.map.addLayer({
+                        'id': 'borders-label',
+                        'type': 'symbol',
+                        'minzoom': 7,
+                        'source-layer': 'data',
+                        'source': 'borders',
+                        'layout': {
+                            'text-field': ['get', 'name']
+                        }
+                    });
+
+                    this.map.addLayer({
                         id: `coverage-poly`,
                         type: 'fill',
                         source: 'coverage',

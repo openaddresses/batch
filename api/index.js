@@ -1,6 +1,8 @@
 'use strict';
 
 const fs = require('fs');
+const Cacher = require('./lib/cacher');
+const Miss = Cacher.Miss;
 const session = require('express-session');
 const { ValidationError } = require('express-json-validator-middleware');
 const { Webhooks } = require('@octokit/webhooks');
@@ -77,6 +79,8 @@ async function server(args, config, cb) {
     } else if (!postgres) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
+
+    const cacher = new Cacher();
 
     const pool = new Pool({
         connectionString: postgres
@@ -728,7 +732,9 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const collections = await Collection.list(pool);
+                const collections = await cacher.get(Miss(req.query, 'collection'), async () => {
+                    return await Collection.list(pool);
+                });
 
                 return res.json(collections);
             } catch (err) {
@@ -872,6 +878,7 @@ async function server(args, config, cb) {
                 collection.patch(req.body);
 
                 await collection.commit(pool);
+                await cacher.del('collection');
 
                 return res.json(collection.json());
             } catch (err) {
@@ -919,7 +926,7 @@ async function server(args, config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                if (z > 5) throw new Error(400, null, 'Up to z5 is supported');
+                if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
                 const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
 
                 res.type('application/vnd.mapbox-vector-tile');
@@ -950,7 +957,9 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const data = await Data.list(pool, req.query);
+                const data = await cacher.get(Miss(req.query, 'data'), async () => {
+                    return await Data.list(pool, req.query);
+                });
 
                 return res.json(data);
             } catch (err) {

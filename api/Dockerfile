@@ -27,4 +27,5 @@ RUN cd web \
     && cd ..
 
 CMD service nginx restart \
+    service memcached restart \
     && npm run start

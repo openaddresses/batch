@@ -36,6 +36,8 @@ class Cacher {
 
             return cached;
         } catch (err) {
+            console.error(err);
+
             if (res) return res;
 
             const fresh = await miss();
@@ -53,7 +55,7 @@ class Cacher {
                     }
                 }
             } catch (err) {
-                // Ignore cache errors
+                console.error(err);
             }
 
             return fresh;

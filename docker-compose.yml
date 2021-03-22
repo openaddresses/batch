@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+    api:
+        build: ./api/
+        links:
+            - postgis
+        ports:
+            - 5001:5000
+        environment:
+            - POSTGRES=postgres://docker:docker@postgis:5432/gis
+            - MAPBOX_TOKEN
+
+    postgis:
+        image: kartoza/postgis:13.0
+        restart: 'always'
+        ports:
+            - 5434:5432
+        environment:
+            - ALLOW_IP_RANGE=0.0.0.0/0
+            - POSTGRES_DB=gis
+            - POSTGRES_USER=docker
+            - POSTGRES_PASS=docker

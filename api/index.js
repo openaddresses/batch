@@ -75,16 +75,36 @@ async function server(args, config, cb) {
     let postgres = process.env.POSTGRES;
 
     if (args.postgres) {
-        postgres = args.postgres;
+        postgres = args.postgres
     } else if (!postgres) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
     const cacher = new Cacher(!args['no-cache']);
 
-    const pool = new Pool({
-        connectionString: postgres
-    });
+    let pool = false;
+    let retry = 5;
+    do {
+        try {
+            pool = new Pool({
+                connectionString: postgres
+            });
+
+            await pool.query('SELECT NOW()');
+        } catch (err) {
+            pool = false;
+
+            if (retry === 0) {
+                console.error('not ok - terminating due to lack of postgres connection');
+                return process.exit(1);
+            }
+
+            retry--;
+            console.error('not ok - unable to get postgres connection');
+            console.error(`ok - retrying... (${5 - retry}/5)`);
+            await sleep(5000);
+        }
+    } while (!pool);
 
     const analytics = new Analytics(pool);
     const level = new (require('./lib/level'))(pool);
@@ -2152,5 +2172,12 @@ async function server(args, config, cb) {
         console.log('ok - http://localhost:4999');
     });
 }
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
 
 module.exports = configure;

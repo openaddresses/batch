@@ -80,7 +80,7 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
-    const cacher = new Cacher(!args['no-cache']);
+    const cacher = new Cacher(args['no-cache']);
 
     let pool = false;
     let retry = 5;

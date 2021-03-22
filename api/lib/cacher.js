@@ -8,6 +8,8 @@ const memjs = require('memjs');
 class Cacher {
     constructor(nocache = false) {
         this.nocache = nocache;
+
+        if (nocache) console.error('ok - Memcached Disabled');
         this.cache = memjs.Client.create();
     }
 
@@ -36,8 +38,6 @@ class Cacher {
 
             return cached;
         } catch (err) {
-            console.error(err);
-
             if (res) return res;
 
             const fresh = await miss();

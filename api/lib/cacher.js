@@ -10,6 +10,8 @@ class Cacher {
         this.nocache = nocache;
 
         if (nocache) console.error('ok - Memcached Disabled');
+        else console.error('ok - Memcached Enabled');
+
         this.cache = memjs.Client.create();
     }
 

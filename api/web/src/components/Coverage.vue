@@ -140,7 +140,7 @@ export default {
                         layout: { },
                         filter: ['==', ['geometry-type'], 'Polygon'],
                         paint: {
-                            'line-color': 'rgba(0, 0, 0, 1)',
+                            'line-color': 'rgba(0, 0, 0, 0.1)',
                             'line-width': 1
                         }
                     });

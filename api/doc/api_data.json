@@ -905,9 +905,9 @@
     "group": "Export",
     "permission": [
       {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Return the batch-machine processing log for a given export Note: These are stored in AWS CloudWatch and <em>do</em> expire The presence of a loglink on a export, does not guarentree log retention</p>",
@@ -1078,6 +1078,37 @@
   },
   {
     "type": "get",
+    "url": "/api/export/:exportid/output/export.zip",
+    "title": "Get Export Data",
+    "version": "1.0.0",
+    "name": "DataExport",
+    "group": "Exports",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Download the data created in an export</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":exportid",
+            "description": "<p>Export ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Exports"
+  },
+  {
+    "type": "get",
     "url": "/api/export/:export",
     "title": "Get Export",
     "version": "1.0.0",
@@ -1203,6 +1234,13 @@
           },
           {
             "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "description": "<p>Page of results to return</p>"
+          },
+          {
+            "group": "Query",
             "type": "String",
             "allowedValues": [
               "\"Pending\"",
@@ -1246,21 +1284,35 @@
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "id",
+            "field": "total",
+            "description": "<p>The total number of exports in the account</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "exports",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "exports.id",
             "description": "<p>The integer ID of the export task</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "uid",
+            "field": "exports.uid",
             "description": "<p>The User ID that initiated the export task</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "job_id",
+            "field": "exports.job_id",
             "description": "<p>The Job ID being exported</p>"
           },
           {
@@ -1271,28 +1323,28 @@
               "\"csv\""
             ],
             "optional": false,
-            "field": "format",
+            "field": "exports.format",
             "description": "<p>Formats that can be exported to</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "created",
+            "field": "exports.created",
             "description": "<p>The timestamp at which the export was created</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "expiry",
+            "field": "exports.expiry",
             "description": "<p>The timestamp at which the export will expire</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "size",
+            "field": "exports.size",
             "description": "<p>The size of the asset in bytes</p>"
           },
           {
@@ -1306,35 +1358,35 @@
               "\"Warn\""
             ],
             "optional": false,
-            "field": "status",
+            "field": "exports.status",
             "description": "<p>The current status of a given task</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "loglink",
+            "field": "exports.loglink",
             "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "source_name",
+            "field": "exports.source_name",
             "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "layer",
+            "field": "exports.layer",
             "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "name",
+            "field": "exports.name",
             "description": "<p>undefined</p>"
           }
         ]
@@ -2239,6 +2291,37 @@
   },
   {
     "type": "get",
+    "url": "/api/job/:job/raw",
+    "title": "Raw Source",
+    "version": "1.0.0",
+    "name": "RawSingle",
+    "group": "Job",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return the raw source from github - this API is not stable nor will it always return a consistent result</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":job",
+            "description": "<p>Job ID</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Job"
+  },
+  {
+    "type": "get",
     "url": "/api/job/:job/output/sample",
     "title": "Small Sample",
     "version": "1.0.0",
@@ -2827,7 +2910,19 @@
             ],
             "optional": false,
             "field": "access",
-            "description": "<p>undefined</p>"
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
           },
           {
             "group": "Success 200",
@@ -2992,7 +3087,19 @@
             ],
             "optional": false,
             "field": "access",
-            "description": "<p>undefined</p>"
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
           },
           {
             "group": "Success 200",
@@ -3102,6 +3209,51 @@
     },
     "filename": "./index.js",
     "groupTitle": "Login"
+  },
+  {
+    "type": "get",
+    "url": "/api/map/borders/:z/:x/:y.mvt",
+    "title": "Coverage MVT",
+    "version": "1.0.0",
+    "name": "BorderVectorTile",
+    "group": "Map",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Retrive borders Mapbox Vector Tiles</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "z",
+            "description": "<p>Z coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "x",
+            "description": "<p>X coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "y",
+            "description": "<p>Y coordinate</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Map"
   },
   {
     "type": "get",
@@ -4449,7 +4601,19 @@
             ],
             "optional": false,
             "field": "users.access",
-            "description": "<p>undefined</p>"
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "users.level",
+            "description": "<p>The level of donation of a given user</p>"
           },
           {
             "group": "Success 200",
@@ -4506,6 +4670,29 @@
             "field": "filter",
             "defaultValue": "",
             "description": "<p>Filter a complete or partial username/email</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"admin\""
+            ],
+            "optional": true,
+            "field": "access",
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": true,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
           }
         ]
       }
@@ -4557,7 +4744,19 @@
             ],
             "optional": false,
             "field": "users.access",
-            "description": "<p>undefined</p>"
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "users.level",
+            "description": "<p>The level of donation of a given user</p>"
           },
           {
             "group": "Success 200",
@@ -4615,7 +4814,7 @@
             ],
             "optional": true,
             "field": "access",
-            "description": "<p>undefined</p>"
+            "description": "<p>The access level of a given user</p>"
           }
         ]
       }
@@ -4667,7 +4866,19 @@
             ],
             "optional": false,
             "field": "users.access",
-            "description": "<p>undefined</p>"
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "users.level",
+            "description": "<p>The level of donation of a given user</p>"
           },
           {
             "group": "Success 200",

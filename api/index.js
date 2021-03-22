@@ -1,6 +1,8 @@
 'use strict';
 
 const fs = require('fs');
+const Cacher = require('./lib/cacher');
+const Miss = Cacher.Miss;
 const session = require('express-session');
 const { ValidationError } = require('express-json-validator-middleware');
 const { Webhooks } = require('@octokit/webhooks');
@@ -14,7 +16,7 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate', 'email'],
+    boolean: ['help', 'populate', 'email', 'no-cache'],
     string: ['postgres']
 });
 
@@ -78,9 +80,31 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
-    const pool = new Pool({
-        connectionString: postgres
-    });
+    const cacher = new Cacher(args['no-cache']);
+
+    let pool = false;
+    let retry = 5;
+    do {
+        try {
+            pool = new Pool({
+                connectionString: postgres
+            });
+
+            await pool.query('SELECT NOW()');
+        } catch (err) {
+            pool = false;
+
+            if (retry === 0) {
+                console.error('not ok - terminating due to lack of postgres connection');
+                return process.exit(1);
+            }
+
+            retry--;
+            console.error('not ok - unable to get postgres connection');
+            console.error(`ok - retrying... (${5 - retry}/5)`);
+            await sleep(5000);
+        }
+    } while (!pool);
 
     const analytics = new Analytics(pool);
     const level = new (require('./lib/level'))(pool);
@@ -728,7 +752,9 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const collections = await Collection.list(pool);
+                const collections = await cacher.get(Miss(req.query, 'collection'), async () => {
+                    return await Collection.list(pool);
+                });
 
                 return res.json(collections);
             } catch (err) {
@@ -872,6 +898,7 @@ async function server(args, config, cb) {
                 collection.patch(req.body);
 
                 await collection.commit(pool);
+                await cacher.del('collection');
 
                 return res.json(collection.json());
             } catch (err) {
@@ -898,6 +925,43 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {get} /api/map/borders/:z/:x/:y.mvt Coverage MVT
+     * @apiVersion 1.0.0
+     * @apiName BorderVectorTile
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Retrive borders Mapbox Vector Tiles
+     *
+     * @apiParam {Number} z Z coordinate
+     * @apiParam {Number} x X coordinate
+     * @apiParam {Number} y Y coordinate
+     */
+    router.get(
+        ...await schemas.get('GET /map/borders/:z/:x/:y.mvt'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
+
+                if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
+
+                const tile = await cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                    return await Map.border_tile(pool, req.params.z, req.params.x, req.params.y);
+                }, false);
+
+                res.type('application/vnd.mapbox-vector-tile');
+
+                return res.send(tile);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/map/:z/:x/:y.mvt Coverage MVT
      * @apiVersion 1.0.0
      * @apiName VectorTile
@@ -919,9 +983,15 @@ async function server(args, config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const tile = await Map.tile(pool, req.params.z, req.params.x, req.params.y);
+                if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
+
+
+                const tile = await cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                    return await Map.tile(pool, req.params.z, req.params.x, req.params.y);
+                }, false);
 
                 res.type('application/vnd.mapbox-vector-tile');
+
                 return res.send(tile);
             } catch (err) {
                 return Err.respond(err, res);
@@ -949,7 +1019,9 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const data = await Data.list(pool, req.query);
+                const data = await cacher.get(Miss(req.query, 'data'), async () => {
+                    return await Data.list(pool, req.query);
+                });
 
                 return res.json(data);
             } catch (err) {
@@ -2100,5 +2172,12 @@ async function server(args, config, cb) {
         console.log('ok - http://localhost:4999');
     });
 }
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
 
 module.exports = configure;

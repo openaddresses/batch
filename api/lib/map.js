@@ -51,6 +51,62 @@ class Map {
         }
     }
 
+    static async border_tile(pool, z, x, y) {
+        try {
+            const bbox = sm.bbox(x, y, z, false, '900913');
+
+            let where = 'true';
+            if (z < 2) where = "code ~ '^[a-z]{2}$'";
+            else if (z < 4) where = "code ~ '^[a-z]{2}-[a-z]+$'";
+            else if (z === 5) where = "code ~ '^[a-z]{2}-[0-9]+$'";
+
+            const pgres = await pool.query(`
+                SELECT
+                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                FROM (
+                    SELECT
+                        n.code,
+                        n.name,
+                        ST_AsMVTGeom(
+                            ST_Transform(geom, 3857),
+                            ST_SetSRID(ST_MakeBox2D(
+                                ST_MakePoint($1, $2),
+                                ST_MakePoint($3, $4)
+                            ), 3857),
+                            4096,
+                            256,
+                            false
+                        ) AS geom
+                    FROM (
+                        SELECT
+                            map.name,
+                            map.code,
+                            map.geom
+                        FROM
+                            map
+                        WHERE
+                            ${where}
+                            AND ST_Intersects(
+                                map.geom,
+                                ST_Transform(ST_SetSRID(ST_MakeBox2D(
+                                    ST_MakePoint($1, $2),
+                                    ST_MakePoint($3, $4)
+                                ), 3857), 4326)
+                        )
+                    ) n
+                    GROUP BY
+                        n.name,
+                        n.code,
+                        n.geom
+                ) q
+            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
+
+            return pgres.rows[0].mvt;
+        } catch (err) {
+            throw new Err(500, err, 'Failed to generate tile');
+        }
+    }
+
     static async tile(pool, z, x, y) {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');
@@ -101,12 +157,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [
-                bbox[0],
-                bbox[1],
-                bbox[2],
-                bbox[3]
-            ]);
+            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
 
             return pgres.rows[0].mvt;
         } catch (err) {

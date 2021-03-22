@@ -8,7 +8,8 @@ COPY ./ $HOME/api
 WORKDIR $HOME/api
 
 RUN apt-get update \
-    && apt-get install -y nginx curl
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata \
+    && apt-get install -y nginx curl memcached
 
 RUN curl 'https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.gz' | tar -xzv \
     && cp ./node-v14.16.0-linux-x64/bin/node /usr/bin/ \
@@ -27,4 +28,5 @@ RUN cd web \
     && cd ..
 
 CMD service nginx restart \
+    && service memcached restart \
     && npm run start

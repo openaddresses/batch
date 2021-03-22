@@ -75,7 +75,7 @@ async function server(args, config, cb) {
     let postgres = process.env.POSTGRES;
 
     if (args.postgres) {
-        postgres = args.postgres
+        postgres = args.postgres;
     } else if (!postgres) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }

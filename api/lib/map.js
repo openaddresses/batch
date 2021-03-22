@@ -56,9 +56,9 @@ class Map {
             const bbox = sm.bbox(x, y, z, false, '900913');
 
             let where = 'true';
-            if (z < 2) where = "code ~ '^[a-z]{2}$'"
-            else if (z < 4) where = "code ~ '^[a-z]{2}-[a-z]+$'"
-            else if (z === 5) where = "code ~ '^[a-z]{2}-[0-9]+$'"
+            if (z < 2) where = "code ~ '^[a-z]{2}$'";
+            else if (z < 4) where = "code ~ '^[a-z]{2}-[a-z]+$'";
+            else if (z === 5) where = "code ~ '^[a-z]{2}-[0-9]+$'";
 
             const pgres = await pool.query(`
                 SELECT
@@ -99,7 +99,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [ bbox[0], bbox[1], bbox[2], bbox[3] ]);
+            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
 
             return pgres.rows[0].mvt;
         } catch (err) {
@@ -157,7 +157,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [ bbox[0], bbox[1], bbox[2], bbox[3] ]);
+            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
 
             return pgres.rows[0].mvt;
         } catch (err) {

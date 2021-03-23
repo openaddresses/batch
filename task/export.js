@@ -172,7 +172,10 @@ function archive(tmp) {
 function convert(tmp, loc, exp, job) {
     let ogr = ogr2ogr(loc)
         .timeout(600000)
-        .skipfailures();
+        .skipfailures()
+        .onStderr((data) => {
+            console.error(data);
+        })
 
     if (exp.format === 'shapefile') {
         return new Promise((resolve, reject) => {

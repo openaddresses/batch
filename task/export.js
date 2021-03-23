@@ -170,7 +170,7 @@ function archive(tmp) {
 }
 
 function convert(tmp, loc, exp, job) {
-    const ogr = ogr2ogr(loc)
+    let ogr = ogr2ogr(loc)
         .timeout(600000)
         .skipfailures();
 

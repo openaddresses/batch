@@ -170,9 +170,13 @@ function archive(tmp) {
 }
 
 function convert(tmp, loc, exp, job) {
+    const ogr = ogr2ogr(loc)
+        .timeout(600000)
+        .skipfailures();
+
     if (exp.format === 'shapefile') {
         return new Promise((resolve, reject) => {
-            const inp = ogr2ogr(loc).format('ESRI Shapefile').skipfailures().stream();
+            const inp = ogr.format('ESRI Shapefile').stream();
             const out = fs.createWriteStream(path.resolve(tmp, 'export.zip'));
 
             out.on('error', reject);
@@ -182,35 +186,27 @@ function convert(tmp, loc, exp, job) {
             inp.pipe(out);
         });
     } else if (exp.format === 'csv') {
+        ogr = ogr.format('csv');
+
         if (job.layer === 'addresses') {
-            return new Promise((resolve, reject) => {
-                const inp = ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_XY']).skipfailures().stream();
-                const out = fs.createWriteStream(path.resolve(tmp, './export', 'export.csv'));
-
-                out.on('error', reject);
-                inp.on('error', reject);
-                out.on('close', async () => {
-                    await archive(tmp);
-                    return resolve();
-                });
-
-                inp.pipe(out);
-            });
+            ogr = ogr.options(['-lco', 'GEOMETRY=AS_XY']);
         } else {
-            return new Promise((resolve, reject) => {
-                const inp = ogr2ogr(loc).format('csv').options(['-lco', 'GEOMETRY=AS_WKT']).skipfailures().stream();
-                const out = fs.createWriteStream(path.resolve(tmp, './export', 'export.csv'));
-
-                out.on('error', reject);
-                inp.on('error', reject);
-                out.on('close', async () => {
-                    await archive(tmp);
-                    return resolve();
-                });
-
-                inp.pipe(out);
-            });
+            ogr = ogr.options(['-lco', 'GEOMETRY=AS_WKT']);
         }
+
+        return new Promise((resolve, reject) => {
+            const inp = ogr.stream();
+            const out = fs.createWriteStream(path.resolve(tmp, './export', 'export.csv'));
+
+            out.on('error', reject);
+            inp.on('error', reject);
+            out.on('close', async () => {
+                await archive(tmp);
+                return resolve();
+            });
+
+            inp.pipe(out);
+        });
     }
 }
 

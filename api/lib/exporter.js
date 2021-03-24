@@ -178,6 +178,11 @@ class Exporter {
             exp[key] = pgres.rows[0][key];
         }
 
+        exp.id = parseInt(exp.id);
+        exp.uid = parseInt(exp.uid);
+        exp.job_id = parseInt(exp.job_id);
+        if (exp.size) exp.size = parseInt(exp.size);
+
         return exp;
     }
 

@@ -79,7 +79,7 @@ async function cli() {
 
     try {
         const exp = await oa.cmd('export', 'get', {
-            ':exportid': process.env.OA_EXPORT_ID
+            ':exportid': parseInt(process.env.OA_EXPORT_ID)
         });
 
         const job = await oa.cmd('job', 'get', {
@@ -87,7 +87,7 @@ async function cli() {
         });
 
         const update = {
-            ':exportid': process.env.OA_EXPORT_ID,
+            ':exportid': parseInt(process.env.OA_EXPORT_ID),
             status: 'Running'
         };
 
@@ -95,6 +95,8 @@ async function cli() {
             update.loglink = await loglink();
         }
 
+        console.error(process.env.OA_API);
+        console.error(update);
         await oa.cmd('export', 'update', update)
 
         const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
@@ -126,12 +128,16 @@ async function cli() {
 
         console.error('ok - done');
     } catch (err) {
-        await oa.cmd('export', 'update', {
-            ':exportid': process.env.OA_EXPORT_ID,
-            status: 'Fail'
-        });
+        console.error(err);
 
-        throw err;
+        try {
+            await oa.cmd('export', 'update', {
+                ':exportid': parseInt(process.env.OA_EXPORT_ID),
+                status: 'Fail'
+            });
+        } finally {
+            process.exit(1);
+        }
     }
 }
 

@@ -181,7 +181,7 @@ class Exporter {
         exp.id = parseInt(exp.id);
         exp.uid = parseInt(exp.uid);
         exp.job_id = parseInt(exp.job_id);
-        exp.size = parseInt(exp.size);
+        if (exp.size) exp.size = parseInt(exp.size);
 
         return exp;
     }

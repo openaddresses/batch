@@ -95,6 +95,7 @@ async function cli() {
             update.loglink = await loglink();
         }
 
+        console.error(update);
         await oa.cmd('export', 'update', update)
 
         const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));

@@ -126,12 +126,14 @@ async function cli() {
 
         console.error('ok - done');
     } catch (err) {
+        console.error(err);
+
         await oa.cmd('export', 'update', {
             ':exportid': process.env.OA_EXPORT_ID,
             status: 'Fail'
         });
 
-        throw err;
+        process.exit(1);
     }
 }
 

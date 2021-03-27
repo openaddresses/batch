@@ -192,8 +192,8 @@ class CI {
             if (!['Warn', 'Success'].includes(job.status)) continue;
 
             issue = issue + '\n'
-                + `### ${job.source_name}-${job.layer}-${job.name}\n`
-                + `![Preview Image](https://batch.openaddresses.io/api/job/${job.id}/output/source.png)\n`;
+                + `### [${job.source_name}-${job.layer}-${job.name}](https://batch.openaddresses.io/job/${job.id})\n`
+                + `[![Preview Image](https://batch.openaddresses.io/api/job/${job.id}/output/source.png)](https://batch.openaddresses.io/job/${job.id})\n`;
         }
 
         return issue.trim();

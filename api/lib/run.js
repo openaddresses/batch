@@ -51,7 +51,7 @@ class Run {
             }
 
             const is_pending = !!(await Run.jobs(pool, run.id)).filter((job) => {
-                return job.status === 'Pending';
+                return !['Success', 'Fail'].includes(job.status);
             }).length;
 
             if (!is_pending) {
@@ -71,7 +71,7 @@ class Run {
      * @param {Number} [query.run=false] - Only show run associated with a id (Normally use Run.from unless you need additional job information)
      * @param {String} [query.before=undefined] - Only show runs before the given date
      * @param {String} [query.after=undefined] - Only show jobs after the given date
-     * @param {Number} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show runs with a given status
+     * @param {Number} [query.status=["Success", "Fail", "Running", "Pending", "Warn"]] - Only show runs with a given status
      */
     static async list(pool, query) {
         if (!query) query = {};

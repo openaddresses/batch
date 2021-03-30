@@ -167,10 +167,6 @@ function archive(tmp) {
             });
         }
 
-        arch.on('finish', () => {
-            return resolve(path.resolve(tmp, `export.zip`));
-        });
-
         arch.finalize();
     });
 }

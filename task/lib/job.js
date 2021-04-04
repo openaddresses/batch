@@ -130,8 +130,30 @@ class Job {
     /**
      * Detect if the source is a static S3 asset, and download it from S3 instead of http
      */
-    async s3_down() {
+    s3_down() {
+        return new Promise((resolve, reject) => {
+            if (!this.specific.protocol === 'http') return resolve();
+            if (!this.specific.data.includes('data.openaddresses.io') && this.specific.data.includes('v2.openaddresses.io')) return resolve();
 
+            const url = new URL(this.specific.data);
+
+            const loc = path.resolve(this.tmp, url.pathname.replace(/^\//, '').replace(/\//g, '-'));
+
+            const out = fs.createWriteStream(loc).on('error', (err) => {
+                return reject(err);
+            }).on('close', () => {
+                this.specific.protocol = 'file';
+                this.spefific.data = loc;
+                return resolve();
+            });
+
+            s3.getObject({
+                Bucket: url.host,
+                Key: url.pathname.replace(/^\//, '')
+            }).createReadStream().on('error', (err) => {
+                return reject(err);
+            }).pipe(out);
+        });
     }
 
     async convert() {
@@ -315,6 +337,13 @@ class Job {
             await this.oa.cmd('joberror', 'create', {
                 job: this.job,
                 message: 'Job has skip: true flag enabled'
+            });
+        }
+
+        if (!this.specific.year && this.specific.protocol === 'file') {
+            await this.oa.cmd('joberror', 'create', {
+                job: this.job,
+                message: 'Job has cached data without the year it was cached'
             });
         }
 

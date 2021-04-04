@@ -8,6 +8,7 @@ const test = require('tape');
 test('Job#compress', async (t) => {
     try {
         const job = new Job(
+            true,
             1,
             'http://example.com',
             'addresses',
@@ -26,7 +27,7 @@ test('Job#compress', async (t) => {
 
 test('Job#convert', async (t) => {
     try {
-        const job = new Job(1, 'fake-url', 'addresses', 'state');
+        const job = new Job(true, 1, 'fake-url', 'addresses', 'state');
 
         fs.writeFileSync(
             path.resolve(job.tmp, 'out.csv'),
@@ -78,6 +79,28 @@ test('Job#convert', async (t) => {
                 }
             }
         }, 'job.stats');
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
+test('Job#s3_down', async (t) => {
+    try {
+        const job = new Job(
+            true,
+            1,
+            'http://example.com',
+            'addresses',
+            'county'
+        );
+
+        job.specific = require('./fixtures/us-or-clackamas.json').layers.addresses[0];
+
+        await job.s3_down();
+
+        t.equals(job.specific.protocol, 'file');
     } catch (err) {
         t.error(err);
     }

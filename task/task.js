@@ -128,16 +128,12 @@ async function flow(api, job) {
         await job.update(api, update);
         await job.get();
         await job.fetch();
-        await job.check_source();
-
         run = await Run.get(api, job.run);
 
-        const source_path = path.resolve(job.tmp, 'source.json');
-
-        fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
-
         await job.s3_down();
-        await process_job(job, source_path);
+        await job.check_source();
+
+        await process_job(job);
 
         await job.convert();
         await job.compress();
@@ -171,8 +167,11 @@ async function flow(api, job) {
     }
 }
 
-function process_job(job, source_path) {
+function process_job(job) {
     return new Promise((resolve, reject) => {
+        const source_path = path.resolve(job.tmp, 'source.json');
+        fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
+
         const task = CP.spawn('openaddr-process-one', [
             source_path,
             job.tmp,

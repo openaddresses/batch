@@ -2,7 +2,6 @@
 
 const Ajv = require('ajv');
 const wkt = require('wellknown');
-const JobError = require('./joberror');
 const turf = require('@turf/turf');
 const gzip = require('zlib').createGzip;
 const os = require('os');
@@ -30,13 +29,18 @@ const s3 = new AWS.S3({
     region: 'us-east-1'
 });
 
+/**
+ * @class Job
+ */
 class Job {
-    constructor(job, url, layer, name) {
+    constructor(oa, job, url, layer, name) {
+        if (!oa) throw new Error('OA Instance required');
         if (!job) throw new Error('job param required');
         if (!url) throw new Error('url param required');
         if (!layer) throw new Error('layer param required');
         if (!name) throw new Error('name param required');
 
+        this.oa = oa;
         this.tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
 
         fs.mkdirSync(this.tmp);
@@ -55,6 +59,9 @@ class Job {
         this.stats = {};
         this.size = 0;
 
+        // Store the specific data/conform information for a source
+        this.specific = false;
+
         this.assets = {
             cache: false,
             output: false,
@@ -62,19 +69,14 @@ class Job {
         };
     }
 
-    get(api) {
-        return new Promise((resolve, reject) => {
-            request({
-                url: `${api}/api/job/${this.job}`,
-                json: true,
-                method: 'GET'
-            }, (err, res) => {
-                if (err) return reject(err);
-                this.run = res.body.run;
-
-                return resolve();
-            });
+    async get() {
+        const job = await this.oa.cmd('job', 'get', {
+            ':job': this.job
         });
+
+        this.run = job.run;
+
+        return job;
     }
 
     fetch() {
@@ -110,6 +112,10 @@ class Job {
 
                 this.source = source;
 
+                for (const l of this.source.layers[this.layer]) {
+                    if (l.name === this.name) this.specific = l;
+                }
+
                 return resolve(this.source);
             });
         });
@@ -119,6 +125,13 @@ class Job {
         return new Promise((resolve) => {
             find.file(pattern, path, resolve);
         });
+    }
+
+    /**
+     * Detect if the source is a static S3 asset, and download it from S3 instead of http
+     */
+    async s3_down() {
+
     }
 
     async convert() {
@@ -297,14 +310,20 @@ class Job {
         });
     }
 
-    async check_source(api) {
-        let layer;
-        for (const l of this.source.layers[this.layer]) {
-            if (l.name === this.name) layer = l;
+    async check_source() {
+        if (this.specific.skip) {
+            await this.oa.cmd('joberror', 'create', {
+                job: this.job,
+                message: 'Job has skip: true flag enabled'
+            });
         }
 
-        if (layer.skip) await JobError.create(api, this.job, 'Job has skip: true flag enabled');
-        if (layer.year && parseInt(layer.year) !== new Date().getFullYear()) await JobError.create(api, this.job, `Job has year: ${layer.year} which is not the current year`);
+        if (this.specific.year && parseInt(this.specific.year) !== new Date().getFullYear()) {
+            await this.oa.cmd('joberror', 'create', {
+                job: this.job,
+                message: `Job has year: ${this.specific.year} which is not the current year`
+            });
+        }
 
         return true;
     }
@@ -320,20 +339,35 @@ class Job {
         // 10% reduction or greater is bad
         if (diff.delta.count / diff.master.count <= -0.1) {
             await this.update(api, { status: 'Warn' });
-            if (run.live) await JobError.create(api, this.job, `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`);
+            if (run.live) {
+                await this.oa.cmd('joberror', 'create', {
+                    job: this.job,
+                    message: `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`
+                });
+            }
         }
 
         if (this.job.layer === 'addresses') {
             const number = diff.delta.stats.counts.number / diff.master.stats.counts.number;
             if (number <= -0.1) {
                 await this.update(api, { status: 'Warn' });
-                if (run.live) await JobError.create(api, this.job, `"number" prop dropped by ${Math.round(number * 100) / 100}`);
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: `"number" prop dropped by ${Math.round(number * 100) / 100}`
+                    });
+                }
             }
 
             const street = diff.delta.stats.counts.street / diff.master.stats.counts.street;
             if (street <= -0.1) {
                 await this.update(api, { status: 'Warn' });
-                if (run.live) await JobError.create(api, this.job, `"number" prop dropped by ${Math.round(street * 100) / 100}`);
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: `"number" prop dropped by ${Math.round(street * 100) / 100}`
+                    });
+                }
             }
         }
 

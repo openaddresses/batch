@@ -7,10 +7,10 @@ if (!process.env.AWS_DEFAULT_REGION) {
 }
 
 const config = require('./package.json');
+const OA = require('lib-oa');
 const dke = require('@mapbox/decrypt-kms-env');
 const Run = require('./lib/run');
 const Job = require('./lib/job');
-const JobError = require('./lib/joberror');
 const path = require('path');
 const CP = require('child_process');
 const fs = require('fs');
@@ -85,7 +85,13 @@ async function cli() {
 
     const api = process.env.OA_API;
 
+    const oa = new OA({
+        url: process.env.OA_API,
+        secret: process.env.SharedSecret
+    });
+
     const job = new Job(
+        oa,
         process.env.OA_JOB,
         process.env.OA_SOURCE,
         process.env.OA_SOURCE_LAYER,
@@ -120,9 +126,9 @@ async function flow(api, job) {
         }
 
         await job.update(api, update);
-        await job.get(api);
+        await job.get();
         await job.fetch();
-        await job.check_source(api);
+        await job.check_source();
 
         run = await Run.get(api, job.run);
 
@@ -130,6 +136,7 @@ async function flow(api, job) {
 
         fs.writeFileSync(source_path, JSON.stringify(job.source, null, 4));
 
+        await job.s3_down();
         await process_job(job, source_path);
 
         await job.convert();
@@ -154,7 +161,10 @@ async function flow(api, job) {
 
         console.error(run);
         if (run && run.live) {
-            await JobError.create(api, job.job, 'machine failed to process source');
+            await job.oa.cmd('joberror', 'create', {
+                job: this.job,
+                message: 'machine failed to process source'
+            });
         }
 
         throw new Error(err);

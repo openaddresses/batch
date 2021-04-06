@@ -16,6 +16,7 @@ const stack = {
         T3ClusterASG : {
             Type : 'AWS::AutoScaling::AutoScalingGroup',
             Properties : {
+                AutoScalingGroupName: 't3-cluster-asg',
                 VPCZoneIdentifier: [
                     'subnet-de35c1f5',
                     'subnet-e67dc7ea',
@@ -25,8 +26,8 @@ const stack = {
                     'subnet-b978ade0'
                 ],
                 LaunchConfigurationName : cf.ref('T3ClusterInstances'),
-                MinSize : 1,
-                MaxSize : 1,
+                MinSize : 0,
+                MaxSize : 100,
                 DesiredCapacity : 1
             },
             CreationPolicy : {

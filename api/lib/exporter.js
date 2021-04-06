@@ -2,7 +2,7 @@
 
 const Err = require('./error');
 const { Status } = require('./util');
-const batchjob = require('./batch');
+const batchjob = require('./batch').trigger;
 const moment = require('moment');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');

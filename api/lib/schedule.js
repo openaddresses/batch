@@ -2,7 +2,7 @@
 
 const Err = require('./error');
 const JobError = require('./joberror');
-const batchjob = require('./batch');
+const batchjob = require('./batch').trigger;
 const Level = require('./level');
 
 /**

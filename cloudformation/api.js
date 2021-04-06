@@ -208,7 +208,7 @@ const stack = {
                         { Name: 'JOB_DEFINITION', Value: cf.ref('BatchJobDefinition') },
                         { Name: 'T3_QUEUE', Value:  cf.importValue('t3-queue') },
                         { Name: 'T3_PRIORITY_QUEUE', Value:  cf.importValue('t3-priority-queue') },
-                        { Name: 'T3_Cluster_ASG', Value: cf.importValue('t3-cluster-asg') },
+                        { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
                         { Name: 'MEGA_QUEUE', Value: cf.importValue('mega-queue') },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },

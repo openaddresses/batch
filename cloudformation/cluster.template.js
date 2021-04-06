@@ -4,12 +4,8 @@ const cf = require('@mapbox/cloudfriend');
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',
-    Description: 'OpenAddresses T3-Small Test',
+    Description: 'OpenAddresses Batch T3 Instance Cluster',
     Parameters: {
-        GitSha: {
-            Type: 'String',
-            Description: 'Gitsha to Deploy'
-        },
         ComputeEnvironmentCluster: {
             Type: 'String',
             Description: 'Batch Compute Environment to populate',

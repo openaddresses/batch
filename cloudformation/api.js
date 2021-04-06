@@ -206,10 +206,9 @@ const stack = {
                     }],
                     Environment: [
                         { Name: 'JOB_DEFINITION', Value: cf.ref('BatchJobDefinition') },
-                        { Name: 'JOB_STD_QUEUE', Value:  cf.ref('BatchJobQueue') },
-                        { Name: 'JOB_STD_CI_QUEUE', Value:  cf.ref('BatchCIJobQueue') },
-                        { Name: 'JOB_MEGA_QUEUE', Value: cf.ref('BatchMegaJobQueue') },
-                        { Name: 'JOB_NAME', Value: 'lambda-trigger-job' },
+                        { Name: 'T3_QUEUE', Value:  cf.importValue('t3-queue')
+                        { Name: 'T3_PRIORITY_QUEUE', Value:  cf.importValue('t3-priority-queue') },
+                        { Name: 'MEGA_QUEUE', Value: cf.importValue('mega-queue') },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
                         { Name: 'MAILGUN_API_KEY', Value: cf.ref('MailGun') },

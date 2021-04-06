@@ -21,10 +21,9 @@ const batch = new AWS.Batch({
 function trigger(event) {
     return new Promise((resolve, reject) => {
         const jobDefinition = process.env.JOB_DEFINITION;
-        const jobStdQueue = process.env.JOB_STD_QUEUE;
-        const jobStdCIQueue = process.env.JOB_STD_CI_QUEUE;
-        const jobMegaQueue = process.env.JOB_MEGA_QUEUE;
-        const jobName = process.env.JOB_NAME;
+        const t3_queue = process.env.T3_QUEUE;
+        const t3_priority_queue = process.env.T3_PRIORITY_QUEUE;
+        const mega_queue = process.env.MEGA_QUEUE;
 
         let timeout = 60 * 60 * 6; // 6 Hours
         if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout;
@@ -44,8 +43,8 @@ function trigger(event) {
 
             params = {
                 jobDefinition: jobDefinition,
-                jobQueue: event.type === 'job' ? jobStdQueue : jobStdCIQueue,
-                jobName: jobName,
+                jobQueue: event.type === 'job' ? t3_queue : t3_priority_queue,
+                jobName: `OA_Job_${event.job}`,
                 containerOverrides: {
                     command: ['./task.js'],
                     environment: [
@@ -64,8 +63,8 @@ function trigger(event) {
 
             params = {
                 jobDefinition: jobDefinition,
-                jobQueue: jobStdCIQueue,
-                jobName: jobName,
+                jobQueue: t3_priority_queue,
+                jobName: `OA_Export_${event.id}`,
                 containerOverrides: {
                     command: ['./export.js'],
                     environment: [
@@ -79,8 +78,8 @@ function trigger(event) {
         } else if (event.type === 'collect') {
             params = {
                 jobDefinition: jobDefinition,
-                jobQueue: jobMegaQueue,
-                jobName: jobName,
+                jobQueue: mega_queue,
+                jobName: 'OA_Collect',
                 containerOverrides: {
                     command: ['./collect.js'],
                     environment: []
@@ -89,8 +88,8 @@ function trigger(event) {
         } else if (event.type === 'sources') {
             params = {
                 jobDefinition: jobDefinition,
-                jobQueue: jobStdQueue,
-                jobName: jobName,
+                jobQueue: t3_queue,
+                jobName: 'OA_Sources',
                 containerOverrides: {
                     command: ['./sources.js'],
                     environment: []

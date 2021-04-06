@@ -90,7 +90,7 @@ const stack = {
                 }
             },
             Properties: {
-                ImageId: 'ami-6df8fe7a',
+                ImageId: 'ami-005425225a11a4777',
                 InstanceType: 't3.small',
                 SecurityGroups: [ cf.ref('T3ClusterInstanceSecurityGroup') ],
                 IamInstanceProfile: cf.ref('T3ClusterInstanceProfile'),
@@ -119,52 +119,42 @@ const stack = {
             }
         },
         T3ClusterInstanceRole: {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Statement: [{
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: [ 'ec2.amazonaws.com' ]
+                        },
+                        Action: [ 'sts:AssumeRole' ]
+                    }]
                 },
-                "Path": "/",
-                "Policies": [
-                    {
-                        "PolicyName": "ecs-instance",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ecs:CreateCluster",
-                                        "ecs:DeregisterContainerInstance",
-                                        "ecs:DiscoverPollEndpoint",
-                                        "ecs:Poll",
-                                        "ecs:RegisterContainerInstance",
-                                        "ecs:StartTelemetrySession",
-                                        "ecs:Submit*",
-                                        "ecr:GetAuthorizationToken",
-                                        "ecr:BatchCheckLayerAvailability",
-                                        "ecr:GetDownloadUrlForLayer",
-                                        "ecr:BatchGetImage",
-                                        "logs:CreateLogStream",
-                                        "logs:PutLogEvents"
-                                    ],
-                                    "Resource": "*"
-                                }
-                            ]
-                        }
+                Path: '/',
+                Policies: [{
+                    PolicyName: 'ecs-instance',
+                    PolicyDocument: {
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: [
+                                'ecs:CreateCluster',
+                                'ecs:DeregisterContainerInstance',
+                                'ecs:DiscoverPollEndpoint',
+                                'ecs:Poll',
+                                'ecs:RegisterContainerInstance',
+                                'ecs:StartTelemetrySession',
+                                'ecs:Submit*',
+                                'ecr:GetAuthorizationToken',
+                                'ecr:BatchCheckLayerAvailability',
+                                'ecr:GetDownloadUrlForLayer',
+                                'ecr:BatchGetImage',
+                                'logs:CreateLogStream',
+                                'logs:PutLogEvents'
+                            ],
+                            Resource: '*'
+                        }]
                     }
-                ]
+                }]
             }
         },
         T3ClusterInstanceProfile: {

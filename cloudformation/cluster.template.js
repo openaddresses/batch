@@ -9,7 +9,7 @@ const stack = {
         ComputeEnvironmentCluster: {
             Type: 'String',
             Description: 'Batch Compute Environment to populate',
-            Default: 'batch-task-prod-t3_Batch_5a6a4042-84ad-38ff-bf7c-35ab884e81b2'
+            Default: 't3_Batch_f36a5782-a380-32a1-85a1-f226179b54d7'
         }
     },
     Resources: {

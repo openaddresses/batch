@@ -206,7 +206,7 @@ const stack = {
                     }],
                     Environment: [
                         { Name: 'JOB_DEFINITION', Value: cf.ref('BatchJobDefinition') },
-                        { Name: 'T3_QUEUE', Value:  cf.importValue('t3-queue')
+                        { Name: 'T3_QUEUE', Value:  cf.importValue('t3-queue') },
                         { Name: 'T3_PRIORITY_QUEUE', Value:  cf.importValue('t3-priority-queue') },
                         { Name: 'MEGA_QUEUE', Value: cf.importValue('mega-queue') },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },

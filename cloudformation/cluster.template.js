@@ -110,7 +110,7 @@ const stack = {
             Type: 'AWS::EC2::SecurityGroup',
             Properties: {
                 VpcId: 'vpc-3f2aa15a',
-                GroupDescription: cf.join([cf.stackName, '-default-t3cluster-sg']),
+                GroupDescription: 't3-cluster-sg',
                 SecurityGroupIngress: []
             }
         },
@@ -158,6 +158,15 @@ const stack = {
             Properties: {
                 Path: '/',
                 Roles: [cf.ref('T3ClusterInstanceRole')]
+            }
+        }
+    },
+    Outputs: {
+        T3ASG: {
+            Description: 'AWS Batch T3 Cluster ASG',
+            Value: cf.ref('T3ClusterASG'),
+            Exports: {
+                Name: 't3-cluster-asg'
             }
         }
     }

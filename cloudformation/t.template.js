@@ -12,54 +12,62 @@ const stack = {
         }
     },
     Resources: {
-        T3Cluster: {
-            Type : 'AWS::ECS::Cluster',
+        BatchT3ComputeEnvironment: {
+            Type: 'AWS::Batch::ComputeEnvironment',
             Properties: {
-                ClusterName: cf.join([cf.stackName, '-default']),
-                ClusterSettings: [
-                    { Name: 'containerInsights', Value: 'enabled' }
-                ],
+                Type: 'MANAGED',
+                ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
+                ComputeEnvironmentName: cf.join('-', [cf.stackName, 't3']),
+                State: 'ENABLED'
             }
         },
         T3ClusterASG : {
-            "Type" : "AWS::AutoScaling::AutoScalingGroup",
-            "Properties" : {
-                "VPCZoneIdentifier" : { "Ref" : "Subnets" },
-                "LaunchConfigurationName" : { "Ref" : "T3ClusterInstances" },
-                "MinSize" : 1,
-                "MaxSize" : 1,
-                "DesiredCapacity" : 1
+            Type : 'AWS::AutoScaling::AutoScalingGroup',
+            DependsOn: ['BatchT3ComputeEnvironment'],
+            Properties : {
+                VPCZoneIdentifier: [
+                    'subnet-de35c1f5',
+                    'subnet-e67dc7ea',
+                    'subnet-38b72502',
+                    'subnet-76ae3713',
+                    'subnet-35d87242',
+                    'subnet-b978ade0'
+                ],
+                LaunchConfigurationName : cf.ref('T3ClusterInstances'),
+                MinSize : 1,
+                MaxSize : 1,
+                DesiredCapacity : 1
             },
-            "CreationPolicy" : {
-                "ResourceSignal" : {
-                    "Timeout" : "PT15M"
+            CreationPolicy : {
+                ResourceSignal : {
+                    Timeout : 'PT15M'
                 }
             },
-            "UpdatePolicy": {
-                "AutoScalingRollingUpdate": {
-                    "MinInstancesInService": "1",
-                    "MaxBatchSize": "1",
-                    "PauseTime" : "PT15M",
-                    "WaitOnResourceSignals": "true"
+            UpdatePolicy: {
+                AutoScalingRollingUpdate: {
+                    MinInstancesInService: '1',
+                    MaxBatchSize: '1',
+                    PauseTime : 'PT15M',
+                    WaitOnResourceSignals: 'true'
                 }
             }
         },
-        "T3ClusterInstances": {
-            "Type": "AWS::AutoScaling::LaunchConfiguration",
+        T3ClusterInstances: {
+            Type: 'AWS::AutoScaling::LaunchConfiguration',
             "Metadata" : {
                 "AWS::CloudFormation::Init" : {
                     "config" : {
                         "commands" : {
                             "01_add_instance_to_cluster" : {
-                                "command" : { "Fn::Join": [ "", [ "#!/bin/bash\n", "echo ECS_CLUSTER=", { "Ref": "ECSCluster" }, " >> /etc/ecs/ecs.config" ] ] }
+                                "command" : { "Fn::Join": [ "", [ "#!/bin/bash\n", "echo ECS_CLUSTER=", cf.ref('T3Cluster'), " >> /etc/ecs/ecs.config" ] ] }
                             }
                         },
                         "files" : {
                             "/etc/cfn/cfn-hup.conf" : {
                                 "content" : { "Fn::Join" : ["", [
                                     "[main]\n",
-                                    "stack=", { "Ref" : "AWS::StackId" }, "\n",
-                                    "region=", { "Ref" : "AWS::Region" }, "\n"
+                                    "stack=", cf.stackId, "\n",
+                                    "region=", cf.region, "\n"
                                 ]]},
                                 "mode"    : "000400",
                                 "owner"   : "root",
@@ -69,11 +77,11 @@ const stack = {
                                 "content": { "Fn::Join" : ["", [
                                     "[cfn-auto-reloader-hook]\n",
                                     "triggers=post.update\n",
-                                    "path=Resources.ContainerInstances.Metadata.AWS::CloudFormation::Init\n",
+                                    "path=Resources.T3ClusterInstances.Metadata.AWS::CloudFormation::Init\n",
                                     "action=/opt/aws/bin/cfn-init -v ",
-                                    "         --stack ", { "Ref" : "AWS::StackName" },
-                                    "         --resource ContainerInstances ",
-                                    "         --region ", { "Ref" : "AWS::Region" }, "\n",
+                                    "         --stack ", cf.stackName,
+                                    "         --resource T3ClusterInstances",
+                                    "         --region ", cf.region, "\n",
                                     "runas=root\n"
                                 ]]}
                             }
@@ -86,74 +94,66 @@ const stack = {
                     }
                 }
             },
-            "Properties": {
-                "ImageId" : 'ami-6df8fe7a',
-                "InstanceType"   : 't3.small',
-                "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
-                "IamInstanceProfile": { "Ref": "EC2InstanceProfile" },
-                "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+            Properties: {
+                ImageId: 'ami-6df8fe7a',
+                InstanceType: 't3.small',
+                SecurityGroups: [ cf.ref('InstanceSecurityGroup') ],
+                IamInstanceProfile: cf.ref('EC2InstanceProfile'),
+                UserData: { "Fn::Base64" : { "Fn::Join" : ["", [
                     "#!/bin/bash -xe\n",
                     "yum install -y aws-cfn-bootstrap\n",
 
                     "/opt/aws/bin/cfn-init -v ",
                     "         --stack ", { "Ref" : "AWS::StackName" },
-                    "         --resource ContainerInstances ",
+                    "         --resource T3ClusterInstances ",
                     "         --region ", { "Ref" : "AWS::Region" }, "\n",
 
                     "/opt/aws/bin/cfn-signal -e $? ",
                     "         --stack ", { "Ref" : "AWS::StackName" },
-                    "         --resource ECSAutoScalingGroup ",
+                    "         --resource T3ClusterASG ",
                     "         --region ", { "Ref" : "AWS::Region" }, "\n"
                 ]]}}
             }
         },
-        "InstanceSecurityGroup" : {
-            "Type" : "AWS::EC2::SecurityGroup",
-            "Properties" : {
-                "SecurityGroupIngress" : []
+        InstanceSecurityGroup: {
+            Type: 'AWS::EC2::SecurityGroup',
+            Properties: {
+                VpcId: 'vpc-3f2aa15a',
+                GroupDescription: cf.join([cf.stackName, '-default-t3cluster-sg']),
+                SecurityGroupIngress: []
             }
         },
-        "ECSServiceRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ecs.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
+        ECSServiceRole: {
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Statement: [{
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: [ 'ecs.amazonaws.com' ]
+                        },
+                        Action: [ 'sts:AssumeRole' ]
+                    }]
                 },
-                "Path": "/",
-                "Policies": [
-                    {
-                        "PolicyName": "ecs-service",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:AuthorizeSecurityGroupIngress",
-                                        "ec2:Describe*",
-                                        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-                                        "elasticloadbalancing:DeregisterTargets",
-                                        "elasticloadbalancing:Describe*",
-                                        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-                                        "elasticloadbalancing:RegisterTargets"
-                                    ],
-                                    "Resource": "*"
-                                }
-                            ]
-                        }
+                Path: '/',
+                Policies: [{
+                    PolicyName: 'ecs-service',
+                    PolicyDocument: {
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: [
+                                'ec2:AuthorizeSecurityGroupIngress',
+                                'ec2:Describe*',
+                                'elasticloadbalancing:DeregisterInstancesFromLoadBalancer',
+                                'elasticloadbalancing:DeregisterTargets',
+                                'elasticloadbalancing:Describe*',
+                                'elasticloadbalancing:RegisterInstancesWithLoadBalancer',
+                                'elasticloadbalancing:RegisterTargets'
+                            ],
+                            Resource: '*'
+                        }]
                     }
-                ]
+                }]
             }
         },
         "AmazonEC2ContainerServiceAutoscaleRole": {
@@ -251,73 +251,36 @@ const stack = {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ecs-tasks.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [ "ecs-tasks.amazonaws.com" ]
+                        },
+                        "Action": [ "sts:AssumeRole" ]
+                    }]
                 },
                 "Path": "/",
                 "Policies": [
                     {
                         "PolicyName": "ecs-task",
                         "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:GetObject"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "sqs:ListQueues",
-                                        "sqs:GetQueueUrl"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "sqs:DeleteMessage",
-                                        "sqs:ReceiveMessage",
-                                        "sqs:ChangeMessageVisibility"
-                                    ],
-                                    "Resource": { "Fn::GetAtt" : ["SQSBatchQueue", "Arn"] }
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:PutObject"
-                                    ],
-                                    "Resource":  { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "myS3OutputBucket" } , "/*" ]]}
-                                }
-                            ]
+                            "Statement": [{
+                                Effect: "Allow",
+                                Action: [
+                                    "s3:getObject",
+                                ],
+                                Resource: cf.join(['arn:aws:s3:::v2.openaddresses.io/*' ])
+                            }]
                         }
                     }
                 ]
             }
         },
-
         "EC2InstanceProfile": {
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
                 "Path": "/",
-                "Roles": [
-                    {
-                        "Ref": "EC2Role"
-                    }
-                ]
+                "Roles": [cf.ref('EC2Role')]
             }
         }
     }

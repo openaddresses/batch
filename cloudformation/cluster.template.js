@@ -165,7 +165,7 @@ const stack = {
         T3ASG: {
             Description: 'AWS Batch T3 Cluster ASG',
             Value: cf.ref('T3ClusterASG'),
-            Exports: {
+            Export: {
                 Name: 't3-cluster-asg'
             }
         }

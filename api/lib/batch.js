@@ -9,7 +9,7 @@ const asg = new AWS.AutoScaling({ apiVersion: '2011-01-01', region: 'us-east-1' 
  */
 async function scale_up() {
     const desc = (await asg.describeAutoScalingGroups({
-        AutoScalingGroupNames: [ process.env.T3_CLUSTER_ASG ]
+        AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
     }).promise()).AutoScalingGroups[0];
 
     if (desc.DesiredCapacity < desc.MaxSize) {
@@ -130,4 +130,4 @@ async function trigger(event) {
 module.exports = {
     scale_up,
     trigger
-}
+};

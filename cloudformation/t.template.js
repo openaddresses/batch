@@ -49,41 +49,41 @@ const stack = {
         },
         T3ClusterInstances: {
             Type: 'AWS::AutoScaling::LaunchConfiguration',
-            "Metadata" : {
-                "AWS::CloudFormation::Init" : {
-                    "config" : {
-                        "commands" : {
-                            "01_add_instance_to_cluster" : {
-                                "command" : cf.join([ '#!/bin/bash\n', 'echo ECS_CLUSTER=', cf.ref('ComputeEnvironmentCluster'), ' >> /etc/ecs/ecs.config' ])
+            'Metadata' : {
+                'AWS::CloudFormation::Init' : {
+                    'config' : {
+                        'commands' : {
+                            '01_add_instance_to_cluster' : {
+                                'command' : cf.join(['#!/bin/bash\n', 'echo ECS_CLUSTER=', cf.ref('ComputeEnvironmentCluster'), ' >> /etc/ecs/ecs.config'])
                             }
                         },
-                        "files" : {
-                            "/etc/cfn/cfn-hup.conf" : {
-                                "content" : { "Fn::Join" : ["", [
-                                    "[main]\n",
-                                    "stack=", cf.stackId, "\n",
-                                    "region=", cf.region, "\n"
-                                ]]},
-                                "mode"    : "000400",
-                                "owner"   : "root",
-                                "group"   : "root"
+                        'files' : {
+                            '/etc/cfn/cfn-hup.conf' : {
+                                'content' : { 'Fn::Join' : ['', [
+                                    '[main]\n',
+                                    'stack=', cf.stackId, '\n',
+                                    'region=', cf.region, '\n'
+                                ]] },
+                                'mode'    : '000400',
+                                'owner'   : 'root',
+                                'group'   : 'root'
                             },
-                            "/etc/cfn/hooks.d/cfn-auto-reloader.conf" : {
-                                "content": { "Fn::Join" : ["", [
-                                    "[cfn-auto-reloader-hook]\n",
-                                    "triggers=post.update\n",
-                                    "path=Resources.T3ClusterInstances.Metadata.AWS::CloudFormation::Init\n",
-                                    "action=/opt/aws/bin/cfn-init -v ",
-                                    "         --stack ", cf.stackName,
-                                    "         --resource T3ClusterInstances",
-                                    "         --region ", cf.region, "\n",
-                                    "runas=root\n"
-                                ]]}
+                            '/etc/cfn/hooks.d/cfn-auto-reloader.conf' : {
+                                'content': { 'Fn::Join' : ['', [
+                                    '[cfn-auto-reloader-hook]\n',
+                                    'triggers=post.update\n',
+                                    'path=Resources.T3ClusterInstances.Metadata.AWS::CloudFormation::Init\n',
+                                    'action=/opt/aws/bin/cfn-init -v ',
+                                    '         --stack ', cf.stackName,
+                                    '         --resource T3ClusterInstances',
+                                    '         --region ', cf.region, '\n',
+                                    'runas=root\n'
+                                ]] }
                             }
                         },
-                        "services" : {
-                            "sysvinit" : {
-                                "cfn-hup" : { "enabled" : "true", "ensureRunning" : "true", "files" : ["/etc/cfn/cfn-hup.conf", "/etc/cfn/hooks.d/cfn-auto-reloader.conf"] }
+                        'services' : {
+                            'sysvinit' : {
+                                'cfn-hup' : { 'enabled' : 'true', 'ensureRunning' : 'true', 'files' : ['/etc/cfn/cfn-hup.conf', '/etc/cfn/hooks.d/cfn-auto-reloader.conf'] }
                             }
                         }
                     }
@@ -92,22 +92,22 @@ const stack = {
             Properties: {
                 ImageId: 'ami-005425225a11a4777',
                 InstanceType: 't3.small',
-                SecurityGroups: [ cf.ref('T3ClusterInstanceSecurityGroup') ],
+                SecurityGroups: [cf.ref('T3ClusterInstanceSecurityGroup')],
                 IamInstanceProfile: cf.ref('T3ClusterInstanceProfile'),
-                UserData: { "Fn::Base64" : { "Fn::Join" : ["", [
-                    "#!/bin/bash -xe\n",
-                    "yum install -y aws-cfn-bootstrap\n",
+                UserData: { 'Fn::Base64' : { 'Fn::Join' : ['', [
+                    '#!/bin/bash -xe\n',
+                    'yum install -y aws-cfn-bootstrap\n',
 
-                    "/opt/aws/bin/cfn-init -v ",
-                    "         --stack ", { "Ref" : "AWS::StackName" },
-                    "         --resource T3ClusterInstances ",
-                    "         --region ", { "Ref" : "AWS::Region" }, "\n",
+                    '/opt/aws/bin/cfn-init -v ',
+                    '         --stack ', { 'Ref' : 'AWS::StackName' },
+                    '         --resource T3ClusterInstances ',
+                    '         --region ', { 'Ref' : 'AWS::Region' }, '\n',
 
-                    "/opt/aws/bin/cfn-signal -e $? ",
-                    "         --stack ", { "Ref" : "AWS::StackName" },
-                    "         --resource T3ClusterASG ",
-                    "         --region ", { "Ref" : "AWS::Region" }, "\n"
-                ]]}}
+                    '/opt/aws/bin/cfn-signal -e $? ',
+                    '         --stack ', { 'Ref' : 'AWS::StackName' },
+                    '         --resource T3ClusterASG ',
+                    '         --region ', { 'Ref' : 'AWS::Region' }, '\n'
+                ]] } }
             }
         },
         T3ClusterInstanceSecurityGroup: {
@@ -125,9 +125,9 @@ const stack = {
                     Statement: [{
                         Effect: 'Allow',
                         Principal: {
-                            Service: [ 'ec2.amazonaws.com' ]
+                            Service: ['ec2.amazonaws.com']
                         },
-                        Action: [ 'sts:AssumeRole' ]
+                        Action: ['sts:AssumeRole']
                     }]
                 },
                 Path: '/',

@@ -9,6 +9,7 @@
             "type": "string",
             "enum": [
                 "close",
+                "scale",
                 "level",
                 "collect",
                 "sources"

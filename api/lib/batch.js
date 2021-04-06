@@ -50,17 +50,17 @@ async function trigger(event) {
     if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout;
 
     if (typeof event !== 'object' || Array.isArray(event)) {
-        return reject(new Error('event must be Key/Value pairs'));
+        throw new Error('event must be Key/Value pairs');
     }
 
-    if (!event.type) return reject(new Error('Event Type Required'));
+    if (!event.type) throw new Error('Event Type Required');
     let params;
 
     if (event.type === 'job' || event.type === 'job-ci') {
-        if (!event.job) return reject(new Error('Job ID required'));
-        if (!event.source) return reject(new Error('URL of source required'));
-        if (!event.layer) return reject(new Error('Layer of source required'));
-        if (!event.name) return reject(new Error('Name of source layer required'));
+        if (!event.job) throw new Error('Job ID required');
+        if (!event.source) throw new Error('URL of source required');
+        if (!event.layer) throw new Error('Layer of source required');
+        if (!event.name) throw new Error('Name of source layer required');
 
         params = {
             jobDefinition: jobDefinition,
@@ -80,7 +80,7 @@ async function trigger(event) {
             }
         };
     } else if (event.type === 'export') {
-        if (!event.id) return reject(new Error('Export ID required'));
+        if (!event.id) throw new Error('Export ID required');
 
         params = {
             jobDefinition: jobDefinition,
@@ -129,5 +129,6 @@ async function trigger(event) {
 
 module.exports = {
     scale_up,
+    scale_down,
     trigger
 };

@@ -2,7 +2,7 @@
 
 const Err = require('./error');
 const JobError = require('./joberror');
-const batchjob = require('./batch').trigger;
+const batch = require('./batch');
 const Level = require('./level');
 
 /**
@@ -18,12 +18,22 @@ class Schedule {
             await Schedule.close(pool);
         } else if (event.type === 'level') {
             await Schedule.level(pool);
+        } else if (event.type === 'scale') {
+            await Schedule.level(pool);
+        }
+    }
+
+    static async scale() {
+        try {
+            return await batch.scale_down();
+        } catch (err) {
+            throw new Err(500, err, 'Failed to scale ASG down');
         }
     }
 
     static async collect() {
         try {
-            return await batchjob({
+            return await batch.trigger({
                 type: 'collect'
             });
         } catch (err) {
@@ -45,7 +55,7 @@ class Schedule {
         await JobError.clear(pool);
 
         try {
-            return await batchjob({
+            return await batch.trigger({
                 type: 'sources'
             });
         }  catch (err) {
@@ -54,6 +64,8 @@ class Schedule {
     }
 
     static async close(pool) {
+        // TODO Close old run/jobs
+
         await pool.query(`
             DELETE FROM
                 users_reset

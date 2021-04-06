@@ -10,7 +10,7 @@ const stack = {
             Properties: {
                 Type: 'UNMANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: cf.join('-', [cf.stackName, 't3']),
+                ComputeEnvironmentName: 't3',
                 State: 'ENABLED'
             }
         },
@@ -19,7 +19,7 @@ const stack = {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: cf.join('-', ['batch-hg', cf.ref('AWS::StackName')]),
+                ComputeEnvironmentName: 'mega',
                 ComputeResources: {
                     ImageId: 'ami-056807e883f197989',
                     MaxvCpus: 16,
@@ -82,7 +82,7 @@ const stack = {
                         }
                     }]
                 },
-                LaunchTemplateName: cf.join('-', [cf.stackName, 'mega'])
+                LaunchTemplateName: 'mega'
             }
         },
         BatchSecurityGroup: {
@@ -111,39 +111,62 @@ const stack = {
             }
         },
         BatchJobQueue: {
-            'Type': 'AWS::Batch::JobQueue',
-            'Properties': {
-                'ComputeEnvironmentOrder': [{
-                    'Order': 1,
-                    'ComputeEnvironment': cf.ref('BatchT3ComputeEnvironment')
+            Type: 'AWS::Batch::JobQueue',
+            Properties: {
+                ComputeEnvironmentOrder: [{
+                    Order: 1,
+                    ComputeEnvironment: cf.ref('BatchT3ComputeEnvironment')
                 }],
-                'State': 'ENABLED',
-                'Priority': 1,
-                'JobQueueName': cf.join('-', [cf.stackName, 't3'])
+                State: 'ENABLED',
+                Priority: 1,
+                JobQueueName: 't3'
             }
         },
         BatchMegaJobQueue: {
-            'Type': 'AWS::Batch::JobQueue',
-            'Properties': {
-                'ComputeEnvironmentOrder': [{
-                    'Order': 1,
-                    'ComputeEnvironment': cf.ref('BatchMegaComputeEnvironment')
+            Type: 'AWS::Batch::JobQueue',
+            Properties: {
+                ComputeEnvironmentOrder: [{
+                    Order: 1,
+                    ComputeEnvironment: cf.ref('BatchMegaComputeEnvironment')
                 }],
-                'State': 'ENABLED',
-                'Priority': 1,
-                'JobQueueName': cf.join('-', [cf.stackName, 'mega'])
+                State: 'ENABLED',
+                Priority: 1,
+                JobQueueName: 'mega'
             }
         },
-        BatchCIJobQueue: {
-            'Type': 'AWS::Batch::JobQueue',
-            'Properties': {
-                'ComputeEnvironmentOrder': [{
-                    'Order': 1,
-                    'ComputeEnvironment': cf.ref('BatchT3ComputeEnvironment')
+        BatchPriorityJobQueue: {
+            Type: 'AWS::Batch::JobQueue',
+            Properties: {
+                ComputeEnvironmentOrder: [{
+                    Order: 1,
+                    ComputeEnvironment: cf.ref('BatchT3ComputeEnvironment')
                 }],
-                'State': 'ENABLED',
-                'Priority': 2,
-                'JobQueueName': cf.join('-', [cf.stackName, 't3-priority'])
+                State: 'ENABLED',
+                Priority: 2,
+                JobQueueName: 't3-priority'
+            }
+        }
+    },
+    Outputs: {
+        T3PriorityQueue: {
+            Description: 'T3 Priority Queue',
+            Value: cf.ref('BatchPriorityJobQueue'),
+            Export: {
+                Name: 't3-priority-queue'
+            }
+        },
+        T3Queue: {
+            Description: 'T3 Priority Queue',
+            Value: cf.ref('BatchJobQueue'),
+            Export: {
+                Name: 't3-queue'
+            }
+        },
+        MegaQueue: {
+            Description: 'Mega Queue',
+            Value: cf.ref('BatchMegaJobQueue'),
+            Export: {
+                Name: 'mega-queue'
             }
         }
     }

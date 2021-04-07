@@ -100,7 +100,8 @@ test('Job#s3_down', async (t) => {
 
         await job.s3_down();
 
-        t.equals(job.specific.protocol, 'file');
+        t.equals(job.specific.protocol, 'file', 'protocol: file');
+        t.ok(job.specific.data.match(/file:\/\//), 'data: <file://> prefix');
     } catch (err) {
         t.error(err);
     }

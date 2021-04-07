@@ -33,12 +33,9 @@ const s3 = new AWS.S3({
  * @class Job
  */
 class Job {
-    constructor(oa, job, url, layer, name) {
+    constructor(oa, job) {
         if (!oa) throw new Error('OA Instance required');
         if (!job) throw new Error('job param required');
-        if (!url) throw new Error('url param required');
-        if (!layer) throw new Error('layer param required');
-        if (!name) throw new Error('name param required');
 
         this.oa = oa;
         this.tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
@@ -48,12 +45,11 @@ class Job {
         // pending => processed => uploaded
         this.status = 'pending';
 
-        this.job = job;
-        this.url = url;
+        this.job = parseInt(job);
         this.run = false;
         this.source = false;
-        this.layer = layer;
-        this.name = name;
+        this.layer = false;
+        this.name = false;
         this.bounds = [];
         this.count = 0;
         this.stats = {};
@@ -75,6 +71,9 @@ class Job {
         });
 
         this.run = job.run;
+        this.source = job.source;
+        this.layer = job.layer;
+        this.name = job.name
 
         return job;
     }
@@ -82,7 +81,7 @@ class Job {
     fetch() {
         return new Promise((resolve, reject) => {
             request({
-                url: this.url,
+                url: this.source,
                 method: 'GET'
             }, (err, res) => {
                 if (err) return reject(err);
@@ -143,7 +142,7 @@ class Job {
                 return reject(err);
             }).on('close', () => {
                 this.specific.protocol = 'file';
-                this.spefific.data = loc;
+                this.specific.data = `file://${loc}`;
                 return resolve();
             });
 

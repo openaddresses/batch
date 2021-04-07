@@ -29,6 +29,10 @@ if (require.main === module) {
 async function prompt() {
     const p = await prompts([{
         type: 'text',
+        message: 'OA Job ID',
+        name: 'OA_JOB_ID'
+    },{
+        type: 'text',
         name: 'StackName',
         message: 'Name of the stack to push to',
         initial: 'local'
@@ -39,29 +43,14 @@ async function prompt() {
         initial: 'v2.openaddresses.io'
     },{
         type: 'text',
-        message: 'OA Job ID',
-        name: 'OA_JOB'
-    },{
-        type: 'text',
-        message: 'OA Github Source URL',
-        name: 'OA_SOURCE'
-    },{
-        type: 'text',
-        message: 'OA Layer String',
-        name: 'OA_SOURCE_LAYER'
-    },{
-        type: 'text',
-        message: 'OA Layer Name',
-        name: 'OA_SOURCE_LAYER_NAME'
-    },{
-        type: 'text',
         name: 'OA_API',
         message: 'OA API Base URL',
         initial: 'http://localhost:5000'
     },{
         type: 'text',
         name: 'SharedSecret',
-        message: 'OA API SharedSecret'
+        message: 'OA API SharedSecret',
+        initial: '123'
     }]);
 
     Object.assign(process.env, p);
@@ -74,10 +63,7 @@ async function cli() {
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
 
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
-    if (!process.env.OA_JOB) throw new Error('No OA_JOB env var defined');
-    if (!process.env.OA_SOURCE) throw new Error('No OA_SOURCE env var defined');
-    if (!process.env.OA_SOURCE_LAYER) throw new Error('No OA_SOURCE_LAYER env var defined');
-    if (!process.env.OA_SOURCE_LAYER_NAME) throw new Error('No OA_SOURCE_LAYER_NAME env var defined');
+    if (!process.env.OA_JOB_ID) throw new Error('No OA_JOB_ID env var defined');
 
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
@@ -88,13 +74,7 @@ async function cli() {
         secret: process.env.SharedSecret
     });
 
-    const job = new Job(
-        oa,
-        process.env.OA_JOB,
-        process.env.OA_SOURCE,
-        process.env.OA_SOURCE_LAYER,
-        process.env.OA_SOURCE_LAYER_NAME
-    );
+    const job = new Job(oa, process.env.OA_JOB_ID);
 
     dke(process.env, (err) => {
         if (err) {
@@ -163,7 +143,7 @@ async function flow(api, job) {
             console.error(run);
             if (run && run.live) {
                 await job.oa.cmd('joberror', 'create', {
-                    job: this.job,
+                    job: job.job,
                     message: 'machine failed to process source'
                 });
             }

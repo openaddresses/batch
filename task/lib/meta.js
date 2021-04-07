@@ -79,7 +79,7 @@ class Meta {
      */
     async protection(protect) {
         if (!this.job_id) {
-            console.error('ok - skipping meta#load due to non-aws environment');
+            console.error('ok - skipping meta#protection due to non-aws environment');
             return;
         }
 

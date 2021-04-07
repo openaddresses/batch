@@ -106,10 +106,7 @@ async function trigger(event) {
             containerOverrides: {
                 command: ['./task.js'],
                 environment: [
-                    { name: 'OA_JOB', value: String(event.job) },
-                    { name: 'OA_SOURCE', value: event.source },
-                    { name: 'OA_SOURCE_LAYER', value: event.layer },
-                    { name: 'OA_SOURCE_LAYER_NAME', value: event.name }
+                    { name: 'OA_JOB_ID', value: String(event.job) }
                 ]
             },
             timeout: {

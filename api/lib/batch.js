@@ -4,6 +4,11 @@ const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ apiVersion: '2016-08-10', region: 'us-east-1' });
 const asg = new AWS.AutoScaling({ apiVersion: '2011-01-01', region: 'us-east-1' });
 
+const jobDefinition = process.env.JOB_DEFINITION;
+const t3_queue = process.env.T3_QUEUE;
+const t3_priority_queue = process.env.T3_PRIORITY_QUEUE;
+const mega_queue = process.env.MEGA_QUEUE;
+
 /**
  * Scale Batch T3 ASG Cluster up to MaxSize as needed
  */
@@ -13,23 +18,55 @@ async function scale_out() {
     }).promise()).AutoScalingGroups[0];
 
     if (desc.DesiredCapacity < desc.MaxSize) {
-        await asg.setDesiredCapacity({
-            AutoScalingGroupName: process.env.T3_CLUSTER_ASG,
-            DesiredCapacity: desc.DesiredCapacity + 1
-        }).promise();
+        await scale(desc.DesiredCapacity + 1);
     }
+}
+
+async function scale(desired) {
+    console.log(`ok - scaling to ${desired} instances`);
+
+    await asg.setDesiredCapacity({
+        AutoScalingGroupName: process.env.T3_CLUSTER_ASG,
+        DesiredCapacity: desired
+    }).promise();
 }
 
 /**
  * Scale Batch T3 ASG Cluster down based on job queue size
  */
 async function scale_in() {
-    // Count total number of potential unrun T3 Messages
+    let queued = 0;
 
-    // If remaining messages + running < desired -> remove n remaining
-    // Else do nothing
+    // Number of EC2 instances in ASG (1 instance = 1 task currently)
+    const instances = (await asg.describeAutoScalingGroups({
+        AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
+    }).promise()).AutoScalingGroups[0].DesiredCapacity;
 
-    // Set ASG => remove n remaining
+    for (const queue of [t3_queue, t3_priority_queue]) {
+        for (const status of ['SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING']) {
+            const res = await batch.jobQueue({
+                jobQueue: queue,
+                jobStatus: status
+            }).promise();
+            console.error(`ok - ${queue}:${status}:${res.jobSummaryList.length} jobs`);
+            queued += res.jobSummaryList.length;
+        }
+    }
+
+    if (queued > instances) {
+        console.error(`ok - queued > instances (${queued} > ${instances})`);
+        return; // We've still got lots of work to do
+    }
+    const diff = instances - queued;
+
+    let desired = instances;
+    if (diff <= 5) {
+        desired = 0;
+    } else {
+        desired = Math.floor(diff / 2);
+    }
+
+    await scale(desired);
 }
 
 /**
@@ -46,11 +83,6 @@ async function scale_in() {
  * @returns {Promise}
  */
 async function trigger(event) {
-    const jobDefinition = process.env.JOB_DEFINITION;
-    const t3_queue = process.env.T3_QUEUE;
-    const t3_priority_queue = process.env.T3_PRIORITY_QUEUE;
-    const mega_queue = process.env.MEGA_QUEUE;
-
     let timeout = 60 * 60 * 6; // 6 Hours
     if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout;
 

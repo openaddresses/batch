@@ -2,13 +2,11 @@
 
 'use strict';
 
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
+require('./lib/pre');
 
 const OA = require('lib-oa');
 const prompts = require('prompts');
-const loglink = require('./lib/loglink');
+const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
 const {pipeline} = require('stream');
 const request = require('request');
@@ -72,12 +70,16 @@ async function cli() {
     if (!process.env.OA_EXPORT_ID) throw new Error('No OA_EXPORT_ID env var defined');
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
+    const meta = new Meta();
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
     });
 
     try {
+        await meta.load();
+        await meta.protection(true);
+
         const exp = await oa.cmd('export', 'get', {
             ':exportid': parseInt(process.env.OA_EXPORT_ID)
         });
@@ -92,7 +94,7 @@ async function cli() {
         };
 
         if (process.env.AWS_BATCH_JOB_ID) {
-            update.loglink = await loglink();
+            update.loglink = meta.loglink;
         }
 
         await oa.cmd('export', 'update', update)
@@ -125,6 +127,7 @@ async function cli() {
         });
 
         console.error('ok - done');
+        await meta.protection(false)
     } catch (err) {
         console.error(err);
 
@@ -134,6 +137,7 @@ async function cli() {
                 status: 'Fail'
             });
         } finally {
+            await meta.protection(false)
             process.exit(1);
         }
     }

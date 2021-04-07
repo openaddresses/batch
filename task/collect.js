@@ -2,9 +2,9 @@
 
 'use strict';
 
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
+// Does not need to mark instance
+// as protected as it runs on a managed queue
+require('./lib/pre');
 
 const glob = require('glob');
 const OA = require('lib-oa');

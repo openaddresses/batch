@@ -7,13 +7,7 @@ const test = require('tape');
 
 test('Job#compress', async (t) => {
     try {
-        const job = new Job(
-            true,
-            1,
-            'http://example.com',
-            'addresses',
-            'dcgis'
-        );
+        const job = new Job(true, 1);
 
         fs.writeFileSync(path.resolve(job.tmp, 'out.geojson'), 'test-string');
 
@@ -27,7 +21,10 @@ test('Job#compress', async (t) => {
 
 test('Job#convert', async (t) => {
     try {
-        const job = new Job(true, 1, 'fake-url', 'addresses', 'state');
+        const job = new Job(true, 1);
+        job.source = 'fake-url';
+        job.layer = 'addresses';
+        job.name = 'state';
 
         fs.writeFileSync(
             path.resolve(job.tmp, 'out.csv'),
@@ -88,13 +85,11 @@ test('Job#convert', async (t) => {
 
 test('Job#s3_down', async (t) => {
     try {
-        const job = new Job(
-            true,
-            1,
-            'http://example.com',
-            'addresses',
-            'county'
-        );
+        const job = new Job(true, 1);
+
+        job.source = 'http://example.com';
+        job.layer = 'addresses';
+        job.name = 'county';
 
         job.specific = require('./fixtures/us-or-clackamas.json').layers.addresses[0];
 

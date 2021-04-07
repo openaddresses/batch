@@ -25,7 +25,7 @@ class Schedule {
 
     static async scale() {
         try {
-            return await batch.scale_down();
+            return await batch.scale_in();
         } catch (err) {
             throw new Err(500, err, 'Failed to scale ASG down');
         }

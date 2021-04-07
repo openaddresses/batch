@@ -41,6 +41,7 @@ const stack = {
                 Parameters: { },
                 ContainerProperties: {
                     Environment: [
+                        { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
                         { Name: 'SharedSecret', Value: cf.ref('SharedSecret') },
                         { Name: 'OA_BRANCH', Value: cf.ref('Branch') },

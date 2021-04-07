@@ -7,7 +7,7 @@ const asg = new AWS.AutoScaling({ apiVersion: '2011-01-01', region: 'us-east-1' 
 /**
  * Scale Batch T3 ASG Cluster up to MaxSize as needed
  */
-async function scale_up() {
+async function scale_out() {
     const desc = (await asg.describeAutoScalingGroups({
         AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
     }).promise()).AutoScalingGroups[0];
@@ -23,8 +23,13 @@ async function scale_up() {
 /**
  * Scale Batch T3 ASG Cluster down based on job queue size
  */
-async function scale_down() {
+async function scale_in() {
+    // Count total number of potential unrun T3 Messages
 
+    // If remaining messages + running < desired -> remove n remaining
+    // Else do nothing
+
+    // Set ASG => remove n remaining
 }
 
 /**
@@ -124,11 +129,11 @@ async function trigger(event) {
 
     console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
 
-    await scale_up();
+    await scale_out();
 }
 
 module.exports = {
-    scale_up,
-    scale_down,
+    scale_out,
+    scale_in,
     trigger
 };

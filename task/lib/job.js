@@ -73,7 +73,7 @@ class Job {
         this.run = job.run;
         this.source = job.source;
         this.layer = job.layer;
-        this.name = job.name
+        this.name = job.name;
 
         return job;
     }

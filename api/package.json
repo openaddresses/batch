@@ -44,7 +44,7 @@
         "split": "^1.0.1"
     },
     "devDependencies": {
-        "apidoc": "^0.26.0",
+        "apidoc": "^0.27.1",
         "apidoc-plugin-schema": "^0.1.8",
         "codecov": "^3.8.0",
         "eslint": "^7.20.0",

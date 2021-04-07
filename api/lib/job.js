@@ -11,7 +11,7 @@ const pkg  = require('../package.json');
 const { Status } = require('./util');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const batchjob = require('./batch');
+const batchjob = require('./batch').trigger;
 
 /**
  * @class Job

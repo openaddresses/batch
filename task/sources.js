@@ -2,10 +2,9 @@
 
 'use strict';
 
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
+require('./lib/pre');
 
+const Meta = require('./lib/meta');
 const os = require('os');
 const pkg = require('./package.json');
 const fs = require('fs');
@@ -34,26 +33,38 @@ if (require.main == module) {
 }
 
 async function run(tmp) {
-    console.error('ok - fetching repo');
-    await fetch(tmp);
-    console.error('ok - extracted repo');
+    const Meta = new Meta() {
 
-    console.error('ok - fetching latest sha');
-    const sha = await get_sha();
-    console.error(`ok - ${sha}`);
+    try {
+        await meta.load();
+        await meta.protection(true)
 
-    console.error('ok - listing jobs');
-    const jobs = list(tmp, sha)
-    console.error(`ok - ${jobs.length} jobs found`);
+        console.error('ok - fetching repo');
+        await fetch(tmp);
+        console.error('ok - extracted repo');
 
-    console.error('ok - creating run');
-    const r = await run_create();
-    console.error(`ok - run: ${r.id} created`);
+        console.error('ok - fetching latest sha');
+        const sha = await get_sha();
+        console.error(`ok - ${sha}`);
+
+        console.error('ok - listing jobs');
+        const jobs = list(tmp, sha)
+        console.error(`ok - ${jobs.length} jobs found`);
+
+        console.error('ok - creating run');
+        const r = await run_create();
+        console.error(`ok - run: ${r.id} created`);
 
 
-    console.error('ok - populating run');
-    const p = await run_pop(r.id, jobs);
-    console.error('ok - run populated')
+        console.error('ok - populating run');
+        const p = await run_pop(r.id, jobs);
+        console.error('ok - run populated')
+        await meta.protection(false)
+    } catch (err) {
+        console.error(err);
+        await meta.protection(false)
+        process.exit(1);
+    }
 }
 
 async function fetch(tmp) {

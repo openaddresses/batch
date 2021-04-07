@@ -50,6 +50,7 @@ module.exports = cf.merge(
 
     }),
     // Every Friday
+    schedule('scale',   'cron(0/5 * * * ? *)', 'Scale T3 Batch Cluster'),
     schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),
     schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
     schedule('level',   'cron(0 10 * * ? *)', 'Ensure all accounts have proper levels'),

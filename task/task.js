@@ -2,9 +2,7 @@
 
 'use strict';
 
-if (!process.env.AWS_DEFAULT_REGION) {
-    process.env.AWS_DEFAULT_REGION = 'us-east-1';
-}
+require('./lib/pre');
 
 const config = require('./package.json');
 const dke = require('@mapbox/decrypt-kms-env');
@@ -15,7 +13,7 @@ const path = require('path');
 const CP = require('child_process');
 const fs = require('fs');
 const prompts = require('prompts');
-const loglink = require('./lib/loglink');
+const Meta = require('./lib/meta');
 const args = require('minimist')(process.argv, {
     boolean: ['interactive'],
     alias: {
@@ -108,7 +106,12 @@ async function cli() {
 async function flow(api, job) {
     let run = false;
 
+    const meta = new Meta();
+
     try {
+        await meta.load();
+        await meta.protection(true);
+
         const update = {
             status: 'Running',
             version: config.version,
@@ -116,7 +119,7 @@ async function flow(api, job) {
         };
 
         if (process.env.AWS_BATCH_JOB_ID) {
-            update.loglink = await loglink();
+            update.loglink = meta.loglink;
         }
 
         await job.update(api, update);
@@ -145,19 +148,25 @@ async function flow(api, job) {
         });
 
         await job.check_stats(api, run);
+        await meta.protection(false);
     } catch (err) {
         console.error(err);
 
-        await job.update(api, {
-            status: 'Fail'
-        });
+        try {
+            await job.update(api, {
+                status: 'Fail'
+            });
 
-        console.error(run);
-        if (run && run.live) {
-            await JobError.create(api, job.job, 'machine failed to process source');
+            console.error(run);
+            if (run && run.live) {
+                await JobError.create(api, job.job, 'machine failed to process source');
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            await meta.protection(false);
+            process.exit(1);
         }
-
-        throw new Error(err);
     }
 }
 

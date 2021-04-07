@@ -116,7 +116,11 @@ const stack = {
                     PolicyDocument: {
                         Statement: [{
                             Effect: 'Allow',
-                            Action: ['batch:SubmitJob'],
+                            Action: [
+                                'batch:SubmitJob',
+                                'batch:Describe*',
+                                'batch:List*'
+                            ],
                             Resource: 'arn:aws:batch:*:*:*'
                         },{
                             Effect: 'Allow',
@@ -141,6 +145,13 @@ const stack = {
                                 'secretsmanager:Describe*',
                                 'secretsmanager:Get*',
                                 'secretsmanager:List*'
+                            ],
+                            'Resource': '*'
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'autoscaling:DescribeAutoScalingGroups',
+                                'autoscaling:SetDesiredCapacity'
                             ],
                             'Resource': '*'
                         }]

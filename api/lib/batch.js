@@ -161,7 +161,13 @@ async function trigger(event) {
 
     console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
 
-    await scale_out();
+    try {
+        // Scaling should never block the Queue
+        await scale_out();
+    } catch (err) {
+        console.error(err);
+        console.error('not ok - Failed to scale out ASG');
+    }
 }
 
 module.exports = {

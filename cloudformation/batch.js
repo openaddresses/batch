@@ -26,6 +26,14 @@ const stack = {
                             Effect: 'Allow' ,
                             Action: ['batch:DescribeJobs'],
                             Resource: ['*']
+                        },{
+                            Effect: 'Allow' ,
+                            Action: ['ecs:DescribeContainerInstances'],
+                            Resource: ['*']
+                        },{
+                            Effect: 'Allow' ,
+                            Action: ['autoscaling:SetInstanceProtection'],
+                            Resource: ['*']
                         }]
                     }
                 }],

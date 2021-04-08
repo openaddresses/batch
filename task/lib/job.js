@@ -131,8 +131,8 @@ class Job {
      */
     s3_down() {
         return new Promise((resolve, reject) => {
-            if (!this.specific.protocol === 'http') return resolve();
-            if (!this.specific.data.includes('data.openaddresses.io') && this.specific.data.includes('v2.openaddresses.io')) return resolve();
+            if (this.specific.protocol !== 'http') return resolve();
+            if (!this.specific.data.includes('data.openaddresses.io') && !this.specific.data.includes('v2.openaddresses.io')) return resolve();
 
             const url = new URL(this.specific.data);
 

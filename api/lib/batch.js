@@ -44,7 +44,7 @@ async function scale_in() {
 
     for (const queue of [t3_queue, t3_priority_queue]) {
         for (const status of ['SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING']) {
-            const res = await batch.jobQueue({
+            const res = await batch.listJobs({
                 jobQueue: queue,
                 jobStatus: status
             }).promise();

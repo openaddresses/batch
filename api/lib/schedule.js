@@ -19,7 +19,7 @@ class Schedule {
         } else if (event.type === 'level') {
             await Schedule.level(pool);
         } else if (event.type === 'scale') {
-            await Schedule.level(pool);
+            await Schedule.scale(pool);
         }
     }
 

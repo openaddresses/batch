@@ -7,7 +7,6 @@ require('./lib/pre');
 const config = require('./package.json');
 const OA = require('lib-oa');
 const dke = require('@mapbox/decrypt-kms-env');
-const Run = require('./lib/run');
 const Job = require('./lib/job');
 const path = require('path');
 const CP = require('child_process');
@@ -67,8 +66,6 @@ async function cli() {
 
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
-    const api = process.env.OA_API;
-
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
@@ -82,14 +79,14 @@ async function cli() {
             process.exit(1);
         }
 
-        flow(api, job).catch((err) => {
+        flow(job).catch((err) => {
             console.error(err);
             process.exit(1);
         });
     });
 }
 
-async function flow(api, job) {
+async function flow(job) {
     let run = false;
 
     const meta = new Meta();
@@ -108,10 +105,12 @@ async function flow(api, job) {
             update.loglink = meta.loglink;
         }
 
-        await job.update(api, update);
+        await job.update(update);
         await job.get();
         await job.fetch();
-        run = await Run.get(api, job.run);
+        run = await job.oa.cmd('run', 'get', {
+            ':run': job.run
+        });
 
         await job.s3_down();
         await job.check_source();
@@ -121,7 +120,7 @@ async function flow(api, job) {
         await job.convert();
         await job.compress();
         await job.upload();
-        await job.update(api, {
+        await job.update({
             status: 'Success',
             output: job.assets,
             count: job.count,
@@ -130,13 +129,13 @@ async function flow(api, job) {
             size: job.size
         });
 
-        await job.check_stats(api, run);
+        await job.check_stats(run);
         await meta.protection(false);
     } catch (err) {
         console.error(err);
 
         try {
-            await job.update(api, {
+            await job.update({
                 status: 'Fail'
             });
 

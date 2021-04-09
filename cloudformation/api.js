@@ -119,9 +119,9 @@ const stack = {
                             Action: [
                                 'batch:SubmitJob',
                                 'batch:Describe*',
-                                'batch:List*'
+                                'batch:ListJobs'
                             ],
-                            Resource: 'arn:aws:batch:*:*:*'
+                            Resource: '*'
                         },{
                             Effect: 'Allow',
                             Action: [

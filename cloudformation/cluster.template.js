@@ -17,7 +17,6 @@ const stack = {
             Type : 'AWS::AutoScaling::AutoScalingGroup',
             Properties : {
                 AutoScalingGroupName: 't3-cluster-asg',
-                NewInstancesProtectedFromScaleIn: true,
                 VPCZoneIdentifier: [
                     'subnet-de35c1f5',
                     'subnet-e67dc7ea',

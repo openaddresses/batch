@@ -325,38 +325,38 @@ class Job {
 
     async check_stats(run, diff) {
         // 10% reduction or greater is bad
-        if (diff.delta.count / diff.master.count <= 0.9) {
+        if (diff.compare.count / diff.master.count <= 0.9) {
             await this.update({ status: 'Warn' });
             if (run.live) {
                 await this.oa.cmd('joberror', 'create', {
                     job: this.job,
-                    message: `Feature count dropped by ${diff.master.count - diff.delta.count}`
+                    message: `Feature count dropped by ${diff.master.count - diff.compare.count}`
                 });
             }
         }
 
-        if (this.job.layer === 'addresses') {
-            if (diff.delta.stats.counts.number / diff.master.stats.counts.number <= 0.9) {
+        if (this.layer === 'addresses') {
+            if (diff.compare.stats.counts.number / diff.master.stats.counts.number <= 0.9) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
                         job: this.job,
-                        message: `"number" prop dropped by ${diff.master.stats.counts.number - diff.delta.counts.number}`
+                        message: `"number" prop dropped by ${diff.master.stats.counts.number - diff.compare.stats.counts.number}`
                     });
                 }
             }
 
-            if (diff.delta.stats.counts.street / diff.master.stats.counts.street <= 0.9) {
+            if (diff.compare.stats.counts.street / diff.master.stats.counts.street <= 0.9) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
                         job: this.job,
-                        message: `"number" prop dropped by ${diff.master.stats.counts.street - diff.delta.counts.street}`
+                        message: `"street" prop dropped by ${diff.master.stats.counts.street - diff.compare.stats.counts.street}`
                     });
                 }
             }
 
-            if (diff.delta.stats.counts.number === 0) {
+            if (diff.compare.stats.counts.number === 0) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
@@ -366,7 +366,7 @@ class Job {
                 }
             }
 
-            if (diff.delta.stats.counts.street === 0) {
+            if (diff.compare.stats.counts.street === 0) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
@@ -376,7 +376,7 @@ class Job {
                 }
             }
 
-            if (diff.delta.stats.validity.valid === 0) {
+            if (diff.compare.stats.validity.valid === 0) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {

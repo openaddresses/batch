@@ -323,21 +323,14 @@ class Job {
         return true;
     }
 
-    async check_stats(run) {
-        const diff = await this.compare();
-
-        // New Source
-        if (diff && diff.message && diff.message === 'Job does not match a live job') {
-            return true;
-        }
-
+    async check_stats(run, diff) {
         // 10% reduction or greater is bad
-        if (diff.delta.count / diff.master.count <= -0.1) {
+        if (diff.delta.count / diff.master.count <= 0.9) {
             await this.update({ status: 'Warn' });
             if (run.live) {
                 await this.oa.cmd('joberror', 'create', {
                     job: this.job,
-                    message: `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`
+                    message: `Feature count dropped by ${diff.master.count - diff.delta.count}`
                 });
             }
         }

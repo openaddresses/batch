@@ -129,7 +129,13 @@ async function flow(job) {
             size: job.size
         });
 
-        await job.check_stats(run);
+        try {
+            // stats can fail if "Job does not match a live job"
+            await job.check_stats(run, await job.compare());
+        } catch (err) {
+            console.error(err);
+        }
+
         await meta.protection(false);
     } catch (err) {
         console.error(err);

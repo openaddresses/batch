@@ -1,3 +1,5 @@
+'use strict';
+
 const test = require('tape');
 const Job = require('../lib/job');
 
@@ -10,14 +12,14 @@ test('Count: 10% Reduction', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 90,
             stats: {
@@ -53,14 +55,14 @@ test('Count: 9% Reduction', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -91,14 +93,14 @@ test('Address Count: 10% Reduction', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -140,14 +142,14 @@ test('Address Count: 9% Reduction', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -183,14 +185,14 @@ test('Street Count: 10% Reduction', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -234,14 +236,14 @@ test('Street Count: 9% Reduction', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -279,14 +281,14 @@ test('Address Count: No Addresses', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -327,14 +329,14 @@ test('Address Count: No Streets', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {
@@ -377,14 +379,14 @@ test('Address Count: No Valid Addresses', async (t) => {
         job_update = body;
     };
 
-    let job_err = [];
+    const job_err = [];
     job.oa = {
         cmd: async (cmd, subcmd, body) => {
             job_err.push(body);
         }
     };
 
-    await job.check_stats({live : true}, {
+    await job.check_stats({ live : true }, {
         compare: {
             count: 91,
             stats: {

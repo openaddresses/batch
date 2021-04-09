@@ -336,24 +336,52 @@ class Job {
         }
 
         if (this.job.layer === 'addresses') {
-            const number = diff.delta.stats.counts.number / diff.master.stats.counts.number;
-            if (number <= -0.1) {
+            if (diff.delta.stats.counts.number / diff.master.stats.counts.number <= 0.9) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
                         job: this.job,
-                        message: `"number" prop dropped by ${Math.round(number * 100) / 100}`
+                        message: `"number" prop dropped by ${diff.master.stats.counts.number - diff.delta.counts.number}`
                     });
                 }
             }
 
-            const street = diff.delta.stats.counts.street / diff.master.stats.counts.street;
-            if (street <= -0.1) {
+            if (diff.delta.stats.counts.street / diff.master.stats.counts.street <= 0.9) {
                 await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
                         job: this.job,
-                        message: `"number" prop dropped by ${Math.round(street * 100) / 100}`
+                        message: `"number" prop dropped by ${diff.master.stats.counts.street - diff.delta.counts.street}`
+                    });
+                }
+            }
+
+            if (diff.delta.stats.counts.number === 0) {
+                await this.update({ status: 'Warn' });
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: 'Number fields are all empty'
+                    });
+                }
+            }
+
+            if (diff.delta.stats.counts.street === 0) {
+                await this.update({ status: 'Warn' });
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: 'Street fields are all empty'
+                    });
+                }
+            }
+
+            if (diff.delta.stats.validity.valid === 0) {
+                await this.update({ status: 'Warn' });
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: 'No Valid Address Features'
                     });
                 }
             }

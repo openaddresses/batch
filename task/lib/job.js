@@ -7,7 +7,6 @@ const gzip = require('zlib').createGzip;
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const request = require('request');
 const { pipeline } = require('stream');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
@@ -78,46 +77,34 @@ class Job {
         return job;
     }
 
-    fetch() {
-        return new Promise((resolve, reject) => {
-            request({
-                url: this.source,
-                method: 'GET'
-            }, (err, res) => {
-                if (err) return reject(err);
-
-                let source = false;
-                try {
-                    source = JSON.parse(res.body);
-                } catch (err) {
-                    return reject(err);
-                }
-
-                if (
-                    !source
-                    || !source.schema
-                    || typeof source.schema !== 'number'
-                    || source.schema !== 2
-                ) {
-                    return reject(new Error('Source missing schema: 2'));
-                }
-
-                const valid = validate(source);
-
-                if (!valid) {
-                    console.error(JSON.stringify(validate.errors));
-                    return reject(new Error('Source does not conform to V2 schema'));
-                }
-
-                this.source = source;
-
-                for (const l of this.source.layers[this.layer]) {
-                    if (l.name === this.name) this.specific = l;
-                }
-
-                return resolve(this.source);
-            });
+    async fetch() {
+        const source = await this.oa.cmd('job', 'raw', {
+            ':job': this.job
         });
+
+        if (
+            !source
+            || !source.schema
+            || typeof source.schema !== 'number'
+            || source.schema !== 2
+        ) {
+            throw new Error('Source missing schema: 2');
+        }
+
+        const valid = validate(source);
+
+        if (!valid) {
+            console.error(JSON.stringify(validate.errors));
+            throw new Error('Source does not conform to V2 schema');
+        }
+
+        this.source = source;
+
+        for (const l of this.source.layers[this.layer]) {
+            if (l.name === this.name) this.specific = l;
+        }
+
+        return this.source;
     }
 
     static find(pattern, path) {
@@ -293,42 +280,22 @@ class Job {
         return this.assets;
     }
 
-    update(api, body) {
-        return new Promise((resolve, reject) => {
-            console.error(`ok - updating: ${api}/api/job/${this.job} with ${JSON.stringify(body)}`);
+    async update(body) {
+        console.error(`ok - updating job: ${this.job} with ${JSON.stringify(body)}`);
 
-            request({
-                url: `${api}/api/job/${this.job}`,
-                json: true,
-                method: 'PATCH',
-                body: body,
-                headers: {
-                    'shared-secret': process.env.SharedSecret
-                }
-            }, (err, res) => {
-                if (err) return reject(err);
+        const update = await this.oa.cmd('job', 'update', Object.assign({
+            ':job': this.job
+        }, body));
 
-                return resolve(res.body);
-            });
-        });
+        return update;
     }
 
-    compare(api) {
-        return new Promise((resolve, reject) => {
-            const url = `${api}/api/job/${this.job}/delta`;
-            console.error(`ok - GET: ${url}`);
-
-            request({
-                url: url,
-                json: true,
-                method: 'GET'
-            }, (err, res) => {
-                if (err) return reject(err);
-                console.error(res.body);
-
-                return resolve(res.body);
-            });
+    async compare() {
+        const delta = await this.oa.cmd('job', 'update', {
+            ':job': this.job
         });
+
+        return delta;
     }
 
     async check_source() {
@@ -356,44 +323,65 @@ class Job {
         return true;
     }
 
-    async check_stats(api, run) {
-        const diff = await this.compare(api);
-
-        // New Source
-        if (diff && diff.message && diff.message === 'Job does not match a live job') {
-            return true;
-        }
-
+    async check_stats(run, diff) {
         // 10% reduction or greater is bad
-        if (diff.delta.count / diff.master.count <= -0.1) {
-            await this.update(api, { status: 'Warn' });
+        if (diff.compare.count / diff.master.count <= 0.9) {
+            await this.update({ status: 'Warn' });
             if (run.live) {
                 await this.oa.cmd('joberror', 'create', {
                     job: this.job,
-                    message: `Feature count dropped by ${Math.round((diff.delta.count / diff.master.count <= -0.1) * 100) / 100}`
+                    message: `Feature count dropped by ${diff.master.count - diff.compare.count}`
                 });
             }
         }
 
-        if (this.job.layer === 'addresses') {
-            const number = diff.delta.stats.counts.number / diff.master.stats.counts.number;
-            if (number <= -0.1) {
-                await this.update(api, { status: 'Warn' });
+        if (this.layer === 'addresses') {
+            if (diff.compare.stats.counts.number / diff.master.stats.counts.number <= 0.9) {
+                await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
                         job: this.job,
-                        message: `"number" prop dropped by ${Math.round(number * 100) / 100}`
+                        message: `"number" prop dropped by ${diff.master.stats.counts.number - diff.compare.stats.counts.number}`
                     });
                 }
             }
 
-            const street = diff.delta.stats.counts.street / diff.master.stats.counts.street;
-            if (street <= -0.1) {
-                await this.update(api, { status: 'Warn' });
+            if (diff.compare.stats.counts.street / diff.master.stats.counts.street <= 0.9) {
+                await this.update({ status: 'Warn' });
                 if (run.live) {
                     await this.oa.cmd('joberror', 'create', {
                         job: this.job,
-                        message: `"number" prop dropped by ${Math.round(street * 100) / 100}`
+                        message: `"street" prop dropped by ${diff.master.stats.counts.street - diff.compare.stats.counts.street}`
+                    });
+                }
+            }
+
+            if (diff.compare.stats.counts.number === 0) {
+                await this.update({ status: 'Warn' });
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: 'Number fields are all empty'
+                    });
+                }
+            }
+
+            if (diff.compare.stats.counts.street === 0) {
+                await this.update({ status: 'Warn' });
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: 'Street fields are all empty'
+                    });
+                }
+            }
+
+            if (diff.compare.stats.validity.valid === 0) {
+                await this.update({ status: 'Warn' });
+                if (run.live) {
+                    await this.oa.cmd('joberror', 'create', {
+                        job: this.job,
+                        message: 'No Valid Address Features'
                     });
                 }
             }

@@ -51,28 +51,22 @@ export default {
         calcTable() {
             this.flat.count = this.job.count;
 
-            for (const key of Object.keys(this.job.stats)) {
-                if (typeof this.job.stats[key] === 'object') {
-                    for (const key_i of Object.keys(this.job.stats[key])) {
-                        this.$set(this.flat, `${key}::${key_i}`, this.job.stats[key][key_i]);
+            function recurse(self, container, stats, pre = '') {
+                for (const key of Object.keys(stats)) {
+                    if (stats[key] !== null && stats[key] !== undefined && typeof stats[key] === 'object') {
+                        recurse(self, container, stats[key], pre ? pre + '::' + key : key);
+                    } else if (stats[key] !== null && stats[key] !== undefined) {
+                        self.$set(container, pre ? pre + '::' + key : key, stats[key]);
                     }
-                } else {
-                    this.$set(this.flat, key, this.job.stats[key]);
                 }
             }
+
+            recurse(this, this.flat, this.job.stats)
 
             if (this.delta) {
                 this.$set(this.flat_delta, 'count', this.delta.delta.count);
 
-                for (const key of Object.keys(this.delta.delta.stats)) {
-                    if (typeof this.delta.delta.stats[key] === 'object') {
-                        for (const key_i of Object.keys(this.delta.delta.stats[key])) {
-                            this.$set(this.flat_delta, `${key}::${key_i}`, this.delta.delta.stats[key][key_i]);
-                        }
-                    } else {
-                        this.$set(this.flat_delta, key, this.job.stats[key]);
-                    }
-                }
+                recurse(this, this.flat_delta, this.delta.delta.stats)
             }
 
             for (const key of Object.keys(this.flat)) {

@@ -33,7 +33,7 @@ if (require.main == module) {
 }
 
 async function run(tmp) {
-    const Meta = new Meta() {
+    const meta = new Meta();
 
     try {
         await meta.load();

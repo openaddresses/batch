@@ -133,7 +133,7 @@ class Data {
                 id: parseInt(data_id),
                 jobs: pgres.rows.map((res) => {
                     res.id = parseInt(res.id);
-                    res.id = parseInt(res.count);
+                    res.count = parseInt(res.count);
                     res.run = parseInt(res.run);
                     res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;

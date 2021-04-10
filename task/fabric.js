@@ -101,8 +101,8 @@ async function cli() {
             layers[l].close();
 
             await tippecanoe.tile(
-                fs.createReadStream(path.resolve(DRIVE, `${layer}.geojson`)),
-                output_path,
+                fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
+                tiles,
                 {
                     layer: l
                 }

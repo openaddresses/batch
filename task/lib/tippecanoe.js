@@ -66,7 +66,7 @@ class Tippecanoe {
                 .on('error', reject)
                 .on('close', resolve);
 
-            if (options.stdout) {
+            if (options.std) {
                 tippecanoe.stdout.pipe(process.stdout);
                 tippecanoe.stderr.pipe(process.stderr);
             }
@@ -99,8 +99,11 @@ class Tippecanoe {
      *
      * @param {String} output_path Path to input MBTiles
      * @param {String[]} inputs Array of paths to input MBTiles
+     * @param {Object} options Optional Options
+     * @param {boolean} options.std Don't squelch tippecanoe stderr/stdout [default: false]
+     * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
      */
-    join(output_path, inputs) {
+    join(output_path, inputs, options = {}) {
         return new Promise((resolve, reject) => {
             if (!output_path) return reject(new Error('output_path required'));
             if (!inputs || !inputs.length) return reject(new Error('inputs required'));
@@ -109,13 +112,15 @@ class Tippecanoe {
                 '-o', output_path
             ].concat(inputs);
 
+            if (options.force) base = base.concat(['-f']);
+
             const tilejoin = CP.spawn('tile-join', base, {
                 env: process.env
             })
                 .on('error', reject)
                 .on('close', resolve);
 
-            if (options.stdout) {
+            if (options.std) {
                 tilejoin.stdout.pipe(process.stdout);
                 tilejoin.stderr.pipe(process.stderr);
             }

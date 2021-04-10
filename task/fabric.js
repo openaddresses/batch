@@ -112,7 +112,7 @@ async function cli() {
                 path.resolve(DRIVE, `${l}.mbtiles`),
                 {
                     layer: l,
-                    stdout: true,
+                    std: true,
                     force: true,
                     name: `OpenAddresses ${l} fabric`,
                     attribution: 'OpenAddresses',
@@ -123,7 +123,10 @@ async function cli() {
 
         tippecanoe.join(path.resolve(DRIVE, 'fabric.geojson'), Object.keys(layers).map((l) => {
             return path.resolve(DRIVE, `${l}.mbtiles`);
-        }));
+        }), {
+            std: true,
+            force: true
+        });
 
     } catch (err) {
         await meta.protection(false);

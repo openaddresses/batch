@@ -117,6 +117,10 @@ async function cli() {
                     name: `OpenAddresses ${l} fabric`,
                     attribution: 'OpenAddresses',
                     description: `OpenAddresses ${l} fabric`,
+                    limit: {
+                        features: false,
+                        size: false
+                    }
                 }
             );
         }
@@ -125,7 +129,11 @@ async function cli() {
             return path.resolve(DRIVE, `${l}.mbtiles`);
         }), {
             std: true,
-            force: true
+            force: true,
+            limit: {
+                features: false,
+                size: false
+            }
         });
 
     } catch (err) {

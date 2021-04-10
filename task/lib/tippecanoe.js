@@ -39,6 +39,9 @@ class Tippecanoe {
      * @param {Number} options.zoom.max Max zoom of tiles
      * @param {Number} options.zoom.min Min zoom of tiles
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
+     * @param {Object} options.limit Limit Options
+     * @param {Boolean} [options.limit.features=true] Limit tiles to 200,000 features
+     * @param {Boolean} [options.limit.size=true] Limit tiles to 500K bytes
      *
      * @returns {Promise} true if the vectorization succeeds
      */
@@ -46,6 +49,9 @@ class Tippecanoe {
         return new Promise((resolve, reject) => {
             if (!feats) return reject(new Error('feats required'));
             if (!output_path) return reject(new Error('output_path required'));
+
+            if (!options.zoom) options.zoom = {};
+            if (!options.limit) options.limit = {};
 
             let base = [
                 '-o', output_path
@@ -57,8 +63,10 @@ class Tippecanoe {
             if (options.name) base = base.concat(['-n', `"${options.name}"`]);
             if (options.attribution) base = base.concat(['-A', `"${options.attribution}"`]);
             if (options.description) base = base.concat(['-N', `"${options.description}"`]);
-            if (options.zoom && options.zoom.max) base = base.concat(['-z', options.zoom.max]);
-            if (options.zoom && options.zoom.min) base = base.concat(['-Z', options.zoom.min]);
+            if (options.zoom.max) base = base.concat(['-z', options.zoom.max]);
+            if (options.zoom.min) base = base.concat(['-Z', options.zoom.min]);
+            if (options.limit.features === false) base.concat(['--no-feature-limit']);
+            if (options.limit.size === false) base.concat(['--no-tile-size-limit']);
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env
@@ -102,6 +110,9 @@ class Tippecanoe {
      * @param {Object} options Optional Options
      * @param {boolean} options.std Don't squelch tippecanoe stderr/stdout [default: false]
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
+     * @param {Object} options.limit Limit Options
+     * @param {Boolean} [options.limit.features=true] Limit tiles to 200,000 features
+     * @param {Boolean} [options.limit.size=true] Limit tiles to 500K bytes
      */
     join(output_path, inputs, options = {}) {
         return new Promise((resolve, reject) => {
@@ -113,6 +124,8 @@ class Tippecanoe {
             ].concat(inputs);
 
             if (options.force) base = base.concat(['-f']);
+            if (options.limit.features === false) base.concat(['--no-feature-limit']);
+            if (options.limit.size === false) base.concat(['--no-tile-size-limit']);
 
             const tilejoin = CP.spawn('tile-join', base, {
                 env: process.env

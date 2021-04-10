@@ -103,14 +103,13 @@ async function cli() {
             await get_source(layers[data.layer], data);
         }
 
-        const tiles = path.resolve(DRIVE, 'fabric.mbtiles');
         for (const l of Object.keys(layers)) {
             layers[l].close();
 
             console.error(`ok - generating ${l} tiles`);
             await tippecanoe.tile(
                 fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
-                tiles,
+                path.resolve(DRIVE, `${l}.mbtiles`),
                 {
                     layer: l,
                     stdout: true,
@@ -121,6 +120,10 @@ async function cli() {
                 }
             );
         }
+
+        tippecanoe.join(path.resolve(DRIVE, 'fabric.geojson'), Object.keys(layers).map((l) => {
+            return path.resolve(DRIVE, `${l}.mbtiles`);
+        }));
 
     } catch (err) {
         await meta.protection(false);

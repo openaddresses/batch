@@ -11,15 +11,14 @@ const transform = require('parallel-transform');
 class Tippecanoe {
 
     /**
-     * Create a new OsmiumTool instance
+     * Create a new Tippecanoe instance
      *
      * @constructor
      */
     constructor() {
         try {
-            CP.execSync(`
-                tippecanoe --version 2>&1
-            `);
+            CP.execSync(`tippecanoe --version 2>&1`);
+            CP.execSync(`which tile-join`);
         } catch (err) {
             throw new Error('tippecanoe not installed');
         }
@@ -72,7 +71,6 @@ class Tippecanoe {
                 tippecanoe.stderr.pipe(process.stderr);
             }
 
-            console.error(feats);
             stream.pipeline(
                 feats,
                 split(),
@@ -93,6 +91,34 @@ class Tippecanoe {
                 , (err) => {
                     if (err) return reject(err);
                 });
+        });
+    }
+
+    /**
+     * Join multiple MBTiles into a single MBTiles
+     *
+     * @param {String} output_path Path to input MBTiles
+     * @param {String[]} inputs Array of paths to input MBTiles
+     */
+    join(output_path, inputs) {
+        return new Promise((resolve, reject) => {
+            if (!output_path) return reject(new Error('output_path required'));
+            if (!inputs || !inputs.length) return reject(new Error('inputs required'));
+
+            let base = [
+                '-o', output_path
+            ].concat(inputs);
+
+            const tilejoin = CP.spawn('tile-join', base, {
+                env: process.env
+            })
+                .on('error', reject)
+                .on('close', resolve);
+
+            if (options.stdout) {
+                tilejoin.stdout.pipe(process.stdout);
+                tilejoin.stderr.pipe(process.stderr);
+            }
         });
     }
 }

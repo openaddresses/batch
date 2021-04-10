@@ -24,8 +24,15 @@ const s3 = new AWS.S3({
 
 const args = require('minimist')(process.argv, {
     boolean: ['interactive'],
+    string: ['stack', 'bucket', 'api', 'secret'],
     alias: {
         interactive: 'i'
+    },
+    default: {
+        stack: 'local',
+        bucket: 'v2.openaddresses.io',
+        api: 'http://localhost:5000',
+        secret: '123'
     }
 });
 
@@ -39,22 +46,22 @@ async function prompt() {
         type: 'text',
         name: 'StackName',
         message: 'Name of the stack to push to',
-        initial: 'local'
+        initial: args.stack
     },{
         type: 'text',
         name: 'Bucket',
         message: 'AWS S3 bucket to push results to',
-        initial: 'v2.openaddresses.io'
+        initial: args.bucket
     },{
         type: 'text',
         name: 'OA_API',
         message: 'OA API Base URL',
-        initial: 'http://localhost:5000'
+        initial: args.api
     },{
         type: 'text',
         name: 'SharedSecret',
         message: 'OA API SharedSecret',
-        initial: '123'
+        initial: args.secret
     }]);
 
     Object.assign(process.env, p);
@@ -73,7 +80,7 @@ async function cli() {
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
-    }); 
+    });
 
     try {
         await meta.load();
@@ -100,11 +107,17 @@ async function cli() {
         for (const l of Object.keys(layers)) {
             layers[l].close();
 
+            console.error(`ok - generating ${l} tiles`);
             await tippecanoe.tile(
                 fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
                 tiles,
                 {
-                    layer: l
+                    layer: l,
+                    stdout: true,
+                    force: true,
+                    name: `OpenAddresses ${l} fabric`,
+                    attribution: 'OpenAddresses',
+                    description: `OpenAddresses ${l} fabric`,
                 }
             );
         }

@@ -32,10 +32,14 @@ class Tippecanoe {
      * @param {String} output_path Path to write mbtiles to
      * @param {Object} options Optional Options
      * @param {boolean} options.std Don't squelch tippecanoe stderr/stdout [default: false]
+     * @param {String} options.name Human-readable name for the tileset
+     * @param {String} options.attribution Attribution (HTML) to be shown with maps that use data from this tileset
+     * @param {String} options.description Description for the tileset
      * @param {String} options.layer Layer name to put the data to [Default: out]
      * @param {Object} options.zoom Zoom Options
      * @param {Number} options.zoom.max Max zoom of tiles
      * @param {Number} options.zoom.min Min zoom of tiles
+     * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
      *
      * @returns {Promise} true if the vectorization succeeds
      */
@@ -48,18 +52,14 @@ class Tippecanoe {
                 '-o', output_path
             ];
 
-            if (options.layer) {
-                base = base.concat(['-l', options.layer]);
-            } else {
-                base = base.concat(['-l', 'out']);
-            }
+            base = base.concat(['-l', options.layer || 'out']);
 
-            if (options.zoom && options.zoom.max) {
-                base = base.concat(['-z', options.zoom.max]);
-            }
-            if (options.zoom && options.zoom.min) {
-                base = base.concat(['-Z', options.zoom.min]);
-            }
+            if (options.force) base = base.concat(['-f']);
+            if (options.name) base = base.concat(['-n', `"${options.name}"`]);
+            if (options.attribution) base = base.concat(['-A', `"${options.attribution}"`]);
+            if (options.description) base = base.concat(['-N', `"${options.description}"`]);
+            if (options.zoom && options.zoom.max) base = base.concat(['-z', options.zoom.max]);
+            if (options.zoom && options.zoom.min) base = base.concat(['-Z', options.zoom.min]);
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env
@@ -72,6 +72,7 @@ class Tippecanoe {
                 tippecanoe.stderr.pipe(process.stderr);
             }
 
+            console.error(feats);
             stream.pipeline(
                 feats,
                 split(),

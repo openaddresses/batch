@@ -1,9 +1,7 @@
 'use strict';
 
 const CP = require('child_process');
-const split = require('split');
 const stream = require('stream');
-const transform = require('parallel-transform');
 
 /**
  * @class Tippecanoe
@@ -17,8 +15,8 @@ class Tippecanoe {
      */
     constructor() {
         try {
-            CP.execSync(`tippecanoe --version 2>&1`);
-            CP.execSync(`which tile-join`);
+            CP.execSync('tippecanoe --version 2>&1');
+            CP.execSync('which tile-join');
         } catch (err) {
             throw new Error('tippecanoe not installed');
         }
@@ -68,7 +66,7 @@ class Tippecanoe {
             if (options.limit.features === false) base.concat(['--no-feature-limit']);
             if (options.limit.size === false) base.concat(['--no-tile-size-limit']);
 
-            console.error(base)
+            console.error(base);
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env

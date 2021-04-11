@@ -63,10 +63,12 @@ class Tippecanoe {
             if (options.name) base = base.concat(['-n', `"${options.name}"`]);
             if (options.attribution) base = base.concat(['-A', `"${options.attribution}"`]);
             if (options.description) base = base.concat(['-N', `"${options.description}"`]);
-            if (options.zoom.max) base = base.concat(['-z', options.zoom.max]);
-            if (options.zoom.min) base = base.concat(['-Z', options.zoom.min]);
+            if (options.zoom.max) base = base.concat(['--maximum-zoom', options.zoom.max]);
+            if (options.zoom.min) base = base.concat(['--minimum-zoom', options.zoom.min]);
             if (options.limit.features === false) base.concat(['--no-feature-limit']);
             if (options.limit.size === false) base.concat(['--no-tile-size-limit']);
+
+            console.error(base)
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env
@@ -81,22 +83,7 @@ class Tippecanoe {
 
             stream.pipeline(
                 feats,
-                split(),
-                transform(100, (line, cb) => {
-                    if (!line || !line.trim()) return cb(null, '');
-
-                    const feat = JSON.parse(line);
-
-                    if (feat.type === 'FeatureCollection') {
-                        return cb(null, feat.features.map((f) => {
-                            return JSON.stringify(f);
-                        }).join('\n') + '\n');
-                    } else {
-                        return cb(null, line);
-                    }
-                }),
-                tippecanoe.stdin
-                , (err) => {
+                tippecanoe.stdin, (err) => {
                     if (err) return reject(err);
                 });
         });

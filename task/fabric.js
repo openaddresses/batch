@@ -120,6 +120,10 @@ async function cli() {
                     limit: {
                         features: false,
                         size: false
+                    },
+                    zoom: {
+                        max: 18,
+                        min: l === 'parcels' ? 14 : 15
                     }
                 }
             );

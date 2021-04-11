@@ -22,6 +22,12 @@ const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
 });
 
+const zooms = {
+    addresses: 15,
+    parcels: 8,
+    buildings: 15
+};
+
 const args = require('minimist')(process.argv, {
     boolean: ['interactive'],
     string: ['stack', 'bucket', 'api', 'secret'],
@@ -122,14 +128,14 @@ async function cli() {
                         size: false
                     },
                     zoom: {
-                        max: 18,
-                        min: l === 'parcels' ? 14 : 15
+                        max: 15,
+                        min: zooms[l]
                     }
                 }
             );
         }
 
-        tippecanoe.join(path.resolve(DRIVE, 'fabric.geojson'), Object.keys(layers).map((l) => {
+        tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), Object.keys(layers).map((l) => {
             return path.resolve(DRIVE, `${l}.mbtiles`);
         }), {
             std: true,

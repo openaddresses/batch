@@ -66,8 +66,6 @@ class Tippecanoe {
             if (options.limit.features === false) base.concat(['--no-feature-limit']);
             if (options.limit.size === false) base.concat(['--no-tile-size-limit']);
 
-            console.error(base);
-
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env
             })

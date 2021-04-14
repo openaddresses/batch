@@ -18,6 +18,10 @@ class User {
             throw new Err(401, null, 'Authentication Required');
         }
 
+        if (req.auth.access === 'disabled') {
+            throw new Err(401, null, 'Account Disabled');
+        }
+
         return true;
     }
 

@@ -435,6 +435,10 @@ class User {
             throw new Err(403, null, 'User has not confirmed email');
         }
 
+        if (!pgres.rows[0].validated) {
+            throw new Err(403, null, 'Account Disabled - Please Contact Us');
+        }
+
         return {
             uid: parseInt(pgres.rows[0].id),
             level: pgres.rows[0].level,

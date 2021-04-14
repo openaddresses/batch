@@ -139,6 +139,31 @@ class Exporter {
         };
     }
 
+    /**
+     * Count the number of exports the user has performed this monttw
+     *
+     * @param {Pool} pool Postgres Pool Instance
+     * @param {Number} uid User ID to count
+     */
+    async count(pool, uid) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    count(*)
+                FROM
+                    exports
+                WHERE
+                    uid = $1
+                    AND created > date_trunc('month', NOW())
+            `, [ uid ]);
+
+            if (!pgres.rows.length) return 0
+            return parseInt(pgres.rows[0].count);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get export count');
+        }
+    }
+
     static async data(pool, auth, export_id, res) {
         const exp = await Exporter.from(pool, export_id);
 
@@ -153,6 +178,12 @@ class Exporter {
         return s3.stream(res, `export-${export_id}.zip`);
     }
 
+    /**
+     * Return a single exort
+     *
+     * @param {Pool} pool Postgres Pool Instance
+     * @param {Number} id Export ID
+     */
     static async from(pool, id) {
         let pgres;
         try {

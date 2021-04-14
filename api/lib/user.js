@@ -19,7 +19,7 @@ class User {
         }
 
         if (req.auth.access === 'disabled') {
-            throw new Err(401, null, 'Account Disabled');
+            throw new Err(403, null, 'Account Disabled - Please Contact Us');
         }
 
         return true;
@@ -435,7 +435,7 @@ class User {
             throw new Err(403, null, 'User has not confirmed email');
         }
 
-        if (!pgres.rows[0].validated) {
+        if (pgres.rows[0].access === 'disabled') {
             throw new Err(403, null, 'Account Disabled - Please Contact Us');
         }
 

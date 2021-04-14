@@ -9,9 +9,9 @@ const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
  */
 class Upload {
     static async put(uid, name, stream) {
-        const key = `${process.env.stackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`;
+        const key = `${process.env.StackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`;
         return new Promise((resolve, reject) => {
-            console.error(`${process.env.stackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`);
+            console.error(`${process.env.StackName}/upload/${uid}/${Math.random().toString(36).substring(2, 15)}/${name}`);
             s3.upload({
                 Bucket: process.env.Bucket,
                 ACL: 'public-read',

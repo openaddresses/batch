@@ -2906,6 +2906,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": false,
@@ -3083,6 +3084,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": false,
@@ -4167,6 +4169,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"close\"",
+              "\"scale\"",
               "\"level\"",
               "\"collect\"",
               "\"sources\""
@@ -4597,6 +4600,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": false,
@@ -4676,6 +4680,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": true,
@@ -4740,6 +4745,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": false,
@@ -4810,6 +4816,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": true,
@@ -4862,6 +4869,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"user\"",
+              "\"disabled\"",
               "\"admin\""
             ],
             "optional": false,

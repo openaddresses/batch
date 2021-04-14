@@ -2,6 +2,7 @@
     "type": "string",
     "enum": [
         "user",
+        "disabled",
         "admin"
     ],
     "description": "The access level of a given user"

@@ -79,7 +79,7 @@
                         <span v-text='user.email'/>
                     </div>
                     <div class='col col--3'>
-                        <span v-if='user.access === "disabled"'class='mx3 fr bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                        <span v-if='user.access === "disabled"' class='mx3 fr bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
                         <span v-else class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
 
                         <span v-if='user.level !== "basic"' class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='user.level'></span>
@@ -87,6 +87,19 @@
                 </div>
 
                 <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
+                    <h3 class='pb6 w-full'>User Access</h3>
+
+                    <div class='col col--12'>
+                        <div class='w-full select-container'>
+                            <select @change='patchUser(user)' v-model='user.access' class='select'>
+                                <option>disabled</option>
+                                <option>admin</option>
+                                <option>user</option>
+                            </select>
+                            <div class='select-arrow'></div>
+                        </div>
+                    </div>
+
                     <h3 class='pb6 w-full'>User Flags</h3>
 
                     <div class='col col--6'>
@@ -201,6 +214,7 @@ export default {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    access: user.access,
                     flags: user.flags
                 })
             }).then((res) => {

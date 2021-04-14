@@ -276,6 +276,20 @@ class User {
             throw new Err(500, err, 'Internal User Error');
         }
 
+        try {
+            // Force relogin on account changes
+            await this.pool.query(`
+                DELETE FROM
+                    session
+                WHERE
+                    (sess->'auth'->>'uid')::BIGINT = $1
+            `, [
+                uid
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to reset sessions');
+        }
+
         const row = pgres.rows[0];
 
         return {

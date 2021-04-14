@@ -407,7 +407,6 @@ async function server(args, config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'id');
-
                 await user.is_admin(req);
 
                 res.json(await user.patch(req.params.id, req.body));

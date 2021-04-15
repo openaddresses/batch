@@ -61,11 +61,11 @@ class Flight {
      *
      * @param {Tape} test tape instance to run takeoff action on
      */
-    takeoff(test) {
+    takeoff(test, custom = {}) {
         test('test server takeoff', (t) => {
-            api({
+            api(Object.assign({
                 postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-            }, (srv, pool) => {
+            }, custom), (srv, pool) => {
                 t.ok(srv, 'server object returned');
                 t.ok(pool, 'pool object returned');
 

@@ -145,7 +145,7 @@ class Exporter {
      * @param {Pool} pool Postgres Pool Instance
      * @param {Number} uid User ID to count
      */
-    async count(pool, uid) {
+    static async count(pool, uid) {
         try {
             const pgres = await pool.query(`
                 SELECT

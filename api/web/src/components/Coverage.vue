@@ -100,7 +100,6 @@ export default {
 
                 this.map = new mapboxgl.Map({
                     container: 'map',
-                    zoom: 1,
                     style: 'mapbox://styles/mapbox/light-v9'
                 });
 
@@ -189,8 +188,6 @@ export default {
                                 17, 100
                             ],
                             'circle-opacity': 1.0,
-                            'circle-stroke-color': '#ffffff',
-                            'circle-stroke-width': 1
                         }
                     });
 

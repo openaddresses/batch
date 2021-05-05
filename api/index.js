@@ -1236,6 +1236,9 @@ async function server(args, config, cb) {
 
                 const run = await Run.from(pool, req.params.run);
 
+                // The CI is making a CI run "live" and updating the /data list
+                if ((!run.live && req.body.live) || (run.live && !req.body.live)) await cacher.del('data');
+
                 run.patch(req.body);
 
                 await run.commit(pool);

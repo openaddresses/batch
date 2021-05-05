@@ -30,31 +30,24 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        createExport: function(jobid, fmt) {
-            this.loading = true;
-            fetch(window.location.origin + `/api/export`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    job_id: jobid,
-                    format: fmt
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to create export');
-                }
+        createExport: async function(jobid, fmt) {
+            try {
+                this.loading = true;
+                const res = await window.std('/api/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        job_id: jobid,
+                        format: fmt
+                    })
+                });
 
-                return res.json();
-            }).then((res) => {
-                console.error(res)
                 this.$router.push({ path: `/export/${res.id}` });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ if (require.main === module) {
 }
 
 function configure(args, cb) {
-    Config.env().then((config) => {
+    Config.env(args).then((config) => {
         return server(args, config, cb);
     }).catch((err) => {
         console.error(err);
@@ -1894,6 +1894,10 @@ async function server(args, config, cb) {
         async (req, res) => {
             try {
                 await user.is_level(req, 'backer');
+
+                if (req.auth.access !== 'admin' && await Exporter.count(pool, req.auth.uid) >= config.limits.exports) {
+                    throw new Err(400, null, 'Reached Monthly Export Limit');
+                }
 
                 const job = await Job.from(pool, req.body.job_id);
                 if (job.status !== 'Success') throw new Err(400, null, 'Cannot export a job that was not successful');

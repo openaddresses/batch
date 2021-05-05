@@ -193,49 +193,26 @@ export default {
             this.getDelta();
             this.getSample();
         },
-        getError: function() {
-            fetch(window.location.origin + `/api/job/error/${this.jobid}`, {
-                method: 'GET'
-            }).then((res) => {
-                return res.json();
-            }).then((res) => {
-                if (res.status === 404) return;
-                this.joberror = res;
-            }).catch(() => {
+        getError: async function() {
+            try {
+                this.joberror = await window.std(`/api/job/error/${this.jobid}`);
+            } catch (err) {
                 this.joberror = false;
-            });
+            }
         },
-        getDelta: function() {
-            fetch(window.location.origin + `/api/job/${this.jobid}/delta`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job delta');
-                }
-
-                return res.json();
-            }).then((res) => {
+        getDelta: async function() {
+            try {
+                const res = await window.std(window.location.origin + `/api/job/${this.jobid}/delta`);
                 this.delta.master = res.master;
                 this.delta.compare = res.compare;
                 this.delta.delta = res.delta;
-            }).catch(() => {
+            } catch (err) {
                 this.delta = false;
-            });
+            }
         },
-        getSample: function() {
-            fetch(window.location.origin + `/api/job/${this.jobid}/output/sample`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job sample');
-                }
-
-                return res.json();
-            }).then((res) => {
+        getSample: async function() {
+            try {
+                const res = await window.std(`/api/job/${this.jobid}/output/sample`);
                 const props = {};
                 for (const r of res) {
                     for (const key of Object.keys(r.properties)) {
@@ -245,51 +222,34 @@ export default {
 
                 this.props = Object.keys(props);
                 this.sample = res;
-            }).catch(() => {
+            } catch (err) {
                 this.delta = false;
-            });
+            }
         },
-        getJob: function() {
-            this.loading = true;
-            fetch(window.location.origin + `/api/job/${this.jobid}`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.job = res;
-
+        getJob: async function() {
+            try {
+                this.loading = true;
+                this.job = await window.std(`/api/job/${this.jobid}`);
                 this.name = this.job.source
                     .replace(/.*sources\//, '')
                     .replace(/\.json/, '');
 
                 this.loading = false;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        createRerun: function() {
-            this.loading = true;
-            fetch(window.location.origin + `/api/job/${this.jobid}/rerun`, {
-                method: 'POST'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to rerun job');
-                }
+        createRerun: async function() {
+            try {
+                this.loading = true;
+                const res = await window.std(`/api/job/${this.jobid}/rerun`, {
+                    method: 'POST'
+                });
 
-                return res.json();
-            }).then((res) => {
                 this.$router.push({ path: `/run/${res.run}` });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

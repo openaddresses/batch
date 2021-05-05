@@ -101,46 +101,27 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        getExport: function(loading) {
-            if (loading) this.loading = true;
-            fetch(window.location.origin + `/api/export/${this.exportid}`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get export');
-                }
+        getExport: async function(loading) {
+            try {
+                if (loading) this.loading = true;
+                this.exp = await window.std(`/api/export/${this.exportid}`);
 
-                return res.json();
-            }).then((res) => {
-                this.exp = res;
                 if (!this.job) {
                     this.getJob();
                 } else {
                     this.loading = false;
                 }
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        getJob: function() {
-            fetch(window.location.origin + `/api/job/${this.exp.job_id}`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.job = res;
+        getJob: async function() {
+            try {
+                this.job = await window.std(window.location.origin + `/api/job/${this.exp.job_id}`);
                 this.loading = false;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

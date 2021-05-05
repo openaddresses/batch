@@ -15,6 +15,7 @@
         "babel-plugin-polyfill-regenerator": "^0.1.6",
         "chart.js": "^2.9.4",
         "core-js": "^3.6.4",
+        "lib-oa": "^2.4.0",
         "mapbox-gl": "^2.0.1",
         "moment-timezone": "^0.5.31",
         "v-tooltip": "^2.0.3",

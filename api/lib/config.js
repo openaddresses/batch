@@ -6,7 +6,11 @@ const { createAppAuth } = require('@octokit/auth-app');
 const { Octokit } = require('@octokit/rest');
 
 class Config {
-    static async env() {
+    static async env(args = {}) {
+        this.limits = args.limit || {
+            exports: 300
+        };
+
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
                 console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');

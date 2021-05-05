@@ -61,20 +61,10 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        getJob: function() {
-            this.loading.job = true;
-            fetch(window.location.origin + `/api/job/${this.jobid}`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.job = res;
+        getJob: async function() {
+            try {
+                this.loading.job = true;
+                this.job = await window.std(`/api/job/${this.jobid}`);
 
                 this.name = this.job.source
                     .replace(/.*sources\//, '')
@@ -82,32 +72,23 @@ export default {
 
                 this.loading.job = false;
                 this.getRaw();
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        getRaw: function() {
-            this.loading.raw = true;
-            fetch(window.location.origin + `/api/job/${this.jobid}/raw`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get job');
-                }
-
-                return res.json();
-            }).then((res) => {
+        getRaw: async function() {
+            try {
+                this.loading.raw = true;
+                const res = await window.std(`/api/job/${this.jobid}/raw`);
                 for (const l of res.layers[this.job.layer]) {
                     if (l.name == this.job.name) this.raw = l;
                 }
 
                 this.coverage = res.coverage;
                 this.loading.raw = false;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         },
     }
 }

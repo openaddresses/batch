@@ -8,7 +8,11 @@ const request = promisify(require('request'));
 const flight = new Flight();
 
 flight.init(test);
-flight.takeoff(test);
+flight.takeoff(test, {
+    limit: {
+        exports: 1
+    }
+});
 
 test('POST: /api/run', async (t) => {
     try {
@@ -298,6 +302,33 @@ test('GET /api/export/1 - backer', async (t) =>  {
             size: 2134,
             status: 'Success',
             loglink: 'i-am-a-loglink'
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('POST /api/export - backer - exceeded limit', async (t) =>  {
+    try {
+        const exp = await request({
+            url: 'http://localhost:4999/api/export',
+            method: 'POST',
+            json: true,
+            jar: usr.jar,
+            body: {
+                job_id: 1,
+                format: 'csv'
+            }
+        });
+
+        t.equals(exp.statusCode, 400, 'http: 400');
+
+        t.deepEquals(exp.body, {
+            status: 400,
+            message: 'Reached Monthly Export Limit',
+            messages: []
         });
     } catch (err) {
         t.error(err, 'no errors');

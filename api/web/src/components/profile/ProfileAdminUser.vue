@@ -173,64 +173,48 @@ export default {
         refresh: function() {
             this.getUsers();
         },
-        getUsers: function() {
-            this.loading = true;
+        getUsers: async function() {
+            try {
+                this.loading = true;
 
-            const url = new URL(`${window.location.origin}/api/user`);
-            url.searchParams.append('limit', this.perpage)
-            url.searchParams.append('page', this.page)
-            url.searchParams.append('filter', this.filter.name)
+                const url = new URL(`${window.location.origin}/api/user`);
+                url.searchParams.append('limit', this.perpage)
+                url.searchParams.append('page', this.page)
+                url.searchParams.append('filter', this.filter.name)
 
-            if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
-            if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access)
+                if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
+                if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access)
 
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                this.loading = false;
-
-                if (!res.ok && res.statusCode !== 404 && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok && res.statusCode !== 404) {
-                    throw new Error('Failed to load users');
-                }
-                return res.json();
-            }).then((res) => {
+                const res = await window.std(url);
                 this.total = res.total;
                 this.users = res.users.map((user) => {
                     user._open = false;
                     return user;
                 });
-            }).catch((err) => {
+                this.loading = false;
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        patchUser: function(user) {
-            const url = new URL(`${window.location.origin}/api/user/${user.id}`);
+        patchUser: async function(user) {
+            try {
+                const res = await window.std(`/api/user/${user.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        access: user.access,
+                        flags: user.flags
+                    })
+                });
 
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    access: user.access,
-                    flags: user.flags
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to update user');
-                }
-                return res.json();
-            }).then((res) => {
                 for (const key of Object.keys(res)) {
                     user[key] = res[key];
                 }
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

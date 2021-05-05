@@ -67,16 +67,15 @@ export default {
             this.$router.push('/login');
         },
         register: async function() {
-            this.attempted = true;
+            try  {
+                this.attempted = true;
 
-            if (!this.username.length) return;
-            if (!this.password.length) return;
-            if (!this.email.length) return;
-            this.loading = true;
+                if (!this.username.length) return;
+                if (!this.password.length) return;
+                if (!this.email.length) return;
+                this.loading = true;
 
-            let res;
-            try {
-                res = await fetch(window.location.origin + `/api/user`, {
+                await fetch('/api/user', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -88,26 +87,12 @@ export default {
                         password: this.password
                     })
                 });
-            } catch(err) {
-                return this.$emit('err', err);
-            }
 
-            this.loading = false;
-
-            try {
-                const body = await res.json();
-
-                if (!res.ok && body.message) {
-                    throw new Error(body.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to register user');
-                }
-
+                this.loading = false;
+                this.success = true;
             } catch (err) {
                 return this.$emit('err', err);
             }
-
-            this.success = true;
         }
     }
 }

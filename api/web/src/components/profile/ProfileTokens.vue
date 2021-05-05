@@ -121,7 +121,7 @@ export default {
         },
         setToken: async function() {
             try {
-                const res = await fetch(`${window.location.origin}/api/token`, {
+                const res = await window.std('/api/token', {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: {
@@ -132,49 +132,31 @@ export default {
                     })
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
-                this.newToken.token = body.token;
+                this.newToken.token = res.token;
             } catch (err) {
                 this.$emit('err', err);
             }
         },
-        getTokens: function() {
-            this.loading = true;
-
-            fetch(`${window.location.origin}/api/token`, {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to load tokens');
-                }
-                return res.json();
-            }).then((res) => {
-                this.tokens = res.tokens;
+        getTokens: async function() {
+            try {
+                this.loading = true;
+                this.tokens = window.std('/api/token');
                 this.loading = false;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        deleteToken: function(token_id) {
-            fetch(`${window.location.origin}/api/token/${token_id}`, {
-                method: 'DELETE',
-                credentials: 'same-origin'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to delete token');
-                }
+        deleteToken: async function(token_id) {
+            try {
+                await window.std(`/api/token/${token_id}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
 
                 this.getTokens();
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

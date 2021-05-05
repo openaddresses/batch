@@ -94,42 +94,31 @@ export default {
         };
     },
     methods: {
-        logout: function() {
-            fetch(`${window.location.origin}/api/login`, {
-                method: 'DELETE'
-            }).then((res) => {
-                return res.json();
-            }).then(() => {
+        logout: async function() {
+            try {
+                await window.std('/api/login', {
+                    method: 'DELETE'
+                });
+
                 this.auth = false;
                 this.$router.push('/data');
-            }).catch((err) => {
-                console.error(err);
+            } catch (err) {
                 this.err = err;
-            });
+            }
         },
-        getLogin: function() {
-            fetch(`${window.location.origin}/api/login`, {
-                method: 'GET'
-            }).then((res) => {
-                return res.json();
-            }).then((res) => {
-                this.auth = res;
-            }).catch((err) => {
-                console.error(err);
+        getLogin: async function() {
+            try {
+                this.auth = await window.std('/api/login');
+            } catch (err) {
                 this.err = err;
-            });
+            }
         },
-        getCount: function() {
-            fetch(`${window.location.origin}/api/job/error/count`, {
-                method: 'GET'
-            }).then((res) => {
-                return res.json();
-            }).then((res) => {
-                this.errors = res.count;
-            }).catch((err) => {
-                console.error(err);
+        getCount: async function() {
+            try {
+                this.errors = (await window.std('/api/job/error/count')).count;
+            } catch (err) {
                 this.err = err;
-            });
+            }
         },
         internal: function(url, tab) {
             url = window.location.origin + url;

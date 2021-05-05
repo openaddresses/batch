@@ -113,64 +113,48 @@ export default {
             this.newCollection.sources.splice(0, 0, this.newCollection.source);
             this.newCollection.source = '';
         },
-        getCollections: function() {
-            this.loading = true;
+        getCollections: async function() {
+            try {
+                this.loading = true;
 
-            const url = new URL(`${window.location.origin}/api/collections`);
-
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                this.loading = false;
-
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to load collections');
-                }
-
-                return res.json();
-            }).then((res) => {
+                const res = await window.std('/api/collections');
                 this.collections = res.map((collection) => {
                     collection._open = false;
                     return collection;
                 });
-            }).catch((err) => {
+
+                this.loading = false;
+            } catch (err) {
                 this.$emit('err', err);
-            });
-        },
-        setCollection: function() {
-            this.newCollection.name = this.newCollection.name.toLowerCase();
-
-            if (!/^[a-z0-9-]+$/.test(this.newCollection.name)) {
-                return this.$emit('err', new Error('Collection names may only contain a-z 0-9 and -'));
             }
+        },
+        setCollection: async function() {
+            try {
+                this.newCollection.name = this.newCollection.name.toLowerCase();
 
-            this.loading = true;
-
-            const url = new URL(`${window.location.origin}/api/collections`);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: this.newCollection.name,
-                    sources: this.newCollection.sources
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to save collection');
+                if (!/^[a-z0-9-]+$/.test(this.newCollection.name)) {
+                    return this.$emit('err', new Error('Collection names may only contain a-z 0-9 and -'));
                 }
 
+                this.loading = true;
+
+                await window.std('/api/collections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: this.newCollection.name,
+                        sources: this.newCollection.sources
+                    })
+                });
+
+                this.loading = false;
                 this.refresh();
-            }).catch((err) => {
+            } catch(err) {
                 this.loading = false;
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

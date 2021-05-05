@@ -37,20 +37,11 @@ export default {
         });
     },
     methods: {
-        init: function() {
-            if (!this.job.bounds) return;
+        init: async function() {
+            try {
+                if (!this.job.bounds) return;
 
-            fetch(`${window.location.origin}/api/map`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to fetch map data');
-                }
-
-                return res.json();
-            }).then((res) => {
+                const res = await window.std('/api/map');
                 mapboxgl.accessToken = res.token;
 
                 const bounds = this.job.bounds.coordinates;
@@ -92,9 +83,9 @@ export default {
                         }
                     });
                 });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

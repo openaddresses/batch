@@ -84,18 +84,9 @@ export default {
                 this.map.resize();
             });
         },
-        init: function() {
-            fetch(`${window.location.origin}/api/map`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to fetch map data');
-                }
-
-                return res.json();
-            }).then((res) => {
+        init: async function() {
+            try {
+                const res = await window.std('/api/map');
                 mapboxgl.accessToken = res.token;
 
                 this.map = new mapboxgl.Map({
@@ -260,9 +251,9 @@ export default {
                         }
                     });
                 });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

@@ -61,26 +61,14 @@ export default {
         refresh: function() {
             this.getLog();
         },
-        getLog: function() {
-            this.loading = true;
-            fetch(`${window.location.origin}/api/${this.logtype}/${this.id}/log`, {
-                method: 'GET'
-            }).then((res) => {
+        getLog: async function() {
+            try {
+                this.loading = true;
+                this.lines = await window.std(`${window.location.origin}/api/${this.logtype}/${this.id}/log`);
                 this.loading = false;
-
-                if (!res.ok && res.status !== 304 && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get logs');
-                }
-
-                return res.json();
-            }).then((res) => {
-
-                this.lines = res;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         },
         linenum: function(line) {
             window.location.hash = `${this.logtype}:${this.id}:log:${line.id}`

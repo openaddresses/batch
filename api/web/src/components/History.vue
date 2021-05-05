@@ -141,20 +141,10 @@ export default {
         external: function(url) {
             window.open(url, '_blank');
         },
-        getHistory: function() {
-            this.loading = true;
-            fetch(window.location.origin + `/api/data/${this.dataid}/history`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get data history');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.history = res;
+        getHistory: async function() {
+            try {
+                this.loading = true;
+                this.history = await window.std(`/api/data/${this.dataid}/history`);
 
                 this.chart = {
                     datasets: [{
@@ -206,25 +196,13 @@ export default {
                 }
 
                 this.loading = false;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
         getData: async function() {
             try {
-                const res = await fetch(window.location.origin + `/api/data/${this.dataid}`, {
-                    method: 'GET'
-                });
-
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get data history');
-                }
-
-                const body = await res.json();
-
-                this.data = body;
+                this.data = await window.std(`/api/data/${this.dataid}`);
             } catch (err) {
                 this.$emit('err', err);
             }

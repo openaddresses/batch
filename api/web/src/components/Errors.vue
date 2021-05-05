@@ -78,28 +78,14 @@ export default {
         refresh: function() {
             this.getProblems();
         },
-        getProblems: function() {
-            this.loading = true;
-            const url = new URL(`${window.location.origin}/api/job/error`);
-
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                if (res.status === 404) {
-                    this.problems = [];
-                } else if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get error sources');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.problems = res;
+        getProblems: async function() {
+            try {
+                this.loading = true;
+                this.problems = await window.std('/api/job/error');
                 this.loading = false;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         },
         external: function(url) {
             window.open(url, "_blank");

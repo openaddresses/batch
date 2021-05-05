@@ -52,28 +52,29 @@ export default {
         }
     },
     methods: {
-        forgot: function() {
-            this.attempted = true;
+        forgot: async function() {
+            try {
+                this.attempted = true;
 
-            if (!this.user.length) return;
-            this.loading = true;
+                if (!this.user.length) return;
+                this.loading = true;
 
-            fetch(window.location.origin + `/api/login/forgot`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    user: this.user
-                })
-            }).then((res) => {
+                await window.std('/api/login/forgot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        user: this.user
+                    })
+                });
+
                 this.loading = false;
-                if (!res.ok) throw new Error('Failed to reset password');
                 this.reset = true;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

@@ -65,21 +65,11 @@ export default {
         refresh: function() {
             this.getTraffic();
         },
-        getTraffic: function() {
-            this.loading.traffic = true;
+        getTraffic: async function() {
+            try {
+                this.loading.traffic = true;
 
-            const url = new URL(`${window.location.origin}/api/dash/traffic`);
-
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to load traffic');
-                }
-                return res.json();
-            }).then((res) => {
+                const res = await window.std(`/api/dash/traffic`);
                 res.datasets[0].data = res.datasets[0].data.map((d) => {
                     d.x = new Date(d.x);
                     return d;
@@ -87,9 +77,9 @@ export default {
 
                 this.traffic = res;
                 this.loading.traffic = false;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

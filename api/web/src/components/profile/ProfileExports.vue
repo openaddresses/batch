@@ -69,31 +69,22 @@ export default {
         refresh: function() {
             this.getExports();
         },
-        getExports: function() {
-            this.loading = true;
+        getExports: async function() {
+            try {
+                this.loading = true;
 
-            const url = new URL(`${window.location.origin}/api/export`);
-            url.searchParams.append('limit', this.perpage)
-            url.searchParams.append('page', this.page)
+                const url = new URL(`${window.location.origin}/api/export`);
+                url.searchParams.append('limit', this.perpage)
+                url.searchParams.append('page', this.page)
 
-            fetch(url, {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to load exports');
-                }
-                return res.json();
-            }).then((res) => {
+                const res = await window.std(url);
                 this.exps = res.exports;
                 this.total = res.total;
 
                 this.loading = false;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

@@ -46,15 +46,14 @@ export default {
     },
     methods: {
         login: async function() {
-            this.attempted = true;
-
-            if (!this.username.length) return;
-            if (!this.password.length) return;
-            this.loading = true;
-
-            let res;
             try {
-                res = await fetch(window.location.origin + `/api/login`, {
+                this.attempted = true;
+
+                if (!this.username.length) return;
+                if (!this.password.length) return;
+                this.loading = true;
+
+                await window.std('/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -65,27 +64,14 @@ export default {
                         password: this.password
                     })
                 });
-            } catch(err) {
-                return this.$emit('err', err);
-            }
 
-            this.loading = false;
+                this.loading = false;
 
-            try {
-                const body = await res.json();
-
-                if (!res.ok && body.message) {
-                    throw new Error(body.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to login');
-                }
-
+                this.$emit('auth');
+                this.$router.push('/data')
             } catch (err) {
-                return this.$emit('err', err);
+                this.$emit('err', err);
             }
-
-            this.$emit('auth');
-            this.$router.push('/data')
         }
     }
 }

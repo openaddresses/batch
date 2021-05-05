@@ -94,6 +94,7 @@ export default {
             try {
                 this.loading = true;
                 this.jobs = await window.std(window.location.origin + '/api/job');
+                this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
             }

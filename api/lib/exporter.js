@@ -155,9 +155,9 @@ class Exporter {
                 WHERE
                     uid = $1
                     AND created > date_trunc('month', NOW())
-            `, [ uid ]);
+            `, [uid]);
 
-            if (!pgres.rows.length) return 0
+            if (!pgres.rows.length) return 0;
             return parseInt(pgres.rows[0].count);
         } catch (err) {
             throw new Err(500, err, 'Failed to get export count');

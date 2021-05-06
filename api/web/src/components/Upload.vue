@@ -8,8 +8,8 @@
             <UploadFile />
         </template>
         <template v-else-if='auth && auth.flags && auth.access'>
-            <div class='flex-parent flex-parent--center-main'>
-                <div class='flex-child py24'>
+            <div class='flex flex--center-main'>
+                <div class='py24'>
                     <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                 </div>
             </div>
@@ -17,8 +17,8 @@
             <div @click='external("https://github.com/openaddresses/openaddresses")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Ask an admin to enable upload permissions on your account</div>
         </template>
         <template v-else>
-            <div class='flex-parent flex-parent--center-main'>
-                <div class='flex-child py24'>
+            <div class='flex flex--center-main'>
+                <div class='py24'>
                     <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                 </div>
             </div>

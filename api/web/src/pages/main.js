@@ -9,23 +9,23 @@ Vue.use(VTooltip);
 
 // === Components ===
 
-import Register from './components/Register.vue';
-import Profile from './components/Profile.vue';
-import Export from './components/Export.vue';
-import Upload from './components/Upload.vue';
-import Errors from './components/Errors.vue';
-import Login from './components/Login.vue';
-import Forgot from './components/Forgot.vue';
-import Verify from './components/Verify.vue';
-import Reset from './components/Reset.vue';
-import History from './components/History.vue';
-import Data from './components/Data.vue';
-import Runs from './components/Runs.vue';
-import Jobs from './components/Jobs.vue';
-import Job from './components/Job.vue';
-import Run from './components/Run.vue';
-import JobLog from './components/JobLog.vue';
-import JobRaw from './components/JobRaw.vue';
+import Register from '../components/Register.vue';
+import Profile from '../components/Profile.vue';
+import Export from '../components/Export.vue';
+import Upload from '../components/Upload.vue';
+import Errors from '../components/Errors.vue';
+import Login from '../components/Login.vue';
+import Forgot from '../components/Forgot.vue';
+import Verify from '../components/Verify.vue';
+import Reset from '../components/Reset.vue';
+import History from '../components/History.vue';
+import Data from '../components/Data.vue';
+import Runs from '../components/Runs.vue';
+import Jobs from '../components/Jobs.vue';
+import Job from '../components/Job.vue';
+import Run from '../components/Run.vue';
+import JobLog from '../components/JobLog.vue';
+import JobRaw from '../components/JobRaw.vue';
 
 // === Routes ===
 

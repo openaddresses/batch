@@ -60,8 +60,8 @@
         </div>
 
         <template v-if='loading.run'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-else>
@@ -69,40 +69,40 @@
                 <h2 class='txt-h4 pb12 fl'>Dashboard:</h2>
 
                 <template v-if='loading.count'>
-                    <div class='flex-parent flex-parent--center-main w-full'>
-                        <div class='flex-child loading py24'></div>
+                    <div class='flex flex--center-main w-full py24'>
+                        <div class='loading'></div>
                     </div>
                 </template>
                 <template v-else>
                     <div class='col col--12 grid border round border--gray-light'>
                         <div @click='filterShortcut("Pending")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Pending'></div>
-                            <div class='flex-parent flex-parent--center-main w-full'>
-                                <div class='flex-child'>
+                            <div class='flex flex--center-main w-full'>
+                                <div>
                                     <Status status='Pending' class='fl'/> Pending
                                 </div>
                             </div>
                         </div>
                         <div @click='filterShortcut("Warn")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Warn'></div>
-                            <div class='flex-parent flex-parent--center-main w-full'>
-                                <div class='flex-child'>
+                            <div class='flex flex--center-main w-full'>
+                                <div>
                                     <Status status='Warn' class='fl'/> Warn
                                 </div>
                             </div>
                         </div>
                         <div @click='filterShortcut("Fail")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Fail'></div>
-                            <div class='flex-parent flex-parent--center-main w-full'>
-                                <div class='flex-child'>
+                            <div class='flex flex--center-main w-full'>
+                                <div>
                                     <Status status='Fail' class='fl'/> Fail
                                 </div>
                             </div>
                         </div>
                         <div @click='filterShortcut("Success")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
                             <div class='align-center' v-text='count.status.Success'></div>
-                            <div class='flex-parent flex-parent--center-main w-full'>
-                                <div class='flex-child'>
+                            <div class='flex flex--center-main w-full'>
+                                <div>
                                     <Status status='Success' class='fl'/> Success
                                 </div>
                             </div>
@@ -116,8 +116,8 @@
             </div>
 
             <template v-if='loading.jobs'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
+                <div class='flex flex--center-main w-full py24'>
+                    <div class='loading'></div>
                 </div>
             </template>
             <template v-else-if='jobs.length'>
@@ -146,8 +146,8 @@
                 </div>
             </template>
             <template v-else-if='!jobs.length'>
-                <div class='w-full flex-parent flex-parent--center-main'>
-                    <div class='flex-child py24'>
+                <div class='w-full flex flex--center-main'>
+                    <div class='py24'>
                         <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                     </div>
                 </div>

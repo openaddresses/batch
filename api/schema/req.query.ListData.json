@@ -17,6 +17,10 @@
         "point": {
             "type": "string",
             "description": "Filter results by geographic point '{lng},{lat}'"
+        },
+        "fabric": {
+            "type": "boolean",
+            "description": "Query results by fabric inclusion"
         }
     }
 }

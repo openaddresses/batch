@@ -6,7 +6,6 @@ require('./lib/pre');
 
 const config = require('./package.json');
 const OA = require('lib-oa');
-const dke = require('@mapbox/decrypt-kms-env');
 const Job = require('./lib/job');
 const path = require('path');
 const CP = require('child_process');
@@ -73,16 +72,9 @@ async function cli() {
 
     const job = new Job(oa, process.env.OA_JOB_ID);
 
-    dke(process.env, (err) => {
-        if (err) {
-            console.error(err);
-            process.exit(1);
-        }
-
-        flow(job).catch((err) => {
-            console.error(err);
-            process.exit(1);
-        });
+    flow(job).catch((err) => {
+        console.error(err);
+        process.exit(1);
     });
 }
 

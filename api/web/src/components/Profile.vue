@@ -8,7 +8,7 @@
                 <h2 v-else-if='mode === "admin"' class='txt-h4 ml12 pb12 fl'>Administration:</h2>
 
                 <div class='fr'>
-                    <div v-if='profile.access === "admin"' class='flex-parent-inline'>
+                    <div v-if='profile.access === "admin"' class='flex-inline'>
                         <button @click='mode = "profile"' :class='{ "btn--stroke": mode !== "profile" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Profile</button>
                         <button @click='mode = "analytics"' :class='{ "btn--stroke": mode !== "analytics" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Analytics</button>
                         <button @click='mode = "admin"' :class='{ "btn--stroke": mode !== "admin" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Admin</button>
@@ -19,8 +19,8 @@
 
         <template v-if='mode === "profile"'>
             <template v-if='loading.profile'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
+                <div class='flex flex--center-main w-full py24'>
+                    <div class='loading'></div>
                 </div>
             </template>
             <template v-else>

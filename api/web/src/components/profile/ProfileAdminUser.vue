@@ -57,13 +57,13 @@
 
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-else-if='!users.length'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child py24'>
+            <div class='flex flex--center-main w-full'>
+                <div class='py24'>
                     <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                 </div>
             </div>
@@ -72,13 +72,13 @@
         <template v-else>
             <div :key='user.id' v-for='user in users' class='col col--12 grid'>
                 <div @click='user._open = !user._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
-                    <div class='col col--3'>
-                        <span v-text='user.username'/>
+                    <div class='col col--4'>
+                        <span class='txt-truncate' v-text='user.username'/>
                     </div>
                     <div class='col col--6'>
-                        <span v-text='user.email'/>
+                        <span class='txt-truncate' v-text='user.email'/>
                     </div>
-                    <div class='col col--3'>
+                    <div class='col col--2'>
                         <span v-if='user.access === "disabled"' class='mx3 fr bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
                         <span v-else class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
 

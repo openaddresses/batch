@@ -16,6 +16,7 @@ class Data {
      * @param {String} [query.layer=Null] - Filter results by source layer
      * @param {String} [query.name=Null] - Filter results by source layer name
      * @param {String} [query.point=false] - Filter results by geographic point
+     * @param {Boolean} query.fabric - Filter results by if they are part of the fabric
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -44,6 +45,7 @@ class Data {
             const pgres = await pool.query(`
                 SELECT
                     results.id,
+                    results.fabric,
                     results.source,
                     results.updated,
                     results.layer,
@@ -65,6 +67,7 @@ class Data {
                         char_length($4) = 0
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
                     )
+                    ${query.fabric !== undefined ? 'AND results.fabric = ' + !!query.fabric : ''}
                 ORDER BY
                     results.source,
                     results.layer,
@@ -150,6 +153,7 @@ class Data {
                 SELECT
                     results.id,
                     results.source,
+                    results.fabric,
                     results.updated,
                     results.layer,
                     results.name,
@@ -182,7 +186,7 @@ class Data {
         }
     }
 
-    static async update(pool, job) {
+    static async update(pool, job, fabric) {
         let data;
         try {
             data = await Data.list(pool, {
@@ -210,19 +214,22 @@ class Data {
                         layer,
                         name,
                         job,
-                        updated
+                        updated,
+                        fabric
                     ) VALUES (
                         $1,
                         $2,
                         $3,
                         $4,
-                        NOW()
+                        NOW(),
+                        $5
                     )
                 `, [
                     job.source_name,
                     job.layer,
                     job.name,
-                    job.id
+                    job.id,
+                    !!fabric
                 ]);
 
                 return true;
@@ -234,11 +241,9 @@ class Data {
                 await pool.query(`
                     UPDATE results
                         SET
-                            source = $1,
-                            layer = $2,
-                            name = $3,
                             job = $4,
-                            updated = NOW()
+                            updated = NOW(),
+                            fabric = COALESCE($5, fabric, False)
                         WHERE
                             source = $1
                             AND layer = $2
@@ -247,7 +252,8 @@ class Data {
                     job.source_name,
                     job.layer,
                     job.name,
-                    job.id
+                    job.id,
+                    fabric
                 ]);
 
                 return true;

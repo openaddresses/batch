@@ -19,36 +19,36 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-else>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
+            <div class='col col--12 flex flex--center-main'>
+                <h3 class='txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
 
             <template v-if='!["Success", "Fail"].includes(exp.status)'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
+                <div class='flex flex--center-main w-full py24'>
+                    <div class='loading'></div>
                 </div>
-                <div class='col col--12 flex-parent flex-parent--center-main'>
+                <div class='col col--12 flex flex--center-main'>
                     <h3 v-if='exp.status === "Pending"' class='flex-child txt-h4 py6'>Your Export Is Queued</h3>
                     <h3 v-else-if='exp.status === "Running"' class='flex-child txt-h4 py6'>Your Export Is Running</h3>
                 </div>
             </template>
             <template v-else-if='exp.status === "Fail"'>
-                <div class='flex-parent flex-parent--center-main w-full'>
+                <div class='flex flex--center-main w-full'>
                 </div>
-                <div class='col col--12 flex-parent flex-parent--center-main'>
-                    <h3 class='flex-child txt-h4 py6'>Your Export Failed - Contact us to find out what went wrong</h3>
+                <div class='col col--12 flex flex--center-main'>
+                    <h3 class='txt-h4 py6'>Your Export Failed - Contact us to find out what went wrong</h3>
                 </div>
             </template>
             <template v-else-if='exp.status === "Success"'>
-                <div class='flex-parent flex-parent--center-main w-full py12'>
+                <div class='flex flex--center-main w-full py12'>
                     <button @click='datapls' class='btn btn--stroke round btn--gray'>
-                        <div class='flex-parent flex-parent--center-main'>
-                            <svg class='flex-child icon h36 w36'><use xlink:href='#icon-arrow-down'/></svg>
+                        <div class='flex flex--center-main'>
+                            <svg class='icon h36 w36'><use xlink:href='#icon-arrow-down'/></svg>
                         </div>
                         <div class='align-center'>Download</div>
                         <div class='align-center' v-text='exp.format'></div>

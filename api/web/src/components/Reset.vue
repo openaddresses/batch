@@ -1,27 +1,27 @@
 <template>
     <div class='col col--12 grid pt12'>
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-if='reset'>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6'>Reset Login</h3>
+            <div class='col col--12 flex flex--center-main'>
+                <h3 class='txt-h4 py6'>Reset Login</h3>
             </div>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
-                <div class='flex-child py6'>Your password has been reset</div>
+            <div class='col col--12 flex flex--center-main'>
+                <div class='py6'>Your password has been reset</div>
             </div>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
+            <div class='col col--12 flex flex--center-main'>
                 <button @click='$router.push({ path: "/data" })' class='btn btn--stroke round my12'>Login</button>
             </div>
         </template>
         <template v-else>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6'>Reset Login</h3>
+            <div class='col col--12 flex flex--center-main'>
+                <h3 class='txt-h4 py6'>Reset Login</h3>
             </div>
 
-            <div class='col col--12 flex-parent flex-parent--center-main'>
+            <div class='col col--12 flex flex--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12 w-full'>Reset Token</label>
                     <input v-on:keyup.enter='forgot' :class='{

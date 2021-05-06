@@ -1,7 +1,7 @@
 <template>
     <div id='app' class='col col--12'>
         <div class='col col--12 px12 py12 border-b border--gray'>
-            <img @click='external("https://openaddresses.io")' class='h24 w24 round mr12 cursor-pointer' src='../public/logo.jpg'/>
+            <img @click='external("https://openaddresses.io")' class='h24 w24 round mr12 cursor-pointer' src='../../public/logo.jpg'/>
             <router-link to='/data'><button class='btn btn--stroke btn--s btn--gray round mr12'>Data</button></router-link>
             <router-link to='/run'><button class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button></router-link>
             <router-link to='/job'><button class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button></router-link>
@@ -32,8 +32,8 @@
             </span>
         </div>
 
-        <div class='col col--12 flex-parent flex-parent--center-main relative'>
-            <div class='flex-child col col--12 wmax600'>
+        <div class='col col--12 flex flex--center-main relative'>
+            <div class='col col--12 wmax600'>
                 <router-view
                     :auth='auth'
                     @auth='getLogin'
@@ -66,9 +66,9 @@
 </template>
 
 <script>
-import MustLogin from './components/MustLogin.vue'
-import Perk from './components/Perk.vue'
-import Err from './components/Err.vue'
+import MustLogin from '../components/MustLogin.vue'
+import Perk from '../components/Perk.vue'
+import Err from '../components/Err.vue'
 
 export default {
     name: 'OpenAddresses',
@@ -145,7 +145,20 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+
+.col--1 { width: 8.3333% !important; }
+.col--2 { width: 16.6666% !important; }
+.col--3 { width: 25% !important; }
+.col--4 { width: 33.3333% !important; }
+.col--5 { width: 41.6666% !important; }
+.col--6 { width: 50% !important; }
+.col--7 { width: 58.3333% !important; }
+.col--8 { width: 66.6666% !important; }
+.col--9 { width: 75% !important; }
+.col--10 { width: 83.3333% !important; }
+.col--11 { width: 91.6666% !important; }
+.col--12 { width: 100% !important; }
 
 .dropdown {
     position: relative;

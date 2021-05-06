@@ -32,16 +32,16 @@ export default {
         this.verify();
     },
     methods: {
-        verify: function() {
-            fetch(window.location.origin + `/api/login/verify?token=${this.$route.query.token}`, {
-                method: 'GET',
-                credentials: 'same-origin',
-            }).then((res) => {
+        verify: async function() {
+            try {
+                await window.std(`/api/login/verify?token=${this.$route.query.token}`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
                 this.loading = false;
-                if (!res.ok) throw new Error('Failed to verify email');
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

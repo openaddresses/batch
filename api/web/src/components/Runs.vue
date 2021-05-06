@@ -84,24 +84,14 @@ export default {
         emitrun: function(run_id) {
             this.$router.push({ path: `/run/${run_id}` });
         },
-        getRuns: function() {
-            this.loading = true;
-            fetch(window.location.origin + '/api/run', {
-                method: 'GET'
-            }).then((res) => {
+        getRuns: async function() {
+            try {
+                this.loading = true;
+                this.runs = await window.std('/api/run');
                 this.loading = false;
-
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get runs');
-                }
-                return res.json();
-            }).then((res) => {
-                this.runs = res;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

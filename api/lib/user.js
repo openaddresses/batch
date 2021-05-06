@@ -18,6 +18,10 @@ class User {
             throw new Err(401, null, 'Authentication Required');
         }
 
+        if (req.auth.access === 'disabled') {
+            throw new Err(403, null, 'Account Disabled - Please Contact Us');
+        }
+
         return true;
     }
 
@@ -272,6 +276,20 @@ class User {
             throw new Err(500, err, 'Internal User Error');
         }
 
+        try {
+            // Force relogin on account changes
+            await this.pool.query(`
+                DELETE FROM
+                    session
+                WHERE
+                    (sess->'auth'->>'uid')::BIGINT = $1
+            `, [
+                uid
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to reset sessions');
+        }
+
         const row = pgres.rows[0];
 
         return {
@@ -429,6 +447,10 @@ class User {
 
         if (!pgres.rows[0].validated) {
             throw new Err(403, null, 'User has not confirmed email');
+        }
+
+        if (pgres.rows[0].access === 'disabled') {
+            throw new Err(403, null, 'Account Disabled - Please Contact Us');
         }
 
         return {

@@ -58,30 +58,31 @@ export default {
        if (this.$route.query.token) this.token = this.$route.query.token;
     },
     methods: {
-        forgot: function() {
-            this.attempted = true;
+        forgot: async function() {
+            try {
+                this.attempted = true;
 
-            if (!this.password.length) return;
-            if (!this.token.length) return;
-            this.loading = true;
+                if (!this.password.length) return;
+                if (!this.token.length) return;
+                this.loading = true;
 
-            fetch(window.location.origin + `/api/login/reset`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    token: this.token,
-                    password: this.password
-                })
-            }).then((res) => {
+                await window.std('/api/login/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        token: this.token,
+                        password: this.password
+                    })
+                });
+
                 this.loading = false;
-                if (!res.ok) throw new Error('Failed to reset password');
                 this.reset = true;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

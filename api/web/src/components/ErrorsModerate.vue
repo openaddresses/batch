@@ -23,49 +23,37 @@ export default {
         refresh: function() {
             this.getProblems();
         },
-        mod: function(job_id, confirm) {
-            const url = new URL(`${window.location.origin}/api/job/error/${job_id}`);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    moderate: confirm ? 'confirm' : 'reject'
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get update job error');
-                }
+        mod: async function(job_id, confirm) {
+            try {
+                await window.std(`/api/job/error/${job_id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        moderate: confirm ? 'confirm' : 'reject'
+                    })
+                });
 
                 this.$emit('moderated');
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        createRerun: function(job_id) {
-            this.loading = true;
+        createRerun: async function(job_id) {
+            try {
+                this.loading = true;
 
-            this.mod(job_id, false)
+                this.mod(job_id, false)
 
-            fetch(window.location.origin + `/api/job/${job_id}/rerun`, {
-                method: 'POST'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to rerun job');
-                }
+                const res = await window.std(`/api/job/${job_id}/rerun`, {
+                    method: 'POST'
+                });
 
-                return res.json();
-            }).then((res) => {
                 this.$router.push({ path: `/run/${res.run}` });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

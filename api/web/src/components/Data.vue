@@ -241,48 +241,25 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        getCollections: function() {
-            this.loading.collections = true;
-            const url = new URL(`${window.location.origin}/api/collections`);
-
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get collections');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.collections = res;
-
+        getCollections: async function() {
+            try {
+                this.loading.collections = true;
+                this.collections = await window.std('/api/collections');
                 this.loading.collections = false;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        getData: function() {
-            this.loading.sources = true;
-            const url = new URL(`${window.location.origin}/api/data`);
-            if (this.filter.source) url.searchParams.set('source', this.filter.source);
-            if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
-            if (this.filter.point) url.searchParams.set('point', this.filter.point.join(','));
+        getData: async function() {
+            try {
+                this.loading.sources = true;
 
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                if (res.status === 404) {
-                    this.datas = [];
-                } if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get data');
-                }
+                const url = new URL(`${window.location.origin}/api/data`);
+                if (this.filter.source) url.searchParams.set('source', this.filter.source);
+                if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
+                if (this.filter.point) url.searchParams.set('point', this.filter.point.join(','));
 
-                return res.json();
-            }).then((res) => {
+                const res = await window.std(url);
                 const dataname = {};
 
                 for (const data of res) {
@@ -318,9 +295,9 @@ export default {
                 this.datas = data;
 
                 this.loading.sources = false;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

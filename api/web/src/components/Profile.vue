@@ -107,20 +107,17 @@
                     </div>
 
                     <div class='col col--4'>
-                        <div class='align-center'>
-                            <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
-                        </div>
-
                         <div class='txt-s align-center'>All Basic Features</div>
-                        <div class='txt-s align-center'>CSV/Shapefile Export</div>
+                        <div class='txt-s align-center'>300 Custom Exports / month</div>
                     </div>
 
                     <div class='col col--4'>
+                        <div class='txt-s align-center'>All Backer Features</div>
+
                         <div class='align-center'>
                             <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
                         </div>
 
-                        <div class='txt-s align-center'>All Backer Features</div>
                         <div class='txt-s align-center'>Fastest Data Access</div>
                         <div class='txt-s align-center'>Validated Data</div>
                     </div>
@@ -190,27 +187,18 @@ export default {
         refresh: function() {
             this.getLogin();
         },
-        getLogin: function() {
-            this.loading.profile = true;
+        getLogin: async function() {
+            try {
+                this.loading.profile = true;
 
-            const url = new URL(`${window.location.origin}/api/login`);
-            url.searchParams.append('level', 'true');
+                const url = new URL(`${window.location.origin}/api/login`);
+                url.searchParams.append('level', 'true');
 
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to load profile');
-                }
-                return res.json();
-            }).then((res) => {
-                this.profile = res;
+                this.profile = await window.std(url)
                 this.loading.profile = false;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

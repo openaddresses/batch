@@ -84,23 +84,13 @@ export default {
                 this.map.resize();
             });
         },
-        init: function() {
-            fetch(`${window.location.origin}/api/map`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to fetch map data');
-                }
-
-                return res.json();
-            }).then((res) => {
+        init: async function() {
+            try {
+                const res = await window.std('/api/map');
                 mapboxgl.accessToken = res.token;
 
                 this.map = new mapboxgl.Map({
                     container: 'map',
-                    zoom: 1,
                     style: 'mapbox://styles/mapbox/light-v9'
                 });
 
@@ -189,8 +179,6 @@ export default {
                                 17, 100
                             ],
                             'circle-opacity': 1.0,
-                            'circle-stroke-color': '#ffffff',
-                            'circle-stroke-width': 1
                         }
                     });
 
@@ -263,9 +251,9 @@ export default {
                         }
                     });
                 });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

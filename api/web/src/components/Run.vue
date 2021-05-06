@@ -235,68 +235,36 @@ export default {
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
         },
-        getRun: function() {
-            this.loading.run = true;
-            fetch(window.location.origin + `/api/run/${this.runid}`, {
-                method: 'GET'
-            }).then((res) => {
+        getRun: async function() {
+            try {
+                this.loading.run = true;
+                this.run = await window.std(`/api/run/${this.runid}`);
                 this.loading.run = false;
-
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to register user');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.run = res;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            })
+            }
         },
-        getCount: function() {
-            this.loading.count = true;
-            fetch(window.location.origin + `/api/run/${this.runid}/count`, {
-                method: 'GET'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to register user');
-                }
-
-                return res.json();
-            }).then((res) => {
+        getCount: async function() {
+            try {
+                this.loading.count = true;
+                this.count = await window.std(window.location.origin + `/api/run/${this.runid}/count`);
                 this.loading.count = false;
-                this.count = res;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            })
+            }
         },
         getJobs: async function() {
-            this.loading.jobs = true;
-
-            const url = new URL(`${window.location.origin}/api/job`);
-            url.searchParams.set('run', this.runid);
-            if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
-            if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
-            if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
-
             try {
-                const res = await fetch(url, {
-                    method: 'GET'
-                });
+                this.loading.jobs = true;
 
-                let body = await res.json();
-                if (res.status === 404) {
-                    body = [];
-                } else if (!res.ok) {
-                    throw new Error(body.message ? body.message : 'Failed to register user');
-                }
+                const url = new URL(`${window.location.origin}/api/job`);
+                url.searchParams.set('run', this.runid);
+                if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
+                if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
+                if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
 
+                this.jobs = await window.std(url);
                 this.loading.jobs = false;
-                this.jobs = body;
             } catch(err) {
                 this.$emit('err', err);
             }

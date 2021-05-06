@@ -90,24 +90,14 @@ export default {
         refresh: function() {
             this.getJobs();
         },
-        getJobs: function() {
-            this.loading = true;
-            fetch(window.location.origin + '/api/job', {
-                method: 'GET'
-            }).then((res) => {
+        getJobs: async function() {
+            try {
+                this.loading = true;
+                this.jobs = await window.std(window.location.origin + '/api/job');
                 this.loading = false;
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to get jobs');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.jobs = res;
-            }).catch((err) => {
+            } catch(err) {
                 this.$emit('err', err);
-            });
+            }
         }
     }
 }

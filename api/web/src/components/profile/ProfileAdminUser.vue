@@ -33,6 +33,7 @@
                     <div class='w-full select-container'>
                         <select v-model='filter.access' class='select'>
                             <option>all</option>
+                            <option>disabled</option>
                             <option>admin</option>
                             <option>user</option>
                         </select>
@@ -78,12 +79,27 @@
                         <span v-text='user.email'/>
                     </div>
                     <div class='col col--3'>
-                        <span class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                        <span v-if='user.access === "disabled"' class='mx3 fr bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                        <span v-else class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+
                         <span v-if='user.level !== "basic"' class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='user.level'></span>
                     </div>
                 </div>
 
                 <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
+                    <h3 class='pb6 w-full'>User Access</h3>
+
+                    <div class='col col--12'>
+                        <div class='w-full select-container'>
+                            <select @change='patchUser(user)' v-model='user.access' class='select'>
+                                <option>disabled</option>
+                                <option>admin</option>
+                                <option>user</option>
+                            </select>
+                            <div class='select-arrow'></div>
+                        </div>
+                    </div>
+
                     <h3 class='pb6 w-full'>User Flags</h3>
 
                     <div class='col col--6'>
@@ -157,63 +173,48 @@ export default {
         refresh: function() {
             this.getUsers();
         },
-        getUsers: function() {
-            this.loading = true;
+        getUsers: async function() {
+            try {
+                this.loading = true;
 
-            const url = new URL(`${window.location.origin}/api/user`);
-            url.searchParams.append('limit', this.perpage)
-            url.searchParams.append('page', this.page)
-            url.searchParams.append('filter', this.filter.name)
+                const url = new URL(`${window.location.origin}/api/user`);
+                url.searchParams.append('limit', this.perpage)
+                url.searchParams.append('page', this.page)
+                url.searchParams.append('filter', this.filter.name)
 
-            if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
-            if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access)
+                if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
+                if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access)
 
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
-                this.loading = false;
-
-                if (!res.ok && res.statusCode !== 404 && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok && res.statusCode !== 404) {
-                    throw new Error('Failed to load users');
-                }
-                return res.json();
-            }).then((res) => {
+                const res = await window.std(url);
                 this.total = res.total;
                 this.users = res.users.map((user) => {
                     user._open = false;
                     return user;
                 });
-            }).catch((err) => {
+                this.loading = false;
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
-        patchUser: function(user) {
-            const url = new URL(`${window.location.origin}/api/user/${user.id}`);
+        patchUser: async function(user) {
+            try {
+                const res = await window.std(`/api/user/${user.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        access: user.access,
+                        flags: user.flags
+                    })
+                });
 
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    flags: user.flags
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to update user');
-                }
-                return res.json();
-            }).then((res) => {
                 for (const key of Object.keys(res)) {
                     user[key] = res[key];
                 }
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {

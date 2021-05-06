@@ -144,6 +144,7 @@ test('GET: api/data', (t) => {
             id: 1,
             s3: 's3://v2.openaddresses.io/test/job/1/source.geojson.gz',
             source: 'us/dc/statewide',
+            fabric: false,
             layer: 'addresses',
             name: 'dcgis',
             job: 1,

@@ -1030,6 +1030,44 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {patch} /api/data/:data Update Data
+     * @apiVersion 1.0.0
+     * @apiName Update
+     * @apiGroup Data
+     * @apiPermission data
+     *
+     * @apiDescription
+     *   Update an existing data object
+     *
+     * @apiParam {Number} :data Data ID
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchData.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Data.json} apiSuccess
+     *
+     */
+    router.patch(
+        ...await schemas.get('PATCH /data/:data', {
+            body: 'req.body.PatchData.json',
+            res: 'res.Data.json'
+        }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'data');
+
+                await user.is_admin(req);
+
+                req.body.id = req.params.data;
+
+                await cacher.del('data');
+
+                return res.json(await Data.commit(pool, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/data/:data Get Data
      * @apiVersion 1.0.0
      * @apiName SingleData

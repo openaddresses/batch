@@ -147,6 +147,34 @@ class Data {
         }
     }
 
+    static async commit(pool, data) {
+        let pgres;
+        try {
+            pgres = await pool.query(`
+                UPDATE results
+                    SET
+                        fabric = COALESCE($2, fabric, False)
+                    WHERE
+                        id = $1
+                    RETURNING
+                        *
+            `, [
+                data.id,
+                data.fabric,
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'failed to save result');
+        }
+
+        return pgres.rows.map((res) => {
+            res.id = parseInt(res.id);
+            res.job = parseInt(res.job);
+            res.size = parseInt(res.size);
+            res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
+            return res;
+        })[0];
+    }
+
     static async from(pool, data_id) {
         try {
             const pgres = await pool.query(`

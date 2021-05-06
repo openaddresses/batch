@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "fabric": {
+            "type": "boolean",
+            "description": "Should the source be included in the fabric"
+        }
+    }
+}

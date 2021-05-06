@@ -79,7 +79,7 @@ class Cacher {
 
     async del(key) {
         try {
-            await this.cache.get(key);
+            await this.cache.delete(key);
         } catch (err) {
             console.error(err);
         }

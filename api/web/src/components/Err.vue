@@ -15,6 +15,7 @@
                 <div class='txt-l mb12 align-center'>Uh Oh!</div>
                 <div class='txt-m align-center' v-text='err.message'></div>
 
+                <a href='mailto:hello@openaddresses.io' class='fl btn btn--stroke btn--gray round ml12'>Contact Us</a>
                 <button @click='$emit("err", false)' class='fr mb12 mr12 btn round btn--gray btn--stroke'>Ok</button>
             </div>
         </div>

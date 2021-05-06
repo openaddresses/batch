@@ -160,7 +160,7 @@ class Data {
                         *
             `, [
                 data.id,
-                data.fabric,
+                data.fabric
             ]);
         } catch (err) {
             throw new Err(500, err, 'failed to save result');

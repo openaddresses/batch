@@ -9,6 +9,7 @@ require('./lib/pre');
 const DRIVE = '/tmp';
 
 const fs = require('fs');
+const TileBase = require('tilebase');
 const {pipeline} = require('stream');
 const path = require('path');
 const prompts = require('prompts');
@@ -145,6 +146,11 @@ async function cli() {
                 size: false
             }
         });
+
+        await TileBase.to_tb(
+            path.resolve(DRIVE, 'fabric.mbtiles'),
+            path.resolve(DRIVE, 'fabric.tilebase')
+        );
 
     } catch (err) {
         await meta.protection(false);

@@ -126,7 +126,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>Human-Readable name of the collection</p>"
           },
           {
             "group": "Body",
@@ -477,6 +477,13 @@ define({ "api": [
             "optional": true,
             "field": "point",
             "description": "<p>Filter results by geographic point '{lng},{lat}'</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "fabric",
+            "description": "<p>Query results by fabric inclusion</p>"
           }
         ]
       }
@@ -815,6 +822,134 @@ define({ "api": [
             "type": "Object",
             "optional": false,
             "field": "jobs.stats",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Data"
+  },
+  {
+    "type": "patch",
+    "url": "/api/data/:data",
+    "title": "Update Data",
+    "version": "1.0.0",
+    "name": "Update",
+    "group": "Data",
+    "permission": [
+      {
+        "name": "data"
+      }
+    ],
+    "description": "<p>Update an existing data object</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":data",
+            "description": "<p>Data ID</p>"
+          }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "fabric",
+            "description": "<p>Should the source be included in the fabric</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
             "description": "<p>undefined</p>"
           }
         ]

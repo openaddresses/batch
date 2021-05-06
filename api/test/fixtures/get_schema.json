@@ -119,6 +119,11 @@
         "query": true,
         "res": true
     },
+    "PATCH /data/:data": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
     "GET /data/:data": {
         "body": false,
         "query": false,

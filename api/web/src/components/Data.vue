@@ -142,16 +142,30 @@
                 </div>
                 <template v-if='d._open'>
                     <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                        <div @click='emitjob(job.job)' class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
-                            <div class='col col--5'>
+                        <div class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
+                            <div @click='emitjob(job.job)' class='col col--5'>
                                 <span v-text='job.layer'/> - <span v-text='job.name'/>
 
                             </div>
-                            <div class='col col--3'>
+                            <div @click='emitjob(job.job)' class='col col--2'>
                                 <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
                             </div>
-                            <div class='col col--4'>
+                            <div class='col col--5'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+
+                                <template v-if='auth && auth.access === "admin"'>
+                                    <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                        <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-settings" /></svg>
+
+                                        <div class='round dropdown-content'>
+                                            <label class='switch-container'>
+                                                <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
+                                                <div class='switch switch--blue mx6'></div>
+                                                Fabric
+                                            </label>
+                                        </div>
+                                    </span>
+                                </template>
 
                                 <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
                                     <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
@@ -246,6 +260,21 @@ export default {
                 this.loading.collections = true;
                 this.collections = await window.std('/api/collections');
                 this.loading.collections = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        updateData: async function(job) {
+            try {
+                await window.std(`/api/data/${job.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fabric: job.fabric
+                    })
+                });
             } catch (err) {
                 this.$emit('err', err);
             }

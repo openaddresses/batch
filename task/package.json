@@ -12,10 +12,10 @@
         "@turf/turf": "^6.3.0",
         "ajv": "^6.12.6",
         "archiver": "^5.0.0",
-        "csv-parse": "^4.8.8",
+        "csv-parse": "^4.15.4",
         "find": "^0.3.0",
         "glob": "^7.1.6",
-        "lib-oa": "2.4.0",
+        "lib-oa": "2.4.1",
         "minimist": "^1.2.5",
         "mkdirp": "^1.0.4",
         "oa": "2.3.0",
@@ -28,7 +28,7 @@
         "wellknown": "^0.5.0"
     },
     "devDependencies": {
-        "eslint": "^7.12.1",
+        "eslint": "^7.25.0",
         "eslint-plugin-node": "^11.0.0",
         "tape": "^5.0.0"
     }

@@ -5,15 +5,15 @@
             <h3 class='align-center pb12'>New Features</h3>
 
             <div class='grid'>
-                <div class='col col--4 flex-parent flex-parent--center-main'>
+                <div class='col col--4 flex flex--center-main'>
                     <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg>
                     Buildings
                 </div>
-                <div class='col col--4 flex-parent flex-parent--center-main'>
+                <div class='col col--4 flex flex--center-main'>
                     <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg>
                     Addresses
                 </div>
-                <div class='col col--4 flex-parent flex-parent--center-main'>
+                <div class='col col--4 flex flex--center-main'>
                     <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg>
                     Parcels
                 </div>
@@ -115,13 +115,13 @@
         </div>
 
         <template v-if='loading.sources'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full'>
+                <div class='loading py24'></div>
             </div>
         </template>
         <template v-else-if='!datas.length'>
-            <div class='flex-parent flex-parent--center-main'>
-                <div class='flex-child py24'>
+            <div class='flex flex--center-main'>
+                <div class='py24'>
                     <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                 </div>
             </div>

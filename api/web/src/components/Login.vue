@@ -1,16 +1,16 @@
 <template>
     <div class='col col--12 grid pt12'>
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full'>
+                <div class='loading py24'></div>
             </div>
         </template>
         <template v-else>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6'>Login</h3>
+            <div class='col col--12 flex flex--center-main'>
+                <h3 class='txt-h4 py6'>Login</h3>
             </div>
 
-            <div class='col col--12 flex-parent flex-parent--center-main'>
+            <div class='col col--12 flex flex--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12 w-full'>Username: <span @click='$router.push({ path: "/login/forgot" })' class='fr cursor-pointer txt-underline-on-hover'>Forgot it?</span></label>
                     <input v-on:keyup.enter='login' :class='{

@@ -32,8 +32,8 @@
             </span>
         </div>
 
-        <div class='col col--12 flex-parent flex-parent--center-main relative'>
-            <div class='flex-child col col--12 wmax600'>
+        <div class='col col--12 flex flex--center-main relative'>
+            <div class='col col--12 wmax600'>
                 <router-view
                     :auth='auth'
                     @auth='getLogin'

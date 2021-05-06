@@ -17,8 +17,8 @@
 
         <template v-if='!isCollapsed'>
             <template v-if='loading'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
+                <div class='flex flex--center-main w-full'>
+                    <div class='loading py24'></div>
                 </div>
             </template>
             <template v-else>

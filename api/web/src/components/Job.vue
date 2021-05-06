@@ -13,7 +13,7 @@
 
             <div :key='message' v-for='message in joberror.messages' class='align-center w-full' v-text='message'></div>
 
-            <div class='flex-parent flex-parent--center-main'>
+            <div class='flex flex--center-main'>
                 <ErrorsModerate @moderated='joberror = false' class='py12' :job='job'/>
             </div>
         </div>
@@ -58,13 +58,13 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
+            <div class='flex flex--center-main w-full'>
+                <div class='loading py24'></div>
             </div>
         </template>
         <template v-else>
-            <div class='col col--12 flex-parent flex-parent--center-main'>
-                <h3 class='flex-child txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
+            <div class='col col--12 flex flex--center-main'>
+                <h3 class='txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
             </div>
             <div class='col col--12 py12'>
                 <h3 class='fl txt-h4 py6'>
@@ -73,7 +73,7 @@
                     <span v-if='mode === "bounds"'>Job Bounds:</span>
                 </h3>
 
-                <div class='flex-parent-inline fr'>
+                <div class='flex-inline fr'>
                     <button @click='mode = "preview"' :class='{ "btn--stroke": mode !== "preview" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Preview</button>
                     <button @click='mode = "numeric"' :class='{ "btn--stroke": mode !== "numeric" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Numeric</button>
                     <button @click='mode = "bounds"' :class='{ "btn--stroke": mode !== "bounds" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Map</button>
@@ -101,12 +101,12 @@
                 </template>
                 <template v-else>
                     <div class='col col--12 border border--gray-light round'>
-                        <div class='flex-parent flex-parent--center-main pt36'>
-                            <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
+                        <div class='flex flex--center-main pt36'>
+                            <svg class='icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                         </div>
 
-                        <div class='flex-parent flex-parent--center-main pt12 pb36'>
-                            <h1 class='flex-child txt-h4 cursor-default'>No Preview Image Found</h1>
+                        <div class='flex flex--center-main pt12 pb36'>
+                            <h1 class='txt-h4 cursor-default'>No Preview Image Found</h1>
                         </div>
                     </div>
                 </template>

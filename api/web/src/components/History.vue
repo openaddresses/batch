@@ -18,8 +18,8 @@
             <h2 class='txt-h4 pb12 fl'>Stats History:</h2>
 
             <template v-if='loading'>
-                <div class='flex flex--center-main w-full'>
-                    <div class='loading py24'></div>
+                <div class='flex flex--center-main w-full py24'>
+                    <div class='loading'></div>
                 </div>
             </template>
             <template v-else>
@@ -61,8 +61,8 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex flex--center-main w-full'>
-                <div class='loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-else>

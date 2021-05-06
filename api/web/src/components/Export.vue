@@ -19,8 +19,8 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex flex--center-main w-full'>
-                <div class='loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-else>
@@ -29,8 +29,8 @@
             </div>
 
             <template v-if='!["Success", "Fail"].includes(exp.status)'>
-                <div class='flex flex--center-main w-full'>
-                    <div class='loading py24'></div>
+                <div class='flex flex--center-main w-full py24'>
+                    <div class='loading'></div>
                 </div>
                 <div class='col col--12 flex flex--center-main'>
                     <h3 v-if='exp.status === "Pending"' class='flex-child txt-h4 py6'>Your Export Is Queued</h3>

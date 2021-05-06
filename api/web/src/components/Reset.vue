@@ -1,8 +1,8 @@
 <template>
     <div class='col col--12 grid pt12'>
         <template v-if='loading'>
-            <div class='flex flex--center-main w-full'>
-                <div class='loading py24'></div>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
             </div>
         </template>
         <template v-if='reset'>

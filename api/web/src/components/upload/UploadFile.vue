@@ -10,8 +10,8 @@
             </div>
 
             <div v-if='progress && progress < 101' class='col col--12'>
-                <div class='flex flex--center-main w-full'>
-                    <div class='loading py24'></div>
+                <div class='flex flex--center-main w-full py24'>
+                    <div class='loading'></div>
                 </div>
 
                 <div class='align-center txt-truncate' v-text='name'></div>

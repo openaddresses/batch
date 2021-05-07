@@ -136,7 +136,7 @@ async function cli() {
             );
         }
 
-        tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), Object.keys(layers).map((l) => {
+        await tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), Object.keys(layers).map((l) => {
             return path.resolve(DRIVE, `${l}.mbtiles`);
         }), {
             std: true,
@@ -151,6 +151,13 @@ async function cli() {
             path.resolve(DRIVE, 'fabric.mbtiles'),
             path.resolve(DRIVE, 'fabric.tilebase')
         );
+
+        await s3.putObject({
+            ContentType: 'application/octet-stream',
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/fabric.tilebase`,
+            Body: fs.createReadStream(path.resolve(DRIVE, 'fabric.tilebase'))
+        }).promise();
 
     } catch (err) {
         await meta.protection(false);

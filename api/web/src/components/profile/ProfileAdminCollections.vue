@@ -1,5 +1,5 @@
 <template>
-    <div class='col col--12 grid pt24'>
+    <div class='col col--12 grid py24'>
         <div class='col col--12 grid border-b border--gray-light pt24'>
             <div class='col col--12'>
                 <h2 class='txt-h4 ml12 pb12 fl'>
@@ -8,6 +8,9 @@
                 </h2>
 
                 <div class='fr'>
+                    <button class='btn round btn--stroke color-gray color-green-on-hover mx3'>
+                        <svg class='icon'><use xlink:href='#icon-package'/></svg>
+                    </button>
                     <button @click='newCollection.show = true' class='btn round btn--stroke color-gray color-green-on-hover mx3'>
                         <svg class='icon'><use xlink:href='#icon-plus'/></svg>
                     </button>
@@ -70,11 +73,19 @@
             <div :key='collection.id' v-for='collection in collections' class='col col--12 grid'>
                 <div @click='collection._open = !collection._open' class='col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
                     <span v-text='collection.name'/>
+
                     <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='collection.sources.length + " rules"'></span>
                 </div>
 
-                <div v-if='collection._open' class='col col-12 border border--gray-light round px12 py12 my6'>
+                <div v-if='collection._open && !collection._edit' class='col col-12 border border--gray-light round px12 py12 my6 relative'>
                     <div :key='source' v-for='source in collection.sources' class='col col--12 pre' v-text='source'></div>
+
+                    <button @click='collection._edit = !collection._edit' class='color-gray color-blue-on-hover absolute top right pt24 pr24'>
+                        <svg class='icon'><use xlink:href='#icon-pencil'/></svg>
+                    </button>
+                </div>
+                <div v-else-if='collection._open && collection._edit' class='col col-12 border border--gray-light round px12 py12 my6'>
+                    <div :key='source' v-for='source in collection.sources' class='col col--12' v-text='source'></div>
                 </div>
             </div>
         </template>
@@ -120,6 +131,7 @@ export default {
                 const res = await window.std('/api/collections');
                 this.collections = res.map((collection) => {
                     collection._open = false;
+                    collection._edit = false;
                     return collection;
                 });
 

@@ -1,5 +1,9 @@
 <template>
-    <div id='app' class='col col--12 h-full'>
+    <div id='app' class='col col--12 h-full relative'>
+        <div class='cursor-pointer absolute top left px3 py3 round z1 bg-white'>
+             <svg class='inline pt3 icon'><use xlink:href='#icon-chevron-left'/></svg>
+            <img @click='external("https://batch.openaddresses.io")' class='h24 w24 round' src='../../../public/logo.jpg'/>
+        </div>
         <Fabric/>
     </div>
 </template>
@@ -16,6 +20,13 @@ export default {
         };
     },
     methods: {
+        external: function(url, tab) {
+            if (!tab) {
+                window.location.href = url;
+            } else {
+                window.open(url, "_blank");
+            }
+        }
     },
     components: {
         Fabric

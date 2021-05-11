@@ -73,12 +73,9 @@ async function server(args, config, cb) {
     const Exporter = require('./lib/exporter');
     const schemas = new (require('./lib/schema'))();
 
-    let tb = false;
-    if (config.StackName !== 'test') {
-        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        console.log('ok - loaded TileBase');
-        await tb.open();
-    }
+    const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+    console.log('ok - loaded TileBase');
+    await tb.open();
 
     let postgres = process.env.POSTGRES;
 
@@ -994,9 +991,15 @@ async function server(args, config, cb) {
                     return await Map.fabric_tile(tb, req.params.z, req.params.x, req.params.y);
                 }, false);
 
-                res.type('application/vnd.mapbox-vector-tile');
+                if (tile.length === 0) {
+                    throw new Err(404, null, 'No Tile Found');
+                }
 
-                return res.send(tile);
+                res.writeHead(200, {
+                    'Content-Type': 'application/vnd.mapbox-vector-tile',
+                    'Content-Encoding': 'gzip'
+                });
+                res.end(tile);
             } catch (err) {
                 return Err.respond(err, res);
             }

@@ -24,6 +24,7 @@ class Config {
                 this.octo = false;
                 this.CookieSecret = '123';
                 this.SharedSecret = '123';
+                this.StackName = 'test';
             } else {
                 const secrets = await Config.secret('Batch');
 
@@ -31,6 +32,7 @@ class Config {
                 this.CookieSecret = secrets.CookieSecret;
                 this.SharedSecret = process.env.SharedSecret;
                 this.MailGun = secrets.MailGun;
+                this.StackName = process.env.StackName;
 
                 let github = secrets.GitHubKey
                     .replace('-----BEGIN RSA PRIVATE KEY-----', '')
@@ -56,11 +58,13 @@ class Config {
             if (!process.env.BaseUrl) {
                 console.error('ok - set env BaseUrl: http://batch.openaddresses.io');
                 process.env.BaseUrl = 'http://batch.openaddresses.io';
+                this.BaseUrl = 'http://batch.openaddresses.io';
             }
 
             if (!process.env.Bucket) {
                 console.error('ok - set env Bucket: v2.openaddresses.io');
                 process.env.Bucket = 'v2.openaddresses.io';
+                this.Bucket = 'v2.openaddresses.io';
             }
 
             if (!process.env.MAPBOX_TOKEN) {

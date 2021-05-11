@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import VTooltip from 'v-tooltip';
 import App from './App.vue'
 import std from '../std.js';
+std();
 
 Vue.config.productionTip = false
 Vue.use(VueRouter);

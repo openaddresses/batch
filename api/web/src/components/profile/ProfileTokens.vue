@@ -140,7 +140,7 @@ export default {
         getTokens: async function() {
             try {
                 this.loading = true;
-                this.tokens = window.std('/api/token');
+                this.tokens = (await window.std('/api/token')).tokens;
                 this.loading = false;
             } catch (err) {
                 this.$emit('err', err);

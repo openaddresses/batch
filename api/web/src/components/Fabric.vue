@@ -1,7 +1,7 @@
 <template>
     <div class='col col--12 h-full'>
         <div class='col col--12 relative h-full'>
-            <div id="map" class='w-full h-full'></div>
+            <div id='map' class='w-full h-full'></div>
         </div>
     </div>
 </template>
@@ -14,7 +14,6 @@ export default {
     name: 'Fabric',
     data: function() {
         return {
-            layers: ['addresses', 'parcels', 'buildings'],
             map: ''
         }
     },
@@ -35,15 +34,6 @@ export default {
                 this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
                 this.map.on('load', () => {
-                    this.map.addSource('coverage', {
-                        type: 'vector',
-                        tiles: [
-                            `${window.location.origin}/api/map/{z}/{x}/{y}.mvt`
-                        ],
-                        minzoom: 0,
-                        maxzoom: 5
-                    });
-
                     this.map.addSource('borders', {
                         type: 'vector',
                         tiles: [
@@ -190,6 +180,7 @@ export default {
                     });
                 });
             } catch (err) {
+                console.error(err);
                 this.$emit('err', err);
             }
         }

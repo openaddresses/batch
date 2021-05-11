@@ -1,10 +1,12 @@
 <template>
-    <div id='app' class='col col--12'>
-        I AM A MAP
+    <div id='app' class='col col--12 h-full'>
+        <Fabric/>
     </div>
 </template>
 
 <script>
+import Fabric from '../../components/Fabric.vue';
+
 export default {
     name: 'OpenAddressesFabric',
     mounted: function() {
@@ -16,6 +18,7 @@ export default {
     methods: {
     },
     components: {
+        Fabric
     }
 }
 </script>

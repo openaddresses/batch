@@ -64,13 +64,16 @@ const router = new VueRouter({
             path: '/profile',
             component: Profile,
             children: [{
-                path: '/',
+                path: '',
+                name: 'ProfileDefault',
                 component: ProfileDefault
             },{
                 path: '/analytics',
+                name: 'ProfileAnalytics',
                 component: ProfileAnalytics
             },{
                 path: '/admin',
+                name: 'ProfileAdmin',
                 component: ProfileAdmin
             }]
         },

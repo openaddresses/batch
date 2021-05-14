@@ -12,7 +12,6 @@ Vue.use(VTooltip);
 // === Components ===
 
 import Register from '../components/Register.vue';
-import Profile from '../components/Profile.vue';
 import Export from '../components/Export.vue';
 import Upload from '../components/Upload.vue';
 import Errors from '../components/Errors.vue';
@@ -28,6 +27,11 @@ import Job from '../components/Job.vue';
 import Run from '../components/Run.vue';
 import JobLog from '../components/JobLog.vue';
 import JobRaw from '../components/JobRaw.vue';
+
+import Profile from '../components/Profile.vue';
+import ProfileDefault from '../components/profile/ProfileDefault.vue';
+import ProfileAnalytics from '../components/profile/ProfileAnalytics.vue';
+import ProfileAdmin from '../components/profile/ProfileAdmin.vue';
 
 // === Routes ===
 
@@ -55,7 +59,22 @@ const router = new VueRouter({
         { path: '/login/verify', component: Verify },
         { path: '/login/forgot', component: Forgot },
         { path: '/login/reset', component: Reset },
-        { path: '/profile', component: Profile },
+
+        {
+            path: '/profile',
+            component: Profile,
+            children: [{
+                path: '/',
+                component: ProfileDefault
+            },{
+                path: '/analytics',
+                component: ProfileAnalytics
+            },{
+                path: '/admin',
+                component: ProfileAdmin
+            }]
+        },
+
         { path: '/register', component: Register },
 
         { path: '/upload', component: Upload }

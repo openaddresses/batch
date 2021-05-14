@@ -9,162 +9,25 @@
 
                 <div class='fr'>
                     <div v-if='profile.access === "admin"' class='flex-inline'>
-                        <button @click='mode = "profile"' :class='{ "btn--stroke": mode !== "profile" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Profile</button>
-                        <button @click='mode = "analytics"' :class='{ "btn--stroke": mode !== "analytics" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Analytics</button>
-                        <button @click='mode = "admin"' :class='{ "btn--stroke": mode !== "admin" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Admin</button>
+                        <button @click='router.push("/profile/")' :class='{ "btn--stroke": mode !== "profile" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Profile</button>
+                        <button @click='router.push("/profile/analytics")' :class='{ "btn--stroke": mode !== "analytics" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Analytics</button>
+                        <button @click='router.push("/profile/admin")' :class='{ "btn--stroke": mode !== "admin" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Admin</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <template v-if='mode === "profile"'>
-            <template v-if='loading.profile'>
-                <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
-                </div>
-            </template>
-            <template v-else>
-                <div class='col col--12 grid grid--gut12'>
-                    <div class='col col--6 pt12'>
-                        <label>Username:</label>
-                        <input v-model='profile.username' class='input' placeholder='Username'/>
-                    </div>
-                    <div class='col col--6 pt12'>
-                        <label>Email:</label>
-                        <input v-model='profile.email' class='input' placeholder='Username'/>
-                    </div>
-                    <div class='col col--12 clearfix pt12'>
-                        <button disabled class='btn btn--stroke btn--gray btn--s round fr'>Update</button>
-                    </div>
-                </div>
-
-                <div class='col col--12 grid border-b border--gray-light pb12 pt24'>
-                    <div class='col col--12 clearfix'>
-                        <h2 class='fl txt-h4 ml12'>Contribution:</h2>
-
-                        <div class='fr'>
-                            <button @click='getLogin' class='btn round btn--stroke color-gray mx3'>
-                                <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                    <div class='col col--12 align-center'>
-                        OpenAddresses operates on a very small budget
-                    </div>
-                    <div class='col col--12 align-center'>
-                        Please consider contributing to support to keep the lights on as well as support future development of the project.
-                    </div>
-
-                <div class='col col--12 grid'>
-                    <div @click='oc("basic")' class='col col--4 round py12 my12' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
-                        "cursor-pointer": profile.level !== "basic",
-                        "border border--gray-light": profile.level === "basic",
-                    }'>
-                        <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-user" /></svg>
-
-                        <div class='align-center'>Basic</div>
-                        <div class='align-center txt-s'>free</div>
-
-                        <div class='col col--12 pt12'>
-                            <svg v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                            <svg v-else-if='hover === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                            <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
-                        </div>
-                    </div>
-                    <div @click='oc("backer")' class='col col--4 round py12 my12' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
-                        "cursor-pointer": profile.level !== "backer",
-                        "border border--gray-light": profile.level === "backer",
-                    }'>
-                        <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-coin" /></svg>
-                        <div class='align-center'>Backer</div>
-                        <div class='align-center txt-s'>&gt; $5</div>
-
-                        <div class='col col--12 pt12'>
-                            <svg v-if='profile.level === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                            <svg v-else-if='hover === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                            <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
-                        </div>
-                    </div>
-                    <div @click='oc("sponsor")' class='col col--4 round py12 my12' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
-                        "cursor-pointer": profile.level !== "sponsor",
-                        "border border--gray-light": profile.level === "sponsor",
-                    }'>
-                        <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-trophy" /></svg>
-                        <div class='align-center'>Sponsor</div>
-                        <div class='align-center txt-s'>&gt; $100</div>
-
-                        <div class='col col--12 pt12'>
-                            <svg v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                            <svg v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                            <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
-                        </div>
-                    </div>
-
-                    <div class='col col--4'>
-                        <div class='txt-s align-center'>Basic Open Data</div>
-                        <div class='txt-s align-center'>Rate Limited CDN</div>
-                    </div>
-
-                    <div class='col col--4'>
-                        <div class='txt-s align-center'>All Basic Features</div>
-                        <div class='txt-s align-center'>300 Custom Exports / month</div>
-                    </div>
-
-                    <div class='col col--4'>
-                        <div class='txt-s align-center'>All Backer Features</div>
-
-                        <div class='align-center'>
-                            <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
-                        </div>
-
-                        <div class='txt-s align-center'>Fastest Data Access</div>
-                        <div class='txt-s align-center'>Validated Data</div>
-                    </div>
-                </div>
-
-            </template>
-
-            <ProfileTokens @err='$emit("err", $event)'/>
-
-            <template v-if='profile.level !== "basic"'>
-                <ProfileExports @err='$emit("err", $event)'/>
-            </template>
-        </template>
-        <template v-else-if='mode === "analytics"'>
-            <ProfileAnalytics
-                v-if='profile.access === "admin"'
-                @err='$emit("err", $event)'
-            />
-        </template>
-        <template v-else-if='mode === "admin"'>
-            <ProfileAdminUser
-                v-if='profile.access === "admin"'
-                @err='$emit("err", $event)'
-            />
-
-            <ProfileAdminCollections
-                v-if='profile.access === "admin"'
-                @err='$emit("err", $event)'
-            />
-        </template>
+        <router-view :profile='profile' @refresh='getLogin' @err='$emit("err", $event)'/>
     </div>
 </template>
 
 <script>
-import ProfileAnalytics from './profile/ProfileAnalytics.vue'
-import ProfileAdminUser from './profile/ProfileAdminUser.vue'
-import ProfileAdminCollections from './profile/ProfileAdminCollections.vue'
-import ProfileTokens from './profile/ProfileTokens.vue'
-import ProfileExports from './profile/ProfileExports.vue'
 
 export default {
     name: 'Profile',
     props: [ ],
     data: function() {
         return {
-            mode: 'profile',
-            hover: 'none',
             profile: {
                 username: '',
                 access: '',
@@ -172,21 +35,14 @@ export default {
                 level: ''
             },
             loading: {
-                profile: true,
+                profile: true
             }
-        };
+        }
     },
     mounted: function() {
-        this.refresh();
+        this.getLogin();
     },
     methods: {
-        oc: function(level) {
-            if (this.profile.level === level) return;
-            window.open('https://opencollective.com/openaddresses/contribute', "_blank");
-        },
-        refresh: function() {
-            this.getLogin();
-        },
         getLogin: async function() {
             try {
                 this.loading.profile = true;
@@ -200,13 +56,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        ProfileAnalytics,
-        ProfileAdminUser,
-        ProfileAdminCollections,
-        ProfileTokens,
-        ProfileExports
     }
 }
 </script>

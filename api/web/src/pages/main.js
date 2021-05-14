@@ -68,11 +68,11 @@ const router = new VueRouter({
                 name: 'ProfileDefault',
                 component: ProfileDefault
             },{
-                path: '/analytics',
+                path: 'analytics',
                 name: 'ProfileAnalytics',
                 component: ProfileAnalytics
             },{
-                path: '/admin',
+                path: 'admin',
                 name: 'ProfileAdmin',
                 component: ProfileAdmin
             }]

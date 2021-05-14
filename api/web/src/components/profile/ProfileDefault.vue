@@ -3,11 +3,11 @@
         <div class='col col--12 grid grid--gut12'>
             <div class='col col--6 pt12'>
                 <label>Username:</label>
-                <input v-model='profile.username' class='input' placeholder='Username'/>
+                <input v-model='p.username' class='input' placeholder='Username'/>
             </div>
             <div class='col col--6 pt12'>
                 <label>Email:</label>
-                <input v-model='profile.email' class='input' placeholder='Username'/>
+                <input v-model='p.email' class='input' placeholder='Username'/>
             </div>
             <div class='col col--12 clearfix pt12'>
                 <button disabled class='btn btn--stroke btn--gray btn--s round fr'>Update</button>
@@ -116,7 +116,11 @@ export default {
     props: [ 'profile' ],
     data: function() {
         return {
-            hover: 'none'
+            hover: 'none',
+            p: {
+                username: this.profile.username,
+                email: this.profile.email
+            }
         };
     },
     methods: {

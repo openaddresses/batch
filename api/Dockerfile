@@ -11,9 +11,10 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata \
     && apt-get install -y nginx curl memcached
 
-RUN curl 'https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.gz' | tar -xzv \
-    && cp ./node-v14.16.0-linux-x64/bin/node /usr/bin/ \
-    && ./node-v14.16.0-linux-x64/bin/npm install -g npm
+RUN export NODEV='16.1.0' \
+    && curl "https://nodejs.org/dist/v${NODEV}-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
+    && cp ./node-v${NODEV}-linux-x64/bin/node /usr/bin/ \
+    && ./node-v${NODEV}-linux-x64/bin/npm install -g npm
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 

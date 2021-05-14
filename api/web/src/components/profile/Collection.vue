@@ -17,7 +17,7 @@
             <template v-else>
                 <div class='col col--12 pb6'>
                     <h2 class='txt-bold fl'>Edit Collection</h2>
-                    <button @click='open = false' class='fr btn round btn--s btn--stroke btn--gray'>
+                    <button @click='collection.id ? edit = false : $emit("refresh")' class='fr btn round btn--s btn--stroke btn--gray'>
                         <svg class='icon'><use xlink:href='#icon-close'/></svg>
                     </button>
                 </div>
@@ -66,7 +66,7 @@ export default {
             open: !this.collection.id,
             name: this.collection.name || '',
             source: '',
-            sources: this.collection.sources || []
+            sources: this.collection.sources ? JSON.parse(JSON.stringify(this.collection.sources)) : []
         };
     },
     methods: {

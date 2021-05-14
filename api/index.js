@@ -1,4 +1,4 @@
-'use strict';
+'usict';
 
 const fs = require('fs');
 const Cacher = require('./lib/cacher');
@@ -864,6 +864,7 @@ async function server(args, config, cb) {
                 const collection = new Collection(req.body.name, req.body.sources);
                 await collection.generate(pool);
 
+                await cacher.del('collection');
                 return res.json(collection.json());
             } catch (err) {
                 return Err.respond(err, res);

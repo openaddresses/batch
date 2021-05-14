@@ -28,10 +28,6 @@ test('Collecton()', (t) => {
     }, new Err(400, null, 'Collection.sources must be an array'), 'Collection.sources must be an array');
 
     t.throws(() => {
-        new Collection('global', []);
-    }, new Err(400, null, 'Collection.sources must be > 0'), 'Collection.sources must be > 0');
-
-    t.throws(() => {
         new Collection('global', [true]);
     }, new Err(400, null, 'Collection.sources array must contain strings'), 'Collection.sources array must contain strings');
 

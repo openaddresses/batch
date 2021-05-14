@@ -11,7 +11,6 @@ class Collection {
         if (!/^[a-z0-9-]+$/.test(name)) throw new Err(400, null, 'Collection.name may only contain a-z 0-9 and -');
 
         if (!Array.isArray(sources)) throw new Err(400, null, 'Collection.sources must be an array');
-        if (sources.length === 0) throw new Err(400, null, 'Collection.sources must be > 0');
         for (const source of sources) {
             if (typeof source !== 'string') {
                 throw new Err(400, null, 'Collection.sources array must contain strings');

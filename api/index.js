@@ -1,4 +1,4 @@
-'usict';
+'use strict';
 
 const fs = require('fs');
 const Cacher = require('./lib/cacher');
@@ -983,28 +983,28 @@ async function server(args, config, cb) {
     router.get(
         ...await schemas.get('GET /map/fabric/:z/:x/:y.mvt'),
         async (req, res) => {
-                await Param.int(req, 'z');
-                await Param.int(req, 'x');
-                await Param.int(req, 'y');
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
 
-                let tile;
-                try {
-                    tile = await cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                        return await Map.fabric_tile(tb, req.params.z, req.params.x, req.params.y);
-                    }, false);
+            let tile;
+            try {
+                tile = await cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                    return await Map.fabric_tile(tb, req.params.z, req.params.x, req.params.y);
+                }, false);
 
-                    if (tile.length === 0) {
-                        throw new Err(404, null, 'No Tile Found');
-                    }
-                } catch (err) {
-                    return Err.respond(new Err(404, err, 'No Tile Found'), res);
+                if (tile.length === 0) {
+                    throw new Err(404, null, 'No Tile Found');
                 }
+            } catch (err) {
+                return Err.respond(new Err(404, err, 'No Tile Found'), res);
+            }
 
-                res.writeHead(200, {
-                    'Content-Type': 'application/vnd.mapbox-vector-tile',
-                    'Content-Encoding': 'gzip'
-                });
-                res.end(tile);
+            res.writeHead(200, {
+                'Content-Type': 'application/vnd.mapbox-vector-tile',
+                'Content-Encoding': 'gzip'
+            });
+            res.end(tile);
         }
     );
 

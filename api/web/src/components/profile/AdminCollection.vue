@@ -27,74 +27,19 @@
             </div>
         </template>
         <template v-else>
-            <template v-if='newCollection.show'>
-                <div class='col col--12 border border--gray-light round my12'>
-                   <div class='col col--12 grid grid--gut12 pl12 py6'>
-                        <div class='col col--12 pb6'>
-                            <h2 class='txt-bold fl'>Create New Collection</h2>
-                            <button @click='newCollection.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                                <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                            </button>
-                        </div>
-
-                        <div class='col col--12'>
-                            <label>Collection Name</label>
-                            <input v-model='newCollection.name' type='text' class='input' placeholder='Collection Name'/>
-                        </div>
-
-                        <div class='col col--10 py12'>
-                            <input v-on:keyup.enter='addGlob' v-model='newCollection.source' type='text' class='input' placeholder='New Source'/>
-                        </div>
-
-                        <div class='col col--2 py12'>
-                            <button @click='addGlob' class='btn btn--stroke round btn--gray w-full'>
-                                <svg class='fl icon mt6'><use href='#icon-plus'/></svg> Glob
-                            </button>
-                        </div>
-
-                        <div :key='source' v-for='(source, i) in newCollection.sources' class='col col--12'>
-                            <div class='pre'>
-                                <span v-text='source'/>
-                                <svg @click='newCollection.sources.splice(i, 1)' class='cursor-pointer fr icon color-gray-light color-red-on-hover'><use href='#icon-trash'/></svg>
-                            </div>
-                        </div>
-
-                        <div class='col col--12 clearfix'>
-                            <div class='col col--2 fr'>
-                                <button :disabled='newCollection.sources === 0' @click='setCollection' class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'>
-                                    <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-
             <div :key='collection.id' v-for='collection in collections' class='col col--12 grid'>
-                <div @click='collection._open = !collection._open' class='col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
-                    <span v-text='collection.name'/>
-
-                    <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='collection.sources.length + " rules"'></span>
-                </div>
-
-                <div v-if='collection._open && !collection._edit' class='col col-12 border border--gray-light round px12 py12 my6 relative'>
-                    <div :key='source' v-for='source in collection.sources' class='col col--12 pre' v-text='source'></div>
-
-                    <button @click='collection._edit = !collection._edit' class='color-gray color-blue-on-hover absolute top right pt24 pr24'>
-                        <svg class='icon'><use xlink:href='#icon-pencil'/></svg>
-                    </button>
-                </div>
-                <div v-else-if='collection._open && collection._edit' class='col col-12 border border--gray-light round px12 py12 my6'>
-                    <div :key='source' v-for='source in collection.sources' class='col col--12' v-text='source'></div>
-                </div>
+                <Collection :collection='collection'/>
             </div>
         </template>
     </div>
 </template>
 
 <script>
+
+import Collection from './Collection.vue';
+
 export default {
-    name: 'ProfileAdminCollections',
+    name: 'AdminCollections',
     props: [ ],
     data: function() {
         return {
@@ -131,7 +76,6 @@ export default {
                 const res = await window.std('/api/collections');
                 this.collections = res.map((collection) => {
                     collection._open = false;
-                    collection._edit = false;
                     return collection;
                 });
 
@@ -168,6 +112,9 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        Collection
     }
 }
 </script>

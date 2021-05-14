@@ -8,9 +8,6 @@
                 </h2>
 
                 <div class='fr'>
-                    <button class='btn round btn--stroke color-gray color-green-on-hover mx3'>
-                        <svg class='icon'><use xlink:href='#icon-package'/></svg>
-                    </button>
                     <button @click='collections.splice(0, 0, {})' class='btn round btn--stroke color-gray color-green-on-hover mx3'>
                         <svg class='icon'><use xlink:href='#icon-plus'/></svg>
                     </button>

@@ -132,7 +132,7 @@
 import Pager from '../util/Pager.vue';
 
 export default {
-    name: 'ProfileAdminUser',
+    name: 'AdminUser',
     props: [ ],
     data: function() {
         return {

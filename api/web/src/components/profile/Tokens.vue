@@ -85,7 +85,7 @@
 
 <script>
 export default {
-    name: 'ProfileToken',
+    name: 'Tokens',
     props: [ ],
     data: function() {
         return {

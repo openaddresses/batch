@@ -17,7 +17,7 @@ import AdminUser from './AdminUser.vue'
 import AdminCollections from './AdminCollection.vue'
 
 export default {
-    name: 'Profile',
+    name: 'ProfileAdmin',
     props: ['profile'],
     data: function() {
         return {

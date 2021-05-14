@@ -96,17 +96,17 @@ class Collection {
             await pool.query(`
                 UPDATE collections
                     SET
-                        name = $1,
-                        sources = $2::JSONB,
+                        name = COALESCE($1, name),
+                        sources = COALESCE($2::JSONB, sources),
                         created = NOW(),
-                        size = $4
+                        size = COALESCE($3, size)
                     WHERE
-                        id = $3
+                        id = $4
             `, [
                 this.name,
                 JSON.stringify(this.sources),
-                this.id,
-                this.size
+                this.size,
+                this.id
             ]);
 
             return this;

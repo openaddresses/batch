@@ -96,10 +96,10 @@ test('Collection#patch()', (t) => {
 
     // Cannot be changed
     t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.name, 'usa', 'collection.name: usa');
     t.equals(collection.s3, false, 'collection.s3: false');
 
     // Can be changed
+    t.equals(collection.name, 'global', 'collection.name: global');
     t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 123, 'collection.size: 123');

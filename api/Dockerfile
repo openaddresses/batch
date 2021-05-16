@@ -9,7 +9,7 @@ WORKDIR $HOME/api
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata \
-    && apt-get install -y nginx curl memcached python python3
+    && apt-get install -y nginx curl memcached python python3 build-essential
 
 RUN export NODEV='16.1.0' \
     && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \

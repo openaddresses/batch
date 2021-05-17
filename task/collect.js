@@ -54,6 +54,7 @@ async function fetch() {
         tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     } catch (err) {
         console.error(`ok - could not find ${DRIVE}`);
+        process.exit(1);
     }
 
     fs.mkdirSync(tmp);
@@ -73,7 +74,8 @@ async function fetch() {
             await collect(tmp, collection);
         }
     } catch (err) {
-        throw err;
+        console.error(err);
+        process.exit(1);
     }
 }
 

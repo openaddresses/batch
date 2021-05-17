@@ -73,6 +73,7 @@ async function server(args, config, cb) {
     const Exporter = require('./lib/exporter');
     const schemas = new (require('./lib/schema'))();
 
+    console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
     const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
     console.log('ok - loaded TileBase');
     await tb.open();

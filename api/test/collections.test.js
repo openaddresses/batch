@@ -28,10 +28,6 @@ test('Collecton()', (t) => {
     }, new Err(400, null, 'Collection.sources must be an array'), 'Collection.sources must be an array');
 
     t.throws(() => {
-        new Collection('global', []);
-    }, new Err(400, null, 'Collection.sources must be > 0'), 'Collection.sources must be > 0');
-
-    t.throws(() => {
         new Collection('global', [true]);
     }, new Err(400, null, 'Collection.sources array must contain strings'), 'Collection.sources array must contain strings');
 
@@ -96,10 +92,10 @@ test('Collection#patch()', (t) => {
 
     // Cannot be changed
     t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.name, 'usa', 'collection.name: usa');
     t.equals(collection.s3, false, 'collection.s3: false');
 
     // Can be changed
+    t.equals(collection.name, 'global', 'collection.name: global');
     t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["**"]');
     t.equals(collection.created, false, 'collection.created: false');
     t.equals(collection.size, 123, 'collection.size: 123');

@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router';
 import VTooltip from 'v-tooltip';
 import App from './App.vue'
+import std from '../std.js';
+std();
 
 Vue.config.productionTip = false
 Vue.use(VueRouter);
@@ -10,7 +12,6 @@ Vue.use(VTooltip);
 // === Components ===
 
 import Register from '../components/Register.vue';
-import Profile from '../components/Profile.vue';
 import Export from '../components/Export.vue';
 import Upload from '../components/Upload.vue';
 import Errors from '../components/Errors.vue';
@@ -26,6 +27,11 @@ import Job from '../components/Job.vue';
 import Run from '../components/Run.vue';
 import JobLog from '../components/JobLog.vue';
 import JobRaw from '../components/JobRaw.vue';
+
+import Profile from '../components/Profile.vue';
+import ProfileDefault from '../components/profile/ProfileDefault.vue';
+import ProfileAnalytics from '../components/profile/ProfileAnalytics.vue';
+import ProfileAdmin from '../components/profile/ProfileAdmin.vue';
 
 // === Routes ===
 
@@ -53,40 +59,30 @@ const router = new VueRouter({
         { path: '/login/verify', component: Verify },
         { path: '/login/forgot', component: Forgot },
         { path: '/login/reset', component: Reset },
-        { path: '/profile', component: Profile },
+
+        {
+            path: '/profile',
+            component: Profile,
+            children: [{
+                path: '',
+                name: 'ProfileDefault',
+                component: ProfileDefault
+            },{
+                path: 'analytics',
+                name: 'ProfileAnalytics',
+                component: ProfileAnalytics
+            },{
+                path: 'admin',
+                name: 'ProfileAdmin',
+                component: ProfileAdmin
+            }]
+        },
+
         { path: '/register', component: Register },
 
         { path: '/upload', component: Upload }
     ]
 });
-
-window.std = async function(url, opts = {}) {
-    try {
-        url = new URL(url);
-    } catch (err) {
-        url = new URL(window.location.origin + url);
-    }
-
-    try {
-        const res = await fetch(url, opts);
-
-        let bdy = {};
-        if ((res.status < 200 || res.status >= 400) && ![401].includes(res.status)) {
-            try {
-                bdy = await res.json();
-            } catch (err) {
-                throw new Error(`Status Code: ${res.status}`);
-            }
-
-            if (bdy.message) throw new Error(bdy.message);
-            else throw new Error(`Status Code: ${res.status}`);
-        }
-
-        return await res.json();
-    } catch (err) {
-        throw new Error(err.message);
-    }
-}
 
 new Vue({
     router: router,

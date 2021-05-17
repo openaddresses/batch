@@ -11,7 +11,6 @@ class Collection {
         if (!/^[a-z0-9-]+$/.test(name)) throw new Err(400, null, 'Collection.name may only contain a-z 0-9 and -');
 
         if (!Array.isArray(sources)) throw new Err(400, null, 'Collection.sources must be an array');
-        if (sources.length === 0) throw new Err(400, null, 'Collection.sources must be > 0');
         for (const source of sources) {
             if (typeof source !== 'string') {
                 throw new Err(400, null, 'Collection.sources array must contain strings');
@@ -96,17 +95,17 @@ class Collection {
             await pool.query(`
                 UPDATE collections
                     SET
-                        name = $1,
-                        sources = $2::JSONB,
+                        name = COALESCE($1, name),
+                        sources = COALESCE($2::JSONB, sources),
                         created = NOW(),
-                        size = $4
+                        size = COALESCE($3, size)
                     WHERE
-                        id = $3
+                        id = $4
             `, [
                 this.name,
                 JSON.stringify(this.sources),
-                this.id,
-                this.size
+                this.size,
+                this.id
             ]);
 
             return this;

@@ -15,6 +15,7 @@ const express = require('express');
 const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
+const TileBase = require('tilebase');
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache'],
     string: ['postgres']
@@ -71,6 +72,11 @@ async function server(args, config, cb) {
     const Collection = require('./lib/collections');
     const Exporter = require('./lib/exporter');
     const schemas = new (require('./lib/schema'))();
+
+    console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+    const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+    console.log('ok - loaded TileBase');
+    await tb.open();
 
     let postgres = process.env.POSTGRES;
 
@@ -859,6 +865,7 @@ async function server(args, config, cb) {
                 const collection = new Collection(req.body.name, req.body.sources);
                 await collection.generate(pool);
 
+                await cacher.del('collection');
                 return res.json(collection.json());
             } catch (err) {
                 return Err.respond(err, res);
@@ -924,7 +931,7 @@ async function server(args, config, cb) {
     );
 
     /**
-     * @api {get} /api/map/borders/:z/:x/:y.mvt Coverage MVT
+     * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
      * @apiVersion 1.0.0
      * @apiName BorderVectorTile
      * @apiGroup Map
@@ -957,6 +964,48 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
+        }
+    );
+
+    /**
+     * @api {get} /api/map/fabric/:z/:x/:y.mvt Fabric MVT
+     * @apiVersion 1.0.0
+     * @apiName FabricVectorTile
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Retrive fabric Mapbox Vector Tiles
+     *
+     * @apiParam {Number} z Z coordinate
+     * @apiParam {Number} x X coordinate
+     * @apiParam {Number} y Y coordinate
+     */
+    router.get(
+        ...await schemas.get('GET /map/fabric/:z/:x/:y.mvt'),
+        async (req, res) => {
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
+            let tile;
+            try {
+                tile = await cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                    return await Map.fabric_tile(tb, req.params.z, req.params.x, req.params.y);
+                }, false);
+
+                if (tile.length === 0) {
+                    throw new Err(404, null, 'No Tile Found');
+                }
+            } catch (err) {
+                return Err.respond(new Err(404, err, 'No Tile Found'), res);
+            }
+
+            res.writeHead(200, {
+                'Content-Type': 'application/vnd.mapbox-vector-tile',
+                'Content-Encoding': 'gzip'
+            });
+            res.end(tile);
         }
     );
 

@@ -2,7 +2,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "created": {
+        "name": {
             "type": "string"
         },
         "sources": {

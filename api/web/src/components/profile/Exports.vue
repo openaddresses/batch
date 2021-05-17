@@ -46,13 +46,13 @@ import Pager from '../util/Pager.vue';
 import Status from '../Status.vue';
 
 export default {
-    name: 'ProfileExports',
+    name: 'Exports',
     props: [ ],
     data: function() {
         return {
             exps: [],
             page: 0,
-            perpage: 2,
+            perpage: 10,
             total: 100,
             loading: false
         };

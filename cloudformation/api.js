@@ -134,9 +134,7 @@ const stack = {
                         },{
                             Effect: 'Allow',
                             Action: [
-                                's3:PutObject',
-                                's3:PutObjectAcl',
-                                's3:GetObject'
+                                's3:*',
                             ],
                             Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
                         },{

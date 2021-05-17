@@ -109,6 +109,11 @@
         "query": false,
         "res": false
     },
+    "GET /map/fabric/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /map/:z/:x/:y.mvt": {
         "body": false,
         "query": false,

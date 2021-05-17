@@ -65,6 +65,8 @@ class Config {
                 console.error('ok - set env Bucket: v2.openaddresses.io');
                 process.env.Bucket = 'v2.openaddresses.io';
                 this.Bucket = 'v2.openaddresses.io';
+            } else {
+                this.Bucket = process.env.Bucket;
             }
 
             if (!process.env.MAPBOX_TOKEN) {

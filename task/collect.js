@@ -73,7 +73,8 @@ async function fetch() {
             await collect(tmp, collection);
         }
     } catch (err) {
-        throw new Error(err);
+        console.error(err);
+        process.exit(1);
     }
 }
 

@@ -194,7 +194,7 @@ export default {
 
                 const res = await window.std(url);
 
-                console.error(res);
+                Object.assign(user, res);
 
                 user._loading = false;
             } catch (err) {

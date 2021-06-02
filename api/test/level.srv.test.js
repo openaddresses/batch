@@ -93,6 +93,52 @@ test('Level#all', async (t) =>  {
     t.end();
 });
 
+test('Level#user - override', async (t) =>  {
+    const level = new Level(flight.pool);
+
+    try {
+        const usr = await flight.token('hello');
+
+        const usr_pre = await request({
+            url: 'http://localhost:4999/api/login',
+            method: 'GET',
+            json: true,
+            jar: usr.jar
+        });
+
+        t.deepEquals(usr_pre.body, {
+            uid: usr.user.id,
+            level: 'basic',
+            username: usr.user.username,
+            email: usr.user.email,
+            access: 'user',
+            flags: {}
+        });
+
+        await level.single(usr.user.email);
+
+        const usr_post = await request({
+            url: 'http://localhost:4999/api/login',
+            method: 'GET',
+            json: true,
+            jar: usr.jar
+        });
+
+        t.deepEquals(usr_post.body, {
+            uid: usr.user.id,
+            level: 'sponsor',
+            username: usr.user.username,
+            email: usr.user.email,
+            access: 'user',
+            flags: {}
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('Level#user', async (t) =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')

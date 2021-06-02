@@ -31,7 +31,7 @@
                 <div class='col col--3 px6'>
                     <label>Access</label>
                     <div class='w-full select-container'>
-                        <select v-model='filter.access' class='select'>
+                        <select v-model='filter.access' class='select select--stroke'>
                             <option>all</option>
                             <option>disabled</option>
                             <option>admin</option>
@@ -43,7 +43,7 @@
                 <div class='col col--3 px6'>
                     <label>Level</label>
                     <div class='w-full select-container'>
-                        <select v-model='filter.level' class='select'>
+                        <select v-model='filter.level' class='select select--stroke'>
                             <option>all</option>
                             <option>basic</option>
                             <option>backer</option>
@@ -87,39 +87,51 @@
                 </div>
 
                 <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
-                    <h3 class='pb6 w-full'>User Access</h3>
-
-                    <div class='col col--12'>
-                        <div class='w-full select-container'>
-                            <select @change='patchUser(user)' v-model='user.access' class='select'>
-                                <option>disabled</option>
-                                <option>admin</option>
-                                <option>user</option>
-                            </select>
-                            <div class='select-arrow'></div>
+                    <template v-if='user._loading'>
+                        <div class='flex flex--center-main w-full py24'>
+                            <div class='loading'></div>
                         </div>
-                    </div>
+                    </template>
+                    <template v-else>
+                        <div class='col col--12'>
+                            <h3 class='pb6 fl'>User Access</h3>
+                            <button @click='getUser(user)' class='btn btn--stroke round color-gray color-blue-on-hover fr'>
+                                <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
+                            </button>
+                        </div>
 
-                    <h3 class='pb6 w-full'>User Flags</h3>
+                        <div class='col col--12'>
+                            <div class='w-full select-container'>
+                                <select @change='patchUser(user)' v-model='user.access' class='select select--stroke'>
+                                    <option>disabled</option>
+                                    <option>admin</option>
+                                    <option>user</option>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
+                        </div>
 
-                    <div class='col col--6'>
-                        <label class='checkbox-container'>
-                            <input @change='patchUser(user)' v-model='user.flags.upload' type='checkbox' />
-                            <div class='checkbox mr6'>
-                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                            </div>
-                            Source Upload
-                        </label>
-                    </div>
-                    <div class='col col--6'>
-                        <label class='checkbox-container'>
-                            <input @change='patchUser(user)' v-model='user.flags.moderator' type='checkbox' />
-                            <div class='checkbox mr6'>
-                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                            </div>
-                            Source Moderator
-                        </label>
-                    </div>
+                        <h3 class='pb6 w-full'>User Flags</h3>
+
+                        <div class='col col--6'>
+                            <label class='checkbox-container'>
+                                <input @change='patchUser(user)' v-model='user.flags.upload' type='checkbox' />
+                                <div class='checkbox mr6'>
+                                    <svg class='icon'><use xlink:href='#icon-check' /></svg>
+                                </div>
+                                Source Upload
+                            </label>
+                        </div>
+                        <div class='col col--6'>
+                            <label class='checkbox-container'>
+                                <input @change='patchUser(user)' v-model='user.flags.moderator' type='checkbox' />
+                                <div class='checkbox mr6'>
+                                    <svg class='icon'><use xlink:href='#icon-check' /></svg>
+                                </div>
+                                Source Moderator
+                            </label>
+                        </div>
+                    </template>
                 </div>
             </div>
         </template>
@@ -173,10 +185,24 @@ export default {
         refresh: function() {
             this.getUsers();
         },
+        getUser: async function(user) {
+            try {
+                user._loading = true;
+
+                const url = new URL(`${window.location.origin}/api/user/${user.id}`);
+                url.searchParams.append('level', 'true')
+
+                const res = await window.std(url);
+
+                console.error(res);
+
+                user._loading = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
         getUsers: async function() {
             try {
-                this.loading = true;
-
                 const url = new URL(`${window.location.origin}/api/user`);
                 url.searchParams.append('limit', this.perpage)
                 url.searchParams.append('page', this.page)

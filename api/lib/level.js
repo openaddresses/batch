@@ -6,6 +6,18 @@ const request = promisify(require('request'));
 const moment = require('moment');
 const User = require('./user');
 
+// Override OpenCollective levels for these accounts
+// As OpenCollective doesn't seem to provide emails for
+// org accounts via their API
+const SPONSORS = [
+    new RegExp(/^hello@openaddresses.io$/),
+    new RegExp(/^.*@geocode.xyz$/),
+    new RegExp(/^.*@geocod.io$/),
+    new RegExp(/^.*@geocode.earth$/),
+    new RegExp(/^.*@smartystreets.com$/),
+    new RegExp(/^.*@mapbox.com$/),
+];
+
 /**
  * @class Level
  */
@@ -30,6 +42,12 @@ class Level {
      * @param {String} email
      */
     async single(email) {
+        for (const sponsor of SPONSORS) {
+            if (email.match(sponsor)) {
+                return await this.user.level(email, 'sponsor');
+            }
+        }
+
         const res = await request({
             url: this.base,
             method: 'POST',
@@ -154,13 +172,19 @@ class Level {
             if (!usr.account.transactions.nodes.length) return;
             if (!usr.account.email) return;
 
+            for (const sponsor of SPONSORS) {
+                if (usr.account.email.match(sponsor)) {
+                    return await this.user.level(usr.account.email, 'sponsor');
+                }
+            }
+
             const level = Level.calc(usr.account.transactions.nodes[0]);
             await this.user.level(usr.account.email, level);
         }
     }
 
     /**
-     * Retrun the level given an OpenCollective transaction
+     * Calculate the level given an OpenCollective transaction
      *
      * @param {Object}  transaction
      * @param {Date}    transaction.createdAt

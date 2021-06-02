@@ -75,10 +75,10 @@
                     <div class='col col--4'>
                         <span class='txt-truncate' v-text='user.username'/>
                     </div>
-                    <div class='col col--6'>
+                    <div class='col col--5'>
                         <span class='txt-truncate' v-text='user.email'/>
                     </div>
-                    <div class='col col--2'>
+                    <div class='col col--3'>
                         <span v-if='user.access === "disabled"' class='mx3 fr bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
                         <span v-else class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
 

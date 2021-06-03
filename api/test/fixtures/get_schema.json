@@ -19,6 +19,11 @@
         "query": false,
         "res": true
     },
+    "GET /user/:id": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "PATCH /user/:id": {
         "body": true,
         "query": false,

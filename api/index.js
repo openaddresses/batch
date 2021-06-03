@@ -391,6 +391,43 @@ async function server(args, config, cb) {
     );
 
     /**
+     * @api {get} /api/user/:id Single User
+     * @apiVersion 1.0.0
+     * @apiName SingleUser
+     * @apiGroup User
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Get all info about a single user
+     *
+     * @apiParam {Number} :id The UID of the user to update
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.SingleUser.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
+     */
+    router.get(
+        ...await schemas.get('GET /user/:id', {
+            query: 'req.query.SingleUser.json',
+            res: 'res.User.json'
+        }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'id');
+                await user.is_admin(req);
+
+                if (req.query.level) {
+                    const usr = await user.user(req.params.id);
+                    await level.single(usr.email);
+                }
+
+                res.json(await user.user(req.params.id));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {patch} /api/user/:id Update User
      * @apiVersion 1.0.0
      * @apiName PatchUser

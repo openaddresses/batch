@@ -99,7 +99,7 @@ class Cacher {
         try {
             await this.cache.flush();
         } catch (err) {
-            throw new Err(500, err, 'Failed to flush cache');
+            throw new Error('Failed to flush cache');
         }
     }
 }

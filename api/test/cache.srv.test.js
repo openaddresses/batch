@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const test = require('tape');
 const request = require('request');
 const Flight = require('./init');

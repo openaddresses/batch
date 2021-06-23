@@ -86,8 +86,6 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
-    const cacher = new Cacher(args['no-cache']);
-
     let pool = false;
     let retry = 5;
     do {
@@ -114,6 +112,10 @@ async function server(args, config, cb) {
 
     const analytics = new Analytics(pool);
     const level = new (require('./lib/level'))(pool);
+
+    config.cacher = new Cacher(args['no-cache']);
+    config.pool = pool;
+
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -763,7 +765,7 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const collections = await cacher.get(Miss(req.query, 'collection'), async () => {
+                const collections = await config.cacher.get(Miss(req.query, 'collection'), async () => {
                     return await Collection.list(pool);
                 });
 
@@ -871,7 +873,7 @@ async function server(args, config, cb) {
                 const collection = new Collection(req.body.name, req.body.sources);
                 await collection.generate(pool);
 
-                await cacher.del('collection');
+                await config.cacher.del('collection');
                 return res.json(collection.json());
             } catch (err) {
                 return Err.respond(err, res);
@@ -910,7 +912,7 @@ async function server(args, config, cb) {
                 collection.patch(req.body);
 
                 await collection.commit(pool);
-                await cacher.del('collection');
+                await config.cacher.del('collection');
 
                 return res.json(collection.json());
             } catch (err) {
@@ -960,7 +962,7 @@ async function server(args, config, cb) {
 
                 if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
-                const tile = await cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                const tile = await config.cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.border_tile(pool, req.params.z, req.params.x, req.params.y);
                 }, false);
 
@@ -996,7 +998,7 @@ async function server(args, config, cb) {
 
             let tile;
             try {
-                tile = await cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                tile = await config.cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.fabric_tile(tb, req.params.z, req.params.x, req.params.y);
                 }, false);
 
@@ -1040,7 +1042,7 @@ async function server(args, config, cb) {
                 if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
 
-                const tile = await cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                const tile = await config.cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.tile(pool, req.params.z, req.params.x, req.params.y);
                 }, false);
 
@@ -1073,7 +1075,7 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const data = await cacher.get(Miss(req.query, 'data'), async () => {
+                const data = await config.cacher.get(Miss(req.query, 'data'), async () => {
                     return await Data.list(pool, req.query);
                 });
 
@@ -1113,7 +1115,7 @@ async function server(args, config, cb) {
 
                 req.body.id = req.params.data;
 
-                await cacher.del('data');
+                await config.cacher.del('data');
 
                 return res.json(await Data.commit(pool, req.body));
             } catch (err) {
@@ -1330,7 +1332,7 @@ async function server(args, config, cb) {
                 const run = await Run.from(pool, req.params.run);
 
                 // The CI is making a CI run "live" and updating the /data list
-                if ((!run.live && req.body.live) || (run.live && !req.body.live)) await cacher.del('data');
+                if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
                 run.patch(req.body);
 
@@ -2266,7 +2268,7 @@ async function server(args, config, cb) {
     const srv = app.listen(4999, (err) => {
         if (err) return err;
 
-        if (cb) return cb(srv, pool);
+        if (cb) return cb(srv, config);
 
         console.log('ok - http://localhost:4999');
     });

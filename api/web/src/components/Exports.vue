@@ -47,7 +47,7 @@ import Status from './Status.vue';
 
 export default {
     name: 'Exports',
-    props: [ ],
+    props: [ 'profile' ],
     data: function() {
         return {
             exps: [],
@@ -76,6 +76,10 @@ export default {
                 const url = new URL(`${window.location.origin}/api/export`);
                 url.searchParams.append('limit', this.perpage)
                 url.searchParams.append('page', this.page)
+
+                if (this.profile) {
+                    url.searchParams.append('uid', this.profile.uid)
+                }
 
                 const res = await window.std(url);
                 this.exps = res.exports;

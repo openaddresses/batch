@@ -102,7 +102,7 @@
         <Tokens @err='$emit("err", $event)'/>
 
         <template v-if='profile.level !== "basic"'>
-            <Exports @err='$emit("err", $event)'/>
+            <Exports :profile='profile' @err='$emit("err", $event)'/>
         </template>
     </div>
 </template>

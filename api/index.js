@@ -2062,8 +2062,9 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                if (req.auth.access === 'admin' && !req.query.uid) req.query.uid = req.auth.uid;
-                else if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
+                if (req.auth.access !== 'admin') {
+                    req.query.uid = req.auth.uid;
+                }
 
                 res.json(await Exporter.list(pool, req.query));
             } catch (err) {

@@ -8,7 +8,9 @@ const memjs = require('memjs');
 const flight = new Flight();
 
 flight.init(test);
-flight.takeoff(test);
+flight.takeoff(test, {
+    'no-cache': false
+});
 
 test('Meta: Insert Key', async (t) => {
     const client = memjs.Client.create();

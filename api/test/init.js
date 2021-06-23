@@ -65,7 +65,8 @@ class Flight {
     takeoff(test, custom = {}) {
         test('test server takeoff', (t) => {
             api(Object.assign({
-                postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
+                postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
+                'no-cache': true
             }, custom), (srv, config) => {
                 t.ok(srv, 'server object returned');
                 t.ok(config, 'config object returned');

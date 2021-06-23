@@ -27,7 +27,6 @@ test('GET: api/schema', (t) => {
         if (UPDATE) {
             fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
-
         t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
 
         t.end();

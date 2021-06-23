@@ -368,7 +368,7 @@ define({ "api": [
             "group": "Body",
             "type": "String",
             "optional": true,
-            "field": "created",
+            "field": "name",
             "description": "<p>undefined</p>"
           },
           {
@@ -3350,7 +3350,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/map/borders/:z/:x/:y.mvt",
-    "title": "Coverage MVT",
+    "title": "Borders MVT",
     "version": "1.0.0",
     "name": "BorderVectorTile",
     "group": "Map",
@@ -3362,6 +3362,51 @@ define({ "api": [
       }
     ],
     "description": "<p>Retrive borders Mapbox Vector Tiles</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "z",
+            "description": "<p>Z coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "x",
+            "description": "<p>X coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "y",
+            "description": "<p>Y coordinate</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Map"
+  },
+  {
+    "type": "get",
+    "url": "/api/map/fabric/:z/:x/:y.mvt",
+    "title": "Fabric MVT",
+    "version": "1.0.0",
+    "name": "FabricVectorTile",
+    "group": "Map",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Retrive fabric Mapbox Vector Tiles</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -4341,68 +4386,6 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/schema",
-    "title": "List Schemas",
-    "version": "1.0.0",
-    "name": "ListSchemas",
-    "group": "Schemas",
-    "permission": [
-      {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
-      }
-    ],
-    "description": "<p>List all JSON Schemas in use With no parameters this API will return a list of all the endpoints that have a form of schema validation If the url/method params are used, the schemas themselves are returned</p> <pre><code>Note: If url or method params are used, they must be used together</code></pre>",
-    "parameter": {
-      "fields": {
-        "Query": [
-          {
-            "group": "Query",
-            "type": "String",
-            "allowedValues": [
-              "\"GET\"",
-              "\"HEAD\"",
-              "\"POST\"",
-              "\"PUT\"",
-              "\"DELETE\"",
-              "\"CONNECT\"",
-              "\"OPTIONS\"",
-              "\"TRACE\"",
-              "\"PATCH\""
-            ],
-            "optional": true,
-            "field": "method",
-            "description": "<p>HTTP Verb</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "optional": true,
-            "field": "url",
-            "description": "<p>URLEncoded URL that you want to fetch</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": true,
-            "field": "schemas",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./index.js",
-    "groupTitle": "Schemas"
-  },
-  {
-    "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
     "version": "1.0.0",
@@ -4957,6 +4940,118 @@ define({ "api": [
             "optional": true,
             "field": "access",
             "description": "<p>The access level of a given user</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "users.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"disabled\"",
+              "\"admin\""
+            ],
+            "optional": false,
+            "field": "users.access",
+            "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "users.level",
+            "description": "<p>The level of donation of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "users.flags",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "get",
+    "url": "/api/user/:id",
+    "title": "Single User",
+    "version": "1.0.0",
+    "name": "SingleUser",
+    "group": "User",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get all info about a single user</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": ":id",
+            "description": "<p>The UID of the user to update</p>"
+          }
+        ],
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "level",
+            "description": "<p>If true, refresh the user's level from OpenCollective</p>"
           }
         ]
       }

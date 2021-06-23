@@ -102,14 +102,14 @@
         <Tokens @err='$emit("err", $event)'/>
 
         <template v-if='profile.level !== "basic"'>
-            <Exports @err='$emit("err", $event)'/>
+            <Exports :profile='profile' @err='$emit("err", $event)'/>
         </template>
     </div>
 </template>
 
 <script>
 import Tokens from './Tokens.vue'
-import Exports from './Exports.vue'
+import Exports from '../Exports.vue'
 
 export default {
     name: 'ProfileDefault',

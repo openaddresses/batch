@@ -77,6 +77,11 @@ class Cacher {
         return false;
     }
 
+    /**
+     * Delete a key from the cache
+     *
+     * @param {String} key
+     */
     async del(key) {
         try {
             await this.cache.delete(key);
@@ -85,6 +90,17 @@ class Cacher {
         }
 
         return true;
+    }
+
+    /**
+     * Flush the entire cache
+     */
+    async flush() {
+        try {
+            await this.cache.flush();
+        } catch (err) {
+            throw new Error('Failed to flush cache');
+        }
     }
 }
 

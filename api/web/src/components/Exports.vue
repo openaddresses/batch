@@ -31,7 +31,7 @@
             <div :key='exp.id' v-for='exp in exps' class='col col--12 grid bg-gray-light-on-hover cursor-default round py12'>
                 <div @click='$router.push({ path: `/export/${exp.id}`})' class='col col--12 cursor-pointer'>
                      <Status :status='exp.status'/>
-                    <span class='pl6' v-text='"Job #" + exp.job_id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/>
+                    <span class='pl6' v-text='"Export #" + exp.id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/>
                     <span class='fr pr12' v-text='exp.format'/>
                 </div>
             </div>
@@ -42,12 +42,12 @@
 </template>
 
 <script>
-import Pager from '../util/Pager.vue';
-import Status from '../Status.vue';
+import Pager from './util/Pager.vue';
+import Status from './Status.vue';
 
 export default {
     name: 'Exports',
-    props: [ ],
+    props: [ 'profile' ],
     data: function() {
         return {
             exps: [],
@@ -76,6 +76,10 @@ export default {
                 const url = new URL(`${window.location.origin}/api/export`);
                 url.searchParams.append('limit', this.perpage)
                 url.searchParams.append('page', this.page)
+
+                if (this.profile) {
+                    url.searchParams.append('uid', this.profile.uid)
+                }
 
                 const res = await window.std(url);
                 this.exps = res.exports;

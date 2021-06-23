@@ -1,8 +1,18 @@
 {
+    "DELETE /cache": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /cache/:cache_key": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /schema": {
-        "body": true,
+        "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "POST /upload": {
         "body": false,

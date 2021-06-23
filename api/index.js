@@ -86,8 +86,6 @@ async function server(args, config, cb) {
         postgres = 'postgres://postgres@localhost:5432/openaddresses';
     }
 
-    const cacher = new Cacher(args['no-cache']);
-
     let pool = false;
     let retry = 5;
     do {
@@ -114,6 +112,10 @@ async function server(args, config, cb) {
 
     const analytics = new Analytics(pool);
     const level = new (require('./lib/level'))(pool);
+
+    config.cacher = new Cacher(args['no-cache']);
+    config.pool = pool;
+
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -154,6 +156,12 @@ async function server(args, config, cb) {
 
     app.use(analytics.middleware());
     app.use(express.static('web/dist'));
+
+    // Load dynamic routes directory
+    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+        if (!config.silent) console.error(`ok - loaded routes/${r}`);
+        await require('./routes/' + r)(router, schemas, config);
+    }
 
     /**
      * @api {get} /api Get Metadata
@@ -245,43 +253,6 @@ async function server(args, config, cb) {
 
         return next();
     });
-
-    /**
-     * @api {get} /api/schema List Schemas
-     * @apiVersion 1.0.0
-     * @apiName ListSchemas
-     * @apiGroup Schemas
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     List all JSON Schemas in use
-     *     With no parameters this API will return a list of all the endpoints that have a form of schema validation
-     *     If the url/method params are used, the schemas themselves are returned
-     *
-     *     Note: If url or method params are used, they must be used together
-     *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.ListSchema.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListSchema.json} apiSuccess
-     */
-    router.get(
-        ...await schemas.get('GET /schema', {
-            query: 'req.query.ListSchema.json',
-            body: 'res.ListSchema.json'
-        }),
-        async (req, res) => {
-            try {
-                if (req.query.url && req.query.method) {
-                    res.json(schemas.query(req.query.method, req.query.url));
-                } else if (req.query.url || req.query.method) {
-                    throw new Err(400, null, 'url & method params must be used together');
-                } else {
-                    return res.json(schemas.list());
-                }
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        }
-    );
 
     /**
      * @api {post} /api/upload Create Upload
@@ -794,7 +765,7 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const collections = await cacher.get(Miss(req.query, 'collection'), async () => {
+                const collections = await config.cacher.get(Miss(req.query, 'collection'), async () => {
                     return await Collection.list(pool);
                 });
 
@@ -902,7 +873,7 @@ async function server(args, config, cb) {
                 const collection = new Collection(req.body.name, req.body.sources);
                 await collection.generate(pool);
 
-                await cacher.del('collection');
+                await config.cacher.del('collection');
                 return res.json(collection.json());
             } catch (err) {
                 return Err.respond(err, res);
@@ -941,7 +912,7 @@ async function server(args, config, cb) {
                 collection.patch(req.body);
 
                 await collection.commit(pool);
-                await cacher.del('collection');
+                await config.cacher.del('collection');
 
                 return res.json(collection.json());
             } catch (err) {
@@ -991,7 +962,7 @@ async function server(args, config, cb) {
 
                 if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
-                const tile = await cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                const tile = await config.cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.border_tile(pool, req.params.z, req.params.x, req.params.y);
                 }, false);
 
@@ -1027,7 +998,7 @@ async function server(args, config, cb) {
 
             let tile;
             try {
-                tile = await cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                tile = await config.cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.fabric_tile(tb, req.params.z, req.params.x, req.params.y);
                 }, false);
 
@@ -1071,7 +1042,7 @@ async function server(args, config, cb) {
                 if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
 
-                const tile = await cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                const tile = await config.cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.tile(pool, req.params.z, req.params.x, req.params.y);
                 }, false);
 
@@ -1104,7 +1075,7 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                const data = await cacher.get(Miss(req.query, 'data'), async () => {
+                const data = await config.cacher.get(Miss(req.query, 'data'), async () => {
                     return await Data.list(pool, req.query);
                 });
 
@@ -1144,7 +1115,7 @@ async function server(args, config, cb) {
 
                 req.body.id = req.params.data;
 
-                await cacher.del('data');
+                await config.cacher.del('data');
 
                 return res.json(await Data.commit(pool, req.body));
             } catch (err) {
@@ -1361,7 +1332,7 @@ async function server(args, config, cb) {
                 const run = await Run.from(pool, req.params.run);
 
                 // The CI is making a CI run "live" and updating the /data list
-                if ((!run.live && req.body.live) || (run.live && !req.body.live)) await cacher.del('data');
+                if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
                 run.patch(req.body);
 
@@ -2091,8 +2062,9 @@ async function server(args, config, cb) {
         }),
         async (req, res) => {
             try {
-                if (req.auth.access === 'admin' && !req.query.uid) req.query.uid = req.auth.uid;
-                else if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
+                if (req.auth.access !== 'admin') {
+                    req.query.uid = req.auth.uid;
+                }
 
                 res.json(await Exporter.list(pool, req.query));
             } catch (err) {
@@ -2297,7 +2269,7 @@ async function server(args, config, cb) {
     const srv = app.listen(4999, (err) => {
         if (err) return err;
 
-        if (cb) return cb(srv, pool);
+        if (cb) return cb(srv, config);
 
         console.log('ok - http://localhost:4999');
     });

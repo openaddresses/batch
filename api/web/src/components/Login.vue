@@ -70,6 +70,7 @@ export default {
                 this.$emit('auth');
                 this.$router.push('/data')
             } catch (err) {
+                this.loading = false;
                 this.$emit('err', err);
             }
         }

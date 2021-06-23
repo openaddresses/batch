@@ -14,6 +14,7 @@ class Flight {
     constructor() {
         this.srv;
         this.pool;
+        this.config;
     }
 
     /**
@@ -64,13 +65,16 @@ class Flight {
     takeoff(test, custom = {}) {
         test('test server takeoff', (t) => {
             api(Object.assign({
-                postgres: 'postgres://postgres@localhost:5432/openaddresses_test'
-            }, custom), (srv, pool) => {
+                postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
+                'no-cache': true
+            }, custom), (srv, config) => {
                 t.ok(srv, 'server object returned');
-                t.ok(pool, 'pool object returned');
+                t.ok(config, 'config object returned');
+                t.ok(config.pool, 'pool object returned');
 
                 this.srv = srv;
-                this.pool = pool;
+                this.pool = config.pool;
+                this.config = config;
 
                 t.end();
             });
@@ -158,6 +162,8 @@ class Flight {
 
             t.ok(this.pool, 'pool object returned');
             await this.pool.end();
+
+            await this.config.cacher.cache.quit();
 
             t.end();
         });

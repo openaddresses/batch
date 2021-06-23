@@ -1,25 +1,14 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
+    <div class='col col--12 grid pt24'>
+        <div class='col col--12 grid border-b border--gray-light pt24'>
             <div class='col col--12'>
-                <h2 class='txt-h4 pb12 fl'>Exports:</h2>
+                <h2 class='txt-h4 ml12 pb12 fl'>Exports:</h2>
 
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-            </div>
-
-            <div class='col col--1'>
-                Status
-            </div>
-            <div class='col col--2'>
-                Export ID
-            </div>
-            <div class='col col--7'>
-                Export
-            </div>
-            <div class='col col--2'>
-                Format
+                <div class='fr'>
+                    <button @click='refresh' class='btn round btn--stroke color-gray mx3'>
+                        <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -28,61 +17,79 @@
                 <div class='loading'></div>
             </div>
         </template>
+        <template v-else-if='!exps.length'>
+            <div class='col col--12'>
+                <div class='flex flex--center-main'>
+                    <div class='py24'>
+                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                    </div>
+                </div>
+                <div class='w-full align-center'>You haven't created any exports yet</div>
+            </div>
+        </template>
         <template v-else>
-            <div :key='e.id' v-for='e in exports' class='col col--12 grid'>
-                <div @click='emitexport(e.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--1'>
-                        <Status :status='e.status'/>
-                    </div>
-                    <div class='col col--2'>
-                        Export <span v-text='e.id'/>
-                    </div>
-                    <div class='col col--7'>
-                        <span v-text='`${e.source_name} - ${e.layer} - ${e.name} - ${e.format}`'/>
-                    </div>
-                    <div class='col col--2'>
-                        <span v-text='e.format'/>
-                    </div>
+            <div :key='exp.id' v-for='exp in exps' class='col col--12 grid bg-gray-light-on-hover cursor-default round py12'>
+                <div @click='$router.push({ path: `/export/${exp.id}`})' class='col col--12 cursor-pointer'>
+                     <Status :status='exp.status'/>
+                    <span class='pl6' v-text='"Export #" + exp.id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/>
+                    <span class='fr pr12' v-text='exp.format'/>
                 </div>
             </div>
         </template>
+
+        <Pager v-if='exps.length' @page='page = $event' :perpage='perpage' :total='total'/>
     </div>
 </template>
 
 <script>
+import Pager from './util/Pager.vue';
 import Status from './Status.vue';
 
 export default {
     name: 'Exports',
-    props: [ 'auth' ],
-    mounted: function() {
-        this.refresh();
-    },
+    props: [ ],
     data: function() {
         return {
-            exports: [],
+            exps: [],
+            page: 0,
+            perpage: 10,
+            total: 100,
             loading: false
         };
     },
-    components: {
-        Status
+    mounted: function() {
+        this.refresh();
+    },
+    watch: {
+        page: function() {
+            this.getExports();
+        },
     },
     methods: {
-        emitexport: function(exportid) {
-            this.$router.push({ path: `/export/${exportid}` });
-        },
         refresh: function() {
             this.getExports();
         },
         getExports: async function() {
             try {
                 this.loading = true;
-                this.exports = (await window.std(window.location.origin + '/api/export')).exports;
+
+                const url = new URL(`${window.location.origin}/api/export`);
+                url.searchParams.append('limit', this.perpage)
+                url.searchParams.append('page', this.page)
+
+                const res = await window.std(url);
+                this.exps = res.exports;
+                this.total = res.total;
+
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        Pager,
+        Status
     }
 }
 </script>

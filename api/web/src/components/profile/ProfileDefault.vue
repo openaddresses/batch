@@ -109,7 +109,7 @@
 
 <script>
 import Tokens from './Tokens.vue'
-import Exports from './Exports.vue'
+import Exports from '../Exports.vue'
 
 export default {
     name: 'ProfileDefault',

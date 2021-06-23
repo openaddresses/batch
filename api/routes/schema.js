@@ -2,7 +2,7 @@
 
 const Err = require('../lib/error');
 
-async function router(router, schemas) {
+async function router(schema) {
     /**
      * @api {get} /api/schema List Schemas
      * @apiVersion 1.0.0
@@ -20,11 +20,10 @@ async function router(router, schemas) {
      * @apiSchema (Query) {jsonschema=../schema/req.query.ListSchema.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ListSchema.json} apiSuccess
      */
-    router.get(
-        ...await schemas.get('GET /schema', {
+    schema.get('/schema', {
             query: 'req.query.ListSchema.json',
             res: 'res.ListSchema.json'
-        }),
+        },
         async (req, res) => {
             try {
                 if (req.query.url && req.query.method) {

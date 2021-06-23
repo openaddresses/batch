@@ -14,6 +14,8 @@ class Schemas {
      * @param {Object} router Express Router Object
      */
     constructor(router) {
+        if (!router) throw new Error('Router Param Required');
+
         this.validator = new Validator({
             allErrors: true
         });
@@ -44,6 +46,8 @@ class Schemas {
     }
 
     async generic(url, schemas = {}) {
+        if (!schemas) schemas = {};
+
         const parsed = url.split(' ');
         if (parsed.length !== 2) throw new Error('schema.generic() must be of format "<VERB> <URL>"');
 

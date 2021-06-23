@@ -2,7 +2,7 @@
 
 const Err = require('../lib/error');
 
-async function router(router, schemas, config) {
+async function router(schema, config) {
     /**
      * @api {delete} /api/cache Flush Cache
      * @apiVersion 1.0.0
@@ -15,10 +15,9 @@ async function router(router, schemas, config) {
      *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    router.delete(
-        ...await schemas.get('DELETE /cache', {
+    schema.delete('/cache', {
             res: 'res.Standard.json'
-        }),
+        },
         async (req, res) => {
             try {
                 await config.cacher.flush();
@@ -45,10 +44,9 @@ async function router(router, schemas, config) {
      *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    router.delete(
-        ...await schemas.get('DELETE /cache/:cache_key', {
+    schema.delete('/cache/:cache_key', {
             res: 'res.Standard.json'
-        }),
+        },
         async (req, res) => {
             try {
                 await config.cacher.del(req.params.cache_key);

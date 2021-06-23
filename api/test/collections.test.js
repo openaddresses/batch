@@ -10,7 +10,9 @@ const Err = require('../lib/error');
 const flight = new Flight();
 flight.init(test);
 
-test('Collecton()', (t) => {
+process.env.Bucket = 'v2.openaddresses.io';
+
+test('Collection()', (t) => {
     t.throws(() => {
         new Collection();
     }, new Err(400, null, 'Collection.name must be a string'), 'Collection.name must be a string');
@@ -120,7 +122,7 @@ test('Collection#generate()', async (t) => {
         t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
         t.ok(collection.created, 'collection.created: <data>');
         t.equals(collection.size, 0, 'collection.size: 0');
-        t.equals(collection.s3, 's3://undefined/test/collection-usa.zip', 'collection.s3: s3://undefined/test/collection-usa.zip');
+        t.equals(collection.s3, 's3://v2.openaddresses.io/test/collection-usa.zip', 'collection.s3: s3://v2.openaddresses.io/test/collection-usa.zip');
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -160,7 +162,7 @@ test('Collection#list', async (t) => {
             name: 'usa',
             sources: ['us/**'],
             size: 0,
-            s3: 's3://undefined/test/collection-usa.zip'
+            s3: 's3://v2.openaddresses.io/test/collection-usa.zip'
         }, 'list[0]: <object>');
     } catch (err) {
         t.error(err, 'no errors');
@@ -222,7 +224,7 @@ test('Collection#from()', async (t) => {
         t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
         t.ok(collection.created, 'collection.created: <date>');
         t.equals(collection.size, 0, 'collection.size: 0');
-        t.equals(collection.s3, 's3://undefined/test/collection-usa.zip', 'collection.s3: <s3 path>');
+        t.equals(collection.s3, 's3://v2.openaddresses.io/test/collection-usa.zip', 'collection.s3: <s3 path>');
 
     } catch (err) {
         t.error(err, 'no errors');
@@ -279,7 +281,7 @@ test('Collection#commit()', async (t) => {
         t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["us/**"]');
         t.ok(collection.created, 'collection.created: <date>');
         t.equals(collection.size, 1234, 'collection.size: 0');
-        t.equals(collection.s3, 's3://undefined/test/collection-global.zip', 'collection.s3: <s3 path>');
+        t.equals(collection.s3, 's3://v2.openaddresses.io/test/collection-global.zip', 'collection.s3: <s3 path>');
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -312,7 +314,7 @@ test('Collection#delete()', async (t) => {
             name: 'usa',
             sources: ['us/**'],
             size: 0,
-            s3: 's3://undefined/test/collection-usa.zip'
+            s3: 's3://v2.openaddresses.io/test/collection-usa.zip'
         }, 'list[0]: <object>');
     } catch (err) {
         t.error(err, 'no errors');

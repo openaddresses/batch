@@ -5,7 +5,7 @@ jobs:
         docker:
             - image: ubuntu:20.04
             - image: mdillon/postgis:11
-            - image: memcached/1.6
+            - image: memcached:1.6
 
         steps:
             - run:

@@ -16,6 +16,7 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const TileBase = require('tilebase');
+const Schema = require('./lib/schema');
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache'],
     string: ['postgres']
@@ -71,7 +72,6 @@ async function server(args, config, cb) {
     const Schedule = require('./lib/schedule');
     const Collection = require('./lib/collections');
     const Exporter = require('./lib/exporter');
-    const schemas = new (require('./lib/schema'))();
 
     console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
     const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
@@ -134,6 +134,8 @@ async function server(args, config, cb) {
     const app = express();
     const router = express.Router();
 
+    const schema = new Schema(router);
+
     app.disable('x-powered-by');
     app.use(minify());
 
@@ -160,7 +162,7 @@ async function server(args, config, cb) {
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(router, schemas, config);
+        await require('./routes/' + r)(router, schema, config);
     }
 
     /**
@@ -267,8 +269,8 @@ async function server(args, config, cb) {
      *     If a source is unable to be pulled from directly, authenticated users can cache
      *     data resources to the OpenAddresses S3 cache to be pulled from
      */
-    router.post(
-        ...await schemas.get('POST /upload'),
+    schema.post(
+        '/upload',
         async (req, res) => {
             try {
                 await user.is_flag(req, 'upload');

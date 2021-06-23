@@ -55,6 +55,8 @@ class Schemas {
             for (const key of Object.keys(req.query)) {
                 if (schema.properties[key] && schema.properties[key].type === 'integer') {
                     req.query[key] = parseInt(req.query[key]);
+                } else if (schema.properties[key] && schema.properties[key].type === 'number') {
+                    req.query[key] = Number(req.query[key]);
                 } else if (schema.properties[key] && schema.properties[key].type === 'boolean') {
                     if (['true', '1'].includes(req.query[key])) {
                         req.query[key] = true;

@@ -293,8 +293,7 @@ async function server(args, config, cb) {
             });
 
             return req.pipe(busboy);
-        }
-    );
+        });
 
     /**
      * @api {get} /api/user List Users
@@ -311,8 +310,7 @@ async function server(args, config, cb) {
      */
     await schema.get('/user', {
         res: 'res.ListUsers.json'
-    },
-    async (req, res) => {
+    }, async (req, res) => {
         try {
             await user.is_admin(req);
 
@@ -320,8 +318,7 @@ async function server(args, config, cb) {
         } catch (err) {
             return Err.respond(err, res);
         }
-    }
-    );
+    });
 
     /**
      * @api {post} /api/user Create User
@@ -339,8 +336,7 @@ async function server(args, config, cb) {
     await schema.post('/user', {
         body: 'req.body.CreateUser.json',
         res: 'res.User.json'
-    },
-    async (req, res) => {
+    }, async (req, res) => {
         try {
             const usr = await user.register(req.body);
 
@@ -356,8 +352,7 @@ async function server(args, config, cb) {
         } catch (err) {
             return Err.respond(err, res);
         }
-    }
-    );
+    });
 
     /**
      * @api {get} /api/user/:id Single User
@@ -377,8 +372,7 @@ async function server(args, config, cb) {
     await schema.get('/user/:id', {
         query: 'req.query.SingleUser.json',
         res: 'res.User.json'
-    },
-    async (req, res) => {
+    }, async (req, res) => {
         try {
             await Param.int(req, 'id');
             await user.is_admin(req);
@@ -392,8 +386,7 @@ async function server(args, config, cb) {
         } catch (err) {
             return Err.respond(err, res);
         }
-    }
-    );
+    });
 
     /**
      * @api {patch} /api/user/:id Update User
@@ -410,22 +403,19 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchUser.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
-    await schema.patch(
-        '/user/:id', {
-            body: 'req.body.PatchUser.json',
-            res: 'res.User.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'id');
-                await user.is_admin(req);
+    await schema.patch('/user/:id', {
+        body: 'req.body.PatchUser.json',
+        res: 'res.User.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'id');
+            await user.is_admin(req);
 
-                res.json(await user.patch(req.params.id, req.body));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(await user.patch(req.params.id, req.body));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/login/verify Verify User
@@ -439,19 +429,16 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.get(
-        '/login/verify', {
-            query: 'req.query.VerifyLogin.json',
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                res.json(await user.verify(req.query.token));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+    await schema.get('/login/verify', {
+        query: 'req.query.VerifyLogin.json',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            res.json(await user.verify(req.query.token));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
 
     /**
@@ -467,27 +454,24 @@ async function server(args, config, cb) {
      * @apiSchema (Query) {jsonawait schema=./schema/req.query.GetLogin.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
      */
-    await schema.get(
-        '/login', {
-            query: 'req.query.GetLogin.json',
-            res: 'res.Login.json'
-        },
-        async (req, res) => {
-            if (req.session && req.session.auth && req.session.auth.username) {
-                try {
-                    if (req.query.level) await level.single(req.session.auth.email);
-                    res.json(await user.user(req.session.auth.uid));
-                } catch (err) {
-                    return Err.respond(err, res);
-                }
-            } else {
-                return res.status(401).json({
-                    status: 401,
-                    message: 'Invalid session'
-                });
+    await schema.get('/login', {
+        query: 'req.query.GetLogin.json',
+        res: 'res.Login.json'
+    }, async (req, res) => {
+        if (req.session && req.session.auth && req.session.auth.username) {
+            try {
+                if (req.query.level) await level.single(req.session.auth.email);
+                res.json(await user.user(req.session.auth.uid));
+            } catch (err) {
+                return Err.respond(err, res);
             }
+        } else {
+            return res.status(401).json({
+                status: 401,
+                message: 'Invalid session'
+            });
         }
-    );
+    });
 
     /**
      * @api {post} /api/login Create Session
@@ -502,31 +486,28 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateLogin.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
      */
-    await schema.post(
-        '/login', {
-            body: 'req.body.CreateLogin.json',
-            res: 'res.Login.json'
-        },
-        async (req, res) => {
-            try {
-                req.session.auth = await user.login({
-                    username: req.body.username,
-                    password: req.body.password
-                });
+    await schema.post( '/login', {
+        body: 'req.body.CreateLogin.json',
+        res: 'res.Login.json'
+    }, async (req, res) => {
+        try {
+            req.session.auth = await user.login({
+                username: req.body.username,
+                password: req.body.password
+            });
 
-                return res.json({
-                    uid: req.session.auth.uid,
-                    level: req.session.auth.level,
-                    username: req.session.auth.username,
-                    email: req.session.auth.email,
-                    access: req.session.auth.access,
-                    flags: req.session.auth.flags
-                });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json({
+                uid: req.session.auth.uid,
+                level: req.session.auth.level,
+                username: req.session.auth.username,
+                email: req.session.auth.email,
+                access: req.session.auth.access,
+                flags: req.session.auth.flags
+            });
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {delete} /api/login Delete Session
@@ -540,26 +521,23 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.delete(
-        '/login', {
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            req.session.destroy((err) => {
-                if (err) {
-                    return res.status(500).json({
-                        status: 500,
-                        message: 'Failed to logout user'
-                    });
-                }
-
-                return res.json({
-                    status: 200,
-                    message: 'The user has been logged ut'
+    await schema.delete( '/login', {
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        req.session.destroy((err) => {
+            if (err) {
+                return res.status(500).json({
+                    status: 500,
+                    message: 'Failed to logout user'
                 });
+            }
+
+            return res.json({
+                status: 200,
+                message: 'The user has been logged ut'
             });
-        }
-    );
+        });
+    });
 
     /**
      * @api {post} /api/login/forgot Forgot Login
@@ -574,24 +552,21 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.ForgotLogin.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.post(
-        '/login/forgot', {
-            body: 'req.body.ForgotLogin.json',
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                const reset = await user.forgot(req.body.user); // Username or email
+    await schema.post('/login/forgot', {
+        body: 'req.body.ForgotLogin.json',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            const reset = await user.forgot(req.body.user); // Username or email
 
-                if (args.email) await email.forgot(reset);
+            if (args.email) await email.forgot(reset);
 
-                // To avoid email scraping - this will always return true, regardless of success
-                return res.json({ status: 200, message: 'Password Email Sent' });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            // To avoid email scraping - this will always return true, regardless of success
+            return res.json({ status: 200, message: 'Password Email Sent' });
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/login/reset Reset Login
@@ -607,23 +582,20 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.ResetLogin.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.post(
-        '/login/reset', {
-            body: 'req.body.ResetLogin.json',
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                return res.json(await user.reset({
-                    token: req.body.token,
-                    password: req.body.password
-                }));
+    await schema.post( '/login/reset', {
+        body: 'req.body.ResetLogin.json',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            return res.json(await user.reset({
+                token: req.body.token,
+                password: req.body.password
+            }));
 
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/token List Tokens
@@ -637,20 +609,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ListTokens.json} apiSuccess
      */
-    await schema.get(
-        '/token', {
-            res: 'res.ListTokens.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_auth(req);
+    await schema.get( '/token', {
+        res: 'res.ListTokens.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
 
-                return res.json(await token.list(req.auth));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await token.list(req.auth));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/token Create Token
@@ -665,21 +634,18 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateToken.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.CreateToken.json} apiSuccess
      */
-    await schema.post(
-        '/token', {
-            body: 'req.body.CreateToken.json',
-            res: 'res.CreateToken.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_auth(req);
+    await schema.post( '/token', {
+        body: 'req.body.CreateToken.json',
+        res: 'res.CreateToken.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
 
-                return res.json(await token.generate(req.auth, req.body.name));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await token.generate(req.auth, req.body.name));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {delete} /api/token/:id Delete Token
@@ -723,26 +689,23 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.Schedule.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.post(
-        '/schedule', {
-            body: 'req.body.Schedule.json',
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+    await schema.post( '/schedule', {
+        body: 'req.body.Schedule.json',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                await Schedule.event(pool, req.body);
+            await Schedule.event(pool, req.body);
 
-                return res.json({
-                    status: 200,
-                    message: 'Schedule Event Started'
-                });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json({
+                status: 200,
+                message: 'Schedule Event Started'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/collections List Collections
@@ -756,22 +719,19 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ListCollections.json} apiSuccess
      */
-    await schema.get(
-        '/collections', {
-            res: 'res.ListCollections.json'
-        },
-        async (req, res) => {
-            try {
-                const collections = await config.cacher.get(Miss(req.query, 'collection'), async () => {
-                    return await Collection.list(pool);
-                });
+    await schema.get( '/collections', {
+        res: 'res.ListCollections.json'
+    }, async (req, res) => {
+        try {
+            const collections = await config.cacher.get(Miss(req.query, 'collection'), async () => {
+                return await Collection.list(pool);
+            });
 
-                return res.json(collections);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(collections);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/collections/:collection/data Get Collection Data
@@ -794,9 +754,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :collection Collection ID
      */
-    await schema.get(
-        '/collections/:collection/data',
-        null,
+    await schema.get( '/collections/:collection/data', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'collection');
@@ -807,8 +765,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {delete} /api/collections/:collection Delete Collection
@@ -824,27 +781,24 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.delete(
-        '/collections/:collection', {
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'collection');
+    await schema.delete( '/collections/:collection', {
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'collection');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                await Collection.delete(pool, req.params.collection);
+            await Collection.delete(pool, req.params.collection);
 
-                return res.json({
-                    status: 200,
-                    message: 'Collection Deleted'
-                });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json({
+                status: 200,
+                message: 'Collection Deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/collections Create Collection
@@ -859,25 +813,22 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateCollection.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Collection.json} apiSuccess
      */
-    await schema.post(
-        '/collections', {
-            body: 'req.body.CreateCollection.json',
-            res: 'res.Collection.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+    await schema.post( '/collections', {
+        body: 'req.body.CreateCollection.json',
+        res: 'res.Collection.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                const collection = new Collection(req.body.name, req.body.sources);
-                await collection.generate(pool);
+            const collection = new Collection(req.body.name, req.body.sources);
+            await collection.generate(pool);
 
-                await config.cacher.del('collection');
-                return res.json(collection.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            await config.cacher.del('collection');
+            return res.json(collection.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {patch} /api/collections/:collection Patch Collection
@@ -894,30 +845,27 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchCollection.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Collection.json} apiSuccess
      */
-    await schema.patch(
-        '/collections/:collection', {
-            body: 'req.body.PatchCollection.json',
-            res: 'res.Collection.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'collection');
+    await schema.patch( '/collections/:collection', {
+        body: 'req.body.PatchCollection.json',
+        res: 'res.Collection.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'collection');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                const collection = await Collection.from(pool, req.params.collection);
+            const collection = await Collection.from(pool, req.params.collection);
 
-                collection.patch(req.body);
+            collection.patch(req.body);
 
-                await collection.commit(pool);
-                await config.cacher.del('collection');
+            await collection.commit(pool);
+            await config.cacher.del('collection');
 
-                return res.json(collection.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(collection.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/map Coverage TileJSON
@@ -929,13 +877,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Data required for map initialization
      */
-    await schema.get(
-        '/map',
-        null,
+    await schema.get( '/map', null,
         (req, res) => {
             return res.json(Map.map());
-        }
-    );
+        });
 
     /**
      * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
@@ -951,9 +896,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    await schema.get(
-        '/map/borders/:z/:x/:y.mvt',
-        null,
+    await schema.get( '/map/borders/:z/:x/:y.mvt', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'z');
@@ -972,8 +915,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {get} /api/map/fabric/:z/:x/:y.mvt Fabric MVT
@@ -989,9 +931,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    await schema.get(
-        '/map/fabric/:z/:x/:y.mvt',
-        null,
+    await schema.get( '/map/fabric/:z/:x/:y.mvt', null,
         async (req, res) => {
             await Param.int(req, 'z');
             await Param.int(req, 'x');
@@ -1015,8 +955,7 @@ async function server(args, config, cb) {
                 'Content-Encoding': 'gzip'
             });
             res.end(tile);
-        }
-    );
+        });
 
     /**
      * @api {get} /api/map/:z/:x/:y.mvt Coverage MVT
@@ -1032,9 +971,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    await schema.get(
-        '/map/:z/:x/:y.mvt',
-        null,
+    await schema.get( '/map/:z/:x/:y.mvt', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'z');
@@ -1054,8 +991,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {get} /api/data List Data
@@ -1070,23 +1006,20 @@ async function server(args, config, cb) {
      * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListData.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.ListData.json} apiSuccess
      */
-    await schema.get(
-        '/data', {
-            query: 'req.query.ListData.json',
-            res: 'res.ListData.json'
-        },
-        async (req, res) => {
-            try {
-                const data = await config.cacher.get(Miss(req.query, 'data'), async () => {
-                    return await Data.list(pool, req.query);
-                });
+    await schema.get( '/data', {
+        query: 'req.query.ListData.json',
+        res: 'res.ListData.json'
+    }, async (req, res) => {
+        try {
+            const data = await config.cacher.get(Miss(req.query, 'data'), async () => {
+                return await Data.list(pool, req.query);
+            });
 
-                return res.json(data);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(data);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {patch} /api/data/:data Update Data
@@ -1104,27 +1037,24 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.Data.json} apiSuccess
      *
      */
-    await schema.patch(
-        '/data/:data', {
-            body: 'req.body.PatchData.json',
-            res: 'res.Data.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'data');
+    await schema.patch( '/data/:data', {
+        body: 'req.body.PatchData.json',
+        res: 'res.Data.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'data');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                req.body.id = req.params.data;
+            req.body.id = req.params.data;
 
-                await config.cacher.del('data');
+            await config.cacher.del('data');
 
-                return res.json(await Data.commit(pool, req.body));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await Data.commit(pool, req.body));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/data/:data Get Data
@@ -1140,22 +1070,19 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Data.json} apiSuccess
      */
-    await schema.get(
-        '/data/:data', {
-            res: 'res.Data.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'data');
+    await schema.get( '/data/:data', {
+        res: 'res.Data.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'data');
 
-                const data = await Data.from(pool, req.params.data);
+            const data = await Data.from(pool, req.params.data);
 
-                return res.json(data);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(data);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/data/:data/history Return Data History
@@ -1171,20 +1098,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.DataHistory.json} apiSuccess
      */
-    await schema.get(
-        '/data/:data/history', {
-            res: 'res.DataHistory.json'
-        },
-        async (req, res) => {
-            try {
-                const history = await Data.history(pool, req.params.data);
+    await schema.get( '/data/:data/history', {
+        res: 'res.DataHistory.json'
+    }, async (req, res) => {
+        try {
+            const history = await Data.history(pool, req.params.data);
 
-                return res.json(history);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(history);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/run List Runs
@@ -1201,22 +1125,19 @@ async function server(args, config, cb) {
      * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListRuns.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.ListRuns.json} apiSuccess
      */
-    await schema.get(
-        '/run', {
-            query: 'req.query.ListRuns.json',
-            res: 'res.ListRuns.json'
-        },
-        async (req, res) => {
-            try {
-                if (req.query.status) req.query.status = req.query.status.split(',');
-                const runs = await Run.list(pool, req.query);
+    await schema.get( '/run', {
+        query: 'req.query.ListRuns.json',
+        res: 'res.ListRuns.json'
+    }, async (req, res) => {
+        try {
+            if (req.query.status) req.query.status = req.query.status.split(',');
+            const runs = await Run.list(pool, req.query);
 
-                return res.json(runs);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(runs);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/run Create Run
@@ -1231,23 +1152,20 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateRun.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Run.json} apiSuccess
      */
-    await schema.post(
-        '/run', {
-            body: 'req.body.CreateRun.json',
-            res: 'res.Run.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+    await schema.post( '/run', {
+        body: 'req.body.CreateRun.json',
+        res: 'res.Run.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                const run = await Run.generate(pool, req.body);
+            const run = await Run.generate(pool, req.body);
 
-                return res.json(run.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(run.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/run/:run Get Run
@@ -1260,20 +1178,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Run.json} apiSuccess
      */
-    await schema.get(
-        '/run/:run', {
-            res: 'res.Run.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'run');
+    await schema.get( '/run/:run', {
+        res: 'res.Run.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'run');
 
-                res.json(await Run.from(pool, req.params.run));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(await Run.from(pool, req.params.run));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/run/:run/count Run Stats
@@ -1289,20 +1204,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.RunStats.json} apiSuccess
      */
-    await schema.get(
-        '/run/:run/count', {
-            res: 'res.RunStats.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'run');
+    await schema.get( '/run/:run/count', {
+        res: 'res.RunStats.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'run');
 
-                res.json(await Run.stats(pool, req.params.run));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(await Run.stats(pool, req.params.run));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {patch} /api/run/:run Update Run
@@ -1320,32 +1232,29 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.Run.json} apiSuccess
      *
      */
-    await schema.patch(
-        '/run/:run', {
-            body: 'req.body.PatchRun.json',
-            res: 'res.Run.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'run');
+    await schema.patch( '/run/:run', {
+        body: 'req.body.PatchRun.json',
+        res: 'res.Run.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'run');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                const run = await Run.from(pool, req.params.run);
+            const run = await Run.from(pool, req.params.run);
 
-                // The CI is making a CI run "live" and updating the /data list
-                if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
+            // The CI is making a CI run "live" and updating the /data list
+            if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
-                run.patch(req.body);
+            run.patch(req.body);
 
-                await run.commit(pool);
+            await run.commit(pool);
 
-                return res.json(run.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(run.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/run/:run/jobs Populate Run Jobs
@@ -1366,23 +1275,20 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.SingleJobsCreate.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
-    await schema.post(
-        '/run/:run/jobs', {
-            body: 'req.body.SingleJobsCreate.json',
-            res: 'res.SingleJobsCreate.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'run');
+    await schema.post( '/run/:run/jobs', {
+        body: 'req.body.SingleJobsCreate.json',
+        res: 'res.SingleJobsCreate.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'run');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                return res.json(await Run.populate(pool, req.params.run, req.body.jobs));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await Run.populate(pool, req.params.run, req.body.jobs));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/run/:run/jobs List Run Jobs
@@ -1398,25 +1304,22 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.SingleJobs.json} apiSuccess
      */
-    await schema.get(
-        '/run/:run/jobs', {
-            res: 'res.SingleJobs.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'run');
+    await schema.get( '/run/:run/jobs', {
+        res: 'res.SingleJobs.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'run');
 
-                const jobs = await Run.jobs(pool, req.params.run);
+            const jobs = await Run.jobs(pool, req.params.run);
 
-                res.json({
-                    run: req.params.run,
-                    jobs: jobs
-                });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json({
+                run: req.params.run,
+                jobs: jobs
+            });
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job List Jobs
@@ -1431,20 +1334,17 @@ async function server(args, config, cb) {
      * @apiSchema (query) {jsonawait schema=./schema/req.query.ListJobs.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.ListJobs.json} apiSuccess
      */
-    await schema.get(
-        '/job', {
-            query: 'req.query.ListJobs.json',
-            res: 'res.ListJobs.json'
-        },
-        async (req, res) => {
-            try {
-                if (req.query.status) req.query.status = req.query.status.split(',');
-                return res.json(await Job.list(pool, req.query));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+    await schema.get( '/job', {
+        query: 'req.query.ListJobs.json',
+        res: 'res.ListJobs.json'
+    }, async (req, res) => {
+        try {
+            if (req.query.status) req.query.status = req.query.status.split(',');
+            return res.json(await Job.list(pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job/error Get Job Errors
@@ -1460,18 +1360,15 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ErrorList.json} apiSuccess
      */
-    await schema.get(
-        '/job/error', {
-            res: 'res.ErrorList.json'
-        },
-        async (req, res) => {
-            try {
-                return res.json(await JobError.list(pool, req.query));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+    await schema.get( '/job/error', {
+        res: 'res.ErrorList.json'
+    }, async (req, res) => {
+        try {
+            return res.json(await JobError.list(pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job/error/count Job Error Count
@@ -1486,18 +1383,15 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ErrorCount.json} apiSuccess
      */
-    await schema.get(
-        '/job/error/count', {
-            res: 'res.ErrorCount.json'
-        },
-        async (req, res) => {
-            try {
-                return res.json(await JobError.count(pool));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+    await schema.get( '/job/error/count', {
+        res: 'res.ErrorCount.json'
+    }, async (req, res) => {
+        try {
+            return res.json(await JobError.count(pool));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
 
     /**
@@ -1512,20 +1406,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ErrorSingle.json} apiSuccess
      */
-    await schema.get(
-        '/job/error/:job', {
-            res: 'res.ErrorSingle.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get( '/job/error/:job', {
+        res: 'res.ErrorSingle.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                return res.json(await JobError.get(pool, req.params.job));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await JobError.get(pool, req.params.job));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/job/error Create Job Error
@@ -1543,22 +1434,19 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.ErrorCreate.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.ErrorCreate.json} apiSuccess
      */
-    await schema.post(
-        '/job/error', {
-            body: 'req.body.ErrorCreate.json',
-            res: 'res.ErrorCreate.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+    await schema.post( '/job/error', {
+        body: 'req.body.ErrorCreate.json',
+        res: 'res.ErrorCreate.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                const joberror = new JobError(req.body.job, req.body.message);
-                return res.json(await joberror.generate(pool));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            const joberror = new JobError(req.body.job, req.body.message);
+            return res.json(await joberror.generate(pool));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/job/error/:job Resolve Job Error
@@ -1575,23 +1463,20 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/res.ErrorModerate.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.ErrorModerate.json} apiSuccess
      */
-    await schema.post(
-        '/job/error/:job', {
-            body: 'req.body.ErrorModerate.json',
-            res: 'res.ErrorModerate.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.post( '/job/error/:job', {
+        body: 'req.body.ErrorModerate.json',
+        res: 'res.ErrorModerate.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                await user.is_flag(req, 'moderator');
+            await user.is_flag(req, 'moderator');
 
-                res.json(JobError.moderate(pool, ci, req.params.job, req.body));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(JobError.moderate(pool, ci, req.params.job, req.body));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job/:job Get Job
@@ -1607,22 +1492,19 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Job.json} apiSuccess
      */
-    await schema.get(
-        '/job/:job', {
-            res: 'res.Job.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get( '/job/:job', {
+        res: 'res.Job.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                const job = await Job.from(pool, req.params.job);
+            const job = await Job.from(pool, req.params.job);
 
-                return res.json(job.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(job.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job/:job/raw Raw Source
@@ -1637,9 +1519,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get(
-        '/job/:job/raw',
-        null,
+    await schema.get( '/job/:job/raw', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'job');
@@ -1651,8 +1531,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {post} /api/job/:job Rerun Job
@@ -1668,33 +1547,30 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
-    await schema.post(
-        '/job/:job/rerun', {
-            res: 'res.SingleJobsCreate.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.post( '/job/:job/rerun', {
+        res: 'res.SingleJobsCreate.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                const job = await Job.from(pool, req.params.job);
-                const run = await Run.from(pool, job.run);
+            const job = await Job.from(pool, req.params.job);
+            const run = await Run.from(pool, job.run);
 
-                const new_run = await Run.generate(pool, {
-                    live: !!run.live
-                });
+            const new_run = await Run.generate(pool, {
+                live: !!run.live
+            });
 
-                return res.json(await Run.populate(pool, new_run.id, [{
-                    source: job.source,
-                    layer: job.layer,
-                    name: job.name
-                }]));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await Run.populate(pool, new_run.id, [{
+                source: job.source,
+                layer: job.layer,
+                name: job.name
+            }]));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job/:job/delta Job Stats Comparison
@@ -1710,22 +1586,19 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.SingleDelta.json} apiSuccess
      */
-    await schema.get(
-        '/job/:job/delta', {
-            res: 'res.SingleDelta.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get( '/job/:job/delta', {
+        res: 'res.SingleDelta.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                const delta = await Job.delta(pool, req.params.job);
+            const delta = await Job.delta(pool, req.params.job);
 
-                return res.json(delta);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(delta);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/job/:job/output/source.png Get Job Preview
@@ -1739,9 +1612,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get(
-        '/job/:job/output/source.png',
-        null,
+    await schema.get( '/job/:job/output/source.png', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'job');
@@ -1749,8 +1620,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {get} /api/job/:job/output/source.geojson.gz Get Job Data
@@ -1771,9 +1641,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get(
-        '/job/:job/output/source.geojson.gz',
-        null,
+    await schema.get( '/job/:job/output/source.geojson.gz', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'job');
@@ -1784,8 +1652,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {get} /api/job/:job/output/sample Small Sample
@@ -1799,9 +1666,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get(
-        '/job/:job/output/sample',
-        null,
+    await schema.get( '/job/:job/output/sample', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'job');
@@ -1810,8 +1675,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {get} /api/job/:job/output/cache.zip Get Job Cache
@@ -1833,9 +1697,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} :job Job ID
      *
      */
-    await schema.get(
-        '/job/:job/output/cache.zip',
-        null,
+    await schema.get( '/job/:job/output/cache.zip', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'job');
@@ -1846,8 +1708,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {get} /api/job/:job/log Get Job Log
@@ -1865,22 +1726,19 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
      */
-    await schema.get(
-        '/job/:job/log', {
-            res: 'res.SingleLog.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get( '/job/:job/log', {
+        res: 'res.SingleLog.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                const job = await Job.from(pool, req.params.job);
+            const job = await Job.from(pool, req.params.job);
 
-                return res.json(await job.log());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await job.log());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {patch} /api/job/:job Update Job
@@ -1897,29 +1755,26 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchJob.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Job.json} apiSuccess
      */
-    await schema.patch(
-        '/job/:job', {
-            body: 'req.body.PatchJob.json',
-            res: 'res.Job.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.patch( '/job/:job', {
+        body: 'req.body.PatchJob.json',
+        res: 'res.Job.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'job');
 
-                await user.is_admin(req);
+            await user.is_admin(req);
 
-                const job = await Job.from(pool, req.params.job);
-                job.patch(req.body);
-                await job.commit(pool, Run, Data, ci);
+            const job = await Job.from(pool, req.params.job);
+            job.patch(req.body);
+            await job.commit(pool, Run, Data, ci);
 
-                await Run.ping(pool, ci, job);
+            await Run.ping(pool, ci, job);
 
-                return res.json(job.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(job.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/dash/traffic Session Counts
@@ -1933,20 +1788,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.TrafficAnalytics.json} apiSuccess
      */
-    await schema.get(
-        '/dash/traffic', {
-            res: 'res.TrafficAnalytics.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+    await schema.get( '/dash/traffic', {
+        res: 'res.TrafficAnalytics.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                res.json(await analytics.traffic());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(await analytics.traffic());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/dash/collections Collection Counts
@@ -1960,20 +1812,17 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.CollectionsAnalytics.json} apiSuccess
      */
-    await schema.get(
-        '/dash/collections', {
-            res: 'res.CollectionsAnalytics.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+    await schema.get( '/dash/collections', {
+        res: 'res.CollectionsAnalytics.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                res.json(await analytics.collections());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(await analytics.collections());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {post} /api/export Create Export
@@ -1988,32 +1837,29 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateExport.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
      */
-    await schema.post(
-        '/export', {
-            body: 'req.body.CreateExport.json',
-            res: 'res.Export.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_level(req, 'backer');
+    await schema.post( '/export', {
+        body: 'req.body.CreateExport.json',
+        res: 'res.Export.json'
+    }, async (req, res) => {
+        try {
+            await user.is_level(req, 'backer');
 
-                if (req.auth.access !== 'admin' && await Exporter.count(pool, req.auth.uid) >= config.limits.exports) {
-                    throw new Err(400, null, 'Reached Monthly Export Limit');
-                }
-
-                const job = await Job.from(pool, req.body.job_id);
-                if (job.status !== 'Success') throw new Err(400, null, 'Cannot export a job that was not successful');
-
-                req.body.uid = req.auth.uid;
-
-                const exp = await Exporter.generate(pool, req.body);
-                await exp.batch();
-                return res.json(exp.json());
-            } catch (err) {
-                return Err.respond(err, res);
+            if (req.auth.access !== 'admin' && await Exporter.count(pool, req.auth.uid) >= config.limits.exports) {
+                throw new Err(400, null, 'Reached Monthly Export Limit');
             }
+
+            const job = await Job.from(pool, req.body.job_id);
+            if (job.status !== 'Success') throw new Err(400, null, 'Cannot export a job that was not successful');
+
+            req.body.uid = req.auth.uid;
+
+            const exp = await Exporter.generate(pool, req.body);
+            await exp.batch();
+            return res.json(exp.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/export/:exportid/log Get Export Log
@@ -2031,23 +1877,20 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
      */
-    await schema.get(
-        '/export/:exportid/log', {
-            res: 'res.SingleLog.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'exportid');
+    await schema.get( '/export/:exportid/log', {
+        res: 'res.SingleLog.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'exportid');
 
-                const exp = await Exporter.from(pool, req.params.exportid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(401, null, 'You didn\'t create that export');
+            const exp = await Exporter.from(pool, req.params.exportid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(401, null, 'You didn\'t create that export');
 
-                return res.json(await exp.log());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await exp.log());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/export List Export
@@ -2062,23 +1905,20 @@ async function server(args, config, cb) {
      * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListExport.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.ListExport.json} apiSuccess
      */
-    await schema.get(
-        '/export', {
-            query: 'req.query.ListExport.json',
-            res: 'res.ListExport.json'
-        },
-        async (req, res) => {
-            try {
-                if (req.auth.access !== 'admin') {
-                    req.query.uid = req.auth.uid;
-                }
-
-                res.json(await Exporter.list(pool, req.query));
-            } catch (err) {
-                return Err.respond(err, res);
+    await schema.get( '/export', {
+        query: 'req.query.ListExport.json',
+        res: 'res.ListExport.json'
+    }, async (req, res) => {
+        try {
+            if (req.auth.access !== 'admin') {
+                req.query.uid = req.auth.uid;
             }
+
+            res.json(await Exporter.list(pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/export/:export Get Export
@@ -2092,23 +1932,20 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
      */
-    await schema.get(
-        '/export/:exportid', {
-            res: 'res.Export.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'exportid');
+    await schema.get( '/export/:exportid', {
+        res: 'res.Export.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'exportid');
 
-                const exp = (await Exporter.from(pool, req.params.exportid)).json();
-                if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(401, null, 'You didn\'t create that export');
+            const exp = (await Exporter.from(pool, req.params.exportid)).json();
+            if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(401, null, 'You didn\'t create that export');
 
-                res.json(exp);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(exp);
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
     /**
      * @api {get} /api/export/:exportid/output/export.zip Get Export Data
@@ -2122,9 +1959,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :exportid Export ID
      */
-    await schema.get(
-        '/export/:exportid/output/export.zip',
-        null,
+    await schema.get( '/export/:exportid/output/export.zip', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'exportid');
@@ -2134,8 +1969,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {patch} /api/export/:export Patch Export
@@ -2150,26 +1984,23 @@ async function server(args, config, cb) {
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchExport.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
      */
-    await schema.patch(
-        '/export/:exportid', {
-            body: 'req.body.PatchExport.json',
-            res: 'res.Export.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'exportid');
-                await user.is_admin(req);
+    await schema.patch( '/export/:exportid', {
+        body: 'req.body.PatchExport.json',
+        res: 'res.Export.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'exportid');
+            await user.is_admin(req);
 
-                const exp = await Exporter.from(pool, req.params.exportid);
-                exp.patch(req.body);
-                await exp.commit(pool);
+            const exp = await Exporter.from(pool, req.params.exportid);
+            exp.patch(req.body);
+            await exp.commit(pool);
 
-                return res.json(exp.json());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(exp.json());
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 
 
     /**
@@ -2182,9 +2013,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
      */
-    await schema.post(
-        '/github/event',
-        null,
+    await schema.post( '/github/event', null,
         async (req, res) => {
             if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
@@ -2215,8 +2044,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     /**
      * @api {post} /api/opencollective/event OpenCollective
@@ -2228,9 +2056,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
      */
-    await schema.post(
-        '/opencollective/event',
-        null,
+    await schema.post( '/opencollective/event', null,
         async (req, res) => {
             try {
                 console.error(req.headers);
@@ -2240,8 +2066,7 @@ async function server(args, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-        }
-    );
+        });
 
     schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {

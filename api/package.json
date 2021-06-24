@@ -6,7 +6,7 @@
     "private": true,
     "scripts": {
         "doc": "apidoc -i ./ -f index.js -e node_modules -e web --private",
-        "lint": "eslint index.js lib/**.js test/**.js",
+        "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
         "test": "tape test/*.test.js",
         "start": "node index.js --email",
         "dev": "nodemon -i ./web index.js",

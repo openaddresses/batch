@@ -21,23 +21,21 @@ async function router(schema) {
      * @apiSchema {jsonschema=../schema/res.ListSchema.json} apiSuccess
      */
     schema.get('/schema', {
-            query: 'req.query.ListSchema.json',
-            res: 'res.ListSchema.json'
-        },
-        async (req, res) => {
-            try {
-                if (req.query.url && req.query.method) {
-                    res.json(schema.query(req.query.method, req.query.url));
-                } else if (req.query.url || req.query.method) {
-                    throw new Err(400, null, 'url & method params must be used together');
-                } else {
-                    return res.json(schema.list());
-                }
-            } catch (err) {
-                return Err.respond(err, res);
+        query: 'req.query.ListSchema.json',
+        res: 'res.ListSchema.json'
+    }, async (req, res) => {
+        try {
+            if (req.query.url && req.query.method) {
+                res.json(schema.query(req.query.method, req.query.url));
+            } else if (req.query.url || req.query.method) {
+                throw new Err(400, null, 'url & method params must be used together');
+            } else {
+                return res.json(schema.list());
             }
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    );
+    });
 }
 
 module.exports = router;

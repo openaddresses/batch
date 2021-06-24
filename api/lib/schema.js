@@ -38,7 +38,7 @@ class Schemas {
     }
 
     async patch(url, schemas, ...fns) {
-        this.router.post(...await this.generic(`PATCH ${url}`, schemas), ...fns);
+        this.router.patch(...await this.generic(`PATCH ${url}`, schemas), ...fns);
     }
 
     async put(url, schemas, ...fns) {

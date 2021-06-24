@@ -268,7 +268,7 @@ async function server(args, config, cb) {
      *     If a source is unable to be pulled from directly, authenticated users can cache
      *     data resources to the OpenAddresses S3 cache to be pulled from
      */
-    schema.post('/upload', null,
+    await schema.post('/upload', null,
         async (req, res) => {
             try {
                 await user.is_flag(req, 'upload');
@@ -306,10 +306,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return a list of users that have registered with the service
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.ListUsers.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListUsers.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListUsers.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ListUsers.json} apiSuccess
      */
-    schema.get('/user', {
+    await schema.get('/user', {
             res: 'res.ListUsers.json'
         },
         async (req, res) => {
@@ -333,10 +333,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Create a new user
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateUser.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateUser.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
-    schema.post('/user', {
+    await schema.post('/user', {
             body: 'req.body.CreateUser.json',
             res: 'res.User.json'
         },
@@ -371,10 +371,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :id The UID of the user to update
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.SingleUser.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=./schema/req.query.SingleUser.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
-    schema.get('/user/:id', {
+    await schema.get('/user/:id', {
             query: 'req.query.SingleUser.json',
             res: 'res.User.json'
         },
@@ -407,10 +407,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :id The UID of the user to update
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchUser.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.User.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchUser.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
-    schema.patch(
+    await schema.patch(
         '/user/:id', {
             body: 'req.body.PatchUser.json',
             res: 'res.User.json'
@@ -437,9 +437,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Email Verification of new user
      *
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/login/verify', {
             query: 'req.query.VerifyLogin.json',
             res: 'res.Standard.json'
@@ -464,10 +464,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return information about the currently logged in user
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.GetLogin.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=./schema/req.query.GetLogin.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/login', {
             query: 'req.query.GetLogin.json',
             res: 'res.Login.json'
@@ -499,10 +499,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Log a user into the service and create an authenticated cookie
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateLogin.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Login.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateLogin.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/login', {
             body: 'req.body.CreateLogin.json',
             res: 'res.Login.json'
@@ -538,9 +538,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Log a user out of the service
      *
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.delete(
+    await schema.delete(
         '/login', {
             res: 'res.Standard.json'
         },
@@ -571,10 +571,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     If a user has forgotten their password, send them a password reset link to their email
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.ForgotLogin.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ForgotLogin.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/login/forgot', {
             body: 'req.body.ForgotLogin.json',
             res: 'res.Standard.json'
@@ -604,10 +604,10 @@ async function server(args, config, cb) {
      *     Once a user has obtained a password reset by email via the Forgot Login API,
      *     use the token to reset the password
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.ResetLogin.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ResetLogin.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/login/reset', {
             body: 'req.body.ResetLogin.json',
             res: 'res.Standard.json'
@@ -635,9 +635,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *     List all tokens associated with the requester's account
      *
-     * @apiSchema {jsonschema=./schema/res.ListTokens.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.ListTokens.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/token', {
             res: 'res.ListTokens.json'
         },
@@ -662,10 +662,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Create a new API token for programatic access
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateToken.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.CreateToken.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateToken.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.CreateToken.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/token', {
             body: 'req.body.CreateToken.json',
             res: 'res.CreateToken.json'
@@ -691,9 +691,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Delete a user's API Token
      *
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.delete(
+    await schema.delete(
         '/token/:id', {
             res: 'res.Standard.json'
         },
@@ -720,10 +720,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Internal function to allow scheduled lambdas to kick off events
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.Schedule.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.Schedule.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/schedule', {
             body: 'req.body.Schedule.json',
             res: 'res.Standard.json'
@@ -754,9 +754,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return a list of all collections and their glob rules
      *
-     * @apiSchema {jsonschema=./schema/res.ListCollections.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.ListCollections.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/collections', {
             res: 'res.ListCollections.json'
         },
@@ -794,7 +794,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :collection Collection ID
      */
-    schema.get(
+    await schema.get(
         '/collections/:collection/data',
         null,
         async (req, res) => {
@@ -822,9 +822,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :collection Collection ID
      *
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    schema.delete(
+    await schema.delete(
         '/collections/:collection', {
             res: 'res.Standard.json'
         },
@@ -856,10 +856,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Create a new collection
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateCollection.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateCollection.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Collection.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/collections', {
             body: 'req.body.CreateCollection.json',
             res: 'res.Collection.json'
@@ -891,10 +891,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :collection Collection ID
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchCollection.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Collection.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchCollection.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Collection.json} apiSuccess
      */
-    schema.patch(
+    await schema.patch(
         '/collections/:collection', {
             body: 'req.body.PatchCollection.json',
             res: 'res.Collection.json'
@@ -929,7 +929,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Data required for map initialization
      */
-    schema.get(
+    await schema.get(
         '/map',
         null,
         (req, res) => {
@@ -951,7 +951,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    schema.get(
+    await schema.get(
         '/map/borders/:z/:x/:y.mvt',
         null,
         async (req, res) => {
@@ -989,7 +989,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    schema.get(
+    await schema.get(
         '/map/fabric/:z/:x/:y.mvt',
         null,
         async (req, res) => {
@@ -1032,7 +1032,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    schema.get(
+    await schema.get(
         '/map/:z/:x/:y.mvt',
         null,
         async (req, res) => {
@@ -1067,10 +1067,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Get the latest successful run of a given geographic area
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.ListData.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListData.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListData.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ListData.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/data', {
             query: 'req.query.ListData.json',
             res: 'res.ListData.json'
@@ -1100,11 +1100,11 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchData.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Data.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchData.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Data.json} apiSuccess
      *
      */
-    schema.patch(
+    await schema.patch(
         '/data/:data', {
             body: 'req.body.PatchData.json',
             res: 'res.Data.json'
@@ -1138,9 +1138,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema {jsonschema=./schema/res.Data.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Data.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/data/:data', {
             res: 'res.Data.json'
         },
@@ -1169,9 +1169,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema {jsonschema=./schema/res.DataHistory.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.DataHistory.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/data/:data/history', {
             res: 'res.DataHistory.json'
         },
@@ -1198,10 +1198,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.ListRuns.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListRuns.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListRuns.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ListRuns.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/run', {
             query: 'req.query.ListRuns.json',
             res: 'res.ListRuns.json'
@@ -1228,10 +1228,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Create a new run to hold a batch of jobs
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateRun.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateRun.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Run.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/run', {
             body: 'req.body.CreateRun.json',
             res: 'res.Run.json'
@@ -1258,9 +1258,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Run.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/run/:run', {
             res: 'res.Run.json'
         },
@@ -1287,9 +1287,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema {jsonschema=./schema/res.RunStats.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.RunStats.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/run/:run/count', {
             res: 'res.RunStats.json'
         },
@@ -1316,11 +1316,11 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchRun.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Run.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchRun.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Run.json} apiSuccess
      *
      */
-    schema.patch(
+    await schema.patch(
         '/run/:run', {
             body: 'req.body.PatchRun.json',
             res: 'res.Run.json'
@@ -1363,10 +1363,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.SingleJobsCreate.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.SingleJobsCreate.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/run/:run/jobs', {
             body: 'req.body.SingleJobsCreate.json',
             res: 'res.SingleJobsCreate.json'
@@ -1396,9 +1396,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema {jsonschema=./schema/res.SingleJobs.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.SingleJobs.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/run/:run/jobs', {
             res: 'res.SingleJobs.json'
         },
@@ -1428,10 +1428,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return information about a given subset of jobs
      *
-     * @apiSchema (query) {jsonschema=./schema/req.query.ListJobs.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListJobs.json} apiSuccess
+     * @apiSchema (query) {jsonawait schema=./schema/req.query.ListJobs.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ListJobs.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job', {
             query: 'req.query.ListJobs.json',
             res: 'res.ListJobs.json'
@@ -1458,9 +1458,9 @@ async function server(args, config, cb) {
      *     This API powers a page that allows for human review of failing jobs
      *     Note: Job Errors are cleared with every subsequent full cache
      *
-     * @apiSchema {jsonschema=./schema/res.ErrorList.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.ErrorList.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job/error', {
             res: 'res.ErrorList.json'
         },
@@ -1484,9 +1484,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return a simple count of the current number of job errors
      *
-     * @apiSchema {jsonschema=./schema/res.ErrorCount.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.ErrorCount.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job/error/count', {
             res: 'res.ErrorCount.json'
         },
@@ -1510,9 +1510,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Return a single job error if one exists or 404 if not
      *
-     * @apiSchema {jsonschema=./schema/res.ErrorSingle.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.ErrorSingle.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job/error/:job', {
             res: 'res.ErrorSingle.json'
         },
@@ -1540,10 +1540,10 @@ async function server(args, config, cb) {
      * @apiParam {Number} job Job ID of the given error
      * @apiParam {String} message Text representation of the error
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.ErrorCreate.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ErrorCreate.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ErrorCreate.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ErrorCreate.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/job/error', {
             body: 'req.body.ErrorCreate.json',
             res: 'res.ErrorCreate.json'
@@ -1572,10 +1572,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema (Body) {jsonschema=./schema/res.ErrorModerate.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ErrorModerate.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/res.ErrorModerate.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ErrorModerate.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/job/error/:job', {
             body: 'req.body.ErrorModerate.json',
             res: 'res.ErrorModerate.json'
@@ -1605,9 +1605,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonschema=./schema/res.Job.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Job.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job/:job', {
             res: 'res.Job.json'
         },
@@ -1637,7 +1637,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    schema.get(
+    await schema.get(
         '/job/:job/raw',
         null,
         async (req, res) => {
@@ -1666,9 +1666,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonschema=./schema/res.SingleJobsCreate.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.SingleJobsCreate.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/job/:job/rerun', {
             res: 'res.SingleJobsCreate.json'
         },
@@ -1708,9 +1708,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonschema=./schema/res.SingleDelta.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.SingleDelta.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job/:job/delta', {
             res: 'res.SingleDelta.json'
         },
@@ -1739,7 +1739,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    schema.get(
+    await schema.get(
         '/job/:job/output/source.png',
         null,
         async (req, res) => {
@@ -1771,7 +1771,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    schema.get(
+    await schema.get(
         '/job/:job/output/source.geojson.gz',
         null,
         async (req, res) => {
@@ -1799,7 +1799,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      */
-    schema.get(
+    await schema.get(
         '/job/:job/output/sample',
         null,
         async (req, res) => {
@@ -1833,7 +1833,7 @@ async function server(args, config, cb) {
      * @apiParam {Number} :job Job ID
      *
      */
-    schema.get(
+    await schema.get(
         '/job/:job/output/cache.zip',
         null,
         async (req, res) => {
@@ -1863,9 +1863,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonschema=./schema/res.SingleLog.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/job/:job/log', {
             res: 'res.SingleLog.json'
         },
@@ -1894,10 +1894,10 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchJob.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Job.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchJob.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Job.json} apiSuccess
      */
-    schema.patch(
+    await schema.patch(
         '/job/:job', {
             body: 'req.body.PatchJob.json',
             res: 'res.Job.json'
@@ -1931,9 +1931,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Report anonymouns traffic data about the number of user session created in a given day.
      *
-     * @apiSchema {jsonschema=./schema/res.TrafficAnalytics.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.TrafficAnalytics.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/dash/traffic', {
             res: 'res.TrafficAnalytics.json'
         },
@@ -1958,9 +1958,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Report anonymouns traffic data about the number of collection downloads
      *
-     * @apiSchema {jsonschema=./schema/res.CollectionsAnalytics.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.CollectionsAnalytics.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/dash/collections', {
             res: 'res.CollectionsAnalytics.json'
         },
@@ -1985,10 +1985,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Create a new export task
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.CreateExport.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Export.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateExport.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
      */
-    schema.post(
+    await schema.post(
         '/export', {
             body: 'req.body.CreateExport.json',
             res: 'res.Export.json'
@@ -2029,9 +2029,9 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :exportid Export ID
      *
-     * @apiSchema {jsonschema=./schema/res.SingleLog.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/export/:exportid/log', {
             res: 'res.SingleLog.json'
         },
@@ -2059,10 +2059,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   List existing exports
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.ListExport.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListExport.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListExport.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.ListExport.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/export', {
             query: 'req.query.ListExport.json',
             res: 'res.ListExport.json'
@@ -2090,9 +2090,9 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Get a single export
      *
-     * @apiSchema {jsonschema=./schema/res.Export.json} apiSuccess
+     * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
      */
-    schema.get(
+    await schema.get(
         '/export/:exportid', {
             res: 'res.Export.json'
         },
@@ -2122,7 +2122,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :exportid Export ID
      */
-    schema.get(
+    await schema.get(
         '/export/:exportid/output/export.zip',
         null,
         async (req, res) => {
@@ -2147,10 +2147,10 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Update a single export
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.PatchExport.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Export.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchExport.json} apiParam
+     * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
      */
-    schema.patch(
+    await schema.patch(
         '/export/:exportid', {
             body: 'req.body.PatchExport.json',
             res: 'res.Export.json'
@@ -2182,7 +2182,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
      */
-    schema.post(
+    await schema.post(
         '/github/event',
         null,
         async (req, res) => {
@@ -2228,7 +2228,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
      */
-    schema.post(
+    await schema.post(
         '/opencollective/event',
         null,
         async (req, res) => {

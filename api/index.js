@@ -310,17 +310,17 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.ListUsers.json} apiSuccess
      */
     await schema.get('/user', {
-            res: 'res.ListUsers.json'
-        },
-        async (req, res) => {
-            try {
-                await user.is_admin(req);
+        res: 'res.ListUsers.json'
+    },
+    async (req, res) => {
+        try {
+            await user.is_admin(req);
 
-                res.json(await user.list(req.query));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(await user.list(req.query));
+        } catch (err) {
+            return Err.respond(err, res);
         }
+    }
     );
 
     /**
@@ -337,26 +337,26 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
     await schema.post('/user', {
-            body: 'req.body.CreateUser.json',
-            res: 'res.User.json'
-        },
-        async (req, res) => {
-            try {
-                const usr = await user.register(req.body);
+        body: 'req.body.CreateUser.json',
+        res: 'res.User.json'
+    },
+    async (req, res) => {
+        try {
+            const usr = await user.register(req.body);
 
-                const forgot = await user.forgot(usr.username, 'verify');
+            const forgot = await user.forgot(usr.username, 'verify');
 
-                if (args.email) await email.verify({
-                    username: usr.username,
-                    email: usr.email,
-                    token: forgot.token
-                });
+            if (args.email) await email.verify({
+                username: usr.username,
+                email: usr.email,
+                token: forgot.token
+            });
 
-                res.json(usr);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            res.json(usr);
+        } catch (err) {
+            return Err.respond(err, res);
         }
+    }
     );
 
     /**
@@ -375,24 +375,24 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
     await schema.get('/user/:id', {
-            query: 'req.query.SingleUser.json',
-            res: 'res.User.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'id');
-                await user.is_admin(req);
+        query: 'req.query.SingleUser.json',
+        res: 'res.User.json'
+    },
+    async (req, res) => {
+        try {
+            await Param.int(req, 'id');
+            await user.is_admin(req);
 
-                if (req.query.level) {
-                    const usr = await user.user(req.params.id);
-                    await level.single(usr.email);
-                }
-
-                res.json(await user.user(req.params.id));
-            } catch (err) {
-                return Err.respond(err, res);
+            if (req.query.level) {
+                const usr = await user.user(req.params.id);
+                await level.single(usr.email);
             }
+
+            res.json(await user.user(req.params.id));
+        } catch (err) {
+            return Err.respond(err, res);
         }
+    }
     );
 
     /**

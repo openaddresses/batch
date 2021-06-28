@@ -94,6 +94,7 @@ async function collect(tmp, collection, oa) {
     console.error('ok - archive uploaded');
 
     await oa.cmd('collection', 'update', {
+        ':collection': collection.id,
         size: fs.statSync(zip).size
     });
 }

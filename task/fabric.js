@@ -10,13 +10,13 @@ const DRIVE = '/tmp';
 
 const fs = require('fs');
 const TileBase = require('tilebase');
-const {pipeline} = require('stream');
+const { pipeline } = require('stream');
 const path = require('path');
 const prompts = require('prompts');
 const Tippecanoe = require('./lib/tippecanoe');
 const AWS = require('aws-sdk');
 const Meta = require('./lib/meta');
-const {Unzip} = require('zlib');
+const { Unzip } = require('zlib');
 const OA = require('lib-oa');
 
 const s3 = new AWS.S3({
@@ -44,7 +44,7 @@ const args = require('minimist')(process.argv, {
 });
 
 if (require.main === module) {
-    if (args.interactive) return prompt()
+    if (args.interactive) return prompt();
     return cli();
 }
 
@@ -168,9 +168,6 @@ async function cli() {
 
 function get_source(out, data) {
     return new Promise((resolve, reject) => {
-        const dir = path.parse(data.source).dir;
-        const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
-
         console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
         pipeline(
             s3.getObject({

@@ -13,7 +13,6 @@ const {Unzip} = require('zlib');
 const split = require('split');
 const transform = require('parallel-transform');
 const {pipeline} = require('stream');
-const request = require('request');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp').sync;
@@ -95,7 +94,7 @@ async function collect(tmp, collection) {
         await upload_collection(zip, collection.name);
         console.error('ok - archive uploaded');
 
-        await update_collection(collection, {
+        await oa.cmd('collection', 'update', {
             created: new Date().toISOString(),
             size: fs.statSync(zip).size
         });
@@ -168,25 +167,6 @@ function upload_collection(file, name) {
             if (err) return reject(err);
 
             return resolve(true);
-        });
-    });
-}
-
-function update_collection(collection, patch) {
-    return new Promise((resolve, reject) => {
-        request({
-            url: `${process.env.OA_API}/api/collections/${collection.id}`,
-            method: 'PATCH',
-            json: true,
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            },
-            body: patch
-        }, (err, res) => {
-            if (err) return reject(err);
-
-            if (res.statusCode !== 200) throw new Error(res.body.message ? res.body.message : res.body);
-            return resolve(res.body);
         });
     });
 }

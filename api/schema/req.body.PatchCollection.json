@@ -11,6 +11,10 @@
                 "type": "string"
             }
         },
+        "created": {
+            "type": "string",
+            "description": "The time at which the collection.zip was created"
+        },
         "size": {
             "$ref": "./util/size.json"
         }

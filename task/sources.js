@@ -11,10 +11,10 @@ const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
 const request = require('request');
-const {pipeline} = require('stream');
+const { pipeline } = require('stream');
 const unzipper = require('unzipper');
 
-if (require.main == module) {
+if (require.main === module) {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
     if (!process.env.OA_BRANCH) throw new Error('No OA_BRANCH env var defined');
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
@@ -37,7 +37,7 @@ async function run(tmp) {
 
     try {
         await meta.load();
-        await meta.protection(true)
+        await meta.protection(true);
 
         console.error('ok - fetching repo');
         await fetch(tmp);
@@ -48,7 +48,7 @@ async function run(tmp) {
         console.error(`ok - ${sha}`);
 
         console.error('ok - listing jobs');
-        const jobs = list(tmp, sha)
+        const jobs = list(tmp, sha);
         console.error(`ok - ${jobs.length} jobs found`);
 
         console.error('ok - creating run');
@@ -57,12 +57,12 @@ async function run(tmp) {
 
 
         console.error('ok - populating run');
-        const p = await run_pop(r.id, jobs);
-        console.error('ok - run populated')
-        await meta.protection(false)
+        await run_pop(r.id, jobs);
+        console.error('ok - run populated');
+        await meta.protection(false);
     } catch (err) {
         console.error(err);
-        await meta.protection(false)
+        await meta.protection(false);
         process.exit(1);
     }
 }
@@ -91,15 +91,15 @@ async function fetch(tmp) {
 }
 
 function list(tmp, sha) {
-    const dir = fs.readdirSync(path.resolve(tmp, `openaddresses`))[0];
-    const globs = glob.sync(`**/*.json`, {
+    const dir = fs.readdirSync(path.resolve(tmp, 'openaddresses'))[0];
+    const globs = glob.sync('**/*.json', {
         nodir: true,
-        cwd: path.resolve(tmp, `openaddresses`, dir, 'sources')
+        cwd: path.resolve(tmp, 'openaddresses', dir, 'sources')
     });
 
     const jobs = [];
     for (const glob of globs) {
-        const source = JSON.parse(fs.readFileSync(path.resolve(tmp, `openaddresses`, dir, 'sources', glob)))
+        const source = JSON.parse(fs.readFileSync(path.resolve(tmp, 'openaddresses', dir, 'sources', glob)));
         if (source.schema !== 2) continue;
 
         for (const layer of Object.keys(source.layers)) {
@@ -142,7 +142,7 @@ async function get_sha() {
     return new Promise((resolve, reject) => {
         request({
             json: true,
-            url: `https://api.github.com/repos/openaddresses/openaddresses/commits/master`,
+            url: 'https://api.github.com/repos/openaddresses/openaddresses/commits/master',
             method: 'GET',
             headers: {
                 'User-Agent': `OpenAddresses Task v${pkg.version}`

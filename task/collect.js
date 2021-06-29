@@ -9,11 +9,10 @@ require('./lib/pre');
 const glob = require('glob');
 const OA = require('lib-oa');
 const os = require('os');
-const {Unzip} = require('zlib');
+const { Unzip } = require('zlib');
 const split = require('split');
 const transform = require('parallel-transform');
-const {pipeline} = require('stream');
-const request = require('request');
+const { pipeline } = require('stream');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp').sync;
@@ -22,7 +21,7 @@ const archiver = require('archiver');
 
 const DRIVE = '/tmp';
 
-if (require.main == module) {
+if (require.main === module) {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.StackName) process.env.StackName = 'local';
@@ -49,7 +48,7 @@ async function fetch() {
     });
 
     try {
-        fs.stat(DRIVE)
+        fs.stat(DRIVE);
 
         tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     } catch (err) {
@@ -65,12 +64,12 @@ async function fetch() {
         const datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
-        const stats = await sources(tmp, datas);
+        await sources(tmp, datas);
         console.error('ok - all sources fetched');
 
         for (const collection of collections) {
             console.error(`# ${collection.name}`);
-            await collect(tmp, collection);
+            await collect(tmp, collection, oa);
         }
     } catch (err) {
         console.error(err);
@@ -78,7 +77,7 @@ async function fetch() {
     }
 }
 
-async function collect(tmp, collection) {
+async function collect(tmp, collection, oa) {
     let collection_data = [];
 
     for (const source of collection.sources) {
@@ -88,20 +87,16 @@ async function collect(tmp, collection) {
         }));
     }
 
-    try {
-        const zip = await zip_datas(tmp, collection_data, collection.name);
+    const zip = await zip_datas(tmp, collection_data, collection.name);
 
-        console.error(`ok - zip created: ${zip}`);
-        await upload_collection(zip, collection.name);
-        console.error('ok - archive uploaded');
+    console.error(`ok - zip created: ${zip}`);
+    await upload_collection(zip, collection.name);
+    console.error('ok - archive uploaded');
 
-        await update_collection(collection, {
-            created: new Date().toISOString(),
-            size: fs.statSync(zip).size
-        });
-    } catch (err) {
-        return reject(err);
-    }
+    await oa.cmd('collection', 'update', {
+        ':collection': collection.id,
+        size: fs.statSync(zip).size
+    });
 }
 
 async function sources(tmp, datas) {
@@ -172,31 +167,12 @@ function upload_collection(file, name) {
     });
 }
 
-function update_collection(collection, patch) {
-    return new Promise((resolve, reject) => {
-        request({
-            url: `${process.env.OA_API}/api/collections/${collection.id}`,
-            method: 'PATCH',
-            json: true,
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            },
-            body: patch
-        }, (err, res) => {
-            if (err) return reject(err);
-
-            if (res.statusCode !== 200) throw new Error(res.body.message ? res.body.message : res.body);
-            return resolve(res.body);
-        });
-    });
-}
-
 function zip_datas(tmp, datas, name) {
     return new Promise((resolve, reject) => {
         const output = fs.createWriteStream(path.resolve(tmp, `${name}.zip`))
             .on('error', (err) => {
                 console.error('not ok - ' + err.message);
-                return reject(err)
+                return reject(err);
             }).on('close', () => {
                 return resolve(path.resolve(tmp, `${name}.zip`));
             });
@@ -207,7 +183,7 @@ function zip_datas(tmp, datas, name) {
             console.error('not ok - WARN: ' + err);
         }).on('error', (err) => {
             console.error('not ok - ' + err.message);
-            return reject(err)
+            return reject(err);
         });
 
         archive.pipe(output);

@@ -96,6 +96,8 @@ class Tippecanoe {
      * @param {Object} options.limit Limit Options
      * @param {Boolean} [options.limit.features=true] Limit tiles to 200,000 features
      * @param {Boolean} [options.limit.size=true] Limit tiles to 500K bytes
+     *
+     * @returns {Promise}
      */
     join(output_path, inputs, options = {}) {
         return new Promise((resolve, reject) => {

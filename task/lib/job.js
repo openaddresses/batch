@@ -115,6 +115,8 @@ class Job {
 
     /**
      * Detect if the source is a static S3 asset, and download it from S3 instead of http
+     *
+     * @returns {Promise}
      */
     s3_down() {
         return new Promise((resolve, reject) => {

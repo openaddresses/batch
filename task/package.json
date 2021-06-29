@@ -6,7 +6,7 @@
     "private": true,
     "scripts": {
         "test": "tape test/**.test.js",
-        "lint": "eslint task.js lib/**.js test/**.js"
+        "lint": "eslint *.js lib/**.js test/**.js"
     },
     "dependencies": {
         "@turf/turf": "^6.3.0",

@@ -8,13 +8,12 @@ const OA = require('lib-oa');
 const prompts = require('prompts');
 const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
-const {pipeline} = require('stream');
-const request = require('request');
+const { pipeline } = require('stream');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp').sync;
 const AWS = require('aws-sdk');
-const {Unzip} = require('zlib');
+const { Unzip } = require('zlib');
 const archiver = require('archiver');
 
 const s3 = new AWS.S3({
@@ -97,7 +96,7 @@ async function cli() {
             update.loglink = meta.loglink;
         }
 
-        await oa.cmd('export', 'update', update)
+        await oa.cmd('export', 'update', update);
 
         const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
         mkdirp(path.resolve(tmp));
@@ -106,11 +105,11 @@ async function cli() {
         console.error(`ok - tmp: ${tmp}`);
 
         console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${exp.job_id}/source.geojson.gz`);
-        const loc = await get_source(tmp, exp.job_id)
+        const loc = await get_source(tmp, exp.job_id);
         console.error(`ok - fetched: ${loc}`);
 
-        await convert(tmp, loc, exp, job)
-        console.error(`ok - converted`);
+        await convert(tmp, loc, exp, job);
+        console.error('ok - converted');
 
         await s3.putObject({
             ContentType: 'application/zip',
@@ -127,7 +126,7 @@ async function cli() {
         });
 
         console.error('ok - done');
-        await meta.protection(false)
+        await meta.protection(false);
     } catch (err) {
         console.error(err);
 
@@ -137,7 +136,7 @@ async function cli() {
                 status: 'Fail'
             });
         } finally {
-            await meta.protection(false)
+            await meta.protection(false);
             process.exit(1);
         }
     }
@@ -145,12 +144,12 @@ async function cli() {
 
 function archive(tmp) {
     return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(path.resolve(tmp, `export.zip`))
+        const output = fs.createWriteStream(path.resolve(tmp, 'export.zip'))
             .on('error', (err) => {
                 console.error('not ok - ' + err.message);
-                return reject(err)
+                return reject(err);
             }).on('close', () => {
-                return resolve(path.resolve(tmp, `export.zip`));
+                return resolve(path.resolve(tmp, 'export.zip'));
             });
 
         const arch = archiver('zip', {
@@ -179,7 +178,7 @@ function convert(tmp, loc, exp, job) {
         .skipfailures()
         .onStderr((data) => {
             console.error(data);
-        })
+        });
 
     if (exp.format === 'shapefile') {
         return new Promise((resolve, reject) => {

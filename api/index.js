@@ -28,6 +28,7 @@ const Param = util.Param;
 const { Pool } = require('pg');
 
 const Config = require('./lib/config');
+const SiteMap = require('./lib/sitemap');
 
 if (require.main === module) {
     configure(args);
@@ -180,6 +181,15 @@ async function server(args, config, cb) {
         return res.json({
             version: pkg.version
         });
+    });
+
+    app.get('/sitemap.xml', async (req, res) => {
+        try {
+            res.type('application/xml');
+            res.send(await SiteMap.list(config.pool));
+        } catch (err) {
+            Err.respond(res, err);
+        }
     });
 
     /**

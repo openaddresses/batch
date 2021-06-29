@@ -22,6 +22,9 @@ const sm = new SM({
     size: 256
 });
 
+/**
+ * @class
+ */
 class Map {
     static map() {
         return {

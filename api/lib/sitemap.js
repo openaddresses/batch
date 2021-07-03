@@ -27,7 +27,7 @@ class SiteMap {
             for (const loc of pgres.rows) {
                 map = map + `
                     <url>
-                         <loc>https://batch.openaddresses.io/map/${loc.id}</loc>
+                         <loc>https://batch.openaddresses.io/location/${loc.id}</loc>
                          <changefreq>weekly</changefreq>
                     </url>
                 `;

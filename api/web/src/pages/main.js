@@ -29,6 +29,8 @@ import Run from '../components/Run.vue';
 import JobLog from '../components/JobLog.vue';
 import JobRaw from '../components/JobRaw.vue';
 
+import NotFound from '../components/NotFound.vue';
+
 import Profile from '../components/Profile.vue';
 import ProfileDefault from '../components/profile/ProfileDefault.vue';
 import ProfileAnalytics from '../components/profile/ProfileAnalytics.vue';
@@ -82,7 +84,9 @@ const router = new VueRouter({
 
         { path: '/register', component: Register },
 
-        { path: '/upload', component: Upload }
+        { path: '/upload', component: Upload },
+
+        { path: '*', component: NotFound }
     ]
 });
 

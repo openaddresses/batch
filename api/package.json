@@ -45,7 +45,7 @@
         "tilebase": "^1.3.2"
     },
     "devDependencies": {
-        "apidoc": "^0.27.1",
+        "apidoc": "^0.28.1",
         "apidoc-plugin-schema": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^7.25.0",

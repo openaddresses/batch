@@ -76,14 +76,14 @@
                     <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
                         <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
-                        <div class='col col--8 px6'>
+                        <div class='col col--9 px6'>
                             <label>Source</label>
                             <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
                         </div>
-                        <div class='col col--4 px6'>
+                        <div class='col col--3 px6'>
                             <label>Layer</label>
                             <div class='w-full select-container'>
-                                <select v-model='filter.layer' class='select'>
+                                <select v-model='filter.layer' class='select select--stroke'>
                                     <option>all</option>
                                     <option>addresses</option>
                                     <option>buildings</option>
@@ -91,6 +91,22 @@
                                 </select>
                                 <div class='select-arrow'></div>
                             </div>
+                        </div>
+                        <div class='col col--6 px6'>
+                            <label class='switch-container mr6'>
+                                <input type='checkbox' v-model='filter.switches.before'/>
+                                <div class='switch switch--gray'></div>
+                            </label>
+                            <label>Before</label>
+                            <input class='input' type='date' v-model='filter.before'/>
+                        </div>
+                        <div class='col col--6 px6'>
+                            <label class='switch-container mr6'>
+                                <input type='checkbox' v-model='filter.switches.after'/>
+                                <div class='switch switch--gray'></div>
+                            </label>
+                            <label>After</label>
+                            <input class='input' type='date' v-model='filter.after'/>
                         </div>
                     </div>
                 </template>
@@ -197,9 +213,15 @@ export default {
             },
             showFilter: false,
             filter: {
+                switches: {
+                    before: false,
+                    after: false
+                },
                 point: false,
                 source: '',
-                layer: 'all'
+                layer: 'all',
+                before: '',
+                after: ''
             },
             datas: [],
             collections: []
@@ -212,6 +234,20 @@ export default {
         showFilter: function() {
             this.filter.source = '';
             this.filter.layer = 'all';
+        },
+        'filter.switches.after': function() {
+            this.refresh();
+        },
+        'filter.switches.before': function() {
+            this.refresh();
+        },
+        'filter.after': function() {
+            this.filter.switches.after = true;
+            this.refresh();
+        },
+        'filter.before': function() {
+            this.filter.switches.before = true;
+            this.refresh();
         },
         'filter.point': function() {
             this.refresh();
@@ -287,6 +323,8 @@ export default {
                 if (this.filter.source) url.searchParams.set('source', this.filter.source);
                 if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
                 if (this.filter.point) url.searchParams.set('point', this.filter.point.join(','));
+                if (this.filter.switches.after && this.filter.after) url.searchParams.set('after', this.filter.after);
+                if (this.filter.switches.before && this.filter.before) url.searchParams.set('before', this.filter.before);
 
                 const res = await window.std(url);
                 const dataname = {};

@@ -2,6 +2,7 @@
 
 const Err = require('./error');
 const Map = require('./map');
+const moment = require('moment');
 
 /**
  * @class Data
@@ -15,6 +16,8 @@ class Data {
      * @param {String} [query.source=Null] - Filter results by source
      * @param {String} [query.layer=Null] - Filter results by source layer
      * @param {String} [query.name=Null] - Filter results by source layer name
+     * @param {String} [query.before=Null] - Filter results run before the given date
+     * @param {String} [query.after=Null] - Filter results run after the given date
      * @param {String} [query.point=false] - Filter results by geographic point
      * @param {Boolean} query.fabric - Filter results by if they are part of the fabric
      */
@@ -24,6 +27,9 @@ class Data {
         if (!query.source) query.source = '';
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';
+
+        if (query.before) query.before = moment(query.before).format('YYYY-MM-DD');
+        if (query.after) query.after = moment(query.after).format('YYYY-MM-DD');
 
         if (!query.point) {
             query.point = '';
@@ -63,6 +69,8 @@ class Data {
                     results.source ilike $1
                     AND results.layer ilike $2
                     AND results.name ilike $3
+                    AND ($5::TIMESTAMP IS NULL OR updated < $5::TIMESTAMP)
+                    AND ($6::TIMESTAMP IS NULL OR updated > $6::TIMESTAMP)
                     AND (
                         char_length($4) = 0
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
@@ -76,7 +84,9 @@ class Data {
                 query.source,
                 query.layer,
                 query.name,
-                query.point
+                query.point,
+                query.before,
+                query.after
             ]);
 
             return pgres.rows.map((res) => {

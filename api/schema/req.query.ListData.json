@@ -14,6 +14,14 @@
             "type": "string",
             "description": "Filter results by layer name"
         },
+        "before": {
+            "type": "string",
+            "description": "Filter results updated before the given date"
+        },
+        "after": {
+            "type": "string",
+            "description": "Filter results updated after the given date"
+        },
         "point": {
             "type": "string",
             "description": "Filter results by geographic point '{lng},{lat}'"

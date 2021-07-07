@@ -744,7 +744,7 @@ async function server(args, config, cb) {
      *   Download a given collection file
      *
      *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticatd downloads allow us to prevent abuse, keep the project running and the data free.
+     *    S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
      *
      *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
      *    to a requester pays object on S3. For those that are able, this is the best way to download data.
@@ -1631,7 +1631,7 @@ async function server(args, config, cb) {
      *
      * @apiDescription
      *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw
+     *    S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
      *
      *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
      *    to a requester pays object on S3. For those that are able, this is the best way to download data.
@@ -1686,7 +1686,7 @@ async function server(args, config, cb) {
      *
      *  @apiDescription
      *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw
+     *    S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
      *
      *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
      *    to a requester pays object on S3. For those that are able, this is the best way to download data.

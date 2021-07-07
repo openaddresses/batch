@@ -1784,7 +1784,7 @@ async function server(args, config, cb) {
      * @apiPermission admin
      *
      * @apiDescription
-     *   Report anonymouns traffic data about the number of user sessions created in a given day.
+     *   Report anonymized traffic data about the number of user sessions created in a given day.
      *
      * @apiSchema {jsonawait schema=./schema/res.TrafficAnalytics.json} apiSuccess
      */

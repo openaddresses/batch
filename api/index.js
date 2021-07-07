@@ -744,12 +744,12 @@ async function server(args, config, cb) {
      *   Download a given collection file
      *
      *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw
+     *    S3 egress, authenticatd downloads allow us to prevent abuse, keep the project running and the data free.
      *
      *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
      *    to a requester pays object on S3. For those that are able, this is the best way to download data.
      *
-     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+     *    OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
      *    Please consider donating if you are able https://opencollective.com/openaddresses
      *
      * @apiParam {Number} :collection Collection ID
@@ -1784,7 +1784,7 @@ async function server(args, config, cb) {
      * @apiPermission admin
      *
      * @apiDescription
-     *   Report anonymouns traffic data about the number of user session created in a given day.
+     *   Report anonymouns traffic data about the number of user sessions created in a given day.
      *
      * @apiSchema {jsonawait schema=./schema/res.TrafficAnalytics.json} apiSuccess
      */
@@ -1808,7 +1808,7 @@ async function server(args, config, cb) {
      * @apiPermission admin
      *
      * @apiDescription
-     *   Report anonymouns traffic data about the number of collection downloads
+     *   Report anonymized traffic data about the number of collection downloads.
      *
      * @apiSchema {jsonawait schema=./schema/res.CollectionsAnalytics.json} apiSuccess
      */
@@ -1871,7 +1871,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *   Return the batch-machine processing log for a given export
      *   Note: These are stored in AWS CloudWatch and *do* expire
-     *   The presence of a loglink on a export, does not guarentree log retention
+     *   The presence of a loglink on a export does not guarantee log retention
      *
      * @apiParam {Number} :exportid Export ID
      *
@@ -2054,7 +2054,7 @@ async function server(args, config, cb) {
      * @apiPermission admin
      *
      * @apiDescription
-     *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
+     *   Callback endpoint for OpenCollective. Should not be called by user functions
      */
     await schema.post( '/opencollective/event', null,
         async (req, res) => {

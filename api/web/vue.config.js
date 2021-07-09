@@ -16,12 +16,6 @@ module.exports = {
             template: 'public/index.html',
             filename: 'map.html',
             title: 'OpenAddresses Fabric',
-        },
-        'location/*': {
-            entry: 'src/pages/location/main.js',
-            template: 'public/index.html',
-            filename: 'location.html',
-            title: 'OpenAddresses Location',
         }
     }
 };

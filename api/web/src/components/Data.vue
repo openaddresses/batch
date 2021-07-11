@@ -147,8 +147,11 @@
         <template v-else>
             <div :key='d.source' v-for='d in datas' class='col col--12 grid'>
                 <div @click='d._open = !d._open' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--9'>
-                        <span @click='$router.push(`/location/`)' class='ml12' v-text='d.source'/>
+                    <div class='col col--9 clearfix'>
+                        <span class='ml12 fl' v-text='d.source'/>
+                        <span v-if='d.map' class='fl ml6'>
+                            <svg @click='$router.push(`/location/${d.map}`)' class='icon color-gray color-black-on-hover' style='height: 20px; width: 20px; padding-top: 5px;'><use href='#icon-map'/></svg>
+                        </span>
                     </div>
                     <div class='col col--3 color-gray'>
                         <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>
@@ -343,6 +346,7 @@ export default {
                     const d = {
                         _open: false,
                         source: sourcename,
+                        map: false,
                         has: {
                             addresses: false,
                             buildings: false,
@@ -354,6 +358,7 @@ export default {
                     for (const source of dataname[sourcename]) {
                         d.has[source.layer] = true;
                         d.sources.push(source);
+                        if (source.map) d.map = source.map;
                     }
 
                     data.push(d);

@@ -14,10 +14,9 @@ async function router(schema, config) {
      * @apiDescription
      *   Data required for map initialization
      */
-    await schema.get('/map', null,
-        (req, res) => {
-            return res.json(Map.map());
-        });
+    await schema.get( '/map', null, (req, res) => {
+        return res.json(Map.map());
+    });
 
     /**
      * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT

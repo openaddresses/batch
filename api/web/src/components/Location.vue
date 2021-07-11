@@ -1,9 +1,18 @@
 <template>
     <div class='col col--12 grid pt12'>
-        <Coverage
-            @err='$emit("err", $event)'
-            :filter='locid'
-        />
+        <template v-if='loading'>
+            <div class='flex flex--center-main w-full py24'>
+                <div class='loading'></div>
+            </div>
+        </template>
+        <template v-else>
+            <h1 v-text='location'></h1>
+
+            <Coverage
+                @err='$emit("err", $event)'
+                :filter='locid'
+            />
+        </template>
     </div>
 </template>
 
@@ -19,6 +28,7 @@ export default {
     },
     data: function() {
         return {
+            location: '',
             jobs: [],
             loading: false
         };

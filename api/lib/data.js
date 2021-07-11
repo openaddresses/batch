@@ -58,7 +58,8 @@ class Data {
                     results.name,
                     results.job,
                     job.output,
-                    job.size
+                    job.size,
+                    job.map
                 FROM
                     results
                         INNER JOIN
@@ -93,6 +94,7 @@ class Data {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
                 res.size = parseInt(res.size);
+                res.map = parseInt(res.map);
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
 
                 return res;
@@ -119,7 +121,8 @@ class Data {
                     job.output,
                     job.run,
                     job.count,
-                    job.stats
+                    job.stats,
+                    job.map
                 FROM
                     results INNER JOIN job
                         ON
@@ -148,6 +151,7 @@ class Data {
                     res.id = parseInt(res.id);
                     res.count = parseInt(res.count);
                     res.run = parseInt(res.run);
+                    res.map = parseInt(res.map);
                     res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;
                 })
@@ -197,7 +201,8 @@ class Data {
                     results.name,
                     results.job,
                     job.output,
-                    job.size
+                    job.size,
+                    job.map
                 FROM
                     results,
                     job
@@ -216,6 +221,7 @@ class Data {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
                 res.size = parseInt(res.size);
+                res.map = parseInt(res.map);
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
                 return res;
             })[0];

@@ -124,9 +124,10 @@ class Map {
 
             const pgres = await pool.query(`
                 SELECT
-                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                    ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
                 FROM (
                     SELECT
+                        n.id,
                         n.code,
                         addresses,
                         buildings,
@@ -166,7 +167,8 @@ class Map {
                         n.buildings,
                         n.parcels,
                         n.code,
-                        n.geom
+                        n.geom,
+                        n.id
                 ) q
             `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
 

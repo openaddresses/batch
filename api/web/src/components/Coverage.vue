@@ -27,7 +27,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default {
     name: 'Coverage',
-    props: ['layer'],
+    props: ['layer', 'filter'],
     data: function() {
         return {
             layers: ['addresses', 'parcels', 'buildings'],
@@ -182,6 +182,16 @@ export default {
                         }
                     });
 
+                    for (const layer of ['coverage-poly', 'coverage-point']) {
+                        if (this.filter) {
+                            this.map.setFilter(layer, [
+                                '==',
+                                ['id'],
+                                parseInt(this.filter)
+                            ]);
+                        }
+                    }
+
                     for (const layer of ['addresses', 'parcels', 'buildings']) {
                         this.map.addLayer({
                             id: `coverage-${layer}-poly`,
@@ -232,6 +242,20 @@ export default {
                                 'circle-stroke-width': 1
                             }
                         });
+
+                        if (this.filter) {
+                            this.map.setFilter(`coverage-${layer}-poly`, [
+                                '==',
+                                ['id'],
+                                parseInt(this.filter)
+                            ]);
+
+                            this.map.setFilter(`coverage-${layer}-point`, [
+                                '==',
+                                ['id'],
+                                parseInt(this.filter)
+                            ]);
+                        }
                     }
 
                     this.map.addSource('click', {

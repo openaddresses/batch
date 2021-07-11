@@ -148,7 +148,7 @@
             <div :key='d.source' v-for='d in datas' class='col col--12 grid'>
                 <div @click='d._open = !d._open' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--9'>
-                        <span class='ml12' v-text='d.source'/>
+                        <span @click='$router.push(`/location/${d.}`)' class='ml12' v-text='d.source'/>
                     </div>
                     <div class='col col--3 color-gray'>
                         <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>

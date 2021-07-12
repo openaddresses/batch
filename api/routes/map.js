@@ -2,6 +2,7 @@
 
 const Err = require('../lib/error');
 const { Miss } = require('../lib/cacher');
+const { Param } = require('../lib/util');
 const Map = require('../lib/map');
 
 async function router(schema, config) {
@@ -17,6 +18,22 @@ async function router(schema, config) {
      */
     await schema.get( '/map', null, (req, res) => {
         return res.json(Map.map());
+    });
+
+    /**
+     * @api {get} /api/map/:mapid Map Feature
+     * @apiVersion 1.0.0
+     * @apiName MapFeature
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Get a single Map Object
+     */
+    await schema.get( '/map/:mapid', null, async (req, res) => {
+        await Param.int(req, 'mapid');
+
+        return res.json(await Map.from_id(config.pool, req.params.mapid));
     });
 
     /**

@@ -32,6 +32,41 @@ class Map {
         };
     }
 
+    static async from_id(pool, mapid) {
+        try {
+            const pgres = await pool.query(`
+                SELECT
+                    id,
+                    code,
+                    name,
+                    ST_Extent(geom) AS bbox,
+                    ST_AsGeoJSON(geom)::JSONB AS geom
+                FROM
+                    map
+                WHERE
+                    id = $1
+                GROUP BY
+                    id,
+                    code,
+                    name,
+                    geom
+                LIMIT 1
+            `, [ mapid ]);
+
+            if (pgres.rows.length === 0) return false;
+
+            return {
+                id: parseInt(pgres.rows[0].id),
+                code: pgres.rows[0].code,
+                name: pgres.rows[0].name,
+                bbox: pgres.rows[0].bbox.replace('BOX(', '').replace(')', '').split(',').join(' ').split(' ').map(e => Number(e)),
+                geom: pgres.rows[0].geom,
+            }
+        } catch (err) {
+            throw new Err(500, err, 'Failed to fetch map id');
+        }
+    }
+
     static async from(pool, code) {
         try {
             const pgres = await pool.query(`

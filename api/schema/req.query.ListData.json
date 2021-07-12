@@ -29,6 +29,10 @@
         "fabric": {
             "type": "boolean",
             "description": "Query results by fabric inclusion"
+        },
+        "map": {
+            "type": "integer",
+            "description": "Filter by associated MapID"
         }
     }
 }

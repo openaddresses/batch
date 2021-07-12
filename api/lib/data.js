@@ -20,6 +20,7 @@ class Data {
      * @param {String} [query.after=Null] - Filter results run after the given date
      * @param {String} [query.point=false] - Filter results by geographic point
      * @param {Boolean} query.fabric - Filter results by if they are part of the fabric
+     * @param {Number} query.map - Filter results by associated mapid
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -30,6 +31,8 @@ class Data {
 
         if (query.before) query.before = moment(query.before).format('YYYY-MM-DD');
         if (query.after) query.after = moment(query.after).format('YYYY-MM-DD');
+
+        if (!query.map) query.map = null;
 
         if (!query.point) {
             query.point = '';
@@ -72,6 +75,7 @@ class Data {
                     AND results.name ilike $3
                     AND ($5::TIMESTAMP IS NULL OR updated < $5::TIMESTAMP)
                     AND ($6::TIMESTAMP IS NULL OR updated > $6::TIMESTAMP)
+                    AND ($7::BIGINT IS NULL OR job.map = $7)
                     AND (
                         char_length($4) = 0
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
@@ -87,7 +91,8 @@ class Data {
                 query.name,
                 query.point,
                 query.before,
-                query.after
+                query.after,
+                query.map
             ]);
 
             return pgres.rows.map((res) => {

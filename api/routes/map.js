@@ -19,6 +19,22 @@ async function router(schema, config) {
     });
 
     /**
+     * @api {get} /api/map/:mapid Map Feature
+     * @apiVersion 1.0.0
+     * @apiName MapFeature
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Get a single Map Object
+     */
+    await schema.get( '/map/:mapid', null, async (req, res) => {
+        await Param.int(req, 'mapid');
+
+        return res.json(await Map.from_id(config.pool, req.params.mapid));
+    });
+
+    /**
      * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
      * @apiVersion 1.0.0
      * @apiName BorderVectorTile

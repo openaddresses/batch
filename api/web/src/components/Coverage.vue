@@ -120,7 +120,6 @@ export default {
                     });
 
                     this.map.on('click', (e) => {
-                        console.error(this.map.queryRenderedFeatures(e.point))
                         this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 

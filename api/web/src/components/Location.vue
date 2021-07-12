@@ -6,12 +6,19 @@
             </div>
         </template>
         <template v-else>
-            <h1 v-text='location'></h1>
+            <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
+                <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
+            </button>
 
-            <Coverage
-                @err='$emit("err", $event)'
-                :filter='locid'
-            />
+            <h1 class='txt-h4 pl12' v-text='location.name'></h1>
+
+            <div class='col col--12 pt12'>
+                <Coverage
+                    @err='$emit("err", $event)'
+                    :filter='locid'
+                    :bbox='location.bbox'
+                />
+            </div>
         </template>
     </div>
 </template>
@@ -28,7 +35,7 @@ export default {
     },
     data: function() {
         return {
-            location: '',
+            location: {},
             jobs: [],
             loading: false
         };
@@ -47,7 +54,7 @@ export default {
         getJobs: async function() {
             try {
                 this.loading = true;
-                this.jobs = await window.std(window.location.origin + '/api/job');
+                this.location = await window.std(window.location.origin + `/api/map/${this.locid}`);
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);

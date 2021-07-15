@@ -462,27 +462,31 @@ class Job {
         }
     }
 
-    log() {
-        return new Promise((resolve, reject) => {
-            if (!this.loglink) return reject(new Err(404, null, 'Job has not produced a log'));
+    async log(format = 'json') {
+        if (!this.loglink) throw new Err(404, null, 'Job has not produced a log');
 
-            cwl.getLogEvents({
+        try {
+            const res = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink
-            }, (err, res) => {
-                if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
+            }).promise();
 
-                let line = 0;
-                return resolve(res.events.map((event) => {
-                    return {
-                        id: ++line,
-                        timestamp: event.timestamp,
-                        message: event.message
-                            .replace(/access_token=[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
-                    };
-                }));
+            let line = 0;
+            const events = res.events.map((event) => {
+                return {
+                    id: ++line,
+                    timestamp: event.timestamp,
+                    message: event.message
+                        .replace(/access_token=[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
+                };
             });
-        });
+
+            if (format === 'json') {
+                return events;
+            }
+        } catch (err) {
+            throw new Err(500, err, 'Could not retrieve logs');
+        }
     }
 
     async generate(pool) {

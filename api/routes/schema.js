@@ -20,7 +20,7 @@ async function router(schema) {
      * @apiSchema (Query) {jsonschema=../schema/req.query.ListSchema.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ListSchema.json} apiSuccess
      */
-    schema.get('/schema', {
+    await schema.get('/schema', {
         query: 'req.query.ListSchema.json',
         res: 'res.ListSchema.json'
     }, async (req, res) => {

@@ -15,7 +15,7 @@ async function router(schema, config) {
      *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    schema.delete('/cache', {
+    await schema.delete('/cache', {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
@@ -42,7 +42,7 @@ async function router(schema, config) {
      *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    schema.delete('/cache/:cache_key', {
+    await schema.delete('/cache/:cache_key', {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {

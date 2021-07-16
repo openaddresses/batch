@@ -9,15 +9,70 @@
         "query": false,
         "res": true
     },
-    "GET /schema": {
+    "GET /job": {
         "body": false,
         "query": true,
+        "res": true
+    },
+    "GET /job/:job": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /job/:job/raw": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /job/:job/rerun": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /job/:job/delta": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /job/:job/output/source.png": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /job/:job/output/source.geojson.gz": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /job/:job/output/sample": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /job/:job/output/cache.zip": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /job/:job/log": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /job/:job": {
+        "body": true,
+        "query": false,
         "res": true
     },
     "POST /upload": {
         "body": false,
         "query": false,
         "res": false
+    },
+    "GET /schema": {
+        "body": false,
+        "query": true,
+        "res": true
     },
     "GET /user": {
         "body": false,
@@ -189,11 +244,6 @@
         "query": false,
         "res": true
     },
-    "GET /job": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
     "GET /job/error": {
         "body": false,
         "query": false,
@@ -215,56 +265,6 @@
         "res": true
     },
     "POST /job/error/:job": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /job/:job": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /job/:job/raw": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /job/:job/rerun": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /job/:job/delta": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /job/:job/output/source.png": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /job/:job/output/source.geojson.gz": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /job/:job/output/sample": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /job/:job/output/cache.zip": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /job/:job/log": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "PATCH /job/:job": {
         "body": true,
         "query": false,
         "res": true

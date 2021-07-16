@@ -253,12 +253,6 @@ async function server(args, config, cb) {
         return next();
     });
 
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
-    }
-
     /**
      * @api {post} /api/upload Create Upload
      * @apiVersion 1.0.0
@@ -1748,6 +1742,12 @@ async function server(args, config, cb) {
                 return Err.respond(err, res);
             }
         });
+
+    // Load dynamic routes directory
+    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+        if (!config.silent) console.error(`ok - loaded routes/${r}`);
+        await require('./routes/' + r)(schema, config);
+    }
 
     schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {

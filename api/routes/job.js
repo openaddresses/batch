@@ -2,6 +2,8 @@
 
 const Err = require('../lib/error');
 const Job = require('../lib/job');
+const Run = require('../lib/run');
+const Data = require('../lib/data');
 const { Param }  = require('../lib/util');
 
 async function router(schema, config) {
@@ -24,7 +26,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
-            return res.json(await Job.list(pool, req.query));
+            return res.json(await Job.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -50,7 +52,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'job');
 
-            const job = await Job.from(pool, req.params.job);
+            const job = await Job.from(config.pool, req.params.job);
 
             return res.json(job.json());
         } catch (err) {
@@ -76,7 +78,7 @@ async function router(schema, config) {
             try {
                 await Param.int(req, 'job');
 
-                const job = await Job.from(pool, req.params.job);
+                const job = await Job.from(config.pool, req.params.job);
 
                 console.error(job.source);
                 return res.json(await job.get_raw());
@@ -105,16 +107,16 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'job');
 
-            await user.is_admin(req);
+            await config.user.is_admin(req);
 
-            const job = await Job.from(pool, req.params.job);
-            const run = await Run.from(pool, job.run);
+            const job = await Job.from(config.pool, req.params.job);
+            const run = await Run.from(config.pool, job.run);
 
-            const new_run = await Run.generate(pool, {
+            const new_run = await Run.generate(config.pool, {
                 live: !!run.live
             });
 
-            return res.json(await Run.populate(pool, new_run.id, [{
+            return res.json(await Run.populate(config.pool, new_run.id, [{
                 source: job.source,
                 layer: job.layer,
                 name: job.name
@@ -144,7 +146,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'job');
 
-            const delta = await Job.delta(pool, req.params.job);
+            const delta = await Job.delta(config.pool, req.params.job);
 
             return res.json(delta);
         } catch (err) {
@@ -198,9 +200,9 @@ async function router(schema, config) {
             try {
                 await Param.int(req, 'job');
 
-                await user.is_auth(req);
+                await config.user.is_auth(req);
 
-                await Job.data(pool, req.params.job, res);
+                await Job.data(config.pool, req.params.job, res);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -223,7 +225,7 @@ async function router(schema, config) {
             try {
                 await Param.int(req, 'job');
 
-                return res.json(await Job.sample(pool, req.params.job));
+                return res.json(await Job.sample(config.pool, req.params.job));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -254,7 +256,7 @@ async function router(schema, config) {
             try {
                 await Param.int(req, 'job');
 
-                await user.is_auth(req);
+                await config.user.is_auth(req);
 
                 Job.cache(req.params.job, res);
             } catch (err) {
@@ -284,7 +286,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'job');
 
-            const job = await Job.from(pool, req.params.job);
+            const job = await Job.from(config.pool, req.params.job);
 
             return res.json(await job.log());
         } catch (err) {
@@ -314,13 +316,13 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'job');
 
-            await user.is_admin(req);
+            await config.user.is_admin(req);
 
-            const job = await Job.from(pool, req.params.job);
+            const job = await Job.from(config.pool, req.params.job);
             job.patch(req.body);
-            await job.commit(pool, Run, Data, ci);
+            await job.commit(config.pool, Run, Data, config.ci);
 
-            await Run.ping(pool, ci, job);
+            await Run.ping(config.pool, config.ci, job);
 
             return res.json(job.json());
         } catch (err) {

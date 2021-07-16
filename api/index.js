@@ -62,7 +62,6 @@ function configure(args, cb) {
 async function server(args, config, cb) {
     // these must be run after lib/config
     const Map = require('./lib/map');
-    const ci = new (require('./lib/ci'))(config);
     const Err = require('./lib/error');
     const Run = require('./lib/run');
     const Job = require('./lib/job');
@@ -128,8 +127,13 @@ async function server(args, config, cb) {
     }
 
     const user = new (require('./lib/user'))(pool);
+    config.user = user;
     const email = new (require('./lib/email'))();
+    config.email = email;
     const token = new (require('./lib/token'))(pool);
+    config.token = token;
+    const ci = new (require('./lib/ci'))(config);
+    config.ci = ci;
 
     const app = express();
 

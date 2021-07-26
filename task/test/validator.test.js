@@ -189,6 +189,29 @@ test('Empty Street', (t) => {
     t.end();
 });
 
+test('Invalid Coords - No Geom', (t) => {
+    const validator = new Validator('addresses');
+
+    validator.test({
+        type: 'Feature',
+        properties: {
+            number: '123',
+            street: 'Main St'
+        },
+        geometry: false
+    });
+
+    t.deepEquals(validator.stats, {
+        valid: 0,
+        failures: {
+            geometry: 1,
+            number: 0,
+            street: 0
+        }
+    }, 'expected stats');
+
+    t.end();
+});
 test('Invalid Coords - Lng', (t) => {
     const validator = new Validator('addresses');
 

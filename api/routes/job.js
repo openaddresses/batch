@@ -278,9 +278,11 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
+     * @apiSchema (query) {jsonawait schema=./schema/req.query.SingleLog.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
      */
     await schema.get( '/job/:job/log', {
+        query: 'req.query.SingleLog.json',
         res: 'res.SingleLog.json'
     }, async (req, res) => {
         try {

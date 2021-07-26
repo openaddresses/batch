@@ -103,8 +103,12 @@ class Validator {
 
         if (!feat.properties.street.trim().length) errs.street.push('Feat must have non-empty street property');
 
-        if (isNaN(Number(feat.geometry.coordinates[0])) || feat.geometry.coordinates[0] < -180 || feat.geometry.coordinates[0] > 180) errs.geometry.push('Feat exceeds +/-180deg coord bounds');
-        if (isNaN(Number(feat.geometry.coordinates[1])) || feat.geometry.coordinates[1] < -85 || feat.geometry.coordinates[1] > 85) errs.geometry.push('Feat exceeds +/-85deg coord bounds');
+        if (!feat.geometry) {
+            errs.geometry.push('Feature has no geometry');
+        } else {
+            if (isNaN(Number(feat.geometry.coordinates[0])) || feat.geometry.coordinates[0] < -180 || feat.geometry.coordinates[0] > 180) errs.geometry.push('Feat exceeds +/-180deg coord bounds');
+            if (isNaN(Number(feat.geometry.coordinates[1])) || feat.geometry.coordinates[1] < -85 || feat.geometry.coordinates[1] > 85) errs.geometry.push('Feat exceeds +/-85deg coord bounds');
+        }
 
         if (errs.geometry.length) ++this.stats.failures.geometry;
         if (errs.street.length) ++this.stats.failures.street;

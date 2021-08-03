@@ -25,23 +25,37 @@ class Schemas {
         this.validate = this.validator.validate;
     }
 
+    check (url, schemas, fns) {
+        if (typeof url !== 'string') throw new Error('URL should be string');
+
+        if (schemas === null) schemas = {};
+        if (typeof schemas !== 'object') throw new Error('Schemas should be object');
+
+        if (!fns.length) throw new Error('At least 1 route function should be defined');
+    }
+
     async get(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
         this.router.get(...await this.generic(`GET ${url}`, schemas), ...fns);
     }
 
     async delete(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
         this.router.delete(...await this.generic(`DELETE ${url}`, schemas), ...fns);
     }
 
     async post(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
         this.router.post(...await this.generic(`POST ${url}`, schemas), ...fns);
     }
 
     async patch(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
         this.router.patch(...await this.generic(`PATCH ${url}`, schemas), ...fns);
     }
 
     async put(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
         this.router.put(...await this.generic(`PUT ${url}`, schemas), ...fns);
     }
 

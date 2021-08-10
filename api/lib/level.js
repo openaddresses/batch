@@ -15,7 +15,8 @@ const SPONSORS = [
     new RegExp(/^.*@geocod.io$/),
     new RegExp(/^.*@geocode.earth$/),
     new RegExp(/^.*@smartystreets.com$/),
-    new RegExp(/^.*@mapbox.com$/)
+    new RegExp(/^.*@mapbox.com$/),
+    new RegExp(/^.*@climaterisk.com.au$/)
 ];
 
 /**

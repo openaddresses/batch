@@ -4,6 +4,7 @@ const Err = require('./error');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
+const { sql } = require('slonik');
 
 class Token {
     constructor(pool) {
@@ -16,16 +17,13 @@ class Token {
         }
 
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE FROM
                     users_tokens
                 WHERE
-                    uid = $1
-                    AND id = $2
-            `, [
-                auth.uid,
-                token_id
-            ]);
+                    uid = ${auth.uid}
+                    AND id = ${token_id}
+            `);
 
             return {
                 status: 200,
@@ -44,7 +42,7 @@ class Token {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     users.id AS uid,
                     users.level,
@@ -56,10 +54,8 @@ class Token {
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid
                 WHERE
-                    users_tokens.token = $1
-            `, [
-                token
-            ]);
+                    users_tokens.token = ${token}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to validate token');
         }
@@ -85,7 +81,7 @@ class Token {
         }
 
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     created,
@@ -93,10 +89,8 @@ class Token {
                 FROM
                     users_tokens
                 WHERE
-                    uid = $1
-            `, [
-                auth.uid
-            ]);
+                    uid = ${auth.uid}
+            `);
 
             return {
                 total: pgres.rows.length,
@@ -121,23 +115,19 @@ class Token {
         }
 
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO users_tokens (
                     token,
                     created,
                     uid,
                     name
                 ) VALUES (
-                    $1,
+                    ${'oa.' + (await randomBytes(32)).toString('hex')},
                     NOW(),
-                    $2,
-                    $3
+                    ${auth.uid},
+                    ${name}
                 ) RETURNING *
-            `, [
-                'oa.' + (await randomBytes(32)).toString('hex'),
-                auth.uid,
-                name
-            ]);
+            `);
 
             return {
                 id: parseInt(pgres.rows[0].id),

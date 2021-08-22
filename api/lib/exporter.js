@@ -7,6 +7,7 @@ const moment = require('moment');
 const AWS = require('aws-sdk');
 const S3 = require('./s3');
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
+const { sql } = require('slonik');
 
 class Exporter {
     constructor() {
@@ -56,20 +57,13 @@ class Exporter {
         if (!query.page) query.page = 0;
         if (!query.status) query.status = Status.list();
 
-        query.page = query.page * query.limit;
-
-        const where = [];
-
-        Status.verify(query.status);
-
-        if (query.uid) {
-            where.push(`uid = ${query.uid}`);
-        }
+        if (!query.after) query.after = null;
+        if (!query.before) query.before = null;
+        if (!query.uid) query.uid = null;
 
         if (query.after) {
             try {
-                const after = moment(query.after);
-                where.push(`exports.created > '${after.toDate().toISOString()}'::TIMESTAMP`);
+                query.after = moment(query.after);
             } catch (err) {
                 throw new Err(400, null, 'after param is not recognized as a valid date');
             }
@@ -77,20 +71,17 @@ class Exporter {
 
         if (query.before) {
             try {
-                const before = moment(query.before);
-                where.push(`exports.created < '${before.toDate().toISOString()}'::TIMESTAMP`);
+                query.before = moment(query.before);
             } catch (err) {
                 throw new Err(400, null, 'before param is not recognized as a valid date');
             }
         }
 
-        if (query.status) {
-            where.push(`'{${query.status.join(',')}}'::TEXT[] @> ARRAY[exports.status]`);
-        }
+        Status.verify(query.status);
 
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
                     exports.id,
@@ -110,24 +101,24 @@ class Exporter {
                     job
                 WHERE
                     job.id = exports.job_id
-                    ${where.length ? ' AND ' + where.join(' AND ') : ''}
+                    AND ${sql.array(query.status.join(','), sql`TEXT[]`)} @> ARRAY[exports.status]
+                    AND (${query.uid}::BIGINT IS NOT NULL OR uid = ${query.uid})
+                    AND (${query.after}::TIMESTAMP IS NOT NULL OR exports.created > ${query.after.toDate().toISOString()}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NOT NULL OR exports.created < ${query.before.toDate().toISOString()}::TIMESTAMP)
                 ORDER BY
                     exports.created DESC
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page * query.limit}
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to fetch runs');
         }
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            'exports': pgres.rows.map((exp) => {
+            exports: pgres.rows.map((exp) => {
                 exp.id = parseInt(exp.id);
                 exp.uid = parseInt(exp.uid);
                 exp.job_id = parseInt(exp.job_id);
@@ -147,15 +138,15 @@ class Exporter {
      */
     static async count(pool, uid) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     count(*)
                 FROM
                     exports
                 WHERE
-                    uid = $1
+                    uid = ${uid}
                     AND created > date_trunc('month', NOW())
-            `, [uid]);
+            `);
 
             if (!pgres.rows.length) return 0;
             return parseInt(pgres.rows[0].count);
@@ -187,14 +178,14 @@ class Exporter {
     static async from(pool, id) {
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
                     exports
                 WHERE
-                    id = $1
-            `, [id]);
+                    id = ${id}
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to fetch export');
         }
@@ -227,20 +218,15 @@ class Exporter {
 
     async commit(pool) {
         try {
-            await pool.query(`
+            await pool.query(sql`
                 UPDATE exports
                     SET
-                        size = $2,
-                        status = $3,
-                        loglink = $4
+                        size = ${this.size},
+                        status = ${this.status},
+                        loglink = ${this.loglink}
                     WHERE
-                        id = $1
-           `, [
-                this.id,
-                this.size,
-                this.status,
-                this.loglink
-            ]);
+                        id = ${this.id}
+           `);
         } catch (err) {
             throw new Err(500, err, 'failed to save export');
         }
@@ -261,21 +247,17 @@ class Exporter {
     static async generate(pool, params = {}) {
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 INSERT INTO exports (
                     uid,
                     job_id,
                     format
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3
+                    ${params.uid},
+                    ${params.job_id},
+                    ${params.format}
                 ) RETURNING *
-            `, [
-                params.uid,
-                params.job_id,
-                params.format
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to generate exports');
         }

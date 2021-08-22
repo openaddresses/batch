@@ -63,16 +63,16 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     uid
                 FROM
                     users_reset
                 WHERE
                     expires > NOW()
-                    AND token = $1
+                    AND token = ${token}
                     AND action = 'verify'
-            `, [token]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'User Verify Error');
         }
@@ -82,16 +82,16 @@ class User {
         }
 
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE FROM users_reset
-                    WHERE uid = $1
-            `, [pgres.rows[0].uid]);
+                    WHERE uid = ${pgres.rows[0].uid}
+            `);
 
-            await this.pool.query(`
+            await this.pool.query(sql`
                 UPDATE users
                     SET validated = True
-                    WHERE id = $1
-            `, [pgres.rows[0].uid]);
+                    WHERE id = ${pgres.rows[0].uid}
+            `);
 
             return {
                 status: 200,
@@ -108,16 +108,16 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     uid
                 FROM
                     users_reset
                 WHERE
                     expires > NOW()
-                    AND token = $1
+                    AND token = ${user.token}
                     AND action = 'reset'
-            `, [user.token]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'User Reset Error');
         }
@@ -131,25 +131,20 @@ class User {
         try {
             const userhash = await bcrypt.hash(user.password, 10);
 
-            await this.pool.query(`
+            await this.pool.query(sql`
                 UPDATE users
                     SET
-                        password = $1,
+                        password = ${userhash},
                         validated = True
 
                     WHERE
-                        id = $2
-            `, [
-                userhash,
-                uid
-            ]);
+                        id = ${uid}
+            `);
 
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE FROM users_reset
-                    WHERE uid = $1
-            `, [
-                uid
-            ]);
+                    WHERE uid = ${uid}
+            `);
 
             return {
                 status: 200,
@@ -172,7 +167,7 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     username,
@@ -180,9 +175,9 @@ class User {
                 FROM
                     users
                 WHERE
-                    username = $1
-                    OR email = $1
-            `, [user]);
+                    username = ${user}
+                    OR email = ${user}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -192,13 +187,13 @@ class User {
         u.id = parseInt(u.id);
 
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE FROM
                     users_reset
                 WHERE
-                    uid = $1
-                    AND action = $2
-            `, [u.id, action]);
+                    uid = ${u.id}
+                    AND action = ${action}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -206,16 +201,16 @@ class User {
         try {
             const buffer = await randomBytes(40);
 
-            await this.pool.query(`
+            await this.pool.query(sql`
                 INSERT INTO
                     users_reset (uid, expires, token, action)
                 VALUES (
-                    $1,
+                    ${u.id},
                     NOW() + interval '1 hour',
-                    $2,
-                    $3
+                    ${buffer.toString('hex')},
+                    ${action}
                 )
-            `, [u.id, buffer.toString('hex'), action]);
+            `);
 
             return {
                 uid: u.id,
@@ -231,16 +226,13 @@ class User {
     async level(email, level) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE users
                     SET
-                        level = $2
+                        level = ${level}
                     WHERE
-                        email = $1
-            `, [
-                email,
-                level
-            ]);
+                        email = ${email}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -259,33 +251,27 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE users
                     SET
-                        flags = $2,
-                        access = $3
+                        flags = ${user.flags},
+                        access = ${user.access}}
                     WHERE
-                        id = $1
+                        id = ${uid}
                     RETURNING *
-            `, [
-                uid,
-                user.flags,
-                user.access
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
 
         try {
             // Force relogin on account changes
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE FROM
                     session
                 WHERE
-                    (sess->'auth'->>'uid')::BIGINT = $1
-            `, [
-                uid
-            ]);
+                    (sess->'auth'->>'uid')::BIGINT = ${uid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to reset sessions');
         }
@@ -318,16 +304,12 @@ class User {
         if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';
 
-        const where = [];
-
-        query.page = query.page * query.limit;
-
-        if (query.access) where.push(`access = '${query.access}'`);
-        if (query.level) where.push(`level = '${query.level}'`);
+        if (!query.access) query.access = null;
+        if (!query.level) query.level = null;
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
                     id,
@@ -339,19 +321,17 @@ class User {
                 FROM
                     users
                 WHERE
-                    (username ~ $3 OR email ~ $3)
-                    ${where.length ? 'AND ' + where.join(' AND ') : ''}
+                    (username ~ ${query.filter} OR email ~ ${query.filter})
+                    AND (${query.access}::TEXT IS NOT NULL OR access = ${query.access})
+                    AND (${query.level}::TEXT IS NOT NULL OR level = ${query.level})
                 ORDER BY
                     created DESC
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page,
-                query.filter
-            ]);
+                    ${query.page * query.limit}
+
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -374,7 +354,7 @@ class User {
     async user(uid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     level,
@@ -385,10 +365,8 @@ class User {
                 FROM
                     users
                 WHERE
-                    id = $1
-            `, [
-                uid
-            ]);
+                    id = ${uid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -415,7 +393,7 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     username,
@@ -428,11 +406,9 @@ class User {
                 FROM
                     users
                 WHERE
-                    username = $1 OR
-                    email = $1;
-            `, [
-                user.username
-            ]);
+                    username = ${user.username} OR
+                    email = ${user.username}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Login Error');
         }
@@ -473,7 +449,7 @@ class User {
         try {
             const uhash = await bcrypt.hash(user.password, 10);
 
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO users (
                     username,
                     email,
@@ -481,17 +457,13 @@ class User {
                     access,
                     flags
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
+                    ${user.username},
+                    ${user.email},
+                    ${uhash},
                     'user',
                     '{}'::JSONB
                 ) RETURNING *
-            `, [
-                user.username,
-                user.email,
-                uhash
-            ]);
+            `);
 
             const row = pgres.rows[0];
 

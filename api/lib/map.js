@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const { sql } = require('slonik');
 const hash = require('object-hash');
 const split = require('split');
 const SM = require('@mapbox/sphericalmercator');
@@ -31,17 +32,15 @@ class Map {
 
     static async from(pool, code) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     id
                 FROM
                     map
                 WHERE
-                    code = $1
+                    code = ${code}
                 LIMIT 1
-            `, [
-                code
-            ]);
+            `);
 
             if (pgres.rows.length === 0) return false;
 
@@ -175,7 +174,7 @@ class Map {
 
     static async get_feature(pool, code) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     MAX(map.id) AS id,
                     MAX(map.name) AS name,
@@ -185,10 +184,8 @@ class Map {
                 FROM
                     map LEFT JOIN job ON map.id = job.map
                 WHERE
-                    code = $1
-            `, [
-                code
-            ]);
+                    code = ${code}
+            `);
 
             if (!pgres.rows.length) throw new Err(400, null, 'Feature not found');
 
@@ -276,22 +273,18 @@ class Map {
 
     static async add(pool, name, code, geom) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO map (
                     name,
                     code,
                     geom
                 ) VALUES (
-                    $1,
-                    $2,
-                    ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
+                    ${name},
+                    ${code},
+                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(geom)}), 4326)
                 )
                 RETURNING id
-            `, [
-                name,
-                code,
-                JSON.stringify(geom)
-            ]);
+            `);
 
             return pgres.rows[0].id;
         } catch (err) {
@@ -320,21 +313,17 @@ class Map {
                             return cb(err);
                         }
 
-                        pool.query(`
+                        pool.query(sql`
                             INSERT INTO map (
                                 name,
                                 code,
                                 geom
                             ) VALUES (
-                                $1,
-                                $2,
-                                ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
+                                ${feat.properties.name},
+                                ${feat.properties.code},
+                                ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(feat.geometry)}), 4326)
                             );
-                        `, [
-                            feat.properties.name,
-                            feat.properties.code,
-                            JSON.stringify(feat.geometry)
-                        ], (err) => {
+                        `, (err) => {
                             if (err) return cb(err);
                             return cb(null, '');
                         });

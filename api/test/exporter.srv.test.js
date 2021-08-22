@@ -71,8 +71,6 @@ test('POST: /api/run/:run/jobs', async (t) => {
     t.end();
 });
 
-let usr;
-
 test('POST /api/export - cannot export unsuccessful', async (t) =>  {
     try {
         usr = await flight.token('test-backer', {
@@ -83,7 +81,6 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
             body: {
                 job_id: 1,
                 format: 'csv'
@@ -134,7 +131,6 @@ test('POST /api/export - no donor level', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
             body: {
                 job_id: 1,
                 format: 'csv'
@@ -159,7 +155,6 @@ test('POST /api/export - backer', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
             body: {
                 job_id: 1,
                 format: 'csv'
@@ -194,8 +189,7 @@ test('GET /api/export - backer', async (t) =>  {
         const exp = await flight.request({
             url: '/api/export',
             method: 'GET',
-            json: true,
-            jar: usr.jar
+            json: true
         });
 
         t.ok(exp.body.exports[0].created, '.exports[0].created: <date>');
@@ -230,8 +224,7 @@ test('GET /api/export/100 - backer', async (t) =>  {
         const exp = await flight.request({
             url: '/api/export/100',
             method: 'GET',
-            json: true,
-            jar: usr.jar
+            json: true
         });
 
         t.deepEquals(exp.body, { status: 404, message: 'no exports by that id', messages: [] });
@@ -284,8 +277,7 @@ test('GET /api/export/1 - backer', async (t) =>  {
         const exp = await flight.request({
             url: '/api/export/1',
             method: 'GET',
-            json: true,
-            jar: usr.jar
+            json: true
         });
 
         t.ok(exp.body.created, '.created: <date>');
@@ -315,7 +307,6 @@ test('POST /api/export - backer - exceeded limit', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
             body: {
                 job_id: 1,
                 format: 'csv'

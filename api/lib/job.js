@@ -9,6 +9,7 @@ const Data = require('./data');
 const S3 = require('./s3');
 const pkg  = require('../package.json');
 const { Status } = require('./util');
+const { sql  } = require('slonik');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const batchjob = require('./batch').trigger;
@@ -479,7 +480,7 @@ class Job {
                     ${this.name},
                     'Pending',
                     ${this.version},
-                    ${this.output},
+                    ${JSON.stringify(this.output)}::JSONB,
                     ${this.size},
                     ${this.license}
                 ) RETURNING *

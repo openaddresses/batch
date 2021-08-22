@@ -25,7 +25,7 @@ test('POST: /api/run', async (t) => {
             body: {
                 live: true
             }
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
 
@@ -56,7 +56,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
                     name: 'dcgis'
                 }]
             }
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
 
@@ -71,12 +71,13 @@ test('POST: /api/run/:run/jobs', async (t) => {
     t.end();
 });
 
+flight.user(test, 'test-backer', false, {
+    level: 'backer'
+});
+
+
 test('POST /api/export - cannot export unsuccessful', async (t) =>  {
     try {
-        usr = await flight.token('test-backer', {
-            level: 'backer'
-        });
-
         const exp = await flight.request({
             url: '/api/export',
             method: 'POST',
@@ -113,7 +114,7 @@ test('PATCH /api/job/1', async (t) =>  {
             body: {
                 status: 'Success'
             }
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
     } catch (err) {
@@ -159,7 +160,7 @@ test('POST /api/export - backer', async (t) =>  {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, t);
 
         t.equals(exp.statusCode, 200, 'http: 200');
 
@@ -190,7 +191,7 @@ test('GET /api/export - backer', async (t) =>  {
             url: '/api/export',
             method: 'GET',
             json: true
-        });
+        }, t);
 
         t.ok(exp.body.exports[0].created, '.exports[0].created: <date>');
         delete exp.body.exports[0].created;
@@ -249,7 +250,7 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
                 status: 'Success',
                 loglink: 'i-am-a-loglink'
             }
-        });
+        }, t);
 
         t.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
@@ -293,7 +294,7 @@ test('GET /api/export/1 - backer', async (t) =>  {
             size: 2134,
             status: 'Success',
             loglink: 'i-am-a-loglink'
-        });
+        }, t);
     } catch (err) {
         t.error(err, 'no errors');
     }

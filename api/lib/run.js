@@ -425,7 +425,7 @@ class Run {
                 ) VALUES (
                     NOW(),
                     ${params.live},
-                    ${params.github},
+                    ${JSON.stringify(params.github)}::JSONB,
                     false
                 ) RETURNING *
             `);

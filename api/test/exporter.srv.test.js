@@ -1,7 +1,7 @@
 'use strict';
 
 const test = require('tape');
-const Flight = require('./init');
+const Flight = require('./flight');
 const { promisify } = require('util');
 const request = promisify(require('request'));
 

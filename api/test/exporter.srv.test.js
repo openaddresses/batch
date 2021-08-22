@@ -3,7 +3,6 @@
 const test = require('tape');
 const Flight = require('./flight');
 const { promisify } = require('util');
-const request = promisify(require('request'));
 
 const flight = new Flight();
 
@@ -16,8 +15,8 @@ flight.takeoff(test, {
 
 test('POST: /api/run', async (t) => {
     try {
-        const res = await request({
-            url: 'http://localhost:4999/api/run',
+        const res = await flight.request({
+            url: '/api/run',
             method: 'POST',
             json: true,
             headers: {
@@ -43,8 +42,8 @@ test('POST: /api/run', async (t) => {
 
 test('POST: /api/run/:run/jobs', async (t) => {
     try {
-        const res = await request({
-            url: 'http://localhost:4999/api/run/1/jobs',
+        const res = await flight.request({
+            url: '/api/run/1/jobs',
             method: 'POST',
             json: true,
             headers: {
@@ -80,8 +79,8 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
             level: 'backer'
         });
 
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
             jar: usr.jar,
@@ -107,8 +106,8 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
 
 test('PATCH /api/job/1', async (t) =>  {
     try {
-        const res = await request({
-            url: 'http://localhost:4999/api/job/1',
+        const res = await flight.request({
+            url: '/api/job/1',
             method: 'PATCH',
             json: true,
             headers: {
@@ -131,8 +130,8 @@ test('POST /api/export - no donor level', async (t) =>  {
     try {
         const usr = await flight.token('test');
 
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
             jar: usr.jar,
@@ -156,8 +155,8 @@ test('POST /api/export - no donor level', async (t) =>  {
 
 test('POST /api/export - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
             jar: usr.jar,
@@ -192,8 +191,8 @@ test('POST /api/export - backer', async (t) =>  {
 
 test('GET /api/export - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'GET',
             json: true,
             jar: usr.jar
@@ -228,8 +227,8 @@ test('GET /api/export - backer', async (t) =>  {
 
 test('GET /api/export/100 - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export/100',
+        const exp = await flight.request({
+            url: '/api/export/100',
             method: 'GET',
             json: true,
             jar: usr.jar
@@ -245,8 +244,8 @@ test('GET /api/export/100 - backer', async (t) =>  {
 
 test('PATCH /api/export/1 - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export/1',
+        const exp = await flight.request({
+            url: '/api/export/1',
             method: 'PATCH',
             json: true,
             headers: {
@@ -282,8 +281,8 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
 
 test('GET /api/export/1 - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export/1',
+        const exp = await flight.request({
+            url: '/api/export/1',
             method: 'GET',
             json: true,
             jar: usr.jar
@@ -312,8 +311,8 @@ test('GET /api/export/1 - backer', async (t) =>  {
 
 test('POST /api/export - backer - exceeded limit', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
             jar: usr.jar,

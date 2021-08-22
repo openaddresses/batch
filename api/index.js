@@ -1,4 +1,3 @@
-'use strict';
 
 const fs = require('fs');
 const Cacher = require('./lib/cacher');
@@ -17,15 +16,13 @@ const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const TileBase = require('tilebase');
 const Schema = require('./lib/schema');
+const { sql, createPool } = require('slonik');
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache'],
     string: ['postgres']
 });
 
-const pgSession = require('connect-pg-simple')(session);
-
 const Param = util.Param;
-const { Pool } = require('pg');
 
 const Config = require('./lib/config');
 
@@ -90,11 +87,9 @@ async function server(args, config, cb) {
     let retry = 5;
     do {
         try {
-            pool = new Pool({
-                connectionString: postgres
-            });
+            pool = createPool(postgres);
 
-            await pool.query('SELECT NOW()');
+            await pool.query(sql`SELECT NOW()`);
         } catch (err) {
             pool = false;
 
@@ -116,10 +111,7 @@ async function server(args, config, cb) {
     config.cacher = new Cacher(args['no-cache']);
     config.pool = pool;
 
-
     try {
-        await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-
         if (args.populate) {
             await Map.populate(pool);
         }
@@ -137,23 +129,6 @@ async function server(args, config, cb) {
 
     app.disable('x-powered-by');
     app.use(minify());
-
-    app.use(session({
-        name: args.prod ? '__Host-session' : 'session',
-        proxy: args.prod,
-        resave: false,
-        store: new pgSession({
-            pool: pool,
-            tableName : 'session'
-        }),
-        cookie: {
-            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: true,
-            secure: args.prod
-        },
-        saveUninitialized: true,
-        secret: config.CookieSecret
-    }));
 
     app.use(analytics.middleware());
     app.use(express.static('web/dist'));
@@ -979,7 +954,6 @@ async function server(args, config, cb) {
                 await Param.int(req, 'y');
 
                 if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
-
 
                 const tile = await config.cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                     return await Map.tile(pool, req.params.z, req.params.x, req.params.y);

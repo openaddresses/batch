@@ -62,12 +62,12 @@ class Map {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');
 
-            let where = 'true';
-            if (z < 2) where = "code ~ '^[a-z]{2}$'";
-            else if (z < 4) where = "code ~ '^[a-z]{2}-[a-z]+$'";
-            else if (z === 5) where = "code ~ '^[a-z]{2}-[0-9]+$'";
+            let code = null;
+            if (z < 2) code = '^[a-z]{2}$';
+            else if (z < 4) code = '^[a-z]{2}-[a-z]+$';
+            else if (z === 5) code = '^[a-z]{2}-[0-9]+$';
 
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
                 FROM (
@@ -77,8 +77,8 @@ class Map {
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
-                                ST_MakePoint($1, $2),
-                                ST_MakePoint($3, $4)
+                                ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                ST_MakePoint(${bbox[2]}, ${bbox[3]})
                             ), 3857),
                             4096,
                             256,
@@ -92,12 +92,12 @@ class Map {
                         FROM
                             map
                         WHERE
-                            ${where}
+                            (${code}::TEXT IS NOT NULL OR code ~ ${code})
                             AND ST_Intersects(
                                 map.geom,
                                 ST_Transform(ST_SetSRID(ST_MakeBox2D(
-                                    ST_MakePoint($1, $2),
-                                    ST_MakePoint($3, $4)
+                                    ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                    ST_MakePoint(${bbox[2]}, ${bbox[3]})
                                 ), 3857), 4326)
                         )
                     ) n
@@ -106,7 +106,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
+            `);
 
             return pgres.rows[0].mvt;
         } catch (err) {
@@ -118,7 +118,7 @@ class Map {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');
 
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
                 FROM (
@@ -130,8 +130,8 @@ class Map {
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
-                                ST_MakePoint($1, $2),
-                                ST_MakePoint($3, $4)
+                                ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                ST_MakePoint(${bbox[2]}, ${bbox[3]})
                             ), 3857),
                             4096,
                             256,
@@ -152,8 +152,8 @@ class Map {
                             ST_Intersects(
                                 map.geom,
                                 ST_Transform(ST_SetSRID(ST_MakeBox2D(
-                                    ST_MakePoint($1, $2),
-                                    ST_MakePoint($3, $4)
+                                    ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                    ST_MakePoint(${bbox[2]}, ${bbox[3]})
                                 ), 3857), 4326)
                         )
                     ) n
@@ -164,7 +164,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
+            `);
 
             return pgres.rows[0].mvt;
         } catch (err) {

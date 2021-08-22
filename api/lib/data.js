@@ -107,7 +107,7 @@ class Data {
      */
     static async history(pool, data_id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     job.id,
                     job.created,
@@ -126,13 +126,11 @@ class Data {
                             ON job.run = runs.id
                 WHERE
                     runs.live = true
-                    AND results.id = $1
+                    AND results.id = ${data_id}
                     AND job.status = 'Success'
                 ORDER BY
                     created DESC
-            `, [
-                data_id
-            ]);
+            `);
 
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'No data by that id');

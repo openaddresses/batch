@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
 const Cacher = require('./lib/cacher');
 const Miss = Cacher.Miss;
 const session = require('express-session');
@@ -21,6 +22,17 @@ const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase'],
     string: ['postgres']
 });
+
+const Map = require('./lib/map');
+const Err = require('./lib/error');
+const Run = require('./lib/run');
+const Job = require('./lib/job');
+const JobError = require('./lib/joberror');
+const Data = require('./lib/data');
+const Upload = require('./lib/upload');
+const Schedule = require('./lib/schedule');
+const Collection = require('./lib/collections');
+const Exporter = require('./lib/exporter');
 
 const Param = util.Param;
 
@@ -58,17 +70,7 @@ function configure(args, cb) {
 
 async function server(args, config, cb) {
     // these must be run after lib/config
-    const Map = require('./lib/map');
     const ci = new (require('./lib/ci'))(config);
-    const Err = require('./lib/error');
-    const Run = require('./lib/run');
-    const Job = require('./lib/job');
-    const JobError = require('./lib/joberror');
-    const Data = require('./lib/data');
-    const Upload = require('./lib/upload');
-    const Schedule = require('./lib/schedule');
-    const Collection = require('./lib/collections');
-    const Exporter = require('./lib/exporter');
 
     if (!args['no-tilebase']) {
         console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
@@ -221,11 +223,17 @@ async function server(args, config, cb) {
                 });
             }
 
-            try {
-                req.auth = await token.validate(authorization[1]);
-                req.auth.type = 'token';
-            } catch (err) {
-                return Err.respond(err, res);
+            if (authorization[1].split('.')[0] === 'oa') {
+                try {
+                    req.auth = await token.validate(authorization[1]);
+                    req.auth.type = 'token';
+                } catch (err) {
+                    return Err.respond(err, res);
+                }
+            } else {
+                const decoded = jwt.verify(authorization[1], config.SharedSecret);
+                if (decoded.u) req.auth = await user.user(decoded.u);
+                req.auth.type = 'session';
             }
         } else {
             req.auth = false;
@@ -470,52 +478,25 @@ async function server(args, config, cb) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            req.session.auth = await user.login({
+            req.auth = await user.login({
                 username: req.body.username,
                 password: req.body.password
             });
 
             return res.json({
-                uid: req.session.auth.uid,
-                level: req.session.auth.level,
-                username: req.session.auth.username,
-                email: req.session.auth.email,
-                access: req.session.auth.access,
-                flags: req.session.auth.flags
+                uid: req.auth.uid,
+                level: req.auth.level,
+                username: req.auth.username,
+                email: req.auth.email,
+                access: req.auth.access,
+                flags: req.auth.flags,
+                token: jwt.sign({
+                    u: req.auth.uid
+                }, config.SharedSecret)
             });
         } catch (err) {
             return Err.respond(err, res);
         }
-    });
-
-    /**
-     * @api {delete} /api/login Delete Session
-     * @apiVersion 1.0.0
-     * @apiName DeleteLogin
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Log a user out of the service
-     *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.delete( '/login', {
-        res: 'res.Standard.json'
-    }, async (req, res) => {
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    message: 'Failed to logout user'
-                });
-            }
-
-            return res.json({
-                status: 200,
-                message: 'The user has been logged ut'
-            });
-        });
     });
 
     /**
@@ -1504,7 +1485,6 @@ async function server(args, config, cb) {
 
                 const job = await Job.from(pool, req.params.job);
 
-                console.error(job.source);
                 return res.json(await job.get_raw());
             } catch (err) {
                 return Err.respond(err, res);

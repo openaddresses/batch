@@ -127,14 +127,18 @@ test('PATCH /api/job/1', async (t) =>  {
     t.end();
 });
 
+flight.user(test, 'non_backer');
+
 test('POST /api/export - no donor level', async (t) =>  {
     try {
-        const usr = await flight.token('test');
 
         const exp = await flight.request({
             url: '/api/export',
             method: 'POST',
             json: true,
+            auth: {
+                bearer: flight.token.non_backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'

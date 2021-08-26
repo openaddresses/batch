@@ -165,13 +165,22 @@ class Flight {
 
                 if (new_user.statusCode !== 200) throw new Error(new_user.body.message);
 
+                await this.config.pool.query(sql`
+                     UPDATE users
+                        SET
+                            validated = True
+                        WHERE
+                            id = ${new_user.body.id}
+                `);
+
                 if (admin) {
                     await this.config.pool.query(sql`
                          UPDATE users
                             SET
                                 access = 'admin'
+
                             WHERE
-                                id = ${new_user.body.uid}
+                                id = ${new_user.body.id}
                     `);
                 }
 
@@ -185,8 +194,17 @@ class Flight {
                     `);
                 }
 
-                this.token[username] = new_user.body.token;
+                const new_login = await prequest({
+                    url: new URL(`/api/login`, this.base),
+                    json: true,
+                    method: 'POST',
+                    body: {
+                        username: username,
+                        password: username
+                    }
+                });
 
+                this.token[username] = new_login.body.token;
             } catch (err) {
                 t.error(err);
             }

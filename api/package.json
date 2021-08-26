@@ -31,6 +31,7 @@
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
         "json-schema-ref-parser": "^9.0.7",
+        "jsonwebtoken": "^8.5.1",
         "knex": "^0.95.10",
         "mailgen": "^2.0.14",
         "mailgun.js": "^2.0.6",

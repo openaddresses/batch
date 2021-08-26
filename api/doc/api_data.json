@@ -877,24 +877,6 @@
     "groupTitle": "Login"
   },
   {
-    "type": "delete",
-    "url": "/api/login",
-    "title": "Delete Session",
-    "version": "1.0.0",
-    "name": "DeleteLogin",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Log a user out of the service</p>",
-    "filename": "./index.js",
-    "groupTitle": "Login"
-  },
-  {
     "type": "post",
     "url": "/api/login/forgot",
     "title": "Forgot Login",

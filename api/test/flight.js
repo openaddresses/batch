@@ -122,6 +122,7 @@ class Flight {
             api(Object.assign({
                 postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
                 'no-cache': true,
+                'no-tilebase': true,
                 silent: true,
                 test: true
             }, custom), (srv, config) => {
@@ -157,6 +158,7 @@ class Flight {
                     method: 'POST',
                     body: {
                         username: username,
+                        password: username,
                         email: `${username}@example.com`
                     }
                 });
@@ -179,7 +181,7 @@ class Flight {
                             SET
                                 level = ${opts.level}
                             WHERE
-                                id = ${new_user.body.uid}
+                                id = ${new_user.body.id}
                     `);
                 }
 

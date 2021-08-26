@@ -18,7 +18,7 @@ const TileBase = require('tilebase');
 const Schema = require('./lib/schema');
 const { sql, createPool } = require('slonik');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate', 'email', 'no-cache'],
+    boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase'],
     string: ['postgres']
 });
 
@@ -70,10 +70,14 @@ async function server(args, config, cb) {
     const Collection = require('./lib/collections');
     const Exporter = require('./lib/exporter');
 
-    console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-    const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-    console.log('ok - loaded TileBase');
-    await tb.open();
+    if (!args['no-tilebase']) {
+        console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+        const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+        console.log('ok - loaded TileBase');
+        await tb.open();
+    } else {
+        console.log('ok - TileBase Disabled');
+    }
 
     let postgres = process.env.POSTGRES;
 

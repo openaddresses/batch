@@ -71,7 +71,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
     t.end();
 });
 
-flight.user(test, 'test-backer', false, {
+flight.user(test, 'backer', false, {
     level: 'backer'
 });
 
@@ -82,6 +82,9 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
+            auth: {
+                bearer: flight.token.backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'
@@ -156,6 +159,9 @@ test('POST /api/export - backer', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
+            auth: {
+                bearer: flight.token.backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'
@@ -190,6 +196,9 @@ test('GET /api/export - backer', async (t) =>  {
         const exp = await flight.request({
             url: '/api/export',
             method: 'GET',
+            auth: {
+                bearer: flight.token.backer
+            },
             json: true
         }, t);
 
@@ -224,6 +233,9 @@ test('GET /api/export/100 - backer', async (t) =>  {
     try {
         const exp = await flight.request({
             url: '/api/export/100',
+            auth: {
+                bearer: flight.token.backer
+            },
             method: 'GET',
             json: true
         });
@@ -278,6 +290,9 @@ test('GET /api/export/1 - backer', async (t) =>  {
         const exp = await flight.request({
             url: '/api/export/1',
             method: 'GET',
+            auth: {
+                bearer: flight.token.backer
+            },
             json: true
         });
 
@@ -308,6 +323,9 @@ test('POST /api/export - backer - exceeded limit', async (t) =>  {
             url: '/api/export',
             method: 'POST',
             json: true,
+            auth: {
+                bearer: flight.token.backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'

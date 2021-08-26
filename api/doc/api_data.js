@@ -13,7 +13,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
-    "description": "<p>Report anonymouns traffic data about the number of collection downloads</p>",
+    "description": "<p>Report anonymized traffic data about the number of collection downloads.</p>",
     "filename": "./index.js",
     "groupTitle": "Analytics"
   },
@@ -31,7 +31,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
-    "description": "<p>Report anonymouns traffic data about the number of user session created in a given day.</p>",
+    "description": "<p>Report anonymized traffic data about the number of user sessions created in a given day.</p>",
     "filename": "./index.js",
     "groupTitle": "Analytics"
   },
@@ -67,7 +67,7 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Download a given collection file</p> <p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
+    "description": "<p>Download a given collection file</p> <p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of them the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -305,7 +305,7 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Return the batch-machine processing log for a given export Note: These are stored in AWS CloudWatch and <em>do</em> expire The presence of a loglink on a export, does not guarentree log retention</p>",
+    "description": "<p>Return the batch-machine processing log for a given export Note: These are stored in AWS CloudWatch and <em>do</em> expire The presence of a loglink on a export does not guarantee log retention</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -779,7 +779,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
-    "description": "<p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
+    "description": "<p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -810,7 +810,7 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
-    "description": "<p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
+    "description": "<p>Note: the user must be authenticated to perform a download. One of our largest costs is S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw</p> <p>Faster Downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an <code>s3</code> property which links to a requester pays object on S3. For those that are able, this is the best way to download data.</p> <p>OpenAddresses is entirely funded by volunteers (many of then the developers themselves!) Please consider donating if you are able https://opencollective.com/openaddresses</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1611,7 +1611,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
-    "description": "<p>Callback endpoint for GitHub Webhooks. Should not be called by user functions</p>",
+    "description": "<p>Callback endpoint for OpenCollective. Should not be called by user functions</p>",
     "filename": "./index.js",
     "groupTitle": "Webhooks"
   }

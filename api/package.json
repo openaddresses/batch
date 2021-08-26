@@ -58,6 +58,10 @@
     },
     "apidoc": {
         "name": "OpenAddresses API",
-        "title": "OpenAddresses API"
+        "title": "OpenAddresses API",
+        "header": {
+            "title": "Authentication",
+            "filename": "API.md"
+        }
     }
 }

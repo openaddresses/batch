@@ -28,7 +28,7 @@
                 "type": ["null", "integer"]
             },
             "created": {
-                "type": "string"
+                "type": "integer"
             },
             "source": {
                 "type": "string"

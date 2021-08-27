@@ -11,63 +11,66 @@
             "description": "The total number of exports in the account"
         },
         "exports": {
-            "type": "object",
-            "required": [
-                "id",
-                "job_id",
-                "uid",
-                "status",
-                "format",
-                "created",
-                "expiry",
-                "size",
-                "loglink",
-                "source_name",
-                "layer",
-                "name"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "id": {
-                    "type": "integer",
-                    "description": "The integer ID of the export task"
-                },
-                "uid": {
-                    "type": "integer",
-                    "description": "The User ID that initiated the export task"
-                },
-                "job_id": {
-                    "type": "integer",
-                    "description": "The Job ID being exported"
-                },
-                "format": {
-                    "$ref": "./util/format.json"
-                },
-                "created": {
-                    "type": "string",
-                    "description": "The timestamp at which the export was created"
-                },
-                "expiry": {
-                    "type": "string",
-                    "description": "The timestamp at which the export will expire"
-                },
-                "size": {
-                    "$ref": "./util/size.json"
-                },
-                "status": {
-                    "$ref": "./util/status.json"
-                },
-                "loglink": {
-                    "$ref": "./util/loglink.json"
-                },
-                "source_name": {
-                    "type": "string"
-                },
-                "layer": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "job_id",
+                    "uid",
+                    "status",
+                    "format",
+                    "created",
+                    "expiry",
+                    "size",
+                    "loglink",
+                    "source_name",
+                    "layer",
+                    "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "The integer ID of the export task"
+                    },
+                    "uid": {
+                        "type": "integer",
+                        "description": "The User ID that initiated the export task"
+                    },
+                    "job_id": {
+                        "type": "integer",
+                        "description": "The Job ID being exported"
+                    },
+                    "format": {
+                        "$ref": "./util/format.json"
+                    },
+                    "created": {
+                        "type": "integer",
+                        "description": "The timestamp at which the export was created"
+                    },
+                    "expiry": {
+                        "type": "integer",
+                        "description": "The timestamp at which the export will expire"
+                    },
+                    "size": {
+                        "$ref": "./util/size.json"
+                    },
+                    "status": {
+                        "$ref": "./util/status.json"
+                    },
+                    "loglink": {
+                        "$ref": "./util/loglink.json"
+                    },
+                    "source_name": {
+                        "type": "string"
+                    },
+                    "layer": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
                 }
             }
         }

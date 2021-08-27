@@ -1,4 +1,4 @@
 {
-    "type": "integer",
+    "type": ["null", "integer"],
     "description": "The size of the asset in bytes"
 }

@@ -29,6 +29,9 @@ class Data {
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';
 
+        if (!query.before) query.before = null;
+        if (!query.after) query.after = null;
+
         if (query.before) query.before = moment(query.before).format('YYYY-MM-DD');
         if (query.after) query.after = moment(query.after).format('YYYY-MM-DD');
 

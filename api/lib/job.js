@@ -273,11 +273,11 @@ class Job {
                     ${sql.array(query.status.join(','), sql`TEXT[]`)} @> ARRAY[job.status]
                     AND job.layer ilike ${query.layer}
                     AND job.source ilike ${query.source}
-                    AND (${query.run}::BIGINT IS NOT NULL OR job.run = ${query.run})
-                    AND (${query.after}::TIMESTAMP IS NOT NULL OR job.created > ${query.after.toDate().toISOString()}::TIMESTAMP)
-                    AND (${query.before}::TIMESTAMP IS NOT NULL OR job.created < ${query.before.toDate().toISOString()}::TIMESTAMP)
-                    AND (${query.run}::BIGINT IS NOT NULL OR job.run = ${query.run})
-                    AND (${query.live}::BOOLEAN IS NOT NULL OR runs.live = ${query.live})
+                    AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
+                    AND (${query.after}::TIMESTAMP IS NULL OR job.created > ${query.after.toDate().toISOString()}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NULL OR job.created < ${query.before.toDate().toISOString()}::TIMESTAMP)
+                    AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
+                    AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 ORDER BY
                     job.created DESC
                 LIMIT
@@ -407,13 +407,13 @@ class Job {
             await pool.query(sql`
                 UPDATE job
                     SET
-                        output = ${this.output}
+                        output = ${this.output ? JSON.stringify(this.output) : null}::JSON,
                         loglink = ${this.loglink},
                         status = ${this.status},
                         version = ${this.version},
                         count = ${this.count},
-                        stats = ${this.status},
-                        bounds = ST_SetSRID(ST_GeomFromGeoJSON(${this.bounds}), 4326),
+                        stats = ${this.stats ? JSON.stringify(this.stats) : null}::JSON,
+                        bounds = ST_GeomFromGeoJSON(${this.bounds ? JSON.stringify(this.bounds) : null}::JSON),
                         map = ${this.map},
                         size = ${this.size}
                     WHERE

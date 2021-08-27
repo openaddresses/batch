@@ -2,6 +2,8 @@
     "type": "object",
     "required": [
         "id",
+        "s3",
+        "license",
         "run",
         "map",
         "created",
@@ -23,6 +25,12 @@
         "id": {
             "type": "integer"
         },
+        "license": {
+            "type": ["boolean", "object"]
+        },
+        "s3": {
+            "type": ["boolean", "string"]
+        },
         "run": {
             "type": "integer"
         },
@@ -30,7 +38,7 @@
             "type": ["null", "integer"]
         },
         "created": {
-            "type": "string"
+            "type": "integer"
         },
         "source": {
             "type": "string"
@@ -59,7 +67,7 @@
                 "output": {
                     "type": "boolean"
                 },
-                "preview:": {
+                "preview": {
                     "type": "boolean"
                 }
             }

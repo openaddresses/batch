@@ -97,14 +97,14 @@ class Exporter {
                     job.layer,
                     job.name
                 FROM
-                    exports,
-                    job
+                    exports
+                        LEFT JOIN job
+                            ON job.id = exports.job_id
                 WHERE
-                    job.id = exports.job_id
-                    AND ${sql.array(query.status.join(','), sql`TEXT[]`)} @> ARRAY[exports.status]
-                    AND (${query.uid}::BIGINT IS NOT NULL OR uid = ${query.uid})
-                    AND (${query.after}::TIMESTAMP IS NOT NULL OR exports.created > ${query.after.toDate().toISOString()}::TIMESTAMP)
-                    AND (${query.before}::TIMESTAMP IS NOT NULL OR exports.created < ${query.before.toDate().toISOString()}::TIMESTAMP)
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[exports.status]
+                    AND (${query.uid}::BIGINT IS NULL OR uid = ${query.uid})
+                    AND (${query.after}::TIMESTAMP IS NULL OR exports.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NULL OR exports.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                 ORDER BY
                     exports.created DESC
                 LIMIT

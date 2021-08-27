@@ -115,14 +115,14 @@ class Run {
                     ARRAY_AGG(job.status) AS status,
                     COUNT(job.*) AS jobs
                 FROM
-                    runs,
-                    job
+                    runs
+                        LEFT JOIN job
+                        ON job.run = runs.id
                 WHERE
-                    '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
-                    AND (${query.run}::BIGINT IS NOT NULL OR run = ${query.run})
-                    AND (${query.after}::TIMESTAMP IS NOT NULL OR run.created > ${query.after.toDate().toISOString()}::TIMESTAMP)
-                    AND (${query.before}::TIMESTAMP IS NOT NULL OR run.created < ${query.before.toDate().toISOString()}::TIMESTAMP)
-                    AND job.run = runs.id
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    AND (${query.run}::BIGINT IS NULL OR run = ${query.run})
+                    AND (${query.after}::TIMESTAMP IS NULL OR runs.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NULL OR runs.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                 GROUP BY
                     runs.id,
                     runs.live,

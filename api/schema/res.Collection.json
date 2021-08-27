@@ -23,7 +23,7 @@
             }
         },
         "created": {
-            "type": "string",
+            "type": "integer",
             "description": "The date on which this collection was uploaded"
         },
         "size": {

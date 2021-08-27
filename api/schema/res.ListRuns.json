@@ -21,7 +21,7 @@
                 "description": "If true, successful jobs immediately become the most recent live data"
             },
             "created": {
-                "type": "string"
+                "type": "integer"
             },
             "github": {
                 "type": "object",

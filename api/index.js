@@ -754,7 +754,7 @@ async function server(args, config, cb) {
      *
      * @apiParam {Number} :collection Collection ID
      */
-    await schema.get( '/collections/:collection/data', null,
+    await schema.get('/collections/:collection/data', null,
         async (req, res) => {
             try {
                 await Param.int(req, 'collection');
@@ -1014,6 +1014,12 @@ async function server(args, config, cb) {
             const data = await config.cacher.get(Miss(req.query, 'data'), async () => {
                 return await Data.list(pool, req.query);
             });
+
+            if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
+                for (const d of data) {
+                    delete d.s3;
+                }
+            }
 
             return res.json(data);
         } catch (err) {

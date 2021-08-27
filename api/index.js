@@ -727,6 +727,12 @@ async function server(args, config, cb) {
                 return await Collection.list(pool);
             });
 
+            if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
+                for (const c of collections) {
+                    delete c.s3;
+                }
+            }
+
             return res.json(collections);
         } catch (err) {
             return Err.respond(err, res);

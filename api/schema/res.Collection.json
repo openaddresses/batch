@@ -22,6 +22,10 @@
                 "type": "string"
             }
         },
+        "s3": {
+            "type": "string",
+            "description": "Sponsors have access to the direct S3 bucket"
+        },
         "created": {
             "type": "string",
             "description": "The date on which this collection was uploaded"

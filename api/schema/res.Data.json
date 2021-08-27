@@ -8,7 +8,6 @@
         "layer",
         "name",
         "job",
-        "s3",
         "size",
         "output"
     ],
@@ -32,7 +31,8 @@
             "type": "integer"
         },
         "s3": {
-            "type": "string"
+            "type": "string",
+            "description": "Sponsors have access to the direct S3 bucket"
         },
         "size": {
             "$ref": "./util/size.json"

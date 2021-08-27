@@ -2,7 +2,6 @@
 
 const test = require('tape');
 const Flight = require('./flight');
-const { promisify } = require('util');
 
 const flight = new Flight();
 

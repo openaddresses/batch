@@ -5,33 +5,35 @@
     ],
     "additionalProperties": false,
     "properties": {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "required": [
-                "label",
-                "data"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "label": {
-                    "type": "string"
-                },
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "x",
-                            "y"
-                        ],
-                        "additionalProperties": false,
-                        "properties": {
-                            "x": {
-                                "type": "string"
-                            },
-                            "y": {
-                                "type": "integer"
+        "datasets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "label",
+                    "data"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "label": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "x",
+                                "y"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                                "x": {
+                                    "type": "string"
+                                },
+                                "y": {
+                                    "type": "integer"
+                                }
                             }
                         }
                     }

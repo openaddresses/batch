@@ -36,13 +36,13 @@
             "type": "string"
         },
         "source_name": {
-            "type": "source_name"
+            "type": "string"
         },
         "layer": {
             "type": "string"
         },
         "name": {
-            "type": "name"
+            "type": "string"
         },
         "output": {
             "type": "object",
@@ -71,7 +71,7 @@
             "$ref": "./util/status.json"
         },
         "stats": {
-            "type": "stats"
+            "type": "object"
         },
         "count": {
             "type": ["null", "integer"]

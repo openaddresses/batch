@@ -34,13 +34,13 @@
                 "type": "string"
             },
             "source_name": {
-                "type": "source_name"
+                "type": "string"
             },
             "layer": {
                 "type": "string"
             },
             "name": {
-                "type": "name"
+                "type": "string"
             },
             "output": {
                 "type": "object",

@@ -4,11 +4,6 @@ const User = require('../lib/user');
 const Token = require('../lib/token');
 const test = require('tape');
 const { Pool } = require('pg');
-const Flight = require('./init');
-
-const flight = new Flight();
-
-flight.init(test);
 
 let TOKEN = '';
 

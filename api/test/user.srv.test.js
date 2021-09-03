@@ -1,44 +1,40 @@
 'use strict';
 
 const test = require('tape');
-const request = require('request');
-const Flight = require('./init');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 flight.init(test);
 flight.takeoff(test);
 
-const session = request.jar();
-
-test('GET: api/user (no auth)', (t) => {
-    request({
-        url: 'http://localhost:4999/api/user',
-        method: 'GET',
-        json: true,
-        jar: session
-    }, (err, res) => {
-        t.error(err, 'no error');
-
+test('GET: api/user (no auth)', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user',
+            method: 'GET',
+            json: true,
+        });
         t.equals(res.statusCode, 401, 'http: 401');
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('POST: api/user', (t) => {
-    request({
-        url: 'http://localhost:4999/api/user',
-        method: 'POST',
-        json: true,
-        jar: session,
-        body: {
-            username: 'ingalls',
-            password: 'password123',
-            email: 'ingalls@example.com'
-        }
-    }, (err, res) => {
-        t.error(err, 'no error');
-
-        t.equals(res.statusCode, 200, 'http: 200');
+test('POST: api/user', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user',
+            method: 'POST',
+            json: true,
+            body: {
+                username: 'ingalls',
+                password: 'password123',
+                email: 'ingalls@example.com'
+            }
+        }, t);
 
         t.deepEquals(res.body, {
             id: 1,
@@ -48,73 +44,81 @@ test('POST: api/user', (t) => {
             flags: {}
         }, 'user');
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('POST: api/login (failed)', (t) => {
-    request({
-        url: 'http://localhost:4999/api/login',
-        method: 'POST',
-        json: true,
-        jar: session,
-        body: {
-            username: 'ingalls',
-            password: 'password124'
-        }
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('POST: api/login (failed)', async (t) => {
+    try {
+        await flight.request({
+            url: 'http://localhost:4999/api/login',
+            method: 'POST',
+            json: true,
+            body: {
+                username: 'ingalls',
+                password: 'password124'
+            }
+        });
 
         t.equals(res.statusCode, 403, 'http: 403');
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('POST: api/login (not confirmed)', (t) => {
-    request({
-        url: 'http://localhost:4999/api/login',
-        method: 'POST',
-        json: true,
-        jar: session,
-        body: {
-            username: 'ingalls',
-            password: 'password123'
-        }
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('POST: api/login (not confirmed)', async (t) => {
+    try {
+        await flight.request({
+            url: 'http://localhost:4999/api/login',
+            method: 'POST',
+            json: true,
+            body: {
+                username: 'ingalls',
+                password: 'password123'
+            }
+        });
 
         t.equals(res.statusCode, 403, 'http: 403');
         t.deepEquals(res.body, {
             status: 403, message: 'User has not confirmed email', messages: []
         });
 
-        t.end();
-    });
-});
-
-test('META: Validate User', async (t) => {
-    await flight.pool.query(`
-        UPDATE users SET validated = True;
-    `);
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
     t.end();
 });
 
-test('POST: api/login (success)', (t) => {
-    request({
-        url: 'http://localhost:4999/api/login',
-        method: 'POST',
-        json: true,
-        jar: session,
-        body: {
-            username: 'ingalls',
-            password: 'password123'
-        }
-    }, (err, res) => {
+test('META: Validate User', async (t) => {
+    try {
+        await flight.config.pool.query(sql`
+            UPDATE users SET validated = True;
+        `);
+    } catch (err) {
         t.error(err, 'no error');
+    }
 
-        t.equals(res.statusCode, 200, 'http: 200');
+    t.end();
+});
+
+test('POST: api/login (success)', async (t) => {
+    try {
+        await flight.request({
+            url: 'http://localhost:4999/api/login',
+            method: 'POST',
+            json: true,
+            body: {
+                username: 'ingalls',
+                password: 'password123'
+            }
+        }, t);
+
         t.deepEquals(res.body, {
             uid: 1,
             username: 'ingalls',
@@ -124,20 +128,20 @@ test('POST: api/login (success)', (t) => {
             flags: {}
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('GET: api/login', (t) => {
-    request({
-        url: 'http://localhost:4999/api/login',
-        method: 'GET',
-        json: true,
-        jar: session
-    }, (err, res) => {
-        t.error(err, 'no error');
-
-        t.equals(res.statusCode, 200, 'http: 200');
+test('GET: api/login', async (t) => {
+    try {
+        await flight.request({
+            url: 'http://localhost:4999/api/login',
+            method: 'GET',
+            json: true,
+        }, t);
 
         t.deepEquals(res.body, {
             uid: 1,
@@ -148,8 +152,11 @@ test('GET: api/login', (t) => {
             flags: {}
         }, 'user');
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
 flight.landing(test);

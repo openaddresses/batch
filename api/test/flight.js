@@ -159,7 +159,7 @@ class Flight {
                     body: {
                         username: username,
                         password: username,
-                        email: `${username}@example.com`
+                        email: `${username}@openaddresses.io`
                     }
                 });
 

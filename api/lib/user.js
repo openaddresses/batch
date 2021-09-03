@@ -7,7 +7,15 @@ const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class User {
+    /**
+     * @constructor
+     *
+     * @param {Pool} pool PG Pool Instance
+     */
     constructor(pool) {
         this.pool = pool;
 
@@ -225,6 +233,7 @@ class User {
     }
 
     async level(email, level) {
+    console.error(email, level);
         let pgres;
         try {
             pgres = await this.pool.query(sql`

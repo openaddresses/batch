@@ -194,10 +194,7 @@ async function server(args, config, cb) {
 
     // Unified Auth
     schema.router.use(async (req, res, next) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            req.auth = req.session.auth;
-            req.auth.type = 'session';
-        } else if (req.header('shared-secret')) {
+        if (req.header('shared-secret')) {
             if (req.header('shared-secret') !== config.SharedSecret) {
                 return res.status(401).json({
                     status: 401,
@@ -445,10 +442,10 @@ async function server(args, config, cb) {
         query: 'req.query.GetLogin.json',
         res: 'res.Login.json'
     }, async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
+        if (req.auth && req.auth.username) {
             try {
-                if (req.query.level) await level.single(req.session.auth.email);
-                res.json(await user.user(req.session.auth.uid));
+                if (req.query.level) await level.single(req.auth.email);
+                res.json(await user.user(req.auth.uid));
             } catch (err) {
                 return Err.respond(err, res);
             }

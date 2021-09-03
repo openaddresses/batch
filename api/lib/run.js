@@ -84,7 +84,7 @@ class Run {
 
         Status.verify(query.status);
 
-        if (!query.run) query.run = false;
+        if (!query.run) query.run = null;
 
         if (query.after) {
             try {

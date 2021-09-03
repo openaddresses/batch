@@ -1,4 +1,9 @@
 {
+    "POST /upload": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "DELETE /cache": {
         "body": false,
         "query": false,
@@ -13,11 +18,6 @@
         "body": false,
         "query": true,
         "res": true
-    },
-    "POST /upload": {
-        "body": false,
-        "query": false,
-        "res": false
     },
     "GET /user": {
         "body": false,
@@ -51,11 +51,6 @@
     },
     "POST /login": {
         "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /login": {
-        "body": false,
         "query": false,
         "res": true
     },
@@ -139,13 +134,13 @@
         "query": true,
         "res": true
     },
-    "PATCH /data/:data": {
-        "body": true,
+    "GET /data/:data": {
+        "body": false,
         "query": false,
         "res": true
     },
-    "GET /data/:data": {
-        "body": false,
+    "PATCH /data/:data": {
+        "body": true,
         "query": false,
         "res": true
     },
@@ -179,13 +174,13 @@
         "query": false,
         "res": true
     },
-    "POST /run/:run/jobs": {
-        "body": true,
+    "GET /run/:run/jobs": {
+        "body": false,
         "query": false,
         "res": true
     },
-    "GET /run/:run/jobs": {
-        "body": false,
+    "POST /run/:run/jobs": {
+        "body": true,
         "query": false,
         "res": true
     },

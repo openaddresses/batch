@@ -27,6 +27,9 @@
         },
         "flags": {
             "type": "object"
+        },
+        "token": {
+            "type": "string"
         }
     }
 }

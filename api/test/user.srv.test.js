@@ -38,6 +38,7 @@ test('POST: api/user', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            level: 'basic',
             username: 'ingalls'    ,
             email: 'ingalls@example.com',
             access: 'user',
@@ -53,7 +54,7 @@ test('POST: api/user', async (t) => {
 
 test('POST: api/login (failed)', async (t) => {
     try {
-        await flight.request({
+        const res = await flight.request({
             url: 'http://localhost:4999/api/login',
             method: 'POST',
             json: true,
@@ -73,7 +74,7 @@ test('POST: api/login (failed)', async (t) => {
 
 test('POST: api/login (not confirmed)', async (t) => {
     try {
-        await flight.request({
+        const res = await flight.request({
             url: 'http://localhost:4999/api/login',
             method: 'POST',
             json: true,
@@ -107,9 +108,10 @@ test('META: Validate User', async (t) => {
     t.end();
 });
 
+let token;
 test('POST: api/login (success)', async (t) => {
     try {
-        await flight.request({
+        const res = await flight.request({
             url: 'http://localhost:4999/api/login',
             method: 'POST',
             json: true,
@@ -118,6 +120,10 @@ test('POST: api/login (success)', async (t) => {
                 password: 'password123'
             }
         }, t);
+
+        t.ok(res.body.token);
+        token = res.body.token;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             uid: 1,
@@ -137,8 +143,11 @@ test('POST: api/login (success)', async (t) => {
 
 test('GET: api/login', async (t) => {
     try {
-        await flight.request({
+        const res = await flight.request({
             url: 'http://localhost:4999/api/login',
+            auth: {
+                bearer: token
+            },
             method: 'GET',
             json: true,
         }, t);

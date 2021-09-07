@@ -472,6 +472,7 @@ class User {
                 username: row.username,
                 email: row.email,
                 access: row.access,
+                level: row.level,
                 flags: row.flags
             };
         } catch (err) {

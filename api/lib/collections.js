@@ -138,7 +138,7 @@ class Collection {
 
             return this;
         } catch (err) {
-            if (err.code && err.code === '23505') {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'duplicate collections not allowed');
             }
 

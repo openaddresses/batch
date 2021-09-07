@@ -475,7 +475,7 @@ class User {
                 flags: row.flags
             };
         } catch (err) {
-            if (err.code && err.code === '23505') {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'User already exists');
             }
 

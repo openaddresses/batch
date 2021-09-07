@@ -55,10 +55,10 @@ export default {
 
                 const body = await window.std('/api/login', {
                     method: 'POST',
-                    body: JSON.stringify({
+                    body: {
                         username: this.username,
                         password: this.password
-                    })
+                    }
                 });
 
                 this.loading = false;

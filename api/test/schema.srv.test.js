@@ -134,6 +134,7 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
                 required: [ 'uid', 'username', 'email', 'access', 'level', 'flags' ],
                 additionalProperties: false,
                 properties: {
+                    token: { type: 'string' },
                     uid: { type: 'integer' },
                     username: { type: 'string' },
                     email: { type: 'string' },

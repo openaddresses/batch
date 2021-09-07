@@ -85,7 +85,11 @@
             "type": ["null", "integer"]
         },
         "bounds": {
-            "$ref": "./util/polygon.json"
+            "oneOf": [{
+                "$ref": "./util/polygon.json"
+            }, {
+                "type": "null"
+            }]
         },
         "version": {
             "type": "string",

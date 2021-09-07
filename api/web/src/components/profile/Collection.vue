@@ -88,24 +88,18 @@ export default {
                 if (this.collection.id) {
                     await window.std(`/api/collections/${this.collection.id}`, {
                         method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
+                        body: {
                             name: this.name,
                             sources: this.sources
-                        })
+                        }
                     });
                 } else {
                     await window.std('/api/collections', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
+                        body: {
                             name: this.name,
                             sources: this.sources
-                        })
+                        }
                     });
                 }
 

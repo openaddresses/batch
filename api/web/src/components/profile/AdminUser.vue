@@ -226,13 +226,10 @@ export default {
             try {
                 const res = await window.std(`/api/user/${user.id}`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         access: user.access,
                         flags: user.flags
-                    })
+                    }
                 });
 
                 for (const key of Object.keys(res)) {

@@ -27,12 +27,9 @@ export default {
             try {
                 await window.std(`/api/job/error/${job_id}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         moderate: confirm ? 'confirm' : 'reject'
-                    })
+                    }
                 });
 
                 this.$emit('moderated');

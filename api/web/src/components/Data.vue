@@ -304,12 +304,9 @@ export default {
             try {
                 await window.std(`/api/data/${job.id}`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         fabric: job.fabric
-                    })
+                    }
                 });
             } catch (err) {
                 this.$emit('err', err);

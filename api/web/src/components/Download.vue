@@ -35,13 +35,10 @@ export default {
                 this.loading = true;
                 const res = await window.std('/api/export', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         job_id: jobid,
                         format: fmt
-                    })
+                    }
                 });
 
                 this.$router.push({ path: `/export/${res.id}` });

@@ -68,14 +68,10 @@ export default {
 
                 await window.std('/api/login/reset', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
+                    body: {
                         token: this.token,
                         password: this.password
-                    })
+                    }
                 });
 
                 this.loading = false;

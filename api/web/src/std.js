@@ -1,5 +1,12 @@
 function std() {
-    window.std = async function(url, opts = {}) {
+
+    /**
+     * @param {String} url
+     * @param {Object} opts
+     * @param {Object} opts.headers
+     * @Param {Object} opts.body
+     */
+    window.std = async function(url, opts = {}, redirect = true) {
         try {
             url = new URL(url);
         } catch (err) {
@@ -30,6 +37,8 @@ function std() {
 
                 if (bdy.message) throw new Error(bdy.message);
                 else throw new Error(`Status Code: ${res.status}`);
+            } else if (!redirect && res.status === 401) {
+                window.location = '/login';
             }
 
             return await res.json();

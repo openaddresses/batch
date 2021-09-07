@@ -228,9 +228,20 @@ async function server(args, config, cb) {
                     return Err.respond(err, res);
                 }
             } else {
-                const decoded = jwt.verify(authorization[1], config.SharedSecret);
-                if (decoded.u) req.auth = await user.user(decoded.u);
-                req.auth.type = 'session';
+                try {
+                    const decoded = jwt.verify(authorization[1], config.SharedSecret);
+                    if (decoded.u) req.auth = await user.user(decoded.u);
+                    req.auth.type = 'session';
+                } catch (err) {
+                    if (err.message === 'jwt malformed') {
+                        return res.status(401).json({
+                            status: 401,
+                            message: 'Invalid Access Token'
+                        });
+                    } else {
+                        return Err.respond(err, res);
+                    }
+                }
             }
         } else {
             req.auth = false;

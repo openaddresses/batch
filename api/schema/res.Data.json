@@ -3,6 +3,7 @@
     "additionalProperties": false,
     "required": [
         "id",
+        "fabric",
         "source",
         "updated",
         "layer",
@@ -14,6 +15,9 @@
     "properties": {
         "id": {
             "type": "integer"
+        },
+        "fabric": {
+            "type": "boolean"
         },
         "source": {
             "type": "string"

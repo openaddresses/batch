@@ -5,12 +5,12 @@
         "additionalProperties": false,
         "required": [
             "id",
+            "fabric",
             "source",
             "updated",
             "layer",
             "name",
             "job",
-            "s3",
             "size",
             "output"
         ],
@@ -18,11 +18,14 @@
             "id": {
                 "type": "integer"
             },
+            "fabric": {
+                "type": "boolean"
+            },
             "source": {
                 "type": "string"
             },
             "updated": {
-                "type": "string"
+                "type": "integer"
             },
             "layer": {
                 "type": "string"

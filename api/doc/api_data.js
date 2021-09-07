@@ -36,6 +36,82 @@ define({ "api": [
     "groupTitle": "Analytics"
   },
   {
+    "type": "delete",
+    "url": "/api/cache",
+    "title": "Flush Cache",
+    "version": "1.0.0",
+    "name": "FlushCache",
+    "group": "Cache",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Flush the Memcached Cache</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/cache.js",
+    "groupTitle": "Cache"
+  },
+  {
+    "type": "delete",
+    "url": "/api/cache/:cache_key",
+    "title": "Delete Key",
+    "version": "1.0.0",
+    "name": "FlushCache",
+    "group": "Cache",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Flush the Memcached Cache</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/cache.js",
+    "groupTitle": "Cache"
+  },
+  {
     "type": "post",
     "url": "/api/collections",
     "title": "Create Collection",

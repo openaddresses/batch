@@ -85,7 +85,7 @@
             "type": ["null", "integer"]
         },
         "bounds": {
-            "$ref": "./util/bounds.json"
+            "$ref": "./util/polygon.json"
         },
         "version": {
             "type": "string",

@@ -3,10 +3,21 @@ function std() {
         try {
             url = new URL(url);
         } catch (err) {
-            url = new URL(window.location.origin + url);
+            url = new URL(url, window.location.origin);
         }
 
         try {
+            if (!opts.headers) opts.headers = {};
+
+            if (typeof opts.body === 'object' && !opts.headers['Content-Type']) {
+                opts.body = JSON.stringify(opts.body);
+                opts.headers['Content-Type'] = 'application/json';
+            }
+
+            if (localStorage.token && !opts.headers.Authorization) {
+                opts.headers['Authorization'] = 'Bearer ' + localStorage.token;
+            }
+
             const res = await fetch(url, opts);
 
             let bdy = {};

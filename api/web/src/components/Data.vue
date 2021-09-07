@@ -164,7 +164,7 @@
 
                             </div>
                             <div @click='emitjob(job.job)' class='col col--2'>
-                                <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                                <span v-text='fmt(job.updated)'/>
                             </div>
                             <div class='col col--5'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>

@@ -4,12 +4,12 @@
         "query": false,
         "res": false
     },
-    "DELETE /cache": {
+    "DELETE /cache/:cache_key": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /cache/:cache_key": {
+    "DELETE /cache": {
         "body": false,
         "query": false,
         "res": true
@@ -134,13 +134,13 @@
         "query": true,
         "res": true
     },
-    "GET /data/:data": {
-        "body": false,
+    "PATCH /data/:data": {
+        "body": true,
         "query": false,
         "res": true
     },
-    "PATCH /data/:data": {
-        "body": true,
+    "GET /data/:data": {
+        "body": false,
         "query": false,
         "res": true
     },
@@ -174,13 +174,13 @@
         "query": false,
         "res": true
     },
-    "GET /run/:run/jobs": {
-        "body": false,
+    "POST /run/:run/jobs": {
+        "body": true,
         "query": false,
         "res": true
     },
-    "POST /run/:run/jobs": {
-        "body": true,
+    "GET /run/:run/jobs": {
+        "body": false,
         "query": false,
         "res": true
     },

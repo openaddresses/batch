@@ -17,8 +17,10 @@ const ajv = new Ajv({
     allErrors: true
 });
 
+/**
+ * @class
+ */
 class Flight {
-
     constructor() {
         this.srv;
         this.base = false;
@@ -68,15 +70,21 @@ class Flight {
         let match = false;
         const spath = `${req.method.toUpperCase()} ${req.url.pathname}/`;
 
+        const matches = [];
         for (const r of Object.keys(this.routes)) {
             if (spath.match(this.routes[r])) {
-                match = r;
+                matches.push(r);
             }
         }
 
-        if (!match) {
+        if (!matches.length) {
             t.fail(`Cannot find schema match for: ${spath}`);
             return;
+        } else if (matches.length === 1) {
+            match = matches[0];
+        } else {
+            //TODO multiple selection - default to first one defined in routes to mirror express behabior
+            match = matches[0];
         }
 
         const schemaurl = new URL('/api/schema', this.base);

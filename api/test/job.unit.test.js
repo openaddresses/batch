@@ -5,7 +5,7 @@ const Job = require('../lib/job');
 const pkg = require('../package.json');
 const test = require('tape');
 const nock = require('nock');
-const Flight = require('./init');
+const Flight = require('./flight');
 
 const flight = new Flight();
 flight.init(test);

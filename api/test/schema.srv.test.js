@@ -13,32 +13,6 @@ flight.takeoff(test);
 const UPDATE = process.env.UPDATE;
 const VERBS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
 
-/**
- * Sort a schema object by verb and URL path
- * @param {Object} s Schema Object
- * @returns {Object} sorted schema object
- */
-function sort(s) {
-    const new_s = {};
-    Object.keys(s).sort((a, b) => {
-        const a_method = a.split(' ')[0];
-        const a_url = a.split(' ')[1];
-        const b_method = b.split(' ')[0];
-        const b_url = b.split(' ')[1];
-
-        if (a_url === b_url) return VERBS.indexOf(a_method) - VERBS.indexOf(b_method);
-
-        const n = [a_url, b_url].sort();
-
-        if (a_url.split('/').length !== b_url.split('/')) return a_url.split('/').length - b_url.split('/');
-
-        if (n[0] === b) return 1;
-        else return -1;
-    }).map((k) => new_s[k] = s[k]);
-
-    return new_s;
-}
-
 test('GET: api/schema', async (t) => {
     try {
         const res = await flight.request({
@@ -54,7 +28,7 @@ test('GET: api/schema', async (t) => {
         t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
 
         if (UPDATE) {
-            fs.writeFileSync(fixture, JSON.stringify(sort(res.body), null, 4));
+            fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
     } catch (err) {
         t.error(err, 'no error');

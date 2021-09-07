@@ -11,11 +11,7 @@
             "description": "The Job ID of the error"
         },
         "message": {
-            "type": "array",
-            "description": "An Array of Error messages related to a given Job ID",
-            "items": {
-                "type": "string"
-            }
+            "type": "string"
         }
     }
 }

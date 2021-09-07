@@ -1328,7 +1328,7 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ErrorList.json} apiSuccess
      */
-    await schema.get( '/job/error', {
+    await schema.get('/job/error', {
         res: 'res.ErrorList.json'
     }, async (req, res) => {
         try {
@@ -1374,7 +1374,7 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.ErrorSingle.json} apiSuccess
      */
-    await schema.get( '/job/error/:job', {
+    await schema.get('/job/error/:job', {
         res: 'res.ErrorSingle.json'
     }, async (req, res) => {
         try {
@@ -1440,7 +1440,7 @@ async function server(args, config, cb) {
 
             await user.is_flag(req, 'moderator');
 
-            res.json(JobError.moderate(pool, ci, req.params.job, req.body));
+            res.json(await JobError.moderate(pool, ci, req.params.job, req.body));
         } catch (err) {
             return Err.respond(err, res);
         }

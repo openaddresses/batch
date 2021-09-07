@@ -19,7 +19,10 @@
                 "$ref": "./util/status.json"
             },
             "messages": {
-                "type": "string"
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
             },
             "source_name": {
                 "type": "string"

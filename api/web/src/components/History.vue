@@ -83,7 +83,7 @@
                         Job <span v-text='job.id'/>
                     </div>
                     <div class='col col--5'>
-                        <span v-text='job.created.match(/[0-9]{4}\-[0-9]{2}\-[0-9]{2}/)[0]'></span>
+                        <span v-text='fmt(job.created)'></span>
                     </div>
                     <div class='col col--3'>
                         <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
@@ -98,6 +98,7 @@
 
 <script>
 import LineChart from './LineChart.js';
+import moment from 'moment-timezone';
 
 export default {
     name: 'History',
@@ -107,6 +108,7 @@ export default {
     },
     data: function() {
         return {
+            tz: moment.tz.guess(),
             loading: false,
             colours: [ /* Thanks for the colours! https://github.com/johannesbjork/LaCroixColoR */ ],
             chart: {
@@ -128,6 +130,9 @@ export default {
         this.refresh();
     },
     methods: {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+        },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}`});
         },

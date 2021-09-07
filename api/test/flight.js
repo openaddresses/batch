@@ -236,6 +236,9 @@ class Flight {
             t.ok(this.config.pool, 'pool object returned');
             await this.config.pool.end();
 
+            t.ok(this.config.cacher, 'cacher object returned');
+            await this.config.cacher.cache.quit();
+
             t.end();
         });
     }

@@ -10,7 +10,7 @@ test() {
     cd -
 }
 
-echo "CREATE DATABASE openaddresses_test" | psql
+echo "CREATE DATABASE openaddresses_test" | psql "postgres://postgres@localhost:5432"
 
 test .
 test api/

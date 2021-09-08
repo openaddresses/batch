@@ -10,6 +10,8 @@ test() {
     cd -
 }
 
+echo "CREATE DATABASE openaddresses_test" | psql
+
 test .
 test api/
 test task/

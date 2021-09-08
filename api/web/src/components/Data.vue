@@ -287,11 +287,11 @@ export default {
                 return this.$emit('perk');
             }
 
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         collectionpls: function(c) {
             if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/collections/${c.id}/data`);
+            this.external(`${window.location.origin}/api/collections/${c.id}/data?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");

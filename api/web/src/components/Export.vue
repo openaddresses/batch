@@ -93,7 +93,7 @@ export default {
     },
     methods: {
         datapls: function() {
-            this.external(`${window.location.origin}/api/export/${this.exp.id}/output/export.zip`);
+            this.external(`${window.location.origin}/api/export/${this.exp.id}/output/export.zip?token=${localStorage.token}`);
         },
         refresh: function() {
             this.getExport(true);

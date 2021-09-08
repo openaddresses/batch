@@ -141,7 +141,7 @@ export default {
             this.getHistory();
         },
         datapls: function(id) {
-            this.external(`${window.location.origin}/api/job/${id}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${id}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, '_blank');

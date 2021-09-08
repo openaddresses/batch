@@ -274,8 +274,8 @@ class Job {
                     AND job.layer ilike ${query.layer}
                     AND job.source ilike ${query.source}
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
-                    AND (${query.after}::TIMESTAMP IS NULL OR job.created > ${query.after.toDate().toISOString()}::TIMESTAMP)
-                    AND (${query.before}::TIMESTAMP IS NULL OR job.created < ${query.before.toDate().toISOString()}::TIMESTAMP)
+                    AND (${query.after}::TIMESTAMP IS NULL OR job.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NULL OR job.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 ORDER BY

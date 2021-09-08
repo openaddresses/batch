@@ -42,24 +42,7 @@
             "$ref": "./util/size.json"
         },
         "output": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "cache",
-                "output",
-                "preview"
-            ],
-            "properties": {
-                "cache": {
-                    "type": "boolean"
-                },
-                "output": {
-                    "type": "boolean"
-                },
-                "preview": {
-                    "type": "boolean"
-                }
-            }
+            "$ref": "./util/output.json"
         }
     }
 }

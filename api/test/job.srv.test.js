@@ -123,6 +123,70 @@ test('PATCH: /api/job/:job', async (t) => {
     t.end();
 });
 
+test('GET: /api/job/:job', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/job/1',
+            method: 'GET',
+            json: true,
+        }, t);
+
+        t.equals(res.body.id, 1, 'job.id: 1');
+        t.equals(res.body.run, 1, 'job.run: 1');
+        t.ok(res.body.created, 'job.created: <truthy>');
+        t.equals(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json', 'job.source: <url>');
+        t.equals(res.body.layer, 'addresses', 'job.layer: addresses');
+        t.equals(res.body.name, 'dcgis', 'job.name: dcgis');
+        t.deepEquals(res.body.output, {
+            cache: true,
+            output: true,
+            preview: true
+        }, 'job.output: { ... }');
+        t.equals(res.body.loglink, null, 'job.loglink: null');
+        t.equals(res.body.status, 'Success', 'job.status: Success');
+        t.equals(res.body.version, pkg.version, 'job.version: <semver>');
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: /api/job', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/job',
+            method: 'GET',
+            json: true,
+        }, t);
+
+        t.ok(res.body[0].created)
+        delete res.body[0].created;
+
+        t.deepEquals(res.body, [{
+            id: 1,
+            run: 1,
+            map: null,
+            source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json',
+            source_name: 'us/dc/statewide',
+            layer: 'addresses',
+            name: 'dcgis',
+            output: {
+                cache: true,
+                output: true,
+                preview: true
+            },
+            loglink: null,
+            status: 'Success',
+            size: 339560
+        }]);
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
 
 test('close', (t) => {

@@ -270,7 +270,7 @@ class Job {
                     job INNER JOIN runs
                         ON job.run = runs.id
                 WHERE
-                    ${sql.array(query.status.join(','), sql`TEXT[]`)} @> ARRAY[job.status]
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
                     AND job.layer ilike ${query.layer}
                     AND job.source ilike ${query.source}
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})

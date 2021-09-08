@@ -24,7 +24,7 @@ glob.sync(path.resolve(__dirname, '../schema/**/*.json')).forEach((source) => {
         }
 
         try {
-            const schema = await $RefParser.dereference(source)
+            const schema = await $RefParser.dereference(source);
 
             ajv.compile(schema);
         } catch (err) {

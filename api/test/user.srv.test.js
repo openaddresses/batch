@@ -13,7 +13,7 @@ test('GET: api/user (no auth)', async (t) => {
         const res = await flight.request({
             url: 'http://localhost:4999/api/user',
             method: 'GET',
-            json: true,
+            json: true
         });
         t.equals(res.statusCode, 403, 'http: 403');
     } catch (err) {
@@ -149,7 +149,7 @@ test('GET: api/login', async (t) => {
                 bearer: token
             },
             method: 'GET',
-            json: true,
+            json: true
         }, t);
 
         t.deepEquals(res.body, {

@@ -83,7 +83,7 @@ class Flight {
         } else if (matches.length === 1) {
             match = matches[0];
         } else {
-            //TODO multiple selection - default to first one defined in routes to mirror express behabior
+            // TODO multiple selection - default to first one defined in routes to mirror express behabior
             match = matches[0];
         }
 
@@ -139,7 +139,7 @@ class Flight {
 
                 this.srv = srv;
 
-                this.base = `http://localhost:4999`;
+                this.base = 'http://localhost:4999';
 
                 this.config = config;
 
@@ -161,7 +161,7 @@ class Flight {
         test.test('Create Token', async (t) => {
             try {
                 const new_user = await prequest({
-                    url: new URL(`/api/user`, this.base),
+                    url: new URL('/api/user', this.base),
                     json: true,
                     method: 'POST',
                     body: {
@@ -203,7 +203,7 @@ class Flight {
                 }
 
                 const new_login = await prequest({
-                    url: new URL(`/api/login`, this.base),
+                    url: new URL('/api/login', this.base),
                     json: true,
                     method: 'POST',
                     body: {

@@ -241,7 +241,7 @@ class User {
     }
 
     async level(email, level) {
-    console.error(email, level);
+        console.error(email, level);
         let pgres;
         try {
             pgres = await this.pool.query(sql`

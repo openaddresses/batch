@@ -56,7 +56,7 @@ test('Level#all', async (t) =>  {
                 bearer: flight.token.test_all
             },
             method: 'GET',
-            json: true,
+            json: true
         }, t);
 
         t.equals(usr_pre.body.level, 'basic');
@@ -69,7 +69,7 @@ test('Level#all', async (t) =>  {
             auth: {
                 bearer: flight.token.test_all
             },
-            json: true,
+            json: true
         }, t);
 
         t.deepEquals(usr_post.body.level, 'sponsor');
@@ -93,7 +93,7 @@ test('Level#user - override', async (t) =>  {
             auth: {
                 bearer: flight.token.hello
             },
-            json: true,
+            json: true
         }, t);
 
         t.deepEquals(usr_pre.body.level, 'basic');
@@ -163,7 +163,7 @@ test('Level#user', async (t) =>  {
                 bearer: flight.token.test_single
             },
             method: 'GET',
-            json: true,
+            json: true
         }, t);
 
         t.deepEquals(usr_pre.body.level, 'basic');
@@ -176,7 +176,7 @@ test('Level#user', async (t) =>  {
             auth: {
                 bearer: flight.token.test_single
             },
-            json: true,
+            json: true
         }, t);
 
         t.deepEquals(usr_post.body.level, 'backer');
@@ -225,7 +225,7 @@ test('Level#user - no contrib', async (t) =>  {
             json: true,
             auth: {
                 bearer: flight.token.test_single1
-            },
+            }
         }, t);
 
         t.deepEquals(usr_pre.body.level, 'basic');
@@ -238,7 +238,7 @@ test('Level#user - no contrib', async (t) =>  {
             json: true,
             auth: {
                 bearer: flight.token.test_single1
-            },
+            }
         }, t);
 
         t.deepEquals(usr_post.body.level, 'basic');

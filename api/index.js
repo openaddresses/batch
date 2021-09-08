@@ -1,9 +1,9 @@
+'use strict';
 
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const Cacher = require('./lib/cacher');
 const Miss = Cacher.Miss;
-const session = require('express-session');
 const { ValidationError } = require('express-json-validator-middleware');
 const { Webhooks } = require('@octokit/webhooks');
 const Busboy = require('busboy');
@@ -72,9 +72,10 @@ async function server(args, config, cb) {
     // these must be run after lib/config
     const ci = new (require('./lib/ci'))(config);
 
+    let tb = false;
     if (!args['no-tilebase']) {
         console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
         console.log('ok - loaded TileBase');
         await tb.open();
     } else {

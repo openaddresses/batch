@@ -233,14 +233,10 @@ async function server(args, config, cb) {
                     if (decoded.u) req.auth = await user.user(decoded.u);
                     req.auth.type = 'session';
                 } catch (err) {
-                    if (err.message === 'jwt malformed') {
-                        return res.status(401).json({
-                            status: 401,
-                            message: 'Invalid Access Token'
-                        });
-                    } else {
-                        return Err.respond(err, res);
-                    }
+                    return res.status(401).json({
+                        status: 401,
+                        message: err.message
+                    });
                 }
             }
         } else {
@@ -500,7 +496,9 @@ async function server(args, config, cb) {
                 flags: req.auth.flags,
                 token: jwt.sign({
                     u: req.auth.uid
-                }, config.SharedSecret)
+                }, config.SharedSecret, {
+                    expiresIn: '2 days'
+                })
             });
         } catch (err) {
             return Err.respond(err, res);

@@ -15,7 +15,7 @@ test('GET: api/user (no auth)', async (t) => {
             method: 'GET',
             json: true,
         });
-        t.equals(res.statusCode, 401, 'http: 401');
+        t.equals(res.statusCode, 403, 'http: 403');
     } catch (err) {
         t.error(err, 'no error');
     }

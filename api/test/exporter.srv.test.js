@@ -145,7 +145,7 @@ test('POST /api/export - no donor level', async (t) =>  {
         });
 
         t.deepEquals(exp.body, {
-            status: 401,
+            status: 403,
             message: 'Please donate to use this feature',
             messages: []
         });

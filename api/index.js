@@ -1329,7 +1329,16 @@ async function server(args, config, cb) {
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
-            return res.json(await Job.list(pool, req.query));
+
+            const jobs = await Job.list(pool, req.query);
+
+            if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
+                for (const j of jobs) {
+                    delete j.s3;
+                }
+            }
+
+            return res.json(jobs);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -1487,9 +1496,13 @@ async function server(args, config, cb) {
         try {
             await Param.int(req, 'job');
 
-            const job = await Job.from(pool, req.params.job);
+            const job = (await Job.from(pool, req.params.job)).json();
 
-            return res.json(job.json());
+            if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
+                delete job.s3;
+            }
+
+            return res.json(job);
         } catch (err) {
             return Err.respond(err, res);
         }

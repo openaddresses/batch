@@ -230,7 +230,7 @@ async function server(args, config, cb) {
             } else {
                 try {
                     const decoded = jwt.verify(authorization[1], config.SharedSecret);
-                    if (decoded.u) req.auth = await user.user(decoded.u);
+                    req.auth = await user.user(decoded.u);
                     req.auth.type = 'session';
                 } catch (err) {
                     return res.status(401).json({
@@ -238,6 +238,17 @@ async function server(args, config, cb) {
                         message: err.message
                     });
                 }
+            }
+        } else if (req.query.token) {
+            try {
+                const decoded = jwt.verify(req.query.token, config.SharedSecret);
+                req.token = await user.user(decoded.u);
+                req.token.type = 'token';
+            } catch (err) {
+                return res.status(401).json({
+                    status: 401,
+                    message: err.message
+                });
             }
         } else {
             req.auth = false;
@@ -731,7 +742,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'collection');
 
-                await user.is_auth(req);
+                await user.is_auth(req, true);
 
                 Collection.data(pool, req.params.collection, res);
             } catch (err) {
@@ -1622,7 +1633,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await user.is_auth(req);
+                await user.is_auth(req, true);
 
                 await Job.data(pool, req.params.job, res);
             } catch (err) {
@@ -1678,7 +1689,7 @@ async function server(args, config, cb) {
             try {
                 await Param.int(req, 'job');
 
-                await user.is_auth(req);
+                await user.is_auth(req, true);
 
                 Job.cache(req.params.job, res);
             } catch (err) {
@@ -1939,7 +1950,7 @@ async function server(args, config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'exportid');
-                await user.is_auth(req);
+                await user.is_auth(req, true);
 
                 await Exporter.data(pool, req.auth, req.params.exportid, res);
             } catch (err) {

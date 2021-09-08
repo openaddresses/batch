@@ -22,7 +22,15 @@ class User {
         this.attrs = Object.keys(require('../schema/req.body.PatchUser.json').properties);
     }
 
-    async is_auth(req) {
+    /**
+     * Is the user authenticated
+     *
+     * @param {Object} req Express Request
+     * @param {boolean} token Should URL query tokens be allowed (usually only for downloads)
+     */
+    async is_auth(req, token = false) {
+        if (token && req.token) req.auth = req.token;
+
         if (!req.auth || !req.auth.access || !['session', 'token', 'secret'].includes(req.auth.type)) {
             throw new Err(403, null, 'Authentication Required');
         }

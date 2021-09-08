@@ -25,7 +25,7 @@ export default {
                 return this.createExport(jobid, fmt);
             }
 
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");

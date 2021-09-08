@@ -37,8 +37,9 @@ function std() {
 
                 if (bdy.message) throw new Error(bdy.message);
                 else throw new Error(`Status Code: ${res.status}`);
-            } else if (!redirect && res.status === 401) {
-                window.location = '/login';
+            } else if (redirect && res.status === 401) {
+                delete localStorage.token;
+                return window.location.reload();
             }
 
             return await res.json();

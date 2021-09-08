@@ -461,8 +461,8 @@ async function server(args, config, cb) {
                 return Err.respond(err, res);
             }
         } else {
-            return res.status(401).json({
-                status: 401,
+            return res.status(403).json({
+                status: 403,
                 message: 'Invalid session'
             });
         }
@@ -1862,7 +1862,7 @@ async function server(args, config, cb) {
             await Param.int(req, 'exportid');
 
             const exp = await Exporter.from(pool, req.params.exportid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(401, null, 'You didn\'t create that export');
+            if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(403, null, 'You didn\'t create that export');
 
             return res.json(await exp.log());
         } catch (err) {
@@ -1917,7 +1917,7 @@ async function server(args, config, cb) {
             await Param.int(req, 'exportid');
 
             const exp = (await Exporter.from(pool, req.params.exportid)).json();
-            if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(401, null, 'You didn\'t create that export');
+            if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
             res.json(exp);
         } catch (err) {

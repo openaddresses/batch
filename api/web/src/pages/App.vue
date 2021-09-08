@@ -110,7 +110,7 @@ export default {
             try {
                 this.auth = await window.std('/api/login');
             } catch (err) {
-                this.err = err;
+                delete localStorage.token;
             }
         },
         getCount: async function() {

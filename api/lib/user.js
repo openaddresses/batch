@@ -24,7 +24,7 @@ class User {
 
     async is_auth(req) {
         if (!req.auth || !req.auth.access || !['session', 'token', 'secret'].includes(req.auth.type)) {
-            throw new Err(401, null, 'Authentication Required');
+            throw new Err(403, null, 'Authentication Required');
         }
 
         if (req.auth.access === 'disabled') {
@@ -45,14 +45,14 @@ class User {
             return true;
         }
 
-        throw new Err(401, null, 'Please donate to use this feature');
+        throw new Err(403, null, 'Please donate to use this feature');
     }
 
     async is_flag(req, flag) {
         await this.is_auth(req);
 
         if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin' && req.auth.type !== 'secret') {
-            throw new Err(401, null, `${flag} flag required`);
+            throw new Err(403, null, `${flag} flag required`);
         }
 
         return true;
@@ -60,7 +60,7 @@ class User {
 
     async is_admin(req) {
         if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
-            throw new Err(401, null, 'Admin token required');
+            throw new Err(403, null, 'Admin token required');
         }
 
         return true;

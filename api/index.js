@@ -537,7 +537,7 @@ async function server(args, config, cb) {
         try {
             const reset = await user.forgot(req.body.user); // Username or email
 
-            if (args.email) await email.forgot(reset);
+            if (args.email && reset) await email.forgot(reset);
 
             // To avoid email scraping - this will always return true, regardless of success
             return res.json({ status: 200, message: 'Password Email Sent' });
@@ -569,7 +569,6 @@ async function server(args, config, cb) {
                 token: req.body.token,
                 password: req.body.password
             }));
-
         } catch (err) {
             return Err.respond(err, res);
         }

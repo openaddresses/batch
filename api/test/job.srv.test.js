@@ -128,7 +128,7 @@ test('GET: /api/job/:job', async (t) => {
         const res = await flight.request({
             url: 'http://localhost:4999/api/job/1',
             method: 'GET',
-            json: true,
+            json: true
         }, t);
 
         t.equals(res.body.id, 1, 'job.id: 1');
@@ -157,10 +157,10 @@ test('GET: /api/job', async (t) => {
         const res = await flight.request({
             url: 'http://localhost:4999/api/job',
             method: 'GET',
-            json: true,
+            json: true
         }, t);
 
-        t.ok(res.body[0].created)
+        t.ok(res.body[0].created);
         delete res.body[0].created;
 
         t.deepEquals(res.body, [{

@@ -18,8 +18,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Create a new export task
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateExport.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=../schema/req.body.CreateExport.json} apiParam
+     * @apiSchema {jsonawait schema=../schema/res.Export.json} apiSuccess
      */
     await schema.post('/export', {
         body: 'req.body.CreateExport.json',
@@ -59,7 +59,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :exportid Export ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
+     * @apiSchema {jsonawait schema=../schema/res.SingleLog.json} apiSuccess
      */
     await schema.get('/export/:exportid/log', {
         res: 'res.SingleLog.json'
@@ -86,8 +86,8 @@ async function router(schema, config) {
      * @apiDescription
      *   List existing exports
      *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListExport.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ListExport.json} apiSuccess
+     * @apiSchema (Query) {jsonawait schema=../schema/req.query.ListExport.json} apiParam
+     * @apiSchema {jsonawait schema=../schema/res.ListExport.json} apiSuccess
      */
     await schema.get('/export', {
         query: 'req.query.ListExport.json',
@@ -114,7 +114,7 @@ async function router(schema, config) {
      * @apiDescription
      *   Get a single export
      *
-     * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
+     * @apiSchema {jsonawait schema=../schema/res.Export.json} apiSuccess
      */
     await schema.get('/export/:exportid', {
         res: 'res.Export.json'
@@ -165,8 +165,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Update a single export
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchExport.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Export.json} apiSuccess
+     * @apiSchema (Body) {jsonawait schema=../schema/req.body.PatchExport.json} apiParam
+     * @apiSchema {jsonawait schema=../schema/res.Export.json} apiSuccess
      */
     await schema.patch('/export/:exportid', {
         body: 'req.body.PatchExport.json',

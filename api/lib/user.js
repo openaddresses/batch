@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
+const moment = require('moment');
 const { sql } = require('slonik');
 
 /**
@@ -305,6 +306,8 @@ class User {
      * @param {String} [query.filter=] - Username or Email fragment to filter by
      * @param {String} [query.level=] - Donor level to filter by
      * @param {String} [query.access=] - User Access to filter by
+     * @param {String} [query.before=undefined] - Only show users before the given date
+     * @param {String} [query.after=undefined] - Only show users after the given date
      */
     async list(query) {
         if (!query) query = {};
@@ -314,6 +317,26 @@ class User {
 
         if (!query.access) query.access = null;
         if (!query.level) query.level = null;
+
+        if (!query.after) query.after = null;
+        if (!query.before) query.before = null;
+
+        if (query.after) {
+            try {
+                query.after = moment(query.after);
+            } catch (err) {
+                throw new Err(400, err, 'after param is not recognized as a valid date');
+            }
+        }
+
+        if (query.before) {
+            try {
+                query.before = moment(query.before);
+            } catch (err) {
+                throw new Err(400, err, 'before param is not recognized as a valid date');
+            }
+        }
+
 
         let pgres;
         try {
@@ -329,9 +352,11 @@ class User {
                 FROM
                     users
                 WHERE
-                    (username ~ ${query.filter} OR email ~ ${query.filter})
-                    AND (${query.access}::TEXT IS NOT NULL OR access = ${query.access})
-                    AND (${query.level}::TEXT IS NOT NULL OR level = ${query.level})
+                    (username ~* ${query.filter} OR email ~* ${query.filter})
+                    AND (${query.access}::TEXT IS NULL OR access = ${query.access})
+                    AND (${query.level}::TEXT IS NULL OR level = ${query.level})
+                    AND (${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP IS NULL OR created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP IS NULL OR created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                 ORDER BY
                     created DESC
                 LIMIT

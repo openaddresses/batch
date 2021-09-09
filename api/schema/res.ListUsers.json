@@ -11,34 +11,40 @@
             "description": "Total number of users with the service"
         },
         "users": {
-            "type": "object",
-            "required": [
-                "id",
-                "username",
-                "email",
-                "access",
-                "level",
-                "flags"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "access": {
-                    "$ref": "./util/access.json"
-                },
-                "level": {
-                    "$ref": "./util/level.json"
-                },
-                "flags": {
-                    "type": "object"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "username",
+                    "email",
+                    "access",
+                    "level",
+                    "flags"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "The users unique id"
+                    },
+                    "username": {
+                        "type": "string",
+                        "description": "The users unique username"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "The users email address"
+                    },
+                    "access": {
+                        "$ref": "./util/access.json"
+                    },
+                    "level": {
+                        "$ref": "./util/level.json"
+                    },
+                    "flags": {
+                        "type": "object"
+                    }
                 }
             }
         }

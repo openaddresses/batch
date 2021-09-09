@@ -28,39 +28,22 @@
                 "type": ["null", "integer"]
             },
             "created": {
-                "type": "string"
+                "type": "integer"
             },
             "source": {
                 "type": "string"
             },
             "source_name": {
-                "type": "source_name"
+                "type": "string"
             },
             "layer": {
                 "type": "string"
             },
             "name": {
-                "type": "name"
+                "type": "string"
             },
             "output": {
-                "type": "object",
-                "required": [
-                    "cache",
-                    "output",
-                    "preview"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                    "cache": {
-                        "type": "boolean"
-                    },
-                    "output": {
-                        "type": "boolean"
-                    },
-                    "preview:": {
-                        "type": "boolean"
-                    }
-                }
+                "$ref": "./util/output.json"
             },
             "loglink": {
                 "$ref": "./util/loglink.json"

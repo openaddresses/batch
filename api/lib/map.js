@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const { sql } = require('slonik');
 const hash = require('object-hash');
 const split = require('split');
 const SM = require('@mapbox/sphericalmercator');
@@ -31,17 +32,15 @@ class Map {
 
     static async from(pool, code) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     id
                 FROM
                     map
                 WHERE
-                    code = $1
+                    code = ${code}
                 LIMIT 1
-            `, [
-                code
-            ]);
+            `);
 
             if (pgres.rows.length === 0) return false;
 
@@ -63,12 +62,12 @@ class Map {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');
 
-            let where = 'true';
-            if (z < 2) where = "code ~ '^[a-z]{2}$'";
-            else if (z < 4) where = "code ~ '^[a-z]{2}-[a-z]+$'";
-            else if (z === 5) where = "code ~ '^[a-z]{2}-[0-9]+$'";
+            let code = null;
+            if (z < 2) code = '^[a-z]{2}$';
+            else if (z < 4) code = '^[a-z]{2}-[a-z]+$';
+            else if (z === 5) code = '^[a-z]{2}-[0-9]+$';
 
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
                 FROM (
@@ -78,8 +77,8 @@ class Map {
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
-                                ST_MakePoint($1, $2),
-                                ST_MakePoint($3, $4)
+                                ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                ST_MakePoint(${bbox[2]}, ${bbox[3]})
                             ), 3857),
                             4096,
                             256,
@@ -93,12 +92,12 @@ class Map {
                         FROM
                             map
                         WHERE
-                            ${where}
+                            (${code}::TEXT IS NOT NULL OR code ~ ${code})
                             AND ST_Intersects(
                                 map.geom,
                                 ST_Transform(ST_SetSRID(ST_MakeBox2D(
-                                    ST_MakePoint($1, $2),
-                                    ST_MakePoint($3, $4)
+                                    ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                    ST_MakePoint(${bbox[2]}, ${bbox[3]})
                                 ), 3857), 4326)
                         )
                     ) n
@@ -107,7 +106,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
+            `);
 
             return pgres.rows[0].mvt;
         } catch (err) {
@@ -119,7 +118,7 @@ class Map {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');
 
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
                 FROM (
@@ -131,8 +130,8 @@ class Map {
                         ST_AsMVTGeom(
                             ST_Transform(geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
-                                ST_MakePoint($1, $2),
-                                ST_MakePoint($3, $4)
+                                ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                ST_MakePoint(${bbox[2]}, ${bbox[3]})
                             ), 3857),
                             4096,
                             256,
@@ -153,8 +152,8 @@ class Map {
                             ST_Intersects(
                                 map.geom,
                                 ST_Transform(ST_SetSRID(ST_MakeBox2D(
-                                    ST_MakePoint($1, $2),
-                                    ST_MakePoint($3, $4)
+                                    ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                    ST_MakePoint(${bbox[2]}, ${bbox[3]})
                                 ), 3857), 4326)
                         )
                     ) n
@@ -165,7 +164,7 @@ class Map {
                         n.code,
                         n.geom
                 ) q
-            `, [bbox[0], bbox[1], bbox[2], bbox[3]]);
+            `);
 
             return pgres.rows[0].mvt;
         } catch (err) {
@@ -175,7 +174,7 @@ class Map {
 
     static async get_feature(pool, code) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     MAX(map.id) AS id,
                     MAX(map.name) AS name,
@@ -185,10 +184,8 @@ class Map {
                 FROM
                     map LEFT JOIN job ON map.id = job.map
                 WHERE
-                    code = $1
-            `, [
-                code
-            ]);
+                    code = ${code}
+            `);
 
             if (!pgres.rows.length) throw new Err(400, null, 'Feature not found');
 
@@ -276,22 +273,18 @@ class Map {
 
     static async add(pool, name, code, geom) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO map (
                     name,
                     code,
                     geom
                 ) VALUES (
-                    $1,
-                    $2,
-                    ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
+                    ${name},
+                    ${code},
+                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(geom)}), 4326)
                 )
                 RETURNING id
-            `, [
-                name,
-                code,
-                JSON.stringify(geom)
-            ]);
+            `);
 
             return pgres.rows[0].id;
         } catch (err) {
@@ -320,21 +313,17 @@ class Map {
                             return cb(err);
                         }
 
-                        pool.query(`
+                        pool.query(sql`
                             INSERT INTO map (
                                 name,
                                 code,
                                 geom
                             ) VALUES (
-                                $1,
-                                $2,
-                                ST_SetSRID(ST_GeomFromGeoJSON($3), 4326)
+                                ${feat.properties.name},
+                                ${feat.properties.code},
+                                ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(feat.geometry)}), 4326)
                             );
-                        `, [
-                            feat.properties.name,
-                            feat.properties.code,
-                            JSON.stringify(feat.geometry)
-                        ], (err) => {
+                        `, (err) => {
                             if (err) return cb(err);
                             return cb(null, '');
                         });

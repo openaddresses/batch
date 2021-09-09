@@ -123,13 +123,9 @@ export default {
             try {
                 const res = await window.std('/api/token', {
                     method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         name: this.newToken.name
-                    })
+                    }
                 });
 
                 this.newToken.token = res.token;
@@ -149,8 +145,7 @@ export default {
         deleteToken: async function(token_id) {
             try {
                 await window.std(`/api/token/${token_id}`, {
-                    method: 'DELETE',
-                    credentials: 'same-origin'
+                    method: 'DELETE'
                 });
 
                 this.getTokens();

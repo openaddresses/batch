@@ -22,7 +22,7 @@
                 "type": "string"
             },
             "created": {
-                "type": "string"
+                "type": "integer"
             },
             "s3": {
                 "type": "string"

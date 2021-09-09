@@ -1,5 +1,6 @@
 'use strict';
 const Err = require('./error');
+const { sql } = require('slonik');
 
 /**
  * @class Collections
@@ -55,7 +56,7 @@ class Collection {
 
     static async from(pool, id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     id,
                     name,
@@ -65,8 +66,8 @@ class Collection {
                 FROM
                     collections
                 WHERE
-                    id = $1
-            `, [id]);
+                    id = ${id}
+            `);
 
             if (pgres.rows.length === 0) throw new Err(404, null, 'collection not found');
 
@@ -92,21 +93,16 @@ class Collection {
         if (this.id === false) throw new Err(400, null, 'Collection.id must be populated');
 
         try {
-            await pool.query(`
+            await pool.query(sql`
                 UPDATE collections
                     SET
-                        name = COALESCE($1, name),
-                        sources = COALESCE($2::JSONB, sources),
+                        name = COALESCE(${this.name || null}, name),
+                        sources = COALESCE(${this.sources ? JSON.stringify(this.sources) : null}::JSONB, sources),
                         created = NOW(),
-                        size = COALESCE($3, size)
+                        size = COALESCE(${this.size || null}, size)
                     WHERE
-                        id = $4
-            `, [
-                this.name,
-                JSON.stringify(this.sources),
-                this.size,
-                this.id
-            ]);
+                        id = ${this.id}
+            `);
 
             return this;
         } catch (err) {
@@ -117,23 +113,19 @@ class Collection {
 
     async generate(pool) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO collections (
                     name,
                     sources,
                     created,
                     size
                 ) VALUES (
-                    $1,
-                    $2::JSONB,
+                    ${this.name},
+                    ${JSON.stringify(this.sources)}::JSONB,
                     NOW(),
-                    $3
+                    ${this.size || 0}
                 ) RETURNING *
-            `, [
-                this.name,
-                JSON.stringify(this.sources),
-                this.size || 0
-            ]);
+            `);
 
             pgres.rows[0].id = parseInt(pgres.rows[0].id);
             pgres.rows[0].size = parseInt(pgres.rows[0].size);
@@ -146,7 +138,7 @@ class Collection {
 
             return this;
         } catch (err) {
-            if (err.code && err.code === '23505') {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'duplicate collections not allowed');
             }
 
@@ -157,7 +149,7 @@ class Collection {
     static async list(pool) {
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     id,
                     name,
@@ -185,12 +177,12 @@ class Collection {
 
     static async delete(pool, id) {
         try {
-            await pool.query(`
+            await pool.query(sql`
                 DELETE FROM
                     collections
                 WHERE
-                    id = $1
-            `, [id]);
+                    id = ${id}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to delete collection');
         }

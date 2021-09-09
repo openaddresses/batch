@@ -1,4 +1,4 @@
 {
-    "type": "string",
+    "type": ["null", "string"],
     "description": "The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire"
 }

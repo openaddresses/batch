@@ -45,7 +45,7 @@
                         <span class='ml12' v-text='c.name'/>
                     </div>
                     <div class='col col--2'>
-                        <span v-text='c.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                        <span v-text='fmt(c.created)'/>
                     </div>
                     <div class='col col--5'>
                         <span class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
@@ -164,7 +164,7 @@
 
                             </div>
                             <div @click='emitjob(job.job)' class='col col--2'>
-                                <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                                <span v-text='fmt(job.updated)'/>
                             </div>
                             <div class='col col--5'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
@@ -201,12 +201,14 @@
 
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
+import moment from 'moment-timezone';
 
 export default {
     name: 'Data',
     props: ['auth'],
     data: function() {
         return {
+            tz: moment.tz.guess(),
             loading: {
                 sources: false,
                 collections: false
@@ -260,6 +262,9 @@ export default {
         }
     },
     methods: {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+        },
         size: function(bytes) {
             if (bytes == 0) { return "0.00 B"; }
             var e = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -282,11 +287,11 @@ export default {
                 return this.$emit('perk');
             }
 
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         collectionpls: function(c) {
             if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/collections/${c.id}/data`);
+            this.external(`${window.location.origin}/api/collections/${c.id}/data?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");
@@ -304,12 +309,9 @@ export default {
             try {
                 await window.std(`/api/data/${job.id}`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         fabric: job.fabric
-                    })
+                    }
                 });
             } catch (err) {
                 this.$emit('err', err);

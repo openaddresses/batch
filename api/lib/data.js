@@ -3,6 +3,7 @@
 const Err = require('./error');
 const Map = require('./map');
 const moment = require('moment');
+const { sql } = require('slonik');
 
 /**
  * @class Data
@@ -28,8 +29,13 @@ class Data {
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.name) query.name = '';
 
+        if (!query.before) query.before = null;
+        if (!query.after) query.after = null;
+
         if (query.before) query.before = moment(query.before).format('YYYY-MM-DD');
         if (query.after) query.after = moment(query.after).format('YYYY-MM-DD');
+
+        if (!query.fabric) query.fabric = null;
 
         if (!query.point) {
             query.point = '';
@@ -48,7 +54,7 @@ class Data {
         query.name = query.name + '%';
 
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     results.id,
                     results.fabric,
@@ -66,28 +72,21 @@ class Data {
                                 ON job.map = map.id
                             ON results.job = job.id
                 WHERE
-                    results.source ilike $1
-                    AND results.layer ilike $2
-                    AND results.name ilike $3
-                    AND ($5::TIMESTAMP IS NULL OR updated < $5::TIMESTAMP)
-                    AND ($6::TIMESTAMP IS NULL OR updated > $6::TIMESTAMP)
+                    results.source ilike ${query.source}
+                    AND results.layer ilike ${query.layer}
+                    AND results.name ilike ${query.name}
+                    AND (${query.before}::TIMESTAMP IS NULL OR updated < ${query.before}::TIMESTAMP)
+                    AND (${query.after}::TIMESTAMP IS NULL OR updated > ${query.after}::TIMESTAMP)
                     AND (
-                        char_length($4) = 0
-                        OR ST_DWithin(ST_SetSRID(ST_PointFromText($4), 4326), map.geom, 1.0)
+                        char_length(${query.point}) = 0
+                        OR ST_DWithin(ST_SetSRID(ST_PointFromText(${query.point}), 4326), map.geom, 1.0)
                     )
-                    ${query.fabric !== undefined ? 'AND results.fabric = ' + !!query.fabric : ''}
+                    AND (${query.fabric}::BOOLEAN IS NULL OR results.fabric = ${!!query.fabric})
                 ORDER BY
                     results.source,
                     results.layer,
                     results.name
-            `, [
-                query.source,
-                query.layer,
-                query.name,
-                query.point,
-                query.before,
-                query.after
-            ]);
+            `);
 
             return pgres.rows.map((res) => {
                 res.id = parseInt(res.id);
@@ -111,7 +110,7 @@ class Data {
      */
     static async history(pool, data_id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     job.id,
                     job.created,
@@ -130,13 +129,11 @@ class Data {
                             ON job.run = runs.id
                 WHERE
                     runs.live = true
-                    AND results.id = $1
+                    AND results.id = ${data_id}
                     AND job.status = 'Success'
                 ORDER BY
                     created DESC
-            `, [
-                data_id
-            ]);
+            `);
 
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'No data by that id');
@@ -160,12 +157,12 @@ class Data {
     static async commit(pool, data) {
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 UPDATE results
                     SET
-                        fabric = COALESCE($2, fabric, False)
+                        fabric = COALESCE(${data.fabric}, fabric, False)
                     WHERE
-                        id = $1
+                        id = ${data.id}
                     RETURNING
                         *
             `, [
@@ -187,7 +184,7 @@ class Data {
 
     static async from(pool, data_id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     results.id,
                     results.source,
@@ -203,10 +200,8 @@ class Data {
                     job
                 WHERE
                     results.job = job.id
-                    AND results.id = $1
-            `, [
-                data_id
-            ]);
+                    AND results.id = ${data_id}
+            `);
 
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'No data by that id');
@@ -246,7 +241,7 @@ class Data {
             throw new Err(500, null, 'More than 1 source matches job');
         } else if (data.length === 0) {
             try {
-                await pool.query(`
+                await pool.query(sql`
                     INSERT INTO results (
                         source,
                         layer,
@@ -255,20 +250,14 @@ class Data {
                         updated,
                         fabric
                     ) VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        $4,
+                        ${job.source_name},
+                        ${job.layer},
+                        ${job.name},
+                        ${job.id},
                         NOW(),
-                        $5
+                        ${!!fabric}
                     )
-                `, [
-                    job.source_name,
-                    job.layer,
-                    job.name,
-                    job.id,
-                    !!fabric
-                ]);
+                `);
 
                 return true;
             } catch (err) {
@@ -276,23 +265,17 @@ class Data {
             }
         } else {
             try {
-                await pool.query(`
+                await pool.query(sql`
                     UPDATE results
                         SET
-                            job = $4,
+                            job = ${job.id},
                             updated = NOW(),
-                            fabric = COALESCE($5, fabric, False)
+                            fabric = COALESCE(${fabric || null}, fabric, False)
                         WHERE
-                            source = $1
-                            AND layer = $2
-                            AND name = $3
-                `, [
-                    job.source_name,
-                    job.layer,
-                    job.name,
-                    job.id,
-                    fabric
-                ]);
+                            source = ${job.source_name}
+                            AND layer = ${job.layer}
+                            AND name = ${job.name}
+                `);
 
                 return true;
             } catch (err) {

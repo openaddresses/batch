@@ -1,10 +1,15 @@
 {
-    "DELETE /cache": {
+    "POST /upload": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "DELETE /cache/:cache_key": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /cache/:cache_key": {
+    "DELETE /cache": {
         "body": false,
         "query": false,
         "res": true
@@ -13,11 +18,6 @@
         "body": false,
         "query": true,
         "res": true
-    },
-    "POST /upload": {
-        "body": false,
-        "query": false,
-        "res": false
     },
     "GET /user": {
         "body": false,
@@ -51,11 +51,6 @@
     },
     "POST /login": {
         "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /login": {
-        "body": false,
         "query": false,
         "res": true
     },

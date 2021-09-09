@@ -96,11 +96,8 @@ export default {
     methods: {
         logout: async function() {
             try {
-                await window.std('/api/login', {
-                    method: 'DELETE'
-                });
-
                 this.auth = false;
+                delete localStorage.token;
                 this.$router.push('/data');
             } catch (err) {
                 this.err = err;
@@ -110,7 +107,7 @@ export default {
             try {
                 this.auth = await window.std('/api/login');
             } catch (err) {
-                this.err = err;
+                delete localStorage.token;
             }
         },
         getCount: async function() {

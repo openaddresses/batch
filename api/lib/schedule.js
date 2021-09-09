@@ -4,6 +4,7 @@ const Err = require('./error');
 const JobError = require('./joberror');
 const batch = require('./batch');
 const Level = require('./level');
+const { sql } = require('slonik');
 
 /**
  * @class Schedule
@@ -66,7 +67,7 @@ class Schedule {
     static async close(pool) {
         // TODO Close old run/jobs
 
-        await pool.query(`
+        await pool.query(sql`
             DELETE FROM
                 users_reset
             WHERE

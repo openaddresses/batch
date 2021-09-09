@@ -2,11 +2,11 @@
 
 const Run = require('../lib/run');
 const test = require('tape');
-const Flight = require('./init');
-const { Pool } = require('pg');
+const Flight = require('./flight');
 
 const flight = new Flight();
 flight.init(test);
+flight.takeoff(test);
 
 test('Run()', (t) => {
     const run = new Run();
@@ -20,12 +20,8 @@ test('Run()', (t) => {
 });
 
 test('Run#generate', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const run = await Run.generate(pool, {
+        const run = await Run.generate(flight.config.pool, {
             live: true,
             github: {}
         });
@@ -39,7 +35,7 @@ test('Run#generate', async (t) => {
     }
 
     try {
-        const run = await Run.generate(pool, {
+        const run = await Run.generate(flight.config.pool, {
             live: false,
             github: {}
         });
@@ -52,17 +48,12 @@ test('Run#generate', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Run#populate', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const pop = await Run.populate(pool, 1, [{
+        const pop = await Run.populate(flight.config.pool, 1, [{
             source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'addresses',
             name: 'city'
@@ -77,7 +68,7 @@ test('Run#populate', async (t) => {
     }
 
     try {
-        const pop = await Run.populate(pool, 2, [{
+        const pop = await Run.populate(flight.config.pool, 2, [{
             source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'addresses',
             name: 'city'
@@ -93,7 +84,7 @@ test('Run#populate', async (t) => {
 
     let e;
     try {
-        await Run.populate(pool, 2, [{
+        await Run.populate(flight.config.pool, 2, [{
             source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'addresses',
             name: 'city'
@@ -103,17 +94,12 @@ test('Run#populate', async (t) => {
     }
     t.equals(e.safe, 'Run is already closed');
 
-    pool.end();
     t.end();
 });
 
 test('Run#list', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const runs = await Run.list(pool);
+        const runs = await Run.list(flight.config.pool);
 
         t.equals(runs.length, 2, 'Runs.length: 2');
 
@@ -133,7 +119,7 @@ test('Run#list', async (t) => {
     }
 
     try {
-        const runs = await Run.list(pool, {
+        const runs = await Run.list(flight.config.pool, {
             limit: 1
         });
 
@@ -148,7 +134,7 @@ test('Run#list', async (t) => {
     }
 
     try {
-        const runs = await Run.list(pool, {
+        const runs = await Run.list(flight.config.pool, {
             run: 1
         });
 
@@ -163,7 +149,7 @@ test('Run#list', async (t) => {
     }
 
     try {
-        const runs = await Run.list(pool, {
+        const runs = await Run.list(flight.config.pool, {
             run: 1,
             limit: 1
         });
@@ -178,17 +164,12 @@ test('Run#list', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Run#jobs', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const jobs = await Run.jobs(pool, 1);
+        const jobs = await Run.jobs(flight.config.pool, 1);
 
         t.equals(jobs.length, 1, 'jobs.length: 1');
         t.ok(jobs[0].created, 'jobs[0].created: <date>');
@@ -197,6 +178,7 @@ test('Run#jobs', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
+
+flight.landing(test);

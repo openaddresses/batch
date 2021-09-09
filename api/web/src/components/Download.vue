@@ -25,7 +25,7 @@ export default {
                 return this.createExport(jobid, fmt);
             }
 
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");
@@ -35,13 +35,10 @@ export default {
                 this.loading = true;
                 const res = await window.std('/api/export', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         job_id: jobid,
                         format: fmt
-                    })
+                    }
                 });
 
                 this.$router.push({ path: `/export/${res.id}` });

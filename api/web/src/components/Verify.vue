@@ -34,10 +34,7 @@ export default {
     methods: {
         verify: async function() {
             try {
-                await window.std(`/api/login/verify?token=${this.$route.query.token}`, {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
+                await window.std(`/api/login/verify?token=${this.$route.query.token}`);
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);

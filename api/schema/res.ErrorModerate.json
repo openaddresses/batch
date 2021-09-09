@@ -1,10 +1,14 @@
 {
     "type": "object",
     "required": [
+        "job",
         "moderate"
     ],
     "additionalProperties": false,
     "properties": {
+        "job": {
+            "type": "integer"
+        },
         "moderate": {
             "type": "string",
             "enum": [

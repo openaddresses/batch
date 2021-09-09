@@ -9,6 +9,7 @@ const Data = require('./data');
 const S3 = require('./s3');
 const pkg  = require('../package.json');
 const { Status } = require('./util');
+const { sql  } = require('slonik');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const batchjob = require('./batch').trigger;
@@ -223,37 +224,19 @@ class Job {
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.status) query.status = Status.list();
 
-        const where = [];
+        if (!query.after) query.after = null;
+        if (!query.before) query.before = null;
+        if (!query.live) query.live = null;
+        if (!query.run) query.run = null;
 
         Status.verify(query.status);
-
-        if (!query.run) {
-            query.run = false;
-        } else {
-            query.run = parseInt(query.run);
-
-            if (isNaN(query.run)) {
-                throw new Err(400, null, 'run param must be integer');
-            }
-
-            where.push(`job.run = ${query.run}`);
-        }
-
-        if (query.live !== undefined && !['true', 'false'].includes(query.live)) {
-            throw new Err(400, null, 'live param must be true or false');
-        } else if (query.live === 'true') {
-            where.push('runs.live = true');
-        } else if (query.live === 'false') {
-            where.push('runs.live = false');
-        }
 
         query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
 
         if (query.after) {
             try {
-                const after = moment(query.after);
-                where.push(`job.created > '${after.toDate().toISOString()}'::TIMESTAMP`);
+                query.after = moment(query.after);
             } catch (err) {
                 throw new Err(400, null, 'after param is not recognized as a valid date');
             }
@@ -261,8 +244,7 @@ class Job {
 
         if (query.before) {
             try {
-                const before = moment(query.before);
-                where.push(`job.created < '${before.toDate().toISOString()}'::TIMESTAMP`);
+                query.before = moment(query.before);
             } catch (err) {
                 throw new Err(400, null, 'before param is not recognized as a valid date');
             }
@@ -270,7 +252,7 @@ class Job {
 
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     job.id,
                     job.run,
@@ -288,18 +270,19 @@ class Job {
                     job INNER JOIN runs
                         ON job.run = runs.id
                 WHERE
-                    '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
-                    ${where.length ? 'AND ' + where.join(' AND ') : ''}
-                    AND job.layer ilike $2
-                    AND job.source ilike $3
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    AND job.layer ilike ${query.layer}
+                    AND job.source ilike ${query.source}
+                    AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
+                    AND (${query.after}::TIMESTAMP IS NULL OR job.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NULL OR job.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
+                    AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 ORDER BY
                     job.created DESC
-                LIMIT $1
-            `, [
-                query.limit,
-                query.layer,
-                query.source
-            ]);
+                LIMIT
+                    ${query.limit}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to load jobs');
         }
@@ -309,11 +292,6 @@ class Job {
         }
 
         return pgres.rows.map((job) => {
-            job.id = parseInt(job.id);
-            job.run = parseInt(job.run);
-            job.map = job.map ? parseInt(job.map) : null;
-            job.size = parseInt(job.size);
-
             if (job.output && job.output.output) {
                 job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
             }
@@ -322,9 +300,10 @@ class Job {
         });
     }
 
-    static from(pool, id) {
-        return new Promise((resolve, reject) => {
-            pool.query(`
+    static async from(pool, id) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
                 SELECT
                     id,
                     run,
@@ -345,38 +324,34 @@ class Job {
                 FROM
                     job
                 WHERE
-                    id = $1
-            `, [id], (err, pgres) => {
-                if (err) return reject(new Err(500, err, 'failed to load job'));
+                    id = ${id}
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'failed to load job');
+        }
 
-                if (!pgres.rows.length) {
-                    return reject(new Err(404, null, 'no job by that id'));
-                }
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'no job by that id');
+        }
 
-                pgres.rows[0].id = parseInt(pgres.rows[0].id);
-                pgres.rows[0].run = parseInt(pgres.rows[0].run);
-                pgres.rows[0].map = pgres.rows[0].map ? parseInt(pgres.rows[0].map) : null;
-                pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count);
-                pgres.rows[0].size = parseInt(pgres.rows[0].size);
+        pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count);
 
-                const job = new Job(
-                    pgres.rows[0].run,
-                    pgres.rows[0].source,
-                    pgres.rows[0].layer,
-                    pgres.rows[0].name
-                );
+        const job = new Job(
+            pgres.rows[0].run,
+            pgres.rows[0].source,
+            pgres.rows[0].layer,
+            pgres.rows[0].name
+        );
 
-                for (const key of Object.keys(pgres.rows[0])) {
-                    job[key] = pgres.rows[0][key];
-                }
+        for (const key of Object.keys(pgres.rows[0])) {
+            job[key] = pgres.rows[0][key];
+        }
 
-                if (job.output && job.output.output) {
-                    job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
-                }
+        if (job.output && job.output.output) {
+            job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
+        }
 
-                return resolve(job);
-            });
-        });
+        return job;
     }
 
     patch(patch) {
@@ -429,32 +404,21 @@ class Job {
         if (this.id === false) throw new Err(500, null, 'Job.id must be populated');
 
         try {
-            await pool.query(`
+            await pool.query(sql`
                 UPDATE job
                     SET
-                        output = $1,
-                        loglink = $2,
-                        status = $3,
-                        version = $4,
-                        count = $5,
-                        stats = $6,
-                        bounds = ST_SetSRID(ST_GeomFromGeoJSON($7), 4326),
-                        map = $8,
-                        size = $9
+                        output = ${this.output ? JSON.stringify(this.output) : null}::JSON,
+                        loglink = ${this.loglink},
+                        status = ${this.status},
+                        version = ${this.version},
+                        count = ${this.count},
+                        stats = ${this.stats ? JSON.stringify(this.stats) : null}::JSON,
+                        bounds = ST_GeomFromGeoJSON(${this.bounds ? JSON.stringify(this.bounds) : null}::JSON),
+                        map = ${this.map},
+                        size = ${this.size}
                     WHERE
-                        id = $10
-            `, [
-                this.output,
-                this.loglink,
-                this.status,
-                this.version,
-                this.count,
-                this.stats,
-                this.bounds,
-                this.map,
-                this.size,
-                this.id
-            ]);
+                        id = ${this.id}
+            `);
 
             return this;
         } catch (err) {
@@ -492,7 +456,7 @@ class Job {
         if (!this.name) throw new Err(400, null, 'Cannot generate a job without a name');
 
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO job (
                     run,
                     created,
@@ -507,34 +471,21 @@ class Job {
                     size,
                     license
                 ) VALUES (
-                    $1,
+                    ${this.run},
                     NOW(),
                     '{}'::JSONB,
-                    $2,
-                    $3,
-                    $4,
-                    $5,
+                    ${this.source_name},
+                    ${this.source},
+                    ${this.layer},
+                    ${this.name},
                     'Pending',
-                    $6,
-                    $7,
-                    $8,
-                    $9
+                    ${this.version},
+                    ${JSON.stringify(this.output)}::JSONB,
+                    ${this.size},
+                    ${this.license}
                 ) RETURNING *
-            `, [
-                this.run,
-                this.source_name,
-                this.source,
-                this.layer,
-                this.name,
-                this.version,
-                this.output,
-                this.size,
-                this.license
-            ]);
+            `);
 
-            pgres.rows[0].id = parseInt(pgres.rows[0].id);
-            pgres.rows[0].run = parseInt(pgres.rows[0].run);
-            pgres.rows[0].size = parseInt(pgres.rows[0].size);
             for (const key of Object.keys(pgres.rows[0])) {
                 this[key] = pgres.rows[0][key];
             }

@@ -77,15 +77,11 @@ export default {
 
                 await fetch('/api/user', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
+                    body: {
                         username: this.username,
                         email: this.email,
                         password: this.password
-                    })
+                    }
                 });
 
                 this.loading = false;

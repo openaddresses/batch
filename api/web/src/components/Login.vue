@@ -53,19 +53,17 @@ export default {
                 if (!this.password.length) return;
                 this.loading = true;
 
-                await window.std('/api/login', {
+                const body = await window.std('/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
+                    body: {
                         username: this.username,
                         password: this.password
-                    })
+                    }
                 });
 
                 this.loading = false;
+
+                localStorage.token = body.token;
 
                 this.$emit('auth');
                 this.$router.push('/data')

@@ -1,8 +1,13 @@
 'use strict';
 
 const Err = require('../lib/error');
+const Job = require('../lib/job');
+const Exporter = require('../lib/exporter');
+const { Param } = require('../lib/util');
 
 async function router(schema, config) {
+    const user = new (require('../lib/user'))(config.pool);
+
     /**
      * @api {post} /api/export Create Export
      * @apiVersion 1.0.0
@@ -23,16 +28,16 @@ async function router(schema, config) {
         try {
             await user.is_level(req, 'backer');
 
-            if (req.auth.access !== 'admin' && await Exporter.count(pool, req.auth.uid) >= config.limits.exports) {
+            if (req.auth.access !== 'admin' && await Exporter.count(config.pool, req.auth.uid) >= config.limits.exports) {
                 throw new Err(400, null, 'Reached Monthly Export Limit');
             }
 
-            const job = await Job.from(pool, req.body.job_id);
+            const job = await Job.from(config.pool, req.body.job_id);
             if (job.status !== 'Success') throw new Err(400, null, 'Cannot export a job that was not successful');
 
             req.body.uid = req.auth.uid;
 
-            const exp = await Exporter.generate(pool, req.body);
+            const exp = await Exporter.generate(config.pool, req.body);
             await exp.batch();
             return res.json(exp.json());
         } catch (err) {
@@ -62,7 +67,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'exportid');
 
-            const exp = await Exporter.from(pool, req.params.exportid);
+            const exp = await Exporter.from(config.pool, req.params.exportid);
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(403, null, 'You didn\'t create that export');
 
             return res.json(await exp.log());
@@ -93,7 +98,7 @@ async function router(schema, config) {
                 req.query.uid = req.auth.uid;
             }
 
-            res.json(await Exporter.list(pool, req.query));
+            res.json(await Exporter.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -117,7 +122,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'exportid');
 
-            const exp = (await Exporter.from(pool, req.params.exportid)).json();
+            const exp = (await Exporter.from(config.pool, req.params.exportid)).json();
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
             res.json(exp);
@@ -144,7 +149,7 @@ async function router(schema, config) {
                 await Param.int(req, 'exportid');
                 await user.is_auth(req, true);
 
-                await Exporter.data(pool, req.auth, req.params.exportid, res);
+                await Exporter.data(config.pool, req.auth, req.params.exportid, res);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -171,9 +176,9 @@ async function router(schema, config) {
             await Param.int(req, 'exportid');
             await user.is_admin(req);
 
-            const exp = await Exporter.from(pool, req.params.exportid);
+            const exp = await Exporter.from(config.pool, req.params.exportid);
             exp.patch(req.body);
-            await exp.commit(pool);
+            await exp.commit(config.pool);
 
             return res.json(exp.json());
         } catch (err) {

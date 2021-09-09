@@ -31,7 +31,6 @@ const Data = require('./lib/data');
 const Upload = require('./lib/upload');
 const Schedule = require('./lib/schedule');
 const Collection = require('./lib/collections');
-const Exporter = require('./lib/exporter');
 
 const Param = util.Param;
 

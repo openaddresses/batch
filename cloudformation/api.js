@@ -25,7 +25,7 @@ const stack = {
         APILogs: {
             Type: 'AWS::Logs::LogGroup',
             Properties: {
-                LogGroupName: cf.join('-', ['awslogs', cf.stackName]),
+                LogGroupName: cf.stackName,
                 RetentionInDays: 7
             }
         },
@@ -233,9 +233,9 @@ const stack = {
                     LogConfiguration: {
                         LogDriver: 'awslogs',
                         Options: {
-                            'awslogs-group': cf.join('-', ['awslogs', cf.stackName]),
+                            'awslogs-group': cf.stackName,
                             'awslogs-region': cf.region,
-                            'awslogs-stream-prefix': cf.join('-', ['awslogs', cf.stackName]),
+                            'awslogs-stream-prefix': cf.stackName,
                             'awslogs-create-group': true
                         }
                     },

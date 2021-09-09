@@ -43,6 +43,7 @@ module.exports = cf.merge(
     alarms({
         prefix: 'Batch',
         email: 'nick@ingalls.ca',
+        apache: cf.stackName,
         cluster: cf.ref('APIECSCluster'),
         service: cf.getAtt('APIService', 'Name'),
         loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName'),

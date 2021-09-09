@@ -13,7 +13,7 @@
     "dependencies": {
         "@mapbox/cloudfriend": "^5.0.1",
         "aws-sdk": "^2.901.0",
-        "batch-alarms": "^1.1.0",
+        "batch-alarms": "2.0.0",
         "minimist": "^1.2.2",
         "prompts": "^2.4.0",
         "request": "^2.88.2"

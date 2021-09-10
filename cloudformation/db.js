@@ -23,7 +23,7 @@ const stack = {
             Properties: {
                 Engine: 'postgres',
                 DBName: 'openaddresses',
-                EngineVersion: '12.3',
+                EngineVersion: '13.3',
                 MasterUsername: 'openaddresses',
                 MasterUserPassword: cf.ref('DatabasePassword'),
                 AllocatedStorage: 10,

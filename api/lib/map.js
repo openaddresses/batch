@@ -92,7 +92,7 @@ class Map {
                         FROM
                             map
                         WHERE
-                            (${code}::TEXT IS NOT NULL OR code ~ ${code})
+                            (${code}::TEXT IS NULL OR code ~ ${code})
                             AND ST_Intersects(
                                 map.geom,
                                 ST_Transform(ST_SetSRID(ST_MakeBox2D(

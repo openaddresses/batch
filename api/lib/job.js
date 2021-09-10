@@ -238,7 +238,7 @@ class Job {
             try {
                 query.after = moment(query.after);
             } catch (err) {
-                throw new Err(400, null, 'after param is not recognized as a valid date');
+                throw new Err(400, err, 'after param is not recognized as a valid date');
             }
         }
 
@@ -246,7 +246,7 @@ class Job {
             try {
                 query.before = moment(query.before);
             } catch (err) {
-                throw new Err(400, null, 'before param is not recognized as a valid date');
+                throw new Err(400, err, 'before param is not recognized as a valid date');
             }
         }
 
@@ -274,8 +274,8 @@ class Job {
                     AND job.layer ilike ${query.layer}
                     AND job.source ilike ${query.source}
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
-                    AND (${query.after}::TIMESTAMP IS NULL OR job.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
-                    AND (${query.before}::TIMESTAMP IS NULL OR job.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP IS NULL OR job.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP IS NULL OR job.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 ORDER BY

@@ -3,6 +3,7 @@
 const test = require('tape');
 const Flight = require('./flight');
 const { sql } = require('slonik');
+const moment = require('moment');
 
 const flight = new Flight();
 flight.init(test);
@@ -161,6 +162,267 @@ test('GET: api/login', async (t) => {
             flags: {}
         }, 'user');
 
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+flight.user(test, 'admin', true);
+flight.user(test, 'basic');
+flight.user(test, 'backer', false, {
+    level: 'backer'
+});
+flight.user(test, 'sponsor', false, {
+    level: 'sponsor'
+});
+
+test('GET: api/user', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user',
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 5,
+            users: [{
+                id: 5,
+                level: 'sponsor',
+                username: 'sponsor',
+                email: 'sponsor@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }, {
+                id: 4,
+                level: 'backer',
+                username: 'backer',
+                email: 'backer@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }, {
+                id: 3,
+                level: 'basic',
+                username: 'basic',
+                email: 'basic@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }, {
+                id: 2,
+                level: 'basic',
+                username: 'admin',
+                email: 'admin@openaddresses.io',
+                access: 'admin',
+                flags: {}
+            }, {
+                id: 1,
+                level: 'basic',
+                username: 'ingalls',
+                email: 'ingalls@example.com',
+                access: 'user',
+                flags: {}
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?level=backer', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user?level=backer',
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 1,
+            users: [{
+                id: 4,
+                level: 'backer',
+                username: 'backer',
+                email: 'backer@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?level=sponsor', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user?level=sponsor',
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 1,
+            users: [{
+                id: 5,
+                level: 'sponsor',
+                username: 'sponsor',
+                email: 'sponsor@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?filter=ADMIN', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user?filter=ADMIN',
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 1,
+            users: [{
+                id: 2,
+                level: 'basic',
+                username: 'admin',
+                email: 'admin@openaddresses.io',
+                access: 'admin',
+                flags: {}
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?access=admin', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/user?access=admin',
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 1,
+            users: [{
+                id: 2,
+                level: 'basic',
+                username: 'admin',
+                email: 'admin@openaddresses.io',
+                access: 'admin',
+                flags: {}
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?before=<NOW>', async (t) => {
+    try {
+        const res = await flight.request({
+            url: `http://localhost:4999/api/user?before=${encodeURIComponent(moment().toDate().toISOString())}`,
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 5,
+            users: [{
+                id: 5,
+                level: 'sponsor',
+                username: 'sponsor',
+                email: 'sponsor@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }, {
+                id: 4,
+                level: 'backer',
+                username: 'backer',
+                email: 'backer@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }, {
+                id: 3,
+                level: 'basic',
+                username: 'basic',
+                email: 'basic@openaddresses.io',
+                access: 'user',
+                flags: {}
+            }, {
+                id: 2,
+                level: 'basic',
+                username: 'admin',
+                email: 'admin@openaddresses.io',
+                access: 'admin',
+                flags: {}
+            }, {
+                id: 1,
+                level: 'basic',
+                username: 'ingalls',
+                email: 'ingalls@example.com',
+                access: 'user',
+                flags: {}
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?after=<NOW>', async (t) => {
+    try {
+        const res = await flight.request({
+            url: `http://localhost:4999/api/user?after=${encodeURIComponent(moment().toDate().toISOString())}`,
+            auth: {
+                bearer: flight.token.admin
+            },
+            method: 'GET',
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 0,
+            users: []
+        });
     } catch (err) {
         t.error(err, 'no error');
     }

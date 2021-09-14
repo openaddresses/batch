@@ -2,7 +2,7 @@
 
 const Err = require('../lib/error');
 const Job = require('../lib/job');
-const LevelOverride = require('../lib/level_override');
+const LevelOverride = require('../lib/level-override');
 const { Param } = require('../lib/util');
 
 async function router(schema, config) {

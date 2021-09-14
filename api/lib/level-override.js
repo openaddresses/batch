@@ -13,7 +13,7 @@ class LevelOverride extends Generic {
     constructor() {
         super();
 
-        this._table = Project._table;
+        this._table = LevelOverride._table;
 
         // Attributes which are allowed to be patched
         this.attrs = Object.keys(require('../schema/req.body.PatchLevelOverride.json').properties);

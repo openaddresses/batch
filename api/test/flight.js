@@ -67,6 +67,8 @@ class Flight {
 
         if (!t) return await prequest(req);
 
+        if (!req.method) req.method = 'GET';
+
         let match = false;
         const spath = `${req.method.toUpperCase()} ${req.url.pathname}/`;
 

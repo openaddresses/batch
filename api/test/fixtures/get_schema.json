@@ -1,18 +1,78 @@
 {
-    "POST /upload": {
+    "DELETE /cache": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /cache/:cache_key": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /cache": {
+    "POST /export": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /export/:exportid/log": {
         "body": false,
         "query": false,
         "res": true
+    },
+    "GET /export": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /export/:exportid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /export/:exportid/output/export.zip": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "PATCH /export/:exportid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /github/event": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /level": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /level/:levelid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /level/:levelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /level/:levelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /opencollective/event": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /upload": {
+        "body": false,
+        "query": false,
+        "res": false
     },
     "GET /schema": {
         "body": false,
@@ -273,45 +333,5 @@
         "body": false,
         "query": false,
         "res": true
-    },
-    "POST /export": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /export/:exportid/log": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /export": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "GET /export/:exportid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /export/:exportid/output/export.zip": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "PATCH /export/:exportid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /github/event": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /opencollective/event": {
-        "body": false,
-        "query": false,
-        "res": false
     }
 }

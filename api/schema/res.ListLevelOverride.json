@@ -1,0 +1,46 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "level_overrides"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer"
+        },
+        "level_override": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "created",
+                    "updated",
+                    "pattern",
+                    "level"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Unique ID"
+                    },
+                    "created": {
+                        "$ref": "./util/created.json"
+                    },
+                    "updated": {
+                        "$ref": "./util/updated.json"
+                    },
+                    "pattern": {
+                        "type": "string",
+                        "description": "RegExp pattern to match account emails"
+                    },
+                    "level": {
+                        "$ref": "./util/level.json"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -936,7 +936,7 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/api/export",
+    "url": "/api/level",
     "title": "Create Override",
     "version": "1.0.0",
     "name": "CreateLevelOverride",
@@ -949,6 +949,60 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new level override</p>",
+    "filename": "./routes/level_override.js",
+    "groupTitle": "LevelOverride"
+  },
+  {
+    "type": "delete",
+    "url": "/api/level/:levelid",
+    "title": "Delete Override",
+    "version": "1.0.0",
+    "name": "DeleteLevelOverride",
+    "group": "LevelOverride",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a level override</p>",
+    "filename": "./routes/level_override.js",
+    "groupTitle": "LevelOverride"
+  },
+  {
+    "type": "get",
+    "url": "/api/level/:levelid",
+    "title": "Get Override",
+    "version": "1.0.0",
+    "name": "GetLevelOverride",
+    "group": "LevelOverride",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get a level override</p>",
+    "filename": "./routes/level_override.js",
+    "groupTitle": "LevelOverride"
+  },
+  {
+    "type": "patch",
+    "url": "/api/level/:levelid",
+    "title": "Patch Override",
+    "version": "1.0.0",
+    "name": "PatchLevelOverride",
+    "group": "LevelOverride",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Patch a level override</p>",
     "filename": "./routes/level_override.js",
     "groupTitle": "LevelOverride"
   },

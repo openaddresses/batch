@@ -9,7 +9,7 @@ async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
 
     /**
-     * @api {post} /api/export Create Override
+     * @api {post} /api/level Create Override
      * @apiVersion 1.0.0
      * @apiName CreateLevelOverride
      * @apiGroup LevelOverride
@@ -31,6 +31,92 @@ async function router(schema, config) {
             const level = await LevelOverride.generate(config.pool, req.body)
 
             return res.json(level.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {patch} /api/level/:levelid Patch Override
+     * @apiVersion 1.0.0
+     * @apiName PatchLevelOverride
+     * @apiGroup LevelOverride
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   Patch a level override
+     *
+     * @apiSchema (Body) {jsonawait schema=../schema/req.body.PatchLevelOverride.json} apiParam
+     * @apiSchema {jsonawait schema=../schema/res.LevelOverride.json} apiSuccess
+     */
+    await schema.patch('/level/:levelid', {
+        body: 'req.body.PatchLevelOverride.json',
+        res: 'res.LevelOverride.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
+
+            const level = await LevelOverride.from(config.pool, req.params.levelid)
+            level.patch(req.body);
+            await level.commit(config.pool);
+
+            return res.json(level.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/level/:levelid Get Override
+     * @apiVersion 1.0.0
+     * @apiName GetLevelOverride
+     * @apiGroup LevelOverride
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   Get a level override
+     *
+     * @apiSchema (Body) {jsonawait schema=../schema/req.body.PatchLevelOverride.json} apiParam
+     * @apiSchema {jsonawait schema=../schema/res.LevelOverride.json} apiSuccess
+     */
+    await schema.get('/level/:levelid', {
+        res: 'res.LevelOverride.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
+
+            const level = await LevelOverride.from(config.pool, req.params.levelid)
+            return res.json(level.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {delete} /api/level/:levelid Delete Override
+     * @apiVersion 1.0.0
+     * @apiName DeleteLevelOverride
+     * @apiGroup LevelOverride
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   Delete a level override
+     *
+     * @apiSchema {jsonawait schema=../schema/res.Standard.json} apiSuccess
+     */
+    await schema.delete('/level/:levelid', {
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
+
+            const level = await LevelOverride.from(config.pool, req.params.levelid)
+            await level.delete(config.pool);
+
+            return res.json({
+                status: 200,
+                message: 'Delete Level Override'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }

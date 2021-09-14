@@ -29,8 +29,7 @@
             "$ref": "./util/format.json"
         },
         "created": {
-            "type": "integer",
-            "description": "The timestamp at which the export was created"
+            "$ref": "./util/created.json"
         },
         "expiry": {
             "type": "integer",

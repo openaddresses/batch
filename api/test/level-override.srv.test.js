@@ -173,7 +173,7 @@ test('DELETE: api/level/2', async (t) => {
         t.deepEquals(res.body, {
             status: 200,
             message: 'Delete Level Override'
-             
+
         });
     } catch (err) {
         t.error(err, 'no error');
@@ -196,6 +196,34 @@ test('GET: api/level/2', async (t) => {
             status: 404,
             message: 'level_override not found',
             messages: []
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/level', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:4999/api/level',
+            json: true,
+            auth: {
+                bearer: flight.token.admin
+            }
+        }, t);
+
+        delete res.body.level_override[0].created;
+        delete res.body.level_override[0].updated;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            level_override: [{
+                id: 1,
+                level: 'sponsor',
+                pattern: '/^hello@openaddresses.io$/'
+            }]
         });
     } catch (err) {
         t.error(err, 'no error');

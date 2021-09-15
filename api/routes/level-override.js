@@ -9,6 +9,32 @@ async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
 
     /**
+     * @api {get} /api/level List Override
+     * @apiVersion 1.0.0
+     * @apiName ListLevelOverride
+     * @apiGroup LevelOverride
+     * @apiPermission user
+     *
+     * @apiDescription
+     *   List level overrides
+     *
+     * @apiSchema (Query) {jsonawait schema=../schema/req.query.ListLevelOverride.json} apiParam
+     * @apiSchema {jsonawait schema=../schema/res.ListLevelOverride.json} apiSuccess
+     */
+    await schema.get('/level', {
+        query: 'req.query.ListLevelOverride.json',
+        res: 'res.ListLevelOverride.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
+
+            return res.json(await LevelOverride.list(config.pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/level Create Override
      * @apiVersion 1.0.0
      * @apiName CreateLevelOverride

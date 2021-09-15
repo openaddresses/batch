@@ -44,6 +44,11 @@
         "query": false,
         "res": false
     },
+    "GET /level": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "POST /level": {
         "body": true,
         "query": false,

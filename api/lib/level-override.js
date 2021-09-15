@@ -60,7 +60,7 @@ class LevelOverride extends Generic {
                     level_override
                 WHERE
                     pattern ~ ${query.filter}
-                    AND (${query.level} IS NULL or ${query.level}::TEXT = level)
+                    AND (${query.level}::TEXT IS NULL or ${query.level}::TEXT = level)
                 ORDER BY
                     ${sql.identifier(['level_override', query.sort])} ${query.order}
                 LIMIT

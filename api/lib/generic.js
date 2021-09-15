@@ -56,6 +56,7 @@ class Generic {
                 const single = {};
 
                 for (const key of Object.keys(row)) {
+                    if (key === 'count') continue;
                     single[key] = row[key];
                 }
 

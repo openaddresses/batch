@@ -23,6 +23,7 @@ const stack = {
             Properties: {
                 Engine: 'postgres',
                 DBName: 'openaddresses',
+                DBInstanceIdentifier: cf.stackName,
                 KmsKeyId: cf.ref('OAKMS'),
                 EngineVersion: '13.3',
                 MasterUsername: 'openaddresses',
@@ -52,25 +53,6 @@ const stack = {
                 }]
             }
         },
-        DBInstance: {
-            Type: 'AWS::RDS::DBInstance',
-            Properties: {
-                Engine: 'postgres',
-                DBName: 'openaddresses',
-                EngineVersion: '13.3',
-                MasterUsername: 'openaddresses',
-                MasterUserPassword: cf.ref('DatabasePassword'),
-                AllowMajorVersionUpgrade: true,
-                AllocatedStorage: 10,
-                MaxAllocatedStorage: 100,
-                BackupRetentionPeriod: 10,
-                StorageType: 'gp2',
-                DBInstanceClass: cf.ref('DatabaseType'),
-                DBSecurityGroups: [cf.ref('DBSecurityGroup')],
-                DBSubnetGroupName: cf.ref('DBSubnet'),
-                PubliclyAccessible: true
-            }
-        },
         DBSubnet: {
             Type: 'AWS::RDS::DBSubnetGroup',
             Properties: {
@@ -85,32 +67,8 @@ const stack = {
                 ]
             }
         },
-        DBSecurityGroup: {
-            Type: 'AWS::RDS::DBSecurityGroup',
-            Properties: {
-                GroupDescription: cf.join('-', [cf.stackName, 'rds-sg']),
-                EC2VpcId: 'vpc-3f2aa15a',
-                DBSecurityGroupIngress: [{
-                    EC2SecurityGroupId: cf.getAtt('APIServiceSecurityGroup', 'GroupId')
-                },{
-                    CIDRIP: '0.0.0.0/0'
-                }]
-            }
-        }
-
     },
     Outputs: {
-        DBVPC: {
-            Description: 'Postgres Connection String',
-            Value: cf.join([
-                'postgresql://openaddresses',
-                ':',
-                cf.ref('DatabasePassword'),
-                '@',
-                cf.getAtt('DBInstanceVPC', 'Endpoint.Address'),
-                ':5432/openaddresses'
-            ])
-        },
         DB: {
             Description: 'Postgres Connection String',
             Value: cf.join([
@@ -118,7 +76,7 @@ const stack = {
                 ':',
                 cf.ref('DatabasePassword'),
                 '@',
-                cf.getAtt('DBInstance', 'Endpoint.Address'),
+                cf.getAtt('DBInstanceVPC', 'Endpoint.Address'),
                 ':5432/openaddresses'
             ])
         }

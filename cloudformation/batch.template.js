@@ -1,10 +1,11 @@
 'use strict';
 
 const cf = require('@mapbox/cloudfriend');
-const api = require('./api');
-const batch = require('./batch');
-const db = require('./db');
-const schedule = require('./schedule');
+const api = require('./lib/api');
+const batch = require('./lib/batch');
+const db = require('./lib/db');
+const schedule = require('./lib/schedule');
+const kms = require('./lib/kms');
 const alarms = require('batch-alarms');
 
 const stack = {
@@ -39,6 +40,7 @@ module.exports = cf.merge(
     stack,
     db,
     api,
+    kms,
     batch,
     alarms({
         prefix: 'Batch',

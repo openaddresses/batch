@@ -23,6 +23,7 @@ const stack = {
             Properties: {
                 Engine: 'postgres',
                 DBName: 'openaddresses',
+                KmsKeyId: cf.ref('OAKMS'),
                 EngineVersion: '13.3',
                 MasterUsername: 'openaddresses',
                 MasterUserPassword: cf.ref('DatabasePassword'),
@@ -30,6 +31,7 @@ const stack = {
                 MaxAllocatedStorage: 100,
                 BackupRetentionPeriod: 10,
                 StorageType: 'gp2',
+                StorageEncrypted: true,
                 DBInstanceClass: cf.ref('DatabaseType'),
                 VPCSecurityGroups: [cf.ref('DBVPCSecurityGroup')],
                 DBSubnetGroupName: cf.ref('DBSubnet'),
@@ -40,7 +42,7 @@ const stack = {
             Type: 'AWS::EC2::SecurityGroup',
             Properties: {
                 GroupDescription: cf.join('-', [cf.stackName, 'rds-sg']),
-                VpcId: cf.ref('BRIVPC'),
+                VpcId: 'vpc-3f2aa15a',
                 SecurityGroupIngress: [{
                     IpProtocol: '-1',
                     SourceSecurityGroupId: cf.getAtt('APIServiceSecurityGroup', 'GroupId')
@@ -58,6 +60,7 @@ const stack = {
                 EngineVersion: '13.3',
                 MasterUsername: 'openaddresses',
                 MasterUserPassword: cf.ref('DatabasePassword'),
+                AllowMajorVersionUpgrade: true,
                 AllocatedStorage: 10,
                 MaxAllocatedStorage: 100,
                 BackupRetentionPeriod: 10,
@@ -97,6 +100,17 @@ const stack = {
 
     },
     Outputs: {
+        DBVPC: {
+            Description: 'Postgres Connection String',
+            Value: cf.join([
+                'postgresql://openaddresses',
+                ':',
+                cf.ref('DatabasePassword'),
+                '@',
+                cf.getAtt('DBInstanceVPC', 'Endpoint.Address'),
+                ':5432/openaddresses'
+            ])
+        },
         DB: {
             Description: 'Postgres Connection String',
             Value: cf.join([

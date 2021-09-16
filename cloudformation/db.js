@@ -18,6 +18,38 @@ const stack = {
         }
     },
     Resources: {
+        DBInstanceVPC: {
+            Type: 'AWS::RDS::DBInstance',
+            Properties: {
+                Engine: 'postgres',
+                DBName: 'openaddresses',
+                EngineVersion: '13.3',
+                MasterUsername: 'openaddresses',
+                MasterUserPassword: cf.ref('DatabasePassword'),
+                AllocatedStorage: 10,
+                MaxAllocatedStorage: 100,
+                BackupRetentionPeriod: 10,
+                StorageType: 'gp2',
+                DBInstanceClass: cf.ref('DatabaseType'),
+                VPCSecurityGroups: [cf.ref('DBVPCSecurityGroup')],
+                DBSubnetGroupName: cf.ref('DBSubnet'),
+                PubliclyAccessible: true
+            }
+        },
+        DBVPCSecurityGroup: {
+            Type: 'AWS::EC2::SecurityGroup',
+            Properties: {
+                GroupDescription: cf.join('-', [cf.stackName, 'rds-sg']),
+                VpcId: cf.ref('BRIVPC'),
+                SecurityGroupIngress: [{
+                    IpProtocol: '-1',
+                    SourceSecurityGroupId: cf.getAtt('APIServiceSecurityGroup', 'GroupId')
+                },{
+                    IpProtocol: '-1',
+                    CidrIp: '0.0.0.0/0'
+                }]
+            }
+        },
         DBInstance: {
             Type: 'AWS::RDS::DBInstance',
             Properties: {

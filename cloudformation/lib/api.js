@@ -223,7 +223,15 @@ const stack = {
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
                         { Name: 'MAILGUN_API_KEY', Value: cf.ref('MailGun') },
                         { Name: 'OPENCOLLECTIVE_API_KEY', Value: cf.ref('OpenCollective') },
-                        { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstanceVPC', 'Endpoint.Address'), ':5432/openaddresses']) },
+                        { Name: 'POSTGRES', Value: cf.join([
+                            'postgresql://',
+                            cf.sub('{{resolve:secretsmanager:${AWS::StackName}/rds/secret:SecretString:username:AWSCURRENT}}'),
+                            ':',
+                            cf.sub('{{resolve:secretsmanager:${AWS::StackName}/rds/secret:SecretString:password:AWSCURRENT}}'),
+                            '@',
+                            cf.getAtt('DBInstanceVPC', 'Endpoint.Address'),
+                            ':5432/openaddresses'
+                        ])},
                         { Name: 'SharedSecret', Value: cf.ref('SharedSecret') },
                         { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
                         { Name: 'Bucket', Value: cf.ref('Bucket') },

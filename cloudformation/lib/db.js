@@ -11,13 +11,31 @@ const stack = {
             AllowedValues: [
                 'db.t3.micro'
             ]
-        },
-        DatabasePassword: {
-            Type: 'String',
-            Description: '[secure] Database Password'
         }
     },
     Resources: {
+        DBMasterSecret: {
+            Type: 'AWS::SecretsManager::Secret',
+            Properties: {
+                Description: cf.join([cf.stackName, ' RDS Master Password']),
+                GenerateSecretString: {
+                    SecretStringTemplate: '{"username": "openaddresses"}',
+                    GenerateStringKey: 'password',
+                    ExcludeCharacters: '\"@/\\',
+                    PasswordLength: 32
+                },
+                Name: cf.join([cf.stackName, '/rds/secret']),
+                KmsKeyId: cf.ref('OAKMS'),
+            }
+        },
+        DBMasterSecretAttachment: {
+            Type: 'AWS::SecretsManager::SecretTargetAttachment',
+            Properties: {
+                SecretId: cf.ref('DBMasterSecret'),
+                TargetId: cf.ref('DBInstanceVPC'),
+                TargetType: 'AWS::RDS::DBInstance'
+            }
+        },
         DBInstanceVPC: {
             Type: 'AWS::RDS::DBInstance',
             Properties: {
@@ -26,8 +44,8 @@ const stack = {
                 DBInstanceIdentifier: cf.stackName,
                 KmsKeyId: cf.ref('OAKMS'),
                 EngineVersion: '13.3',
-                MasterUsername: 'openaddresses',
-                MasterUserPassword: cf.ref('DatabasePassword'),
+                MasterUsername: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/rds/secret:SecretString:username:AWSCURRENT}}'),
+                MasterUserPassword: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/rds/secret:SecretString:password:AWSCURRENT}}'),
                 AllocatedStorage: 10,
                 MaxAllocatedStorage: 100,
                 BackupRetentionPeriod: 10,
@@ -72,9 +90,10 @@ const stack = {
         DB: {
             Description: 'Postgres Connection String',
             Value: cf.join([
-                'postgresql://openaddresses',
+                'postgresql://',
+                cf.sub('{{resolve:secretsmanager:${AWS::StackName}/rds/secret:SecretString:username:AWSCURRENT}}'),
                 ':',
-                cf.ref('DatabasePassword'),
+                cf.sub('{{resolve:secretsmanager:${AWS::StackName}/rds/secret:SecretString:password:AWSCURRENT}}'),
                 '@',
                 cf.getAtt('DBInstanceVPC', 'Endpoint.Address'),
                 ':5432/openaddresses'

@@ -141,7 +141,7 @@
 </template>
 
 <script>
-import Pager from '../util/Pager.vue';
+import Pager from '../../util/Pager.vue';
 
 export default {
     name: 'AdminUser',

@@ -1,4 +1,4 @@
-'use strict';
+
 
 const cf = require('@mapbox/cloudfriend');
 const api = require('./lib/api');

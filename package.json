@@ -11,6 +11,10 @@
         "lint": "eslint cloudformation/**.js"
     },
     "dependencies": {
+        "@babel/eslint-parser": "^7.15.7",
+        "@babel/eslint-plugin": "^7.14.5",
+        "@babel/plugin-syntax-class-properties": "^7.12.13",
+        "@babel/preset-env": "^7.15.6",
         "@mapbox/cloudfriend": "^5.0.1",
         "aws-sdk": "^2.901.0",
         "batch-alarms": "2.0.0",

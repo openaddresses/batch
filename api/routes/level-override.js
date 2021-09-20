@@ -1,7 +1,6 @@
-'use strict';
+
 
 const Err = require('../lib/error');
-const Job = require('../lib/job');
 const LevelOverride = require('../lib/level-override');
 const { Param } = require('../lib/util');
 
@@ -54,7 +53,7 @@ async function router(schema, config) {
         try {
             await user.is_admin(req);
 
-            const level = await LevelOverride.generate(config.pool, req.body)
+            const level = await LevelOverride.generate(config.pool, req.body);
 
             return res.json(level.serialize());
         } catch (err) {
@@ -81,8 +80,9 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_admin(req);
+            Param.int('int', req.params);
 
-            const level = await LevelOverride.from(config.pool, req.params.levelid)
+            const level = await LevelOverride.from(config.pool, req.params.levelid);
             level.patch(req.body);
             await level.commit(config.pool);
 
@@ -110,8 +110,9 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_admin(req);
+            Param.int('int', req.params);
 
-            const level = await LevelOverride.from(config.pool, req.params.levelid)
+            const level = await LevelOverride.from(config.pool, req.params.levelid);
             return res.json(level.serialize());
         } catch (err) {
             return Err.respond(err, res);
@@ -135,8 +136,9 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_admin(req);
+            Param.int('int', req.params);
 
-            const level = await LevelOverride.from(config.pool, req.params.levelid)
+            const level = await LevelOverride.from(config.pool, req.params.levelid);
             await level.delete(config.pool);
 
             return res.json({

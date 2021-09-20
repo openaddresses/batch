@@ -1,4 +1,4 @@
-'use strict';
+
 
 const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ apiVersion: '2016-08-10', region: 'us-east-1' });

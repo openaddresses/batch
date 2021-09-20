@@ -1,4 +1,4 @@
-'use strict';
+
 
 const memjs = require('memjs');
 

@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Job = require('../lib/job');
 const pkg = require('../package.json');

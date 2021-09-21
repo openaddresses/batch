@@ -238,10 +238,7 @@ async function server(args, config, cb) {
                 req.token = await user.user(decoded.u);
                 req.token.type = 'token';
             } catch (err) {
-                return res.status(401).json({
-                    status: 401,
-                    message: err.message
-                });
+                // Login/Verify uses non-jwt token
             }
         } else {
             req.auth = false;

@@ -75,7 +75,7 @@ export default {
                 if (!this.email.length) return;
                 this.loading = true;
 
-                await fetch('/api/user', {
+                await window.std('/api/user', {
                     method: 'POST',
                     body: {
                         username: this.username,

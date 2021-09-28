@@ -80,7 +80,8 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_admin(req);
-            Param.int('levelid', req.params);
+
+            Param.int(req, 'levelid');
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             level.patch(req.body);
@@ -110,7 +111,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_admin(req);
-            Param.int('levelid', req.params);
+            Param.int(req, 'levelid');
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             return res.json(level.serialize());
@@ -136,7 +137,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_admin(req);
-            Param.int('levelid', req.params);
+            Param.int(req, 'levelid');
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             await level.delete(config.pool);

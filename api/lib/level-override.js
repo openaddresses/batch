@@ -9,14 +9,11 @@ const { sql } = require('slonik');
  */
 class LevelOverride extends Generic {
     static _table = 'level_override';
+    static _patch = Object.keys(require('../schema/req.body.PatchLevelOverride.json').properties);
+    static _res = require('../schema/res.LevelOverride.json');
 
     constructor() {
         super();
-
-        this._table = LevelOverride._table;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchLevelOverride.json').properties);
     }
 
     /**

@@ -162,7 +162,7 @@ class Level {
             if (!usr.account.email) return;
 
             for (const override of (await Override.list(this.pool)).level_override) {
-                if (email.match(override.pattern)) {
+                if (usr.account.email.match(override.pattern)) {
                     return await this.user.level(email, override.level);
                 }
             }

@@ -1,4 +1,4 @@
-'use strict';
+
 
 const test = require('tape');
 const Validator = require('../lib/validator');

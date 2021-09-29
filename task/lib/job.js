@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Ajv = require('ajv');
 const wkt = require('wellknown');

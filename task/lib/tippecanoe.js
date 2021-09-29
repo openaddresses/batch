@@ -1,4 +1,4 @@
-'use strict';
+
 
 const CP = require('child_process');
 const stream = require('stream');

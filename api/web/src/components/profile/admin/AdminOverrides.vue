@@ -30,7 +30,7 @@
 
                 <div class='col col--6 px6'>
                     <label>Username/Email Filter</label>
-                    <input v-model='filter.name' class='input' placeholder='john-doe' />
+                    <input v-model='filter.pattern' class='input' placeholder='john-doe' />
                 </div>
                 <div class='col col--3 px6'>
                     <label>Access</label>
@@ -67,16 +67,16 @@
                 </button>
             </div>
 
-            <div class='col col--12 grid'>
+            <div class='col col--12 grid grid--gut12'>
                 <div class='col col--9'>
                     <label>Email RegExp Pattern </label>
-                    <input class='input'/>
+                    <input class='input' v-model='newLevel.pattern'/>
                 </div>
 
                 <div class='col col--3'>
                     <label>Account Level</label>
                     <div class='w-full select-container'>
-                        <select class='select select--stroke'>
+                        <select v-model='newLevel.level' class='select select--stroke'>
                             <option>basic</option>
                             <option>donor</option>
                             <option>sponsor</option>
@@ -87,7 +87,7 @@
 
                 <div class='col col--12 clearfix'>
                     <div class='col col--2 fr'>
-                        <button :disabled='sources === 0' @click='setCollection' class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'>
+                        <button @click='createLevel' class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'>
                             <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
                         </button>
                     </div>
@@ -110,11 +110,11 @@
         </template>
         <template v-else>
             <div :key='level.id' v-for='level in levels' class='col col--12 grid'>
-                <div @click='level._open = !level._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
-                    <div class='col col--9'>
-                        <span class='txt-truncate' v-text='level.pattern'/>
+                <div @click='level._open = !level._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round relative'>
+                    <div class='col col--12'>
+                        <span class='txt-truncate pre' v-text='level.pattern'/>
                     </div>
-                    <div class='col col--3'>
+                    <div class='absolute' style='top: 23px; right: 23px;'>
                         <span class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='level.level'></span>
                     </div>
                 </div>
@@ -162,8 +162,12 @@ export default {
         return {
             loading: false,
             add: false,
+            newLevel: {
+                pattern: '',
+                level: 'basic'
+            },
             filter: {
-                name: '',
+                pattern: '',
                 level: 'all',
                 access: 'all'
             },
@@ -227,6 +231,21 @@ export default {
                     return level;
                 });
                 this.loading = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        createLevel: async function(level) {
+            try {
+                const res = await window.std(`/api/level`, {
+                    method: 'POST',
+                    body: {
+                        pattern: this.newLevel.pattern,
+                        level: this.newLevel.level
+                    }
+                });
+
+                this.levels.push(res);
             } catch (err) {
                 this.$emit('err', err);
             }

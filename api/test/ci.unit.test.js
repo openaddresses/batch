@@ -1,4 +1,4 @@
-'use strict';
+
 
 const CI = require('../lib/ci');
 const test = require('tape');

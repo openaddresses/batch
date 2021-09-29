@@ -28,7 +28,7 @@
                 "type": ["null", "integer"]
             },
             "created": {
-                "type": "integer"
+                "$ref": "./util/created.json"
             },
             "source": {
                 "type": "string"

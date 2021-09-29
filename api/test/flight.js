@@ -1,4 +1,4 @@
-'use strict';
+
 
 process.env.StackName = 'test';
 
@@ -65,7 +65,13 @@ class Flight {
     async request(req, t) {
         req.url = new URL(req.url, this.base);
 
-        if (!t) return await prequest(req);
+        if (t === undefined) {
+            throw new Error('flight.request requires two arguments - pass (<req>, false) to disable schema testing');
+        } else if (!t) {
+            return await prequest(req);
+        }
+
+        if (!req.method) req.method = 'GET';
 
         let match = false;
         const spath = `${req.method.toUpperCase()} ${req.url.pathname}/`;
@@ -91,10 +97,15 @@ class Flight {
         schemaurl.searchParams.append('method', match.split(' ')[0]);
         schemaurl.searchParams.append('url', match.split(' ')[1]);
 
-        const schema = ajv.compile((await prequest({
+        const rawschema = await prequest({
             json: true,
             url: schemaurl
-        })).body.res);
+        });
+
+        if (!rawschema.body.res) throw new Error('Cannot validate resultant schema - no result schema defined');
+
+        const schema = ajv.compile(rawschema.body.res);
+
 
         const res = await prequest(req);
 

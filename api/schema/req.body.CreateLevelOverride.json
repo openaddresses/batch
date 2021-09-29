@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "required": [
+        "pattern",
+        "level"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "pattern": {
+            "type": "string",
+            "description": "RegExp pattern to match account emails"
+        },
+        "level": {
+            "$ref": "./util/level.json"
+        }
+    }
+}

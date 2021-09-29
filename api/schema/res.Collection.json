@@ -27,8 +27,7 @@
             "description": "Sponsors have access to the direct S3 bucket"
         },
         "created": {
-            "type": "integer",
-            "description": "The date on which this collection was uploaded"
+            "$ref": "./util/created.json"
         },
         "size": {
             "$ref": "./util/size.json"

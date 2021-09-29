@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Run = require('../lib/run');
 const test = require('tape');

@@ -1,4 +1,4 @@
-'use strict';
+
 
 const request = require('request');
 const pkg = require('../package.json');

@@ -4,9 +4,9 @@ set -euo pipefail
 
 test() {
     cd $1
-    yarn install
-    yarn lint
-    yarn cov || yarn test
+    npm install
+    npm run lint
+    npm run cov || npm test
     cd -
 }
 

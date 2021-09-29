@@ -1,5 +1,3 @@
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const test = require('tape');
@@ -18,9 +16,7 @@ test('GET: api/schema', async (t) => {
             url: '/api/schema',
             method: 'GET',
             json: true
-        });
-
-        t.equals(res.statusCode, 200, 'http: 200');
+        }, t);
 
         const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
 
@@ -42,9 +38,10 @@ test('GET: api/schema?method=FAKE', async (t) => {
             url: '/api/schema?method=fake',
             method: 'GET',
             json: true
-        });
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
+
         t.deepEquals(res.body, {
             status: 400,
             message: 'validation error',
@@ -65,7 +62,7 @@ test('GET: api/schema?method=GET', async (t) => {
             url: '/api/schema?method=GET',
             method: 'GET',
             json: true
-        });
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -87,7 +84,7 @@ test('GET: api/schema?url=123', async (t) => {
             url: '/api/schema?url=123',
             method: 'GET',
             json: true
-        });
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -108,7 +105,7 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
             url: '/api/schema?method=POST&url=/login',
             method: 'GET',
             json: true
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
         t.deepEquals(res.body, {
@@ -161,7 +158,7 @@ test('POST: api/login', async (t) => {
                 fake: 123,
                 username: 123
             }
-        });
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {

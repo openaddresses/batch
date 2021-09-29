@@ -23,7 +23,7 @@
             "type": "string"
         },
         "updated": {
-            "type": "string"
+            "$ref": "./util/updated.json"
         },
         "layer": {
             "type": "string"

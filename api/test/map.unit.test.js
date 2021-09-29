@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Map = require('../lib/map');
 const Job = require('../lib/job');

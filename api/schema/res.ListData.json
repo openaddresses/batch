@@ -25,7 +25,7 @@
                 "type": "string"
             },
             "updated": {
-                "type": "integer"
+                "$ref": "./util/updated.json"
             },
             "layer": {
                 "type": "string"

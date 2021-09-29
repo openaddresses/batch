@@ -1,7 +1,6 @@
-'use strict';
-
 const test = require('tape');
 const Level = require('../lib/level');
+const LevelOverride = require('../lib/level-override');
 const Flight = require('./flight');
 const nock = require('nock');
 const moment = require('moment');
@@ -85,6 +84,11 @@ flight.user(test, 'hello');
 
 test('Level#user - override', async (t) =>  {
     const level = new Level(flight.config.pool);
+
+    await LevelOverride.generate(flight.config.pool, {
+        pattern: '^hello@openaddresses.io$',
+        level: 'sponsor'
+    });
 
     try {
         const usr_pre = await flight.request({

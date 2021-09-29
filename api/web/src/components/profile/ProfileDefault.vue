@@ -25,12 +25,24 @@
                 </div>
             </div>
         </div>
-            <div class='col col--12 align-center'>
+
+        <div v-if='!showDowngrade'>
+            <div class='col col--12 align-center mt12'>
                 OpenAddresses operates on a very small budget
             </div>
             <div class='col col--12 align-center'>
                 Please consider contributing to support to keep the lights on as well as support future development of the project.
             </div>
+        </div>
+        <div v-else class='col col--12 border border--red round mt12 px12 py12'>
+            <p class='align-center'>We're sorry to see you go!</p>
+            <p class='align-center'>Your monthly contribution is managed via OpenCollective and downgrading must be done through them</p>
+
+            <div class='flex flex--center-main mt12'>
+                <button @click='down' class='btn btn--stroke color-gray color-red-on-hover round align-center'>Downgrade</button>
+                <a href='mailto:hello@openaddresses.io' class='fl btn btn--stroke btn--gray round ml12'>Contact Us</a>
+            </div>
+        </div>
 
         <div class='col col--12 grid'>
             <div @click='oc("basic")' class='col col--4 round py12 my12' @mouseover="hover = 'basic'" @mouseleave="hover = false" :class='{
@@ -89,12 +101,12 @@
 
             <div class='col col--4'>
                 <div class='txt-s align-center'>All Backer Features</div>
+                <div class='txt-s align-center'>Direct AWS S3 Access</div>
 
                 <div class='align-center'>
                     <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
                 </div>
 
-                <div class='txt-s align-center'>Fastest Data Access</div>
                 <div class='txt-s align-center'>Validated Data</div>
             </div>
         </div>
@@ -117,6 +129,7 @@ export default {
     data: function() {
         return {
             hover: 'none',
+            showDowngrade: false,
             p: {
                 username: this.profile.username,
                 email: this.profile.email
@@ -124,8 +137,16 @@ export default {
         };
     },
     methods: {
+        down: function() {
+            window.open('https://docs.opencollective.com/help/financial-contributors/payments#cancel-a-recurring-contribution', "_blank");
+        },
         oc: function(level) {
             if (this.profile.level === level) return;
+
+            if (level === 'basic' && this.profile.level !== 'basic') {
+                this.showDowngrade = true;
+                return;
+            }
 
             if (level === 'sponsor') {
                 window.open('https://opencollective.com/openaddresses/contribute/sponsor-13360/checkout', "_blank");

@@ -126,7 +126,14 @@ export default {
     methods: {
         oc: function(level) {
             if (this.profile.level === level) return;
-            window.open('https://opencollective.com/openaddresses/contribute', "_blank");
+
+            if (level === 'sponsor') {
+                window.open('https://opencollective.com/openaddresses/contribute/sponsor-13360/checkout', "_blank");
+            } else if (level === 'backer') {
+                window.open('https://opencollective.com/openaddresses/contribute/backer-13359/checkout', "_blank");
+            } else {
+                window.open('https://opencollective.com/openaddresses/contribute', "_blank");
+            }
         },
     },
     components: {

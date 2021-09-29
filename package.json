@@ -1,5 +1,6 @@
 {
     "name": "batch",
+    "root": true,
     "version": "1.0.0",
     "description": "AWS Batch based ETL Processing",
     "repository": "git@github.com:openaddresses/batch",

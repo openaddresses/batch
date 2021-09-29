@@ -29,8 +29,7 @@ class LevelOverride extends Generic {
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    static async list(pool, query) {
-        if (!query) query = {};
+    static async list(pool, query = {}) {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';

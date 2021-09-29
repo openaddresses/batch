@@ -193,17 +193,14 @@ export default {
 
                 const res = await window.std(url);
                 this.total = res.total;
-                this.levels = res.level_override.map((level) => {
-                    level._open = false;
-                    return level;
-                });
+                this.levels = res.level_override;
 
                 this.loading = false;
             } catch (err) {
                 this.$emit('err', err);
             }
         },
-        createLevel: async function(level) {
+        createLevel: async function() {
             try {
                 const res = await window.std(`/api/level`, {
                     method: 'POST',
@@ -214,16 +211,20 @@ export default {
                 });
 
                 this.levels.push(res);
+
+                this.add = false;
+                this.newLevel.pattern = '';
+                this.newLevel.level = 'basic';
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         deleteLevel: async function(level) {
             try {
-                const res = await window.std(`/api/level/${level.id}`, {
+                await window.std(`/api/level/${level.id}`, {
                     method: 'DELETE'
                 });
-                
+
                 this.getLevels();
             } catch (err) {
                 this.$emit('err', err);

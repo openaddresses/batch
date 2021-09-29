@@ -3,20 +3,7 @@ const pkg = require('../package.json');
 const request = promisify(require('request'));
 const moment = require('moment');
 const User = require('./user');
-
-// Override OpenCollective levels for these accounts
-// As OpenCollective doesn't seem to provide emails for
-// org accounts via their API
-const SPONSORS = [
-    new RegExp(/^hello@openaddresses.io$/),
-    new RegExp(/^.*@geocode.xyz$/),
-    new RegExp(/^.*@geocod.io$/),
-    new RegExp(/^.*@geocode.earth$/),
-    new RegExp(/^.*@smartystreets.com$/),
-    new RegExp(/^.*@mapbox.com$/),
-    new RegExp(/^.*@climaterisk.com.au$/),
-    new RegExp(/^.*@kin.com$/)
-];
+const Override = require('./level-override');
 
 /**
  * @class Level
@@ -31,6 +18,7 @@ class Level {
         this.OpenCollective = process.env.OPENCOLLECTIVE_API_KEY;
         this.base = 'https://api.opencollective.com/graphql/v2';
         this.user = new User(pool);
+        this.pool = pool;
     }
 
     /**
@@ -42,9 +30,10 @@ class Level {
      * @param {String} email
      */
     async single(email) {
-        for (const sponsor of SPONSORS) {
-            if (email.match(sponsor)) {
-                return await this.user.level(email, 'sponsor');
+        for (const override of (await Override.list(this.pool)).level_override) {
+            console.error(override);
+            if (email.match(override.pattern)) {
+                return await this.user.level(email, override.level);
             }
         }
 
@@ -172,9 +161,9 @@ class Level {
             if (!usr.account.transactions.nodes.length) return;
             if (!usr.account.email) return;
 
-            for (const sponsor of SPONSORS) {
-                if (usr.account.email.match(sponsor)) {
-                    return await this.user.level(usr.account.email, 'sponsor');
+            for (const override of (await Override.list(this.pool)).level_override) {
+                if (email.match(override.pattern)) {
+                    return await this.user.level(email, override.level);
                 }
             }
 

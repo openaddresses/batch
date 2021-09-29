@@ -87,7 +87,7 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, false);
 
         t.equals(exp.statusCode, 400, 'http: 400');
 
@@ -141,7 +141,7 @@ test('POST /api/export - no donor level', async (t) =>  {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, false);
 
         t.deepEquals(exp.body, {
             status: 403,
@@ -240,7 +240,7 @@ test('GET /api/export/100 - backer', async (t) =>  {
             },
             method: 'GET',
             json: true
-        });
+        }, false);
 
         t.deepEquals(exp.body, { status: 404, message: 'no exports by that id', messages: [] });
     } catch (err) {
@@ -296,7 +296,7 @@ test('GET /api/export/1 - backer', async (t) =>  {
                 bearer: flight.token.backer
             },
             json: true
-        });
+        }, t);
 
         t.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
@@ -332,7 +332,7 @@ test('POST /api/export - backer - exceeded limit', async (t) =>  {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, false);
 
         t.equals(exp.statusCode, 400, 'http: 400');
 

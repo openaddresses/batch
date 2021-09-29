@@ -76,7 +76,7 @@ test('DELETE: api/cache/data', async (t) => {
             headers: {
                 'shared-secret': '123'
             }
-        });
+        }, t);
 
         t.deepEquals(res.body, {
             status: 200,

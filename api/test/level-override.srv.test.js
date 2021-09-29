@@ -187,7 +187,7 @@ test('GET: api/level/2', async (t) => {
             auth: {
                 bearer: flight.token.admin
             }
-        });
+        }, false);
 
         t.deepEquals(res.body, {
             status: 404,

@@ -15,7 +15,7 @@ test('GET: api/user (no auth)', async (t) => {
             url: 'http://localhost:4999/api/user',
             method: 'GET',
             json: true
-        });
+        }, false);
         t.equals(res.statusCode, 403, 'http: 403');
     } catch (err) {
         t.error(err, 'no error');
@@ -63,7 +63,7 @@ test('POST: api/login (failed)', async (t) => {
                 username: 'ingalls',
                 password: 'password124'
             }
-        });
+        }, false);
 
         t.equals(res.statusCode, 403, 'http: 403');
     } catch (err) {
@@ -83,7 +83,7 @@ test('POST: api/login (not confirmed)', async (t) => {
                 username: 'ingalls',
                 password: 'password123'
             }
-        });
+        }, false);
 
         t.equals(res.statusCode, 403, 'http: 403');
         t.deepEquals(res.body, {

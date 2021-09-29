@@ -273,7 +273,7 @@ test('GET: api/job/error', async (t) => {
             url: 'http://localhost:4999/api/job/error',
             method: 'GET',
             json: true
-        });
+        }, false);
 
         t.equals(res.statusCode, 404, 'http: 404');
 
@@ -295,7 +295,7 @@ test('GET: api/job/error/1', async (t) => {
             url: 'http://localhost:4999/api/job/error/1',
             method: 'GET',
             json: true
-        });
+        }, false);
 
         t.equals(res.statusCode, 404, 'http: 404');
 

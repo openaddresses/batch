@@ -146,6 +146,8 @@ export default {
             if (level === 'basic' && this.profile.level !== 'basic') {
                 this.showDowngrade = true;
                 return;
+            } else {
+                this.showDowngrade = false;
             }
 
             if (level === 'sponsor') {

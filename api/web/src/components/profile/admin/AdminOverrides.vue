@@ -59,7 +59,7 @@
             </div>
         </template>
 
-        <div v-if='add' class='col col--12 grid border border--gray-light round px12 py12 my6 relative grid'>
+        <div v-if='add' class='col col--12 grid border border--gray-light round px12 py12 my6 grid'>
             <div class='col col--12 pb6'>
                 <h2 class='txt-bold fl'>New Level Override</h2>
                 <button @click='add = false' class='fr btn round btn--s btn--stroke btn--gray'>
@@ -78,7 +78,7 @@
                     <div class='w-full select-container'>
                         <select v-model='newLevel.level' class='select select--stroke'>
                             <option>basic</option>
-                            <option>donor</option>
+                            <option>backer</option>
                             <option>sponsor</option>
                         </select>
                         <div class='select-arrow'></div>
@@ -110,40 +110,19 @@
         </template>
         <template v-else>
             <div :key='level.id' v-for='level in levels' class='col col--12 grid'>
-                <div @click='level._open = !level._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round relative'>
-                    <div class='col col--12'>
+                <div class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round relative'>
+                    <div class='col col--11 relative'>
                         <span class='txt-truncate pre' v-text='level.pattern'/>
-                    </div>
-                    <div class='absolute' style='top: 23px; right: 23px;'>
-                        <span class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='level.level'></span>
-                    </div>
-                </div>
 
-                <div v-if='level._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
-                    <template v-if='level._loading'>
-                        <div class='flex flex--center-main w-full py24'>
-                            <div class='loading'></div>
+                        <div class='absolute' style='top: 11px; right: 11px;'>
+                            <span class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='level.level'></span>
                         </div>
-                    </template>
-                    <template v-else>
-                        <div class='col col--12'>
-                            <h3 class='pb6 fl'>User Access</h3>
-                            <button @click='getLevel(user)' class='btn btn--stroke round color-gray color-blue-on-hover fr'>
-                                <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                            </button>
-                        </div>
-
-                        <div class='col col--12'>
-                            <div class='w-full select-container'>
-                                <select @change='patchLevel(user)' v-model='user.level' class='select select--stroke'>
-                                    <option>basic</option>
-                                    <option>donor</option>
-                                    <option>sponsor</option>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
-                        </div>
-                    </template>
+                    </div>
+                    <div class='col col--1'>
+                        <button @click='deleteLevel(level)' style='margin-top: 9px;' class='mx6 btn btn--stroke round color-gray color-red-on-hover'>
+                            <svg class='icon'><use xlink:href='#icon-trash'/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </template>
@@ -201,22 +180,10 @@ export default {
         addLevel: async function() {
             this.add = true;
         },
-        getLevel: async function(level) {
-            try {
-                level._loading = true;
-
-                const url = new URL(`${window.location.origin}/api/level/${level.id}`);
-                const res = await window.std(url);
-
-                Object.assign(level, res);
-
-                level._loading = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        },
         getLevels: async function() {
             try {
+                this.loading = true;
+
                 const url = new URL(`${window.location.origin}/api/level`);
                 url.searchParams.append('limit', this.perpage)
                 url.searchParams.append('page', this.page)
@@ -230,6 +197,7 @@ export default {
                     level._open = false;
                     return level;
                 });
+
                 this.loading = false;
             } catch (err) {
                 this.$emit('err', err);
@@ -250,23 +218,17 @@ export default {
                 this.$emit('err', err);
             }
         },
-        patchLevel: async function(level) {
+        deleteLevel: async function(level) {
             try {
                 const res = await window.std(`/api/level/${level.id}`, {
-                    method: 'PATCH',
-                    body: {
-                        pattern: level.pattern,
-                        level: level.level
-                    }
+                    method: 'DELETE'
                 });
-
-                for (const key of Object.keys(res)) {
-                    level[key] = res[key];
-                }
+                
+                this.getLevels();
             } catch (err) {
                 this.$emit('err', err);
             }
-        }
+        },
     },
     components: {
         Pager

@@ -31,7 +31,6 @@ class Level {
      */
     async single(email) {
         for (const override of (await Override.list(this.pool)).level_override) {
-            console.error(override);
             if (email.match(override.pattern)) {
                 return await this.user.level(email, override.level);
             }

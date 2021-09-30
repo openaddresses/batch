@@ -17,8 +17,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Get the latest successful run of a given geographic area
      *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListData.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ListData.json} apiSuccess
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListData.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListData.json} apiSuccess
      */
     await schema.get('/data', {
         query: 'req.query.ListData.json',
@@ -53,8 +53,8 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchData.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Data.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchData.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
      *
      */
     await schema.patch('/data/:data', {
@@ -88,7 +88,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.Data.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
      */
     await schema.get('/data/:data', {
         res: 'res.Data.json'
@@ -116,7 +116,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :data Data ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.DataHistory.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.DataHistory.json} apiSuccess
      */
     await schema.get('/data/:data/history', {
         res: 'res.DataHistory.json'

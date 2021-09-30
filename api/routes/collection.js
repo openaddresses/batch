@@ -17,7 +17,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a list of all collections and their glob rules
      *
-     * @apiSchema {jsonawait schema=./schema/res.ListCollections.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.ListCollections.json} apiSuccess
      */
     await schema.get('/collections', {
         res: 'res.ListCollections.json'
@@ -85,7 +85,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :collection Collection ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/collections/:collection', {
         res: 'res.Standard.json'
@@ -116,8 +116,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Create a new collection
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateCollection.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Collection.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateCollection.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
      */
     await schema.post('/collections', {
         body: 'req.body.CreateCollection.json',
@@ -148,8 +148,8 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :collection Collection ID
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchCollection.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Collection.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchCollection.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
      */
     await schema.patch('/collections/:collection', {
         body: 'req.body.PatchCollection.json',

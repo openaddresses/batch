@@ -17,8 +17,8 @@ async function router(schema, config) {
      * @apiDescription
      *     Return information about a given subset of jobs
      *
-     * @apiSchema (query) {jsonawait schema=./schema/req.query.ListJobs.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ListJobs.json} apiSuccess
+     * @apiSchema (query) {jsonschema=../schema/req.query.ListJobs.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListJobs.json} apiSuccess
      */
     await schema.get('/job', {
         query: 'req.query.ListJobs.json',
@@ -53,7 +53,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.Job.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
      */
     await schema.get('/job/:job', {
         res: 'res.Job.json'
@@ -111,7 +111,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.SingleJobsCreate.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
      */
     await schema.post('/job/:job/rerun', {
         res: 'res.SingleJobsCreate.json'
@@ -150,7 +150,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.SingleDelta.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.SingleDelta.json} apiSuccess
      */
     await schema.get('/job/:job/delta', {
         res: 'res.SingleDelta.json'
@@ -290,7 +290,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema {jsonawait schema=./schema/res.SingleLog.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
      */
     await schema.get('/job/:job/log', {
         res: 'res.SingleLog.json'
@@ -318,8 +318,8 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchJob.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Job.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchJob.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
      */
     await schema.patch('/job/:job', {
         body: 'req.body.PatchJob.json',

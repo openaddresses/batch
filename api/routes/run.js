@@ -15,8 +15,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Runs are container objects that contain jobs that were started at the same time or by the same process
      *
-     * @apiSchema (Query) {jsonawait schema=../schema/req.query.ListRuns.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.ListRuns.json} apiSuccess
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListRuns.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListRuns.json} apiSuccess
      */
     await schema.get('/run', {
         query: 'req.query.ListRuns.json',
@@ -42,8 +42,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Create a new run to hold a batch of jobs
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.CreateRun.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.Run.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateRun.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
      */
     await schema.post('/run', {
         body: 'req.body.CreateRun.json',
@@ -69,7 +69,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema {jsonawait schema=../schema/res.Run.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
      */
     await schema.get('/run/:run', {
         res: 'res.Run.json'
@@ -95,7 +95,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema {jsonawait schema=../schema/res.RunStats.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.RunStats.json} apiSuccess
      */
     await schema.get('/run/:run/count', {
         res: 'res.RunStats.json'
@@ -121,8 +121,8 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.PatchRun.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.Run.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchRun.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
      *
      */
     await schema.patch('/run/:run', {
@@ -165,8 +165,8 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.SingleJobsCreate.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.SingleJobsCreate.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.SingleJobsCreate.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
      */
     await schema.post('/run/:run/jobs', {
         body: 'req.body.SingleJobsCreate.json',
@@ -195,7 +195,7 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :run Run ID
      *
-     * @apiSchema {jsonawait schema=../schema/res.SingleJobs.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.SingleJobs.json} apiSuccess
      */
     await schema.get('/run/:run/jobs', {
         res: 'res.SingleJobs.json'

@@ -18,7 +18,7 @@ async function router(schema, config) {
      *     This API powers a page that allows for human review of failing jobs
      *     Note: Job Errors are cleared with every subsequent full cache
      *
-     * @apiSchema {jsonawait schema=./schema/res.ErrorList.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.ErrorList.json} apiSuccess
      */
     await schema.get('/job/error', {
         res: 'res.ErrorList.json'
@@ -41,7 +41,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a simple count of the current number of job errors
      *
-     * @apiSchema {jsonawait schema=./schema/res.ErrorCount.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.ErrorCount.json} apiSuccess
      */
     await schema.get('/job/error/count', {
         res: 'res.ErrorCount.json'
@@ -64,7 +64,7 @@ async function router(schema, config) {
      * @apiDescription
      *   Return a single job error if one exists or 404 if not
      *
-     * @apiSchema {jsonawait schema=./schema/res.ErrorSingle.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.ErrorSingle.json} apiSuccess
      */
     await schema.get('/job/error/:job', {
         res: 'res.ErrorSingle.json'
@@ -91,8 +91,8 @@ async function router(schema, config) {
      * @apiParam {Number} job Job ID of the given error
      * @apiParam {String} message Text representation of the error
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ErrorCreate.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ErrorCreate.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.ErrorCreate.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ErrorCreate.json} apiSuccess
      */
     await schema.post('/job/error', {
         body: 'req.body.ErrorCreate.json',
@@ -120,8 +120,8 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
-     * @apiSchema (Body) {jsonawait schema=./schema/res.ErrorModerate.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ErrorModerate.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/res.ErrorModerate.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ErrorModerate.json} apiSuccess
      */
     await schema.post('/job/error/:job', {
         body: 'req.body.ErrorModerate.json',

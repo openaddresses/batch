@@ -1,5 +1,3 @@
-
-
 const Err = require('../lib/error');
 const LevelOverride = require('../lib/level-override');
 const { Param } = require('../lib/util');
@@ -17,8 +15,8 @@ async function router(schema, config) {
      * @apiDescription
      *   List level overrides
      *
-     * @apiSchema (Query) {jsonawait schema=../schema/req.query.ListLevelOverride.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.ListLevelOverride.json} apiSuccess
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListLevelOverride.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListLevelOverride.json} apiSuccess
      */
     await schema.get('/level', {
         query: 'req.query.ListLevelOverride.json',
@@ -43,8 +41,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Create a new level override
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.CreateLevelOverride.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.LevelOverride.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateLevelOverride.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
     await schema.post('/level', {
         body: 'req.body.CreateLevelOverride.json',
@@ -71,8 +69,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Patch a level override
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.PatchLevelOverride.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.LevelOverride.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchLevelOverride.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
     await schema.patch('/level/:levelid', {
         body: 'req.body.PatchLevelOverride.json',
@@ -103,8 +101,8 @@ async function router(schema, config) {
      * @apiDescription
      *   Get a level override
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.PatchLevelOverride.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.LevelOverride.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchLevelOverride.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
     await schema.get('/level/:levelid', {
         res: 'res.LevelOverride.json'
@@ -130,7 +128,7 @@ async function router(schema, config) {
      * @apiDescription
      *   Delete a level override
      *
-     * @apiSchema {jsonawait schema=../schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/level/:levelid', {
         res: 'res.Standard.json'

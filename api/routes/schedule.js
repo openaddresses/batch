@@ -14,8 +14,8 @@ async function router(schema, config) {
      * @apiDescription
      *     Internal function to allow scheduled lambdas to kick off events
      *
-     * @apiSchema (Body) {jsonawait schema=../schema/req.body.Schedule.json} apiParam
-     * @apiSchema {jsonawait schema=../schema/res.Standard.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.Schedule.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.post('/schedule', {
         body: 'req.body.Schedule.json',

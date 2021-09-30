@@ -18,7 +18,7 @@ async function router(schema, config) {
      *     If a source is unable to be pulled from directly, authenticated users can cache
      *     data resources to the OpenAddresses S3 cache to be pulled from
      *
-     * @apiSchema {jsonawait schema=../schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.post('/upload', {
         res: 'res.Standard.json'

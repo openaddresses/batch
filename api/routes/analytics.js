@@ -15,7 +15,7 @@ async function router(schema, config) {
      * @apiDescription
      *   Report anonymized traffic data about the number of user sessions created in a given day.
      *
-     * @apiSchema {jsonawait schema=./schema/res.TrafficAnalytics.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.TrafficAnalytics.json} apiSuccess
      */
     await schema.get('/dash/traffic', {
         res: 'res.TrafficAnalytics.json'
@@ -39,7 +39,7 @@ async function router(schema, config) {
      * @apiDescription
      *   Report anonymized traffic data about the number of collection downloads.
      *
-     * @apiSchema {jsonawait schema=./schema/res.CollectionsAnalytics.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.CollectionsAnalytics.json} apiSuccess
      */
     await schema.get('/dash/collections', {
         res: 'res.CollectionsAnalytics.json'

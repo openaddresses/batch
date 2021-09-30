@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const { Status } = require('./util');
 const batchjob = require('./batch').trigger;
@@ -9,6 +7,9 @@ const S3 = require('./s3');
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class Exporter {
     constructor() {
         this.id = false;

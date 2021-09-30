@@ -1,5 +1,3 @@
-
-
 const request = require('request');
 const pkg = require('../package.json');
 const Err = require('./error');

@@ -1,5 +1,3 @@
-
-
 const Mailgen = require('mailgen');
 const mailgun = require('mailgun.js');
 const Err = require('./error');

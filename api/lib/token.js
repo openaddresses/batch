@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const crypto = require('crypto');
 const { promisify } = require('util');

@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const moment = require('moment');
 const turf = require('@turf/turf');

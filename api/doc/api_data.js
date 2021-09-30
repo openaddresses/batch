@@ -14,7 +14,27 @@ define({ "api": [
       }
     ],
     "description": "<p>Report anonymized traffic data about the number of collection downloads.</p>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/analytics.js",
     "groupTitle": "Analytics"
   },
   {
@@ -32,7 +52,48 @@ define({ "api": [
       }
     ],
     "description": "<p>Report anonymized traffic data about the number of user sessions created in a given day.</p>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "datasets",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "datasets.label",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "datasets.data",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "datasets.data.x",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "datasets.data.y",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/analytics.js",
     "groupTitle": "Analytics"
   },
   {
@@ -126,7 +187,82 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new collection</p>",
-    "filename": "./index.js",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human-Readable name of the collection</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Null/Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the collection</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "s3",
+            "description": "<p>Sponsors have access to the direct S3 bucket</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/collection.js",
     "groupTitle": "Collections"
   },
   {
@@ -157,7 +293,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/collection.js",
     "groupTitle": "Collections"
   },
   {
@@ -188,7 +324,27 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/collection.js",
     "groupTitle": "Collections"
   },
   {
@@ -206,7 +362,55 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a list of all collections and their glob rules</p>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/collection.js",
     "groupTitle": "Collections"
   },
   {
@@ -234,10 +438,81 @@ define({ "api": [
             "field": ":collection",
             "description": "<p>Collection ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String[]",
+            "optional": true,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Null/Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the collection</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "sources",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "s3",
+            "description": "<p>Sponsors have access to the direct S3 bucket</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/collection.js",
     "groupTitle": "Collections"
   },
   {
@@ -255,7 +530,159 @@ define({ "api": [
       }
     ],
     "description": "<p>Get the latest successful run of a given geographic area</p>",
-    "filename": "./index.js",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "source",
+            "description": "<p>Filter results by source name</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "layer",
+            "description": "<p>Filter results by layer type</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "name",
+            "description": "<p>Filter results by layer name</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "description": "<p>Filter results updated before the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "description": "<p>Filter results updated after the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "point",
+            "description": "<p>Filter results by geographic point '{lng},{lat}'</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "fabric",
+            "description": "<p>Query results by fabric inclusion</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "fabric",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/data.js",
     "groupTitle": "Data"
   },
   {
@@ -286,7 +713,104 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "fabric",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "s3",
+            "description": "<p>Sponsors have access to the direct S3 bucket</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/data.js",
     "groupTitle": "Data"
   },
   {
@@ -317,7 +841,104 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "jobs.status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.preview",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.stats",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/data.js",
     "groupTitle": "Data"
   },
   {
@@ -343,10 +964,116 @@ define({ "api": [
             "field": ":data",
             "description": "<p>Data ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "fabric",
+            "description": "<p>Should the source be included in the fabric</p>"
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "fabric",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "s3",
+            "description": "<p>Sponsors have access to the direct S3 bucket</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/data.js",
     "groupTitle": "Data"
   },
   {
@@ -364,7 +1091,62 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a single job error if one exists or 404 if not</p>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "messages",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/error_job.js",
     "groupTitle": "ErrorSingle"
   },
   {
@@ -395,6 +1177,33 @@ define({ "api": [
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The linenumber of the log message</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "timestamp",
+            "description": "<p>The time at which the particular line was generated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>The log line itself</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/export.js",
     "groupTitle": "Export"
   },
@@ -413,6 +1222,110 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new export task</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID to start an export task for</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/export.js",
     "groupTitle": "Exports"
   },
@@ -462,6 +1375,86 @@ define({ "api": [
       }
     ],
     "description": "<p>Get a single export</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/export.js",
     "groupTitle": "Exports"
   },
@@ -480,6 +1473,178 @@ define({ "api": [
       }
     ],
     "description": "<p>List existing exports</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "description": "<p>Page of results to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "description": "<p>Only show runs before the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "description": "<p>Only show runs after the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "uid",
+            "description": "<p>The User ID to show exports for - useful for admin only - user's can ownly see their own</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>The total number of exports in the account</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "exports",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "exports.id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "exports.uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "exports.job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "exports.format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "exports.created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "exports.expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "exports.size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "exports.status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "exports.loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "exports.source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "exports.layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "exports.name",
+            "description": ""
+          }
+        ]
+      }
+    },
     "filename": "./routes/export.js",
     "groupTitle": "Exports"
   },
@@ -498,6 +1663,120 @@ define({ "api": [
       }
     ],
     "description": "<p>Update a single export</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Null/Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Null/String",
+            "optional": true,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The integer ID of the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>The User ID that initiated the export task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job_id",
+            "description": "<p>The Job ID being exported</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"shapefile\"",
+              "\"csv\""
+            ],
+            "optional": false,
+            "field": "format",
+            "description": "<p>Formats that can be exported to</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "expiry",
+            "description": "<p>The timestamp at which the export will expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/export.js",
     "groupTitle": "Exports"
   },
@@ -516,7 +1795,20 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a simple count of the current number of job errors</p>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "count",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/error_job.js",
     "groupTitle": "JobError"
   },
   {
@@ -551,10 +1843,46 @@ define({ "api": [
             "field": "message",
             "description": "<p>Text representation of the error</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": "<p>The Job ID of the error</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/error_job.js",
     "groupTitle": "JobError"
   },
   {
@@ -582,10 +1910,54 @@ define({ "api": [
             "field": ":job",
             "description": "<p>Job ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"confirm\"",
+              "\"reject\""
+            ],
+            "optional": false,
+            "field": "moderate",
+            "description": ""
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "job",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"confirm\"",
+              "\"reject\""
+            ],
+            "optional": false,
+            "field": "moderate",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/error_job.js",
     "groupTitle": "JobError"
   },
   {
@@ -603,7 +1975,62 @@ define({ "api": [
       }
     ],
     "description": "<p>All jobs that fail as part of a live run are entered into the JobError API This API powers a page that allows for human review of failing jobs Note: Job Errors are cleared with every subsequent full cache</p>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "messages",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/error_job.js",
     "groupTitle": "JobErrors"
   },
   {
@@ -631,10 +2058,259 @@ define({ "api": [
             "field": ":job",
             "description": "<p>Job ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Null/Integer",
+            "optional": true,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "map",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Null/String",
+            "optional": true,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "version",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "stats",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "count",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "bounds",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": ""
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Object",
+            "optional": false,
+            "field": "license",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/String",
+            "optional": true,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>The SemVer of the task processor for this job</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -665,7 +2341,27 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -683,7 +2379,195 @@ define({ "api": [
       }
     ],
     "description": "<p>Return information about a given subset of jobs</p>",
-    "filename": "./index.js",
+    "parameter": {
+      "fields": {
+        "query": [
+          {
+            "group": "query",
+            "type": "Integer",
+            "size": "-∞ - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned jobs</p>"
+          },
+          {
+            "group": "query",
+            "type": "Integer",
+            "optional": true,
+            "field": "run",
+            "description": "<p>Only show run associated with a given ID</p>"
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "allowedValues": [
+              "\"all\"",
+              "\"true\"",
+              "\"false\""
+            ],
+            "optional": true,
+            "field": "live",
+            "defaultValue": "all",
+            "description": ""
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "description": "<p>Only show runs before the given date</p>"
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "description": "<p>Only show runs after the given date</p>"
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "description": "<p>Filter results by source name</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -714,7 +2598,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -745,7 +2629,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -776,7 +2660,167 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Object",
+            "optional": false,
+            "field": "license",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/String",
+            "optional": true,
+            "field": "s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "map",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "output.preview",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>The SemVer of the task processor for this job</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -807,7 +2851,139 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "compare.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "compare.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare.stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "compare.bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "compare.bounds.area",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "compare.bounds.geom",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "master.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "master.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master.stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "master.bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "master.bounds.area",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "master.bounds.geom",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "delta.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta.stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "delta.bounds",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -838,7 +3014,34 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>The linenumber of the log message</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "timestamp",
+            "description": "<p>The time at which the particular line was generated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>The log line itself</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -869,7 +3072,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -900,7 +3103,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -931,7 +3134,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/job.js",
     "groupTitle": "Job"
   },
   {
@@ -949,7 +3152,78 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new level override</p>",
-    "filename": "./routes/level_override.js",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -967,7 +3241,27 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete a level override</p>",
-    "filename": "./routes/level_override.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -985,7 +3279,199 @@ define({ "api": [
       }
     ],
     "description": "<p>Get a level override</p>",
-    "filename": "./routes/level_override.js",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": true,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/level-override.js",
+    "groupTitle": "LevelOverride"
+  },
+  {
+    "type": "get",
+    "url": "/api/level",
+    "title": "List Override",
+    "version": "1.0.0",
+    "name": "ListLevelOverride",
+    "group": "LevelOverride",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>List level overrides</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "100",
+            "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial pattern</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": true,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "level_override",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "level_override.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "level_override.created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "level_override.updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "level_override.pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level_override.level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -1003,7 +3489,78 @@ define({ "api": [
       }
     ],
     "description": "<p>Patch a level override</p>",
-    "filename": "./routes/level_override.js",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": true,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "pattern",
+            "description": "<p>RegExp pattern to match account emails</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"basic\"",
+              "\"backer\"",
+              "\"sponsor\""
+            ],
+            "optional": false,
+            "field": "level",
+            "description": "<p>The level of donation of a given user</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -1138,7 +3695,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/map.js",
     "groupTitle": "Map"
   },
   {
@@ -1183,7 +3740,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/map.js",
     "groupTitle": "Map"
   },
   {
@@ -1201,7 +3758,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Data required for map initialization</p>",
-    "filename": "./index.js",
+    "filename": "./routes/map.js",
     "groupTitle": "Map"
   },
   {
@@ -1246,7 +3803,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/map.js",
     "groupTitle": "Map"
   },
   {
@@ -1264,7 +3821,96 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new run to hold a batch of jobs</p>",
-    "filename": "./index.js",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object",
+            "optional": true,
+            "field": "github",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1284,18 +3930,145 @@ define({ "api": [
     "description": "<p>Runs are container objects that contain jobs that were started at the same time or by the same process</p>",
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Query": [
           {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": false,
-            "field": ":data",
-            "description": "<p>Data ID</p>"
+            "group": "Query",
+            "type": "Integer",
+            "size": "-∞ - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "run",
+            "description": "<p>Only show run associated with a given ID</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "before",
+            "description": "<p>Only show runs before the given date</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "after",
+            "description": "<p>Only show runs after the given date</p>"
           }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": "<p>If true, successful jobs immediately become the most recent live data</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": "<p>Is the Run still accepting jobs</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs",
+            "description": "<p>The number of jobs in this run</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1326,7 +4099,55 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "status",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Warn",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Success",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Pending",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status.Fail",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1356,7 +4177,76 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1387,7 +4277,181 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Object",
+            "optional": false,
+            "field": "jobs.license",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/String",
+            "optional": true,
+            "field": "jobs.s3",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.map",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "jobs.created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.source",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.source_name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.layer",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.name",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.cache",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.output",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "jobs.output.preview",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "jobs.loglink",
+            "description": "<p>The AWS Cloudwatch Log ID of an AWS Batch run - note these logs expire</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": false,
+            "field": "jobs.status",
+            "description": "<p>The current status of a given task</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "jobs.stats",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.count",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "jobs.bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "jobs.version",
+            "description": "<p>The SemVer of the task processor for this job</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/Integer",
+            "optional": false,
+            "field": "jobs.size",
+            "description": "<p>The size of the asset in bytes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1415,10 +4479,39 @@ define({ "api": [
             "field": ":run",
             "description": "<p>Run ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String/Object[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "run",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "jobs",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1446,10 +4539,102 @@ define({ "api": [
             "field": ":run",
             "description": "<p>Run ID</p>"
           }
+        ],
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "closed",
+            "description": ""
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object",
+            "optional": true,
+            "field": "github",
+            "description": ""
+          }
         ]
       }
     },
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "live",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "closed",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "github",
+            "description": "<p>Used by the data-pls CI tool</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.ref",
+            "description": "<p>Git reference (branch) of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.sha",
+            "description": "<p>Git SHA of the given run</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "github.url",
+            "description": "<p>Github URL to the specific commit</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "github.check",
+            "description": "<p>Github check ID to update</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/run.js",
     "groupTitle": "Run"
   },
   {
@@ -1467,7 +4652,47 @@ define({ "api": [
       }
     ],
     "description": "<p>Internal function to allow scheduled lambdas to kick off events</p>",
-    "filename": "./index.js",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"close\"",
+              "\"scale\"",
+              "\"level\"",
+              "\"collect\"",
+              "\"sources\""
+            ],
+            "optional": false,
+            "field": "type",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/schedule.js",
     "groupTitle": "Schedule"
   },
   {
@@ -1512,19 +4737,6 @@ define({ "api": [
             "optional": true,
             "field": "url",
             "description": "<p>URLEncoded URL that you want to fetch</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": true,
-            "field": "schemas",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1670,7 +4882,27 @@ define({ "api": [
       }
     ],
     "description": "<p>Statically cache source data</p> <pre><code>If a source is unable to be pulled from directly, authenticated users can cache data resources to the OpenAddresses S3 cache to be pulled from</code></pre>",
-    "filename": "./index.js",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/upload.js",
     "groupTitle": "Upload"
   },
   {

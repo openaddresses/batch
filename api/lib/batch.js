@@ -1,5 +1,3 @@
-
-
 const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ apiVersion: '2016-08-10', region: 'us-east-1' });
 const asg = new AWS.AutoScaling({ apiVersion: '2011-01-01', region: 'us-east-1' });

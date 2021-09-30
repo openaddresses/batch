@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const JobError = require('./joberror');
 const batch = require('./batch');

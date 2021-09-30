@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const Map = require('./map');
 const moment = require('moment');

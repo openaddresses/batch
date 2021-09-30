@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const Generic = require('./generic');
 const { sql } = require('slonik');

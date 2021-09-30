@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "dl": {
+            "type": "boolean",
+            "description": "Optional param to set content-disposition - forcing the browser to download"
+        },
+        "format": {
+            "type": "string",
+            "default": "json",
+            "enum": [
+                "json",
+                "csv"
+            ]
+        }
+    }
+}

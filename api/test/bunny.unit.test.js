@@ -1,5 +1,3 @@
-
-
 const Bunny = require('../lib/bunny');
 const tape = require('tape');
 

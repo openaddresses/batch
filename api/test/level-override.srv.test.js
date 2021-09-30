@@ -10,7 +10,7 @@ flight.user(test, 'admin', true);
 test('POST: api/level', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level',
+            url: '/api/level',
             method: 'POST',
             json: true,
             auth: {
@@ -42,7 +42,7 @@ test('POST: api/level', async (t) => {
 test('POST: api/level', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level',
+            url: '/api/level',
             method: 'POST',
             json: true,
             auth: {
@@ -74,7 +74,7 @@ test('POST: api/level', async (t) => {
 test('PATCH: api/level/2', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level/2',
+            url: '/api/level/2',
             method: 'PATCH',
             json: true,
             auth: {
@@ -105,7 +105,7 @@ test('PATCH: api/level/2', async (t) => {
 test('GET: api/level/2', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level/2',
+            url: '/api/level/2',
             json: true,
             auth: {
                 bearer: flight.token.admin
@@ -132,7 +132,7 @@ test('GET: api/level/2', async (t) => {
 test('GET: api/level/1', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level/1',
+            url: '/api/level/1',
             json: true,
             auth: {
                 bearer: flight.token.admin
@@ -159,7 +159,7 @@ test('GET: api/level/1', async (t) => {
 test('DELETE: api/level/2', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level/2',
+            url: '/api/level/2',
             json: true,
             method: 'DELETE',
             auth: {
@@ -182,7 +182,7 @@ test('DELETE: api/level/2', async (t) => {
 test('GET: api/level/2', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level/2',
+            url: '/api/level/2',
             json: true,
             auth: {
                 bearer: flight.token.admin
@@ -204,7 +204,7 @@ test('GET: api/level/2', async (t) => {
 test('GET: api/level', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/level',
+            url: '/api/level',
             json: true,
             auth: {
                 bearer: flight.token.admin

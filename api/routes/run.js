@@ -1,6 +1,5 @@
 const Err = require('../lib/error');
 const Run = require('../lib/run');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -72,11 +71,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
      */
     await schema.get('/run/:run', {
+        ':run': 'integer',
         res: 'res.Run.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'run');
-
             res.json(await Run.from(config.pool, req.params.run));
         } catch (err) {
             return Err.respond(err, res);
@@ -98,11 +96,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.RunStats.json} apiSuccess
      */
     await schema.get('/run/:run/count', {
+        ':run': 'integer',
         res: 'res.RunStats.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'run');
-
             res.json(await Run.stats(config.pool, req.params.run));
         } catch (err) {
             return Err.respond(err, res);
@@ -126,12 +123,11 @@ async function router(schema, config) {
      *
      */
     await schema.patch('/run/:run', {
+        ':run': 'integer',
         body: 'req.body.PatchRun.json',
         res: 'res.Run.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'run');
-
             await user.is_admin(req);
 
             const run = await Run.from(config.pool, req.params.run);
@@ -169,12 +165,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
      */
     await schema.post('/run/:run/jobs', {
+        ':run': 'integer',
         body: 'req.body.SingleJobsCreate.json',
         res: 'res.SingleJobsCreate.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'run');
-
             await user.is_admin(req);
 
             return res.json(await Run.populate(config.pool, req.params.run, req.body.jobs));
@@ -198,11 +193,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.SingleJobs.json} apiSuccess
      */
     await schema.get('/run/:run/jobs', {
+        ':run': 'integer',
         res: 'res.SingleJobs.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'run');
-
             const jobs = await Run.jobs(config.pool, req.params.run);
 
             res.json({

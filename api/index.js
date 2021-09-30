@@ -15,6 +15,10 @@ const Schema = require('./lib/schema');
 const { sql, createPool } = require('slonik');
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase'],
+    alias: {
+        no_tb: 'no-tilebase',
+        no_c: 'no-cache'
+    },
     string: ['postgres']
 });
 
@@ -28,13 +32,13 @@ if (require.main === module) {
     configure(args);
 }
 
-function configure(args, cb) {
-    Config.env(args).then((config) => {
-        return server(args, config, cb);
-    }).catch((err) => {
+async function configure(args, cb) {
+    try {
+        return server(args, await Config.env(args), cb);
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
@@ -314,6 +318,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
     await schema.get('/user/:id', {
+        ':id': 'integer',
         query: 'req.query.SingleUser.json',
         res: 'res.User.json'
     }, async (req, res) => {
@@ -348,6 +353,7 @@ async function server(args, config, cb) {
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
      */
     await schema.patch('/user/:id', {
+        ':id': 'integer',
         body: 'req.body.PatchUser.json',
         res: 'res.User.json'
     }, async (req, res) => {
@@ -577,21 +583,20 @@ async function server(args, config, cb) {
      *
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
-    await schema.delete(
-        '/token/:id', {
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'id');
+    await schema.delete('/token/:id', {
+        ':id': 'integer',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await Param.int(req, 'id');
 
-                await user.is_auth(req);
+            await user.is_auth(req);
 
-                return res.json(await token.delete(req.auth, req.params.id));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
+            return res.json(await token.delete(req.auth, req.params.id));
+        } catch (err) {
+            return Err.respond(err, res);
         }
+    }
     );
 
     schema.router.use((err, req, res, next) => {

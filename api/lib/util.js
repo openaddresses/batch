@@ -18,15 +18,6 @@ class Status {
     }
 }
 
-class Param {
-    static async int(req, name) {
-        req.params[name] = Number(req.params[name]);
-        if (isNaN(req.params[name])) {
-            throw new Err(400, null, `${name} param must be an integer`);
-        }
-    }
-}
-
 function explode(url) {
     return new Promise((resolve, reject) => {
         request({
@@ -70,7 +61,6 @@ function explode(url) {
 
 module.exports = {
     explode,
-    Param,
     Status
 };
 

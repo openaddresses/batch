@@ -1,7 +1,6 @@
 const Err = require('../lib/error');
 const Run = require('../lib/run');
 const Job = require('../lib/job');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -56,11 +55,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
      */
     await schema.get('/job/:job', {
+        ':job': 'integer',
         res: 'res.Job.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             const job = (await Job.from(config.pool, req.params.job)).json();
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
@@ -86,18 +84,17 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get('/job/:job/raw', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get('/job/:job/raw', {
+        ':job': 'integer'
+    }, async (req, res) => {
+        try {
+            const job = await Job.from(config.pool, req.params.job);
 
-                const job = await Job.from(config.pool, req.params.job);
-
-                return res.json(await job.get_raw());
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+            return res.json(await job.get_raw());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {post} /api/job/:job Rerun Job
@@ -114,11 +111,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
      */
     await schema.post('/job/:job/rerun', {
+        ':job': 'integer',
         res: 'res.SingleJobsCreate.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             await user.is_admin(req);
 
             const job = await Job.from(config.pool, req.params.job);
@@ -153,11 +149,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.SingleDelta.json} apiSuccess
      */
     await schema.get('/job/:job/delta', {
+        ':job': 'integer',
         res: 'res.SingleDelta.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             const delta = await Job.delta(config.pool, req.params.job);
 
             return res.json(delta);
@@ -178,15 +173,15 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get('/job/:job/output/source.png', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
-                Job.preview(req.params.job, res);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+    await schema.get('/job/:job/output/source.png', {
+        ':job': 'integer'
+    }, async (req, res) => {
+        try {
+            Job.preview(req.params.job, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/job/:job/output/source.geojson.gz Get Job Data
@@ -207,18 +202,17 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get('/job/:job/output/source.geojson.gz', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get('/job/:job/output/source.geojson.gz', {
+        ':job': 'integer'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req, true);
 
-                await user.is_auth(req, true);
-
-                await Job.data(config.pool, req.params.job, res);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+            await Job.data(config.pool, req.params.job, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/job/:job/output/sample Small Sample
@@ -232,16 +226,15 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      */
-    await schema.get('/job/:job/output/sample', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
-
-                return res.json(await Job.sample(config.pool, req.params.job));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+    await schema.get('/job/:job/output/sample', {
+        ':job': 'integer'
+    }, async (req, res) => {
+        try {
+            return res.json(await Job.sample(config.pool, req.params.job));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/job/:job/output/cache.zip Get Job Cache
@@ -263,18 +256,17 @@ async function router(schema, config) {
      * @apiParam {Number} :job Job ID
      *
      */
-    await schema.get('/job/:job/output/cache.zip', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'job');
+    await schema.get('/job/:job/output/cache.zip', {
+        ':job': 'integer'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req, true);
 
-                await user.is_auth(req, true);
-
-                Job.cache(req.params.job, res);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+            Job.cache(req.params.job, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/job/:job/log Get Job Log
@@ -293,11 +285,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
      */
     await schema.get('/job/:job/log', {
+        ':job': 'integer',
         res: 'res.SingleLog.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             const job = await Job.from(config.pool, req.params.job);
 
             return res.json(await job.log());
@@ -322,12 +313,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
      */
     await schema.patch('/job/:job', {
+        ':job': 'integer',
         body: 'req.body.PatchJob.json',
         res: 'res.Job.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             await user.is_admin(req);
 
             const job = await Job.from(config.pool, req.params.job);

@@ -2,7 +2,6 @@ const Err = require('../lib/error');
 const Collection = require('../lib/collections');
 const Cacher = require('../lib/cacher');
 const Miss = Cacher.Miss;
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -60,18 +59,17 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :collection Collection ID
      */
-    await schema.get('/collections/:collection/data', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'collection');
+    await schema.get('/collections/:collection/data', {
+        ':collection': 'integer'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req, true);
 
-                await user.is_auth(req, true);
-
-                Collection.data(config.pool, req.params.collection, res);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+            Collection.data(config.pool, req.params.collection, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {delete} /api/collections/:collection Delete Collection
@@ -88,11 +86,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/collections/:collection', {
+        ':collection': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'collection');
-
             await user.is_admin(req);
 
             await Collection.delete(config.pool, req.params.collection);
@@ -152,12 +149,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
      */
     await schema.patch('/collections/:collection', {
+        ':collection': 'integer',
         body: 'req.body.PatchCollection.json',
         res: 'res.Collection.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'collection');
-
             await user.is_admin(req);
 
             const collection = await Collection.from(config.pool, req.params.collection);

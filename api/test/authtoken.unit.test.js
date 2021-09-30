@@ -1,5 +1,3 @@
-
-
 const User = require('../lib/user');
 const Token = require('../lib/token');
 const test = require('tape');

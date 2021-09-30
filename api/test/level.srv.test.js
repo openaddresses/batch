@@ -50,7 +50,7 @@ test('Level#all', async (t) =>  {
 
     try {
         const usr_pre = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             auth: {
                 bearer: flight.token.test_all
             },
@@ -63,7 +63,7 @@ test('Level#all', async (t) =>  {
         await level.all();
 
         const usr_post = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             auth: {
                 bearer: flight.token.test_all
@@ -92,7 +92,7 @@ test('Level#user - override', async (t) =>  {
 
     try {
         const usr_pre = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             auth: {
                 bearer: flight.token.hello
@@ -105,7 +105,7 @@ test('Level#user - override', async (t) =>  {
         await level.single('hello@openaddresses.io');
 
         const usr_post = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             auth: {
                 bearer: flight.token.hello
@@ -162,7 +162,7 @@ test('Level#user', async (t) =>  {
 
     try {
         const usr_pre = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             auth: {
                 bearer: flight.token.test_single
             },
@@ -175,7 +175,7 @@ test('Level#user', async (t) =>  {
         await level.single('test_single@openaddresses.io');
 
         const usr_post = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             auth: {
                 bearer: flight.token.test_single
@@ -224,7 +224,7 @@ test('Level#user - no contrib', async (t) =>  {
 
     try {
         const usr_pre = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             json: true,
             auth: {
@@ -237,7 +237,7 @@ test('Level#user - no contrib', async (t) =>  {
         await level.single('test_single1@openaddresses.io');
 
         const usr_post = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             json: true,
             auth: {
@@ -273,7 +273,7 @@ test('Level#user - no match', async (t) =>  {
 
     try {
         const usr_pre = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             json: true,
             auth: {
@@ -286,7 +286,7 @@ test('Level#user - no match', async (t) =>  {
         await level.single('test_single_none@openaddresses.io');
 
         const usr_post = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'GET',
             json: true,
             auth: {

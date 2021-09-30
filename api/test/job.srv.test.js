@@ -1,5 +1,3 @@
-
-
 const pkg = require('../package.json');
 const test = require('tape');
 const Flight = require('./flight');
@@ -13,7 +11,7 @@ flight.takeoff(test);
 test('POST: /api/run', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/run',
+            url: '/api/run',
             method: 'POST',
             json: true,
             headers: {
@@ -42,7 +40,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
 
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/run/1/jobs',
+            url: '/api/run/1/jobs',
             method: 'POST',
             json: true,
             headers: {
@@ -69,7 +67,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
 test('PATCH: /api/job/:job', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/job/1',
+            url: '/api/job/1',
             method: 'PATCH',
             json: true,
             headers: {
@@ -126,7 +124,7 @@ test('PATCH: /api/job/:job', async (t) => {
 test('GET: /api/job/:job', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/job/1',
+            url: '/api/job/1',
             method: 'GET',
             json: true
         }, t);
@@ -155,7 +153,7 @@ test('GET: /api/job/:job', async (t) => {
 test('GET: /api/job', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/job',
+            url: '/api/job',
             method: 'GET',
             json: true
         }, t);

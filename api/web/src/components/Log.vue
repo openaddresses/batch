@@ -12,6 +12,10 @@
                 <button v-if='!isCollapsed' @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
+
+                <button v-if='!isCollapsed' @click='downloadLog' class='mr12 btn round btn--stroke fr color-gray'>
+                    <svg class='icon'><use xlink:href='#icon-arrow-down'/></svg>
+                </button>
             </div>
         </div>
 
@@ -60,6 +64,9 @@ export default {
     methods: {
         refresh: function() {
             this.getLog();
+        },
+        downloadLog: async function() {
+            window.open(`${window.location.origin}/api/${this.logtype}/${this.id}/log?dl=true&format=csv`, '_blank');
         },
         getLog: async function() {
             try {

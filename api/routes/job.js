@@ -282,16 +282,29 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :job Job ID
      *
+     * @apiSchema (Query) {jsonschema=../schema/req.query.SingleLog.json} apiParam
      * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
      */
     await schema.get('/job/:job/log', {
         ':job': 'integer',
+        query: 'req.query.SingleLog.json',
         res: 'res.SingleLog.json'
     }, async (req, res) => {
         try {
             const job = await Job.from(config.pool, req.params.job);
 
-            return res.json(await job.log());
+            const log = await job.log(req.query.format);
+
+            if (!req.query.dl) {
+                if (!req.query.format || req.query.format === 'json') {
+                    return res.json(log);
+                } else {
+                    return res.send(log);
+                }
+            } else {
+                 res.attachment(`log-${req.params.job}.${req.query.format || 'json'}`);
+                 res.send(log);
+            }
         } catch (err) {
             return Err.respond(err, res);
         }

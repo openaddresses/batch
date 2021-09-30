@@ -8,6 +8,7 @@ const S3 = require('./s3');
 const pkg  = require('../package.json');
 const { Status } = require('./util');
 const { sql  } = require('slonik');
+const stringify = require('csv-stringify/lib/sync');
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const batchjob = require('./batch').trigger;
@@ -424,27 +425,41 @@ class Job {
         }
     }
 
-    log() {
-        return new Promise((resolve, reject) => {
-            if (!this.loglink) return reject(new Err(404, null, 'Job has not produced a log'));
+    async log(format = 'json') {
+        if (!this.loglink) throw new Err(404, null, 'Job has not produced a log');
 
-            cwl.getLogEvents({
+        let events = [];
+
+        try {
+            const res = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink
-            }, (err, res) => {
-                if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
+            }).promise();
 
-                let line = 0;
-                return resolve(res.events.map((event) => {
-                    return {
-                        id: ++line,
-                        timestamp: event.timestamp,
-                        message: event.message
-                            .replace(/access_token=[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
-                    };
-                }));
-            });
+            events = res.events;
+        } catch (err) {
+            throw new Err(500, err, 'Could not retrieve logs');
+        }
+
+        let line = 0;
+        events = events.map((event) => {
+            return {
+                id: ++line,
+                timestamp: event.timestamp,
+                message: event.message
+                    .replace(/access_token=[ps]k\.[A-Za-z0-9.-]+/, '<REDACTED>')
+            };
         });
+
+        if (format === 'json') {
+            return events;
+        } else if (format === 'csv') {
+            return stringify(events.map(e => [ e.id, e.timestamp, e.message ]), {
+                delimiter: ','
+            });
+        } else {
+            throw new Err(400, null, 'Unsupported Format');
+        }
     }
 
     async generate(pool) {

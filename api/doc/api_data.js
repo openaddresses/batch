@@ -949,7 +949,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Create a new level override</p>",
-    "filename": "./routes/level_override.js",
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -967,7 +967,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete a level override</p>",
-    "filename": "./routes/level_override.js",
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -985,7 +985,25 @@ define({ "api": [
       }
     ],
     "description": "<p>Get a level override</p>",
-    "filename": "./routes/level_override.js",
+    "filename": "./routes/level-override.js",
+    "groupTitle": "LevelOverride"
+  },
+  {
+    "type": "get",
+    "url": "/api/level",
+    "title": "List Override",
+    "version": "1.0.0",
+    "name": "ListLevelOverride",
+    "group": "LevelOverride",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>List level overrides</p>",
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -1003,7 +1021,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Patch a level override</p>",
-    "filename": "./routes/level_override.js",
+    "filename": "./routes/level-override.js",
     "groupTitle": "LevelOverride"
   },
   {
@@ -1467,7 +1485,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Internal function to allow scheduled lambdas to kick off events</p>",
-    "filename": "./index.js",
+    "filename": "./routes/schedule.js",
     "groupTitle": "Schedule"
   },
   {
@@ -1512,19 +1530,6 @@ define({ "api": [
             "optional": true,
             "field": "url",
             "description": "<p>URLEncoded URL that you want to fetch</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": true,
-            "field": "schemas",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -1670,7 +1675,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Statically cache source data</p> <pre><code>If a source is unable to be pulled from directly, authenticated users can cache data resources to the OpenAddresses S3 cache to be pulled from</code></pre>",
-    "filename": "./index.js",
+    "filename": "./routes/upload.js",
     "groupTitle": "Upload"
   },
   {

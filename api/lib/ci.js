@@ -1,5 +1,3 @@
-
-
 const assert = require('assert');
 const Run = require('./run');
 const { promisify } = require('util');

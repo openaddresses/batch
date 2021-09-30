@@ -454,7 +454,7 @@ class Job {
         if (format === 'json') {
             return events;
         } else if (format === 'csv') {
-            return stringify(events.map(e => [ e.id, e.timestamp, e.message ]), {
+            return stringify(events.map((e) => [e.id, e.timestamp, e.message]), {
                 delimiter: ','
             });
         } else {

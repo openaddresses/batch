@@ -302,8 +302,8 @@ async function router(schema, config) {
                     return res.send(log);
                 }
             } else {
-                 res.attachment(`log-${req.params.job}.${req.query.format || 'json'}`);
-                 res.send(log);
+                res.attachment(`log-${req.params.job}.${req.query.format || 'json'}`);
+                res.send(log);
             }
         } catch (err) {
             return Err.respond(err, res);

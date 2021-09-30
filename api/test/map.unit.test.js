@@ -1,5 +1,3 @@
-
-
 const Map = require('../lib/map');
 const Job = require('../lib/job');
 const test = require('tape');

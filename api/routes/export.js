@@ -1,7 +1,6 @@
 const Err = require('../lib/error');
 const Job = require('../lib/job');
 const Exporter = require('../lib/exporter');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -60,11 +59,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
      */
     await schema.get('/export/:exportid/log', {
+        ':exportid': 'integer',
         res: 'res.SingleLog.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'exportid');
-
             const exp = await Exporter.from(config.pool, req.params.exportid);
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(403, null, 'You didn\'t create that export');
 
@@ -115,11 +113,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
      */
     await schema.get('/export/:exportid', {
+        ':exportid': 'integer',
         res: 'res.Export.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'exportid');
-
             const exp = (await Exporter.from(config.pool, req.params.exportid)).json();
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
@@ -141,17 +138,17 @@ async function router(schema, config) {
      *
      * @apiParam {Number} :exportid Export ID
      */
-    await schema.get('/export/:exportid/output/export.zip', null,
-        async (req, res) => {
-            try {
-                await Param.int(req, 'exportid');
-                await user.is_auth(req, true);
+    await schema.get('/export/:exportid/output/export.zip', {
+        ':exportid': 'integer'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req, true);
 
-                await Exporter.data(config.pool, req.auth, req.params.exportid, res);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        });
+            await Exporter.data(config.pool, req.auth, req.params.exportid, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {patch} /api/export/:export Patch Export
@@ -167,11 +164,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
      */
     await schema.patch('/export/:exportid', {
+        ':exportid': 'integer',
         body: 'req.body.PatchExport.json',
         res: 'res.Export.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'exportid');
             await user.is_admin(req);
 
             const exp = await Exporter.from(config.pool, req.params.exportid);

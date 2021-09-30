@@ -1,6 +1,5 @@
 const Err = require('../lib/error');
 const Map = require('../lib/map');
-const { Param } = require('../lib/util');
 const Cacher = require('../lib/cacher');
 const Miss = Cacher.Miss;
 
@@ -34,12 +33,12 @@ async function router(schema, config) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    await schema.get('/map/borders/:z/:x/:y.mvt', null, async (req, res) => {
+    await schema.get('/map/borders/:z/:x/:y.mvt', {
+        ':z': 'integer',
+        ':x': 'integer',
+        ':y': 'integer'
+    }, async (req, res) => {
         try {
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
-
             if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
             const tile = await config.cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
@@ -68,11 +67,11 @@ async function router(schema, config) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    await schema.get('/map/fabric/:z/:x/:y.mvt', null, async (req, res) => {
-        await Param.int(req, 'z');
-        await Param.int(req, 'x');
-        await Param.int(req, 'y');
-
+    await schema.get('/map/fabric/:z/:x/:y.mvt', {
+        ':z': 'integer',
+        ':x': 'integer',
+        ':y': 'integer'
+    }, async (req, res) => {
         let tile;
         try {
             tile = await config.cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
@@ -107,12 +106,12 @@ async function router(schema, config) {
      * @apiParam {Number} x X coordinate
      * @apiParam {Number} y Y coordinate
      */
-    await schema.get('/map/:z/:x/:y.mvt', null, async (req, res) => {
+    await schema.get('/map/:z/:x/:y.mvt', {
+        ':z': 'integer',
+        ':x': 'integer',
+        ':y': 'integer'
+    }, async (req, res) => {
         try {
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
-
             if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
             const tile = await config.cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {

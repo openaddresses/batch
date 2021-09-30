@@ -1,6 +1,5 @@
 const Err = require('../lib/error');
 const JobError = require('../lib/joberror');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -67,11 +66,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ErrorSingle.json} apiSuccess
      */
     await schema.get('/job/error/:job', {
+        ':job': 'integer',
         res: 'res.ErrorSingle.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             return res.json(await JobError.get(config.pool, req.params.job));
         } catch (err) {
             return Err.respond(err, res);
@@ -124,12 +122,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ErrorModerate.json} apiSuccess
      */
     await schema.post('/job/error/:job', {
+        ':job': 'integer',
         body: 'req.body.ErrorModerate.json',
         res: 'res.ErrorModerate.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'job');
-
             await user.is_flag(req, 'moderator');
 
             res.json(await JobError.moderate(config.pool, ci, req.params.job, req.body));

@@ -1,5 +1,3 @@
-
-
 const test = require('tape');
 const Flight = require('./flight');
 const memjs = require('memjs');
@@ -26,7 +24,7 @@ test('Meta: Insert Key', async (t) => {
 test('DELETE: api/cache', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/cache',
+            url: '/api/cache',
             method: 'DELETE',
             json: true,
             headers: {
@@ -70,7 +68,7 @@ test('Meta: Insert Key', async (t) => {
 test('DELETE: api/cache/data', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/cache/data',
+            url: '/api/cache/data',
             method: 'DELETE',
             json: true,
             headers: {

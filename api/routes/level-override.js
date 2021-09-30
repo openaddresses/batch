@@ -1,6 +1,5 @@
 const Err = require('../lib/error');
 const LevelOverride = require('../lib/level-override');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -73,13 +72,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
     await schema.patch('/level/:levelid', {
+        ':levelid': 'integer',
         body: 'req.body.PatchLevelOverride.json',
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
         try {
             await user.is_admin(req);
-
-            Param.int(req, 'levelid');
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             level.patch(req.body);
@@ -105,11 +103,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
     await schema.get('/level/:levelid', {
+        ':levelid': 'integer',
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
         try {
             await user.is_admin(req);
-            Param.int(req, 'levelid');
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             return res.json(level.serialize());
@@ -131,11 +129,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/level/:levelid', {
+        ':levelid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_admin(req);
-            Param.int(req, 'levelid');
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             await level.delete(config.pool);

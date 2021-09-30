@@ -1,5 +1,3 @@
-
-
 const test = require('tape');
 const Flight = require('./flight');
 const { sql } = require('slonik');
@@ -12,7 +10,7 @@ flight.takeoff(test);
 test('GET: api/user (no auth)', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user',
+            url: '/api/user',
             method: 'GET',
             json: true
         }, false);
@@ -27,7 +25,7 @@ test('GET: api/user (no auth)', async (t) => {
 test('POST: api/user', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user',
+            url: '/api/user',
             method: 'POST',
             json: true,
             body: {
@@ -56,7 +54,7 @@ test('POST: api/user', async (t) => {
 test('POST: api/login (failed)', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'POST',
             json: true,
             body: {
@@ -76,7 +74,7 @@ test('POST: api/login (failed)', async (t) => {
 test('POST: api/login (not confirmed)', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'POST',
             json: true,
             body: {
@@ -113,7 +111,7 @@ let token;
 test('POST: api/login (success)', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             method: 'POST',
             json: true,
             body: {
@@ -145,7 +143,7 @@ test('POST: api/login (success)', async (t) => {
 test('GET: api/login', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/login',
+            url: '/api/login',
             auth: {
                 bearer: token
             },
@@ -181,7 +179,7 @@ flight.user(test, 'sponsor', false, {
 test('GET: api/user', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user',
+            url: '/api/user',
             auth: {
                 bearer: flight.token.admin
             },
@@ -238,7 +236,7 @@ test('GET: api/user', async (t) => {
 test('GET: api/user?level=backer', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user?level=backer',
+            url: '/api/user?level=backer',
             auth: {
                 bearer: flight.token.admin
             },
@@ -267,7 +265,7 @@ test('GET: api/user?level=backer', async (t) => {
 test('GET: api/user?level=sponsor', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user?level=sponsor',
+            url: '/api/user?level=sponsor',
             auth: {
                 bearer: flight.token.admin
             },
@@ -296,7 +294,7 @@ test('GET: api/user?level=sponsor', async (t) => {
 test('GET: api/user?filter=ADMIN', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user?filter=ADMIN',
+            url: '/api/user?filter=ADMIN',
             auth: {
                 bearer: flight.token.admin
             },
@@ -325,7 +323,7 @@ test('GET: api/user?filter=ADMIN', async (t) => {
 test('GET: api/user?access=admin', async (t) => {
     try {
         const res = await flight.request({
-            url: 'http://localhost:4999/api/user?access=admin',
+            url: '/api/user?access=admin',
             auth: {
                 bearer: flight.token.admin
             },
@@ -354,7 +352,7 @@ test('GET: api/user?access=admin', async (t) => {
 test('GET: api/user?before=<NOW>', async (t) => {
     try {
         const res = await flight.request({
-            url: `http://localhost:4999/api/user?before=${encodeURIComponent(moment().toDate().toISOString())}`,
+            url: `/api/user?before=${encodeURIComponent(moment().toDate().toISOString())}`,
             auth: {
                 bearer: flight.token.admin
             },
@@ -411,7 +409,7 @@ test('GET: api/user?before=<NOW>', async (t) => {
 test('GET: api/user?after=<NOW>', async (t) => {
     try {
         const res = await flight.request({
-            url: `http://localhost:4999/api/user?after=${encodeURIComponent(moment().toDate().toISOString())}`,
+            url: `/api/user?after=${encodeURIComponent(moment().toDate().toISOString())}`,
             auth: {
                 bearer: flight.token.admin
             },

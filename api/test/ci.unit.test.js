@@ -1,5 +1,3 @@
-
-
 const CI = require('../lib/ci');
 const test = require('tape');
 const nock = require('nock');

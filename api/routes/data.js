@@ -1,5 +1,4 @@
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Data = require('../lib/data');
 const Cacher = require('../lib/cacher');
 const Miss = Cacher.Miss;
@@ -58,12 +57,11 @@ async function router(schema, config) {
      *
      */
     await schema.patch('/data/:data', {
+        ':data': 'integer',
         body: 'req.body.PatchData.json',
         res: 'res.Data.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'data');
-
             await user.is_admin(req);
 
             req.body.id = req.params.data;
@@ -91,11 +89,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
      */
     await schema.get('/data/:data', {
+        ':data': 'integer',
         res: 'res.Data.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'data');
-
             const data = await Data.from(config.pool, req.params.data);
 
             return res.json(data);
@@ -119,6 +116,7 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.DataHistory.json} apiSuccess
      */
     await schema.get('/data/:data/history', {
+        ':data': 'integer',
         res: 'res.DataHistory.json'
     }, async (req, res) => {
         try {

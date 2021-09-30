@@ -171,7 +171,7 @@
     },
     "GET /job/:job/log": {
         "body": false,
-        "query": false,
+        "query": true,
         "res": true
     },
     "PATCH /job/:job": {

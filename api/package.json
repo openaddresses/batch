@@ -30,6 +30,7 @@
         "express": "^4.17.1",
         "express-json-validator-middleware": "^2.1.1",
         "express-minify": "^1.0.0",
+        "form-data": "^4.0.0",
         "json-schema-ref-parser": "^9.0.7",
         "jsonwebtoken": "^8.5.1",
         "knex": "^0.95.10",

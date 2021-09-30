@@ -1,6 +1,8 @@
 const Mailgen = require('mailgen');
-const mailgun = require('mailgun.js');
+const Mailgun = require('mailgun.js');
 const Err = require('./error');
+const formData = require('form-data');
+const mailgun = new Mailgun(formData);
 
 /**
  * @class Email

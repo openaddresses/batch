@@ -187,7 +187,11 @@ class User {
                 SELECT
                     id,
                     username,
-                    email
+                    email,
+                    validated,
+                    flags,
+                    level,
+                    access
                 FROM
                     users
                 WHERE
@@ -200,7 +204,10 @@ class User {
 
         if (pgres.rows.length !== 1) return;
         const u = pgres.rows[0];
-        u.id = parseInt(u.id);
+
+        if (action === 'verify' && u.validated) {
+            throw new Err(400, null, 'User is already verified');
+        }
 
         try {
             await this.pool.query(sql`
@@ -229,9 +236,12 @@ class User {
             `);
 
             return {
-                uid: u.id,
+                id: u.id,
                 username: u.username,
                 email: u.email,
+                flags: u.flags,
+                level: u.level,
+                access: u.access,
                 token: buffer.toString('hex')
             };
         } catch (err) {

@@ -1,23 +1,35 @@
 {
-    "type": "object",
-    "required": [
-        "username",
-        "password",
-        "email"
-    ],
-    "additionalProperties": false,
-    "properties": {
-        "username": {
-            "type": "string",
-            "description": "username"
-        },
-        "password": {
-            "type": "string",
-            "description": "password"
-        },
-        "email": {
-            "type": "string",
-            "description": "email"
+    "oneOf": [{
+        "type": "object",
+        "required": [
+            "username",
+            "password",
+            "email"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "username": {
+                "type": "string",
+                "description": "username"
+            },
+            "password": {
+                "type": "string",
+                "description": "password"
+            },
+            "email": {
+                "type": "string",
+                "description": "email"
+            }
         }
-    }
+    },{
+        "type": "object",
+        "required": [ "username" ],
+        "additionalProperties": false,
+        "properties": {
+            "username": {
+                "type": "string",
+                "description": "username"
+            }
+        }
+    }]
 }

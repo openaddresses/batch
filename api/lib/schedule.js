@@ -11,8 +11,8 @@ class Schedule {
     static async event(pool, event) {
         if (event.type === 'collect') {
             await Schedule.collect();
-        } else if (event.type === 'sources') {
-            await Schedule.sources(pool);
+        } else if (['fabric', 'collect', 'sources'].includes(event.type)) {
+            await Schedule.batch(event.type, pool);
         } else if (event.type === 'close') {
             await Schedule.close(pool);
         } else if (event.type === 'level') {
@@ -30,13 +30,19 @@ class Schedule {
         }
     }
 
-    static async collect() {
+    /**
+     * Generic function for triggering a batch job
+     * @param {String} type Type of batch job to trigger
+     */
+    static async batch(type, pool) {
+        if (type === 'sources') await JobError.clear(pool);
+
         try {
             return await batch.trigger({
-                type: 'collect'
+                type: type
             });
         } catch (err) {
-            throw new Err(500, err, 'failed to submit collect job to batch');
+            throw new Err(500, err, 'Failed to submit job to batch');
         }
     }
 
@@ -47,18 +53,6 @@ class Schedule {
             await level.all();
         } catch (err) {
             throw new Err(500, err, 'Failed to level all users');
-        }
-    }
-
-    static async sources(pool) {
-        await JobError.clear(pool);
-
-        try {
-            return await batch.trigger({
-                type: 'sources'
-            });
-        }  catch (err) {
-            throw new Err(500, err, 'failed to submit sources job to batch');
         }
     }
 

@@ -1,5 +1,10 @@
 <template>
     <div class='col col--12 grid pt24'>
+        <AdminActions
+            v-if='profile.access === "admin"'
+            @err='$emit("err", $event)'
+        />
+
         <AdminUser
             v-if='profile.access === "admin"'
             @err='$emit("err", $event)'
@@ -19,6 +24,7 @@
 
 <script>
 import AdminUser from './admin/AdminUser.vue'
+import AdminActions from './admin/AdminActions.vue'
 import AdminCollections from './admin/AdminCollection.vue'
 import AdminOverrides from './admin/AdminOverrides.vue'
 
@@ -33,7 +39,8 @@ export default {
     components: {
         AdminUser,
         AdminCollections,
-        AdminOverrides
+        AdminOverrides,
+        AdminActions
     }
 }
 </script>

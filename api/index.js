@@ -286,17 +286,20 @@ async function server(args, config, cb) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            const usr = await user.register(req.body);
+            if (req.body.password) {
+                await user.register(req.body);
+            }
 
-            const forgot = await user.forgot(usr.username, 'verify');
+            const forgot = await user.forgot(req.body.username, 'verify');
 
             if (args.email) await email.verify({
-                username: usr.username,
-                email: usr.email,
+                username: forgot.username,
+                email: forgot.email,
                 token: forgot.token
             });
 
-            res.json(usr);
+            delete forgot.token;
+            res.json(forgot);
         } catch (err) {
             return Err.respond(err, res);
         }

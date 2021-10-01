@@ -73,8 +73,7 @@ export default {
             },
             email: '',
             username: '',
-            password: '',
-            created: {}
+            password: ''
         }
     },
     methods: {
@@ -83,20 +82,22 @@ export default {
         },
         resend: async function() {
             try  {
-                if (!this.attempted) return;
+                if (!this.success) return;
+                if (!this.username.length) return;
+
+                this.loading.resend = true;
 
                 await window.std('/api/user', {
                     method: 'POST',
                     body: {
                         username: this.username,
-                        email: this.email,
-                        password: this.password
                     }
                 });
-
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading.resend = false;
         },
         register: async function() {
             try  {

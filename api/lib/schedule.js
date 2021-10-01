@@ -11,6 +11,8 @@ class Schedule {
     static async event(pool, event) {
         if (event.type === 'collect') {
             await Schedule.collect();
+        } else if (event.type === 'fabric') {
+            await Schedule.fabric();
         } else if (event.type === 'sources') {
             await Schedule.sources(pool);
         } else if (event.type === 'close') {
@@ -37,6 +39,16 @@ class Schedule {
             });
         } catch (err) {
             throw new Err(500, err, 'failed to submit collect job to batch');
+        }
+    }
+
+    static async collect() {
+        try {
+            return await batch.trigger({
+                type: 'fabric'
+            });
+        } catch (err) {
+            throw new Err(500, err, 'failed to submit fabric job to batch');
         }
     }
 

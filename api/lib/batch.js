@@ -138,6 +138,16 @@ async function trigger(event) {
                 environment: []
             }
         };
+    } else if (event.type === 'fabric') {
+        params = {
+            jobDefinition: jobDefinition,
+            jobQueue: mega_queue,
+            jobName: 'OA_Fabric',
+            containerOverrides: {
+                command: ['./fabric.js'],
+                environment: []
+            }
+        };
     } else if (event.type === 'sources') {
         params = {
             jobDefinition: jobDefinition,

@@ -13,9 +13,12 @@
                 <p class='txt-h4 py6'>Please check your email for a verification link!</p>
             </div>
             <div class='col col--12 flex flex--center-main'>
-                <button :disabled='loading.resend' @click='resend' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>
+                <button :disabled='loading.resend || resent' @click='resend' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>
                     <template v-if='!loading.resend'>
                         Resend Email
+                    </template>
+                    <template v-else-if='resent'>
+                        Email Resent
                     </template>
                     <template v-else>
                         <div class='col col--12 flex flex--center-main'>
@@ -66,6 +69,7 @@ export default {
     data: function() {
         return {
             success: false,
+            resent: false,
             attempted: false,
             loading: {
                 page: false,
@@ -93,6 +97,8 @@ export default {
                         username: this.username,
                     }
                 });
+
+                this.resent = true;
             } catch (err) {
                 this.$emit('err', err);
             }

@@ -1,8 +1,8 @@
 <template>
     <div class='col col--12 grid pt12'>
-        <template v-if='loading'>
+        <template v-if='loading.page'>
             <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
+                <div class='loading.page'></div>
             </div>
         </template>
         <template v-else-if='success'>
@@ -13,9 +13,20 @@
                 <p class='txt-h4 py6'>Please check your email for a verification link!</p>
             </div>
             <div class='col col--12 flex flex--center-main'>
-                <div class='w240 col col--12 grid grid--gut12'>
-                    <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
-                </div>
+                <button :disabled='loading.resend' @click='resend' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>
+                    <template v-if='!loading.resend'>
+                        Resend Email
+                    </template>
+                    <template v-else>
+                        <div class='col col--12 flex flex--center-main'>
+                            <div class='loading loading--s'></div>
+                        </div>
+                    </template>
+                </button>
+            </div>
+
+            <div class='col col--12 flex flex--center-main'>
+                <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
             </div>
         </template>
         <template v-else>
@@ -56,24 +67,23 @@ export default {
         return {
             success: false,
             attempted: false,
-            loading: false,
+            loading: {
+                page: false,
+                resend: false
+            },
             email: '',
             username: '',
-            password: ''
+            password: '',
+            created: {}
         }
     },
     methods: {
         login: function() {
             this.$router.push('/login');
         },
-        register: async function() {
+        resend: async function() {
             try  {
-                this.attempted = true;
-
-                if (!this.username.length) return;
-                if (!this.password.length) return;
-                if (!this.email.length) return;
-                this.loading = true;
+                if (!this.attempted) return;
 
                 await window.std('/api/user', {
                     method: 'POST',
@@ -84,11 +94,35 @@ export default {
                     }
                 });
 
-                this.loading = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        register: async function() {
+            try  {
+                this.attempted = true;
+
+                if (!this.username.length) return;
+                if (!this.password.length) return;
+                if (!this.email.length) return;
+
+                this.loading.page = true;
+
+                this.created = await window.std('/api/user', {
+                    method: 'POST',
+                    body: {
+                        username: this.username,
+                        email: this.email,
+                        password: this.password
+                    }
+                });
+
                 this.success = true;
             } catch (err) {
-                return this.$emit('err', err);
+                this.$emit('err', err);
             }
+
+            this.loading.page = false;
         }
     }
 }

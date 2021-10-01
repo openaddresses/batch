@@ -66,7 +66,7 @@ export default {
             this.loading.collections = true;
             try {
                 await window.std(`/api/schedule`, {
-                    method: 'POST'
+                    method: 'POST',
                     body: {
                         type: 'collect'
                     }
@@ -93,7 +93,7 @@ export default {
             this.loading.fabric = true;
             try {
                 await window.std(`/api/schedule`, {
-                    method: 'POST'
+                    method: 'POST',
                     body: {
                         type: 'fabric'
                     }

@@ -3011,6 +3011,27 @@ define({ "api": [
             "field": ":job",
             "description": "<p>Job ID</p>"
           }
+        ],
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "dl",
+            "description": "<p>Optional param to set content-disposition - forcing the browser to download</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"json\"",
+              "\"csv\""
+            ],
+            "optional": true,
+            "field": "format",
+            "defaultValue": "json",
+            "description": ""
+          }
         ]
       }
     },
@@ -4660,6 +4681,7 @@ define({ "api": [
             "type": "String",
             "allowedValues": [
               "\"close\"",
+              "\"fabric\"",
               "\"scale\"",
               "\"level\"",
               "\"collect\"",

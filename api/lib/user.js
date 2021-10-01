@@ -425,39 +425,6 @@ class User {
             flags: pgres.rows[0].flags
         };
     }
-    async user(uid) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(sql`
-                SELECT
-                    id,
-                    level,
-                    username,
-                    access,
-                    email,
-                    flags
-                FROM
-                    users
-                WHERE
-                    id = ${uid}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-
-        if (pgres.rows.length === 0) {
-            throw new Error(404, null, 'Failed to retrieve user');
-        }
-
-        return {
-            uid: parseInt(pgres.rows[0].id),
-            level: pgres.rows[0].level,
-            username: pgres.rows[0].username,
-            email: pgres.rows[0].email,
-            access: pgres.rows[0].access,
-            flags: pgres.rows[0].flags
-        };
-    }
 
     async login(user) {
         if (!user.username) throw new Err(400, null, 'username required');

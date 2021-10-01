@@ -12,7 +12,7 @@ class Schedule {
         if (event.type === 'collect') {
             await Schedule.collect();
         } else if (['fabric', 'collect', 'sources'].includes(event.type)) {
-            await Schedule.batch(event.type);
+            await Schedule.batch(event.type, pool);
         } else if (event.type === 'close') {
             await Schedule.close(pool);
         } else if (event.type === 'level') {
@@ -34,7 +34,9 @@ class Schedule {
      * Generic function for triggering a batch job
      * @param {String} type Type of batch job to trigger
      */
-    static async batch(type) {
+    static async batch(type, pool) {
+        if (type === 'sources') await JobError.clear(pool);
+
         try {
             return await batch.trigger({
                 type: type

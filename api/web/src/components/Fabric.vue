@@ -58,6 +58,19 @@ export default {
                         }
                     });
 
+                    this.map.addLayer({
+                        id: `buildings`,
+                        type: 'line',
+                        source: 'fabric',
+                        'source-layer': 'buildings',
+                        layout: { },
+                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        paint: {
+                            'line-color': 'rgba(0, 0, 0, 0.1)',
+                            'line-width': 1
+                        }
+                    });
+
                     this.map.on('click', (e) => {
                         console.error(this.map.queryRenderedFeatures(e.point))
                     });

@@ -89,7 +89,6 @@ async function cli() {
 
     try {
         await meta.load();
-        await meta.protection(true);
 
         const tippecanoe = new Tippecanoe();
 

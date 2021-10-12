@@ -25,6 +25,8 @@ async function router(schema, config) {
         res: 'res.ErrorList.json'
     }, async (req, res) => {
         try {
+            if (req.query.status) req.query.status = req.query.status.split(',');
+
             return res.json(await JobError.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);

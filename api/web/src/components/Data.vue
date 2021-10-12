@@ -77,20 +77,10 @@
                         <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
                         <div class='col col--9 px6'>
-                            <label>Source</label>
-                            <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
+                            <QuerySource @source='filter.source = $event'/>
                         </div>
                         <div class='col col--3 px6'>
-                            <label>Layer</label>
-                            <div class='w-full select-container'>
-                                <select v-model='filter.layer' class='select select--stroke'>
-                                    <option>all</option>
-                                    <option>addresses</option>
-                                    <option>buildings</option>
-                                    <option>parcels</option>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
+                            <QueryLayer @layer='filter.layer = $event'/>
                         </div>
                         <div class='col col--6 px6'>
                             <label class='switch-container mr6'>
@@ -201,6 +191,8 @@
 
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
+import QuerySource from './query/Source.vue';
+import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 
 export default {
@@ -371,6 +363,8 @@ export default {
     },
     components: {
         Coverage,
+        QuerySource,
+        QueryLayer,
         Download
     }
 }

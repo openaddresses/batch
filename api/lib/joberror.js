@@ -2,6 +2,7 @@ const Err = require('./error');
 const Job = require('./job');
 const Run = require('./run');
 const { sql } = require('slonik');
+const { Status } = require('./util');
 
 /**
  * @class JobError
@@ -100,7 +101,17 @@ class JobError {
         };
     }
 
-    static async list(pool) {
+    static async list(pool, query) {
+        if (!query) query = {};
+        if (!query.source) query.source = '';
+        if (!query.layer || query.layer === 'all') query.layer = '';
+        if (!query.status) query.status = Status.list();
+
+        query.source = '%' + query.source + '%';
+        query.layer = query.layer + '%';
+
+        Status.verify(query.status);
+
         let pgres;
         try {
             pgres = await pool.query(sql`
@@ -114,6 +125,10 @@ class JobError {
                 FROM
                     job_errors INNER JOIN job
                         ON job_errors.job = job.id
+                WHERE
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    AND job.layer ilike ${query.layer}
+                    AND job.source ilike ${query.source}
                 GROUP BY
                     job.id
                 ORDER BY

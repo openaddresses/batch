@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "source": {
+            "type": "string",
+            "description": "Filter results by source name"
+        },
+        "layer": {
+            "type": "string",
+            "description": "Filter results by layer type"
+        },
+        "status": {
+            "$ref": "./util/status.json"
+        }
+    }
+}

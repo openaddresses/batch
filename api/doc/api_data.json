@@ -1975,6 +1975,40 @@
       }
     ],
     "description": "<p>All jobs that fail as part of a live run are entered into the JobError API This API powers a page that allows for human review of failing jobs Note: Job Errors are cleared with every subsequent full cache</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "source",
+            "description": "<p>Filter results by source name</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "layer",
+            "description": "<p>Filter results by layer type</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"Pending\"",
+              "\"Running\"",
+              "\"Success\"",
+              "\"Fail\"",
+              "\"Warn\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>The current status of a given task</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "Success 200": [

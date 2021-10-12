@@ -17,12 +17,16 @@ async function router(schema, config) {
      *     This API powers a page that allows for human review of failing jobs
      *     Note: Job Errors are cleared with every subsequent full cache
      *
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ErrorList.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ErrorList.json} apiSuccess
      */
     await schema.get('/job/error', {
+        query: 'req.query.ErrorList.json',
         res: 'res.ErrorList.json'
     }, async (req, res) => {
         try {
+            if (req.query.status) req.query.status = req.query.status.split(',');
+
             return res.json(await JobError.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);

@@ -1,5 +1,3 @@
-
-
 const Ajv = require('ajv');
 const wkt = require('wellknown');
 const turf = require('@turf/turf');
@@ -10,18 +8,16 @@ const path = require('path');
 const { pipeline } = require('stream');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
-const schema_v2 = require('oa').schema['2'];
+const OA = require('oa');
 const transform = require('parallel-transform');
 const Stats = require('./stats');
 
-const ajv = new Ajv({
-    schemaId: 'auto'
-});
+const ajv = new Ajv();
+const addFormats = require('ajv-formats');
+addFormats(ajv);
+ajv.addMetaSchema(OA.geojson);
 
-ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'), 'http://json-schema.org/draft-04/schema#');
-ajv.addMetaSchema(require('./geojson.json'), 'http://json.schemastore.org/geojson#/definitions/geometry');
-
-const validate = ajv.compile(schema_v2);
+const validate = ajv.compile(OA.schema[2]);
 
 const find = require('find');
 const s3 = new AWS.S3({

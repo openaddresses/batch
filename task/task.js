@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-
-
 require('./lib/pre');
 
 const config = require('./package.json');

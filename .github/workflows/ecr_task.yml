@@ -24,6 +24,10 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.sha }}
 
+            - name: Docker Layer Caching
+              uses: satackey/action-docker-layer-caching@v0.0.11
+              continue-on-error: true
+
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v1
@@ -36,3 +40,9 @@ jobs:
 
             - name: Docker Push Task
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{github.event.pull_request.head.sha}}
+
+            - name: Docker Task Lint
+              run: docker run task npm run lint
+
+            - name: Docker Task Test
+              run: docker run task npm test

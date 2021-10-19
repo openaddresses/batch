@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-    build:
+    api:
         docker:
             - image: ubuntu:20.04
             - image: postgis/postgis:13-master

@@ -14,4 +14,3 @@ echo "CREATE DATABASE openaddresses_test" | psql "postgres://postgres@localhost:
 
 test .
 test api/
-test task/

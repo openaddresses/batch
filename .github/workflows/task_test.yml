@@ -1,0 +1,31 @@
+name: Task Test
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker Layer Caching
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
+      - name: Docker Task Build
+        run: docker build -t task task
+
+      - name: Docker Task Lint
+        run: docker run task npm run lint
+
+      - name: Docker Task Test
+        run: docker run task npm test
+

@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-
-
 // Does not need to mark instance
 // as protected as it runs on a managed queue
 require('./lib/pre');
@@ -120,8 +118,15 @@ function get_source(tmp, data, stats) {
     return new Promise((resolve, reject) => {
         const dir = path.parse(data.source).dir;
         const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
+        const source_meta = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson.meta`;
 
         mkdirp(path.resolve(tmp, 'sources', dir));
+
+        const job = await oa.cmd('job', 'get', {
+            ':job': data.job
+        });
+
+        fs.writeFileSync(source_meta, JSON.stringify(job, null, 4));
 
         console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
         pipeline(

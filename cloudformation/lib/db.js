@@ -25,7 +25,7 @@ const stack = {
                 DBName: 'openaddresses',
                 DBInstanceIdentifier: cf.stackName,
                 KmsKeyId: cf.ref('OAKMS'),
-                EngineVersion: '13.3',
+                EngineVersion: '13.4',
                 MasterUsername: 'openaddresses',
                 MasterUserPassword: cf.ref('DatabasePassword'),
                 AllocatedStorage: 10,

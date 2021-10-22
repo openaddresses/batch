@@ -9,9 +9,7 @@ const { sql } = require('slonik');
  */
 class Schedule {
     static async event(pool, event) {
-        if (event.type === 'collect') {
-            await Schedule.collect();
-        } else if (['fabric', 'collect', 'sources'].includes(event.type)) {
+        if (['fabric', 'collect', 'sources'].includes(event.type)) {
             await Schedule.batch(event.type, pool);
         } else if (event.type === 'close') {
             await Schedule.close(pool);

@@ -5,7 +5,6 @@ const { ValidationError } = require('express-json-validator-middleware');
 const Analytics = require('./lib/analytics');
 const path = require('path');
 const morgan = require('morgan');
-const util = require('./lib/util');
 const express = require('express');
 const pkg = require('./package.json');
 const minify = require('express-minify');
@@ -23,8 +22,6 @@ const args = require('minimist')(process.argv, {
 });
 
 const Err = require('./lib/error');
-
-const Param = util.Param;
 
 const Config = require('./lib/config');
 
@@ -326,7 +323,6 @@ async function server(args, config, cb) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'id');
             await user.is_admin(req);
 
             if (req.query.level) {
@@ -361,7 +357,6 @@ async function server(args, config, cb) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'id');
             await user.is_admin(req);
 
             res.json(await user.patch(req.params.id, req.body));
@@ -591,8 +586,6 @@ async function server(args, config, cb) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'id');
-
             await user.is_auth(req);
 
             return res.json(await token.delete(req.auth, req.params.id));

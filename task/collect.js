@@ -156,20 +156,15 @@ async function get_source(oa, tmp, data, stats) {
     });
 }
 
-function upload_collection(file, name) {
-    return new Promise((resolve, reject) => {
-        s3.upload({
-            ContentType: 'application/zip',
-            Body: fs.createReadStream(file),
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/collection-${name}.zip`
-        }, (err) => {
-            console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
-            if (err) return reject(err);
+async function upload_collection(file, name) {
+    await s3.upload({
+        ContentType: 'application/zip',
+        Body: fs.createReadStream(file),
+        Bucket: process.env.Bucket,
+        Key: `${process.env.StackName}/collection-${name}.zip`
+    }).promise();
 
-            return resolve(true);
-        });
-    });
+    console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
 }
 
 function zip_datas(tmp, datas, name) {
@@ -196,6 +191,10 @@ function zip_datas(tmp, datas, name) {
         for (const data of datas) {
             archive.file(path.resolve(tmp, 'sources', data), {
                 name: data
+            });
+
+            archive.file(path.resolve(tmp, 'sources', data + '.meta'), {
+                name: data + '.meta'
             });
         }
 

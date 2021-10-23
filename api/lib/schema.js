@@ -106,10 +106,6 @@ class Schemas {
 
         this.schemas.set(parsed.join(' '), schemas);
 
-        if (!schemas.body && !schemas.query) {
-            return [parsed[1]];
-        }
-
         const opts = {};
         if (schemas.query) opts.query = schemas.query;
         if (schemas.body) opts.body = schemas.body;
@@ -174,6 +170,8 @@ class Schemas {
                         req.query[key] = parseInt(req.query[key]);
                     } else if (type === 'number' && !isNaN(Number(req.query[key]))) {
                         req.query[key] = Number(req.query[key]);
+                    } else if (type === 'array') {
+                        req.query[key] = req.query[key].split(',');
                     } else if (type === 'boolean') {
                         if (req.query[key] === 'true') {
                             req.query[key] = true;
@@ -181,6 +179,12 @@ class Schemas {
                             req.query[key] = false;
                         }
                     }
+                }
+            }
+
+            for (const key of Object.keys(schema.properties)) {
+                if (req.query[key] === undefined && schema.properties[key].default) {
+                    req.query[key] = schema.properties[key].default;
                 }
             }
 

@@ -5,6 +5,7 @@ const { Octokit } = require('@octokit/rest');
 
 class Config {
     static async env(args = {}) {
+        this.args = args;
         this.limits = args.limit || {
             exports: 300
         };

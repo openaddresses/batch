@@ -10,12 +10,10 @@
         },
         "page": {
             "type": "integer",
-            "default": 100,
             "description": "The offset based on limit to return"
         },
         "filter": {
             "type": "string",
-            "default": "",
             "description": "Filter a complete or partial pattern"
         },
         "level": {

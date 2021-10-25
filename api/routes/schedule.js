@@ -1,4 +1,4 @@
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Schedule = require('../lib/schedule');
 
 async function router(schema, config) {

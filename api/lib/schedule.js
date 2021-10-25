@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const JobError = require('./joberror');
 const batch = require('./batch');
 const Level = require('./level');

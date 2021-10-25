@@ -1,4 +1,4 @@
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const LevelOverride = require('../lib/level-override');
 
 async function router(schema, config) {

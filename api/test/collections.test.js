@@ -2,7 +2,7 @@ const test = require('tape');
 
 const Flight = require('./flight');
 const Collection = require('../lib/collections');
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 
 const flight = new Flight();
 flight.init(test);

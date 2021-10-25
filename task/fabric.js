@@ -96,20 +96,20 @@ async function cli() {
             fabric: true
         });
 
-        const layers = {};
-        for (const l of ['addresses', 'buildings', 'parcels']) {
-            layers[l] = fs.createWriteStream(path.resolve(DRIVE, `${l}.geojson`), { autoClose: false });
-        }
+        const layers = ['addresses', 'buildings', 'parcels'];
 
         console.error(`ok - fetching ${datas.length} sources`);
         for (const data of datas) {
-            if (!layers[data.layer]) return; // Ignore unsupported sources
+            if (!layers.includes(data.layer)) {
+                console.error(`ok - skipping ${JSON.stringify(data)} due to unsuppoted layer type`);
+                continue; // Ignore unsupported sources
+            }
+
             await get_source(layers[data.layer], data);
         }
+        console.error('ok - completed fetch');
 
-        for (const l of Object.keys(layers)) {
-            layers[l].close();
-
+        for (const l of layers) {
             console.error(`ok - generating ${l} tiles`);
             await tippecanoe.tile(
                 fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
@@ -133,7 +133,7 @@ async function cli() {
             );
         }
 
-        await tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), Object.keys(layers).map((l) => {
+        await tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), layers.map((l) => {
             return path.resolve(DRIVE, `${l}.mbtiles`);
         }), {
             std: true,
@@ -172,13 +172,9 @@ function get_source(out, data) {
                 Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
             }).createReadStream(),
             Unzip(),
-            out,
+            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' }),
             (err) => {
-                if (err) {
-                    console.error(err);
-                    return reject(err);
-                }
-
+                if (err) return reject(err);
                 return resolve();
             }
         );

@@ -225,7 +225,7 @@ class Job {
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
-        if (!query.live) query.live = null;
+        if (!query.live || query.live === 'all') query.live = null;
         if (!query.run) query.run = null;
 
         Status.verify(query.status);

@@ -1,7 +1,6 @@
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const Cacher = require('./lib/cacher');
-const { ValidationError } = require('express-json-validator-middleware');
 const Analytics = require('./lib/analytics');
 const path = require('path');
 const morgan = require('morgan');
@@ -10,7 +9,7 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const TileBase = require('tilebase');
-const Schema = require('./lib/schema');
+const { Schema, Err } = require('@openaddresses/batch-schema');
 const { sql, createPool } = require('slonik');
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase'],
@@ -20,8 +19,6 @@ const args = require('minimist')(process.argv, {
     },
     string: ['postgres']
 });
-
-const Err = require('./lib/error');
 
 const Config = require('./lib/config');
 
@@ -117,7 +114,9 @@ async function server(args, config, cb) {
 
     const app = express();
 
-    const schema = new Schema(express.Router());
+    const schema = new Schema(express.Router(), {
+        schemas: path.resolve(__dirname, './schema')
+    });
 
     app.disable('x-powered-by');
     app.use(minify());
@@ -234,6 +233,8 @@ async function server(args, config, cb) {
         return next();
     });
 
+
+    await schema.api();
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
@@ -592,33 +593,6 @@ async function server(args, config, cb) {
         } catch (err) {
             return Err.respond(err, res);
         }
-    }
-    );
-
-    schema.router.use((err, req, res, next) => {
-        if (err instanceof ValidationError) {
-            let errs = [];
-
-            if (err.validationErrors.body) {
-                errs = errs.concat(err.validationErrors.body.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
-            if (err.validationErrors.query) {
-                errs = errs.concat(err.validationErrors.query.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
-            return Err.respond(
-                new Err(400, null, 'validation error'),
-                res,
-                errs
-            );
-        } else {
-            next(err);
-        }
     });
 
     schema.router.all('*', (req, res) => {
@@ -627,6 +601,8 @@ async function server(args, config, cb) {
             message: 'API endpoint does not exist!'
         });
     });
+
+    schema.error();
 
     const srv = app.listen(4999, (err) => {
         if (err) return err;

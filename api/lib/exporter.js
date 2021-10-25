@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const { Status } = require('./util');
 const batchjob = require('./batch').trigger;
 const moment = require('moment');

@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const Job = require('./job');
 const Run = require('./run');
 const { sql } = require('slonik');

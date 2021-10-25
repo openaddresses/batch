@@ -1,6 +1,6 @@
 const request = require('request');
 const pkg = require('../package.json');
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 
 class Status {
     static list() {

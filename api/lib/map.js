@@ -9,7 +9,7 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const Q = require('d3-queue').queue;
 
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 
 const MAP_LAYERS = [
     'district.geojson',

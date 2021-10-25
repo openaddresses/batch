@@ -20,7 +20,7 @@
         "@octokit/request": "^5.4.15",
         "@octokit/rest": "^18.11.3",
         "@octokit/webhooks": "9.17.0",
-        "@openaddresses/batch-schema": "^1.0.0",
+        "@openaddresses/batch-schema": "^1.0.1",
         "@turf/turf": "^6.5.0",
         "aws-sdk": "^2.901.0",
         "bcrypt": "^5.0.0",

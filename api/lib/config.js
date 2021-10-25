@@ -83,24 +83,16 @@ class Config {
         return this;
     }
 
-    static secret(secretName) {
-        return new Promise((resolve, reject) => {
-            const client = new AWS.SecretsManager({
-                region: process.env.AWS_DEFAULT_REGION
-            });
-
-            client.getSecretValue({
-                SecretId: secretName
-            }, (err, data) => {
-                if (err) return reject(err);
-
-                try {
-                    return resolve(JSON.parse(data.SecretString));
-                } catch (err) {
-                    return reject(err);
-                }
-            });
+    static async secret(secretName) {
+        const client = new AWS.SecretsManager({
+            region: process.env.AWS_DEFAULT_REGION
         });
+
+        const data = client.getSecretValue({
+            SecretId: secretName
+        }).promise();
+
+        return JSON.parse(data.SecretString);
     }
 }
 

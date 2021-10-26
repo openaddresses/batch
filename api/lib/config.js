@@ -88,7 +88,7 @@ class Config {
             region: process.env.AWS_DEFAULT_REGION
         });
 
-        const data = client.getSecretValue({
+        const data = await client.getSecretValue({
             SecretId: secretName
         }).promise();
 

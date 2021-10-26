@@ -2,15 +2,26 @@
     <div id='app' class='col col--12'>
         <div class='col col--12 px12 py12 border-b border--gray'>
             <img @click='external("https://openaddresses.io")' class='h24 w24 round mr12 cursor-pointer' src='../../public/logo.jpg'/>
-            <router-link to='/data'><button class='btn btn--stroke btn--s btn--gray round mr12'>Data</button></router-link>
-            <router-link to='/run'><button class='btn btn--stroke btn--s btn--gray round mr12'>Runs</button></router-link>
-            <router-link to='/job'><button class='btn btn--stroke btn--s btn--gray round mr12'>Jobs</button></router-link>
-            <router-link to='/errors'><button class='btn btn--stroke btn--s btn--gray round mr12'>
-                <span class='bg-gray-light round color-gray px6' v-text='errors'/>
-                Errors
-            </button></router-link>
 
+            <router-link to='/data'>
+                <button class='dropdown btn btn--stroke btn--s btn--gray round mr12'>
+                    Data
 
+                    <div class='round dropdown-content'>
+                        <div v-on:click.stop.prevent='$router.push("/run")' style='width: 80px;' class='round bg-gray-light-on-hover'>Runs</div>
+                        <div v-on:click.stop.prevent='$router.push("/job")' class='round bg-gray-light-on-hover'>Jobs</div>
+                        <div v-on:click.stop.prevent='$router.push("/errors")' class='round bg-gray-light-on-hover'>
+                            <span class='bg-gray-light round color-gray px6' v-text='errors'/>
+                            Errors
+                        </div>
+                    </div>
+                </button>
+            </router-link>
+
+            <button @click='external("/map")' class='btn btn--stroke btn--s btn--gray round mr12'>
+                Map
+                <span class='bg-blue-light round color-white px6'>new</span>
+            </button>
 
             <span class='fr'>
                 <a href='mailto:hello@openaddresses.io' class='btn btn--stroke btn--s btn--gray round mr12'>Contact Us</a>
@@ -25,7 +36,7 @@
                         <svg class='inline pt3 icon'><use xlink:href='#icon-user'/></svg><span v-text='auth.username'/>
 
                         <div class='round dropdown-content'>
-                            <div v-on:click.stop.prevent='logout' class='round bg-gray-faint-on-hover'>Logout</div>
+                            <div v-on:click.stop.prevent='logout' class='round bg-gray-light-on-hover'>Logout</div>
                         </div>
                     </button>
                 </router-link>

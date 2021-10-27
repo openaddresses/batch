@@ -1,8 +1,7 @@
-
-
 const cf = require('@mapbox/cloudfriend');
 const api = require('./lib/api');
 const batch = require('./lib/batch');
+const secret = require('./lib/secret');
 const db = require('./lib/db');
 const schedule = require('./lib/schedule');
 const kms = require('./lib/kms');
@@ -42,6 +41,7 @@ module.exports = cf.merge(
     api,
     kms,
     batch,
+    secret,
     alarms({
         prefix: 'Batch',
         email: 'nick@ingalls.ca',

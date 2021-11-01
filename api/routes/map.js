@@ -96,6 +96,9 @@ async function router(schema, config) {
     }, async (req, res) => {
         let tile;
         try {
+            const encodings = req.headers['accept-encoding'].split(',').map(e => e.trim());
+            if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
+
             tile = await config.cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                 return await Map.fabric_tile(config.tb, req.params.z, req.params.x, req.params.y);
             }, false);
@@ -110,7 +113,7 @@ async function router(schema, config) {
         res.writeHead(200, {
             'Content-Type': 'application/vnd.mapbox-vector-tile',
             'Content-Encoding': 'gzip',
-            'cache-control: no-transform'
+            'cache-control': 'no-transform'
         });
         res.end(tile);
     });

@@ -57,7 +57,7 @@ function schedule(type, cron, desc) {
             Environment: {
                 Variables: {
                     OA_API: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]),
-                    SharedSecret: cf.ref('SharedSecret')
+                    SharedSecret: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}'),
                 }
             },
             Code: {

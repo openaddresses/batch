@@ -51,7 +51,7 @@ const stack = {
                     Environment: [
                         { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
-                        { Name: 'SharedSecret', Value: cf.ref('SharedSecret') },
+                        { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },
                         { Name: 'OA_BRANCH', Value: cf.ref('Branch') },
                         { Name: 'OA_API' , Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]) },
                         { Name: 'StackName', Value: cf.stackName },

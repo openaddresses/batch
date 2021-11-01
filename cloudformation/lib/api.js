@@ -3,10 +3,6 @@ const cf = require('@mapbox/cloudfriend');
 
 const stack = {
     Parameters: {
-        SharedSecret: {
-            Type: 'String',
-            Description: 'Secret for auth against internal API functions'
-        },
         OpenCollective: {
             Type: 'String',
             Description: 'OpenCollective API Token'
@@ -224,7 +220,7 @@ const stack = {
                         { Name: 'MAILGUN_API_KEY', Value: cf.ref('MailGun') },
                         { Name: 'OPENCOLLECTIVE_API_KEY', Value: cf.ref('OpenCollective') },
                         { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstanceVPC', 'Endpoint.Address'), ':5432/openaddresses']) },
-                        { Name: 'SharedSecret', Value: cf.ref('SharedSecret') },
+                        { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },
                         { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
                         { Name: 'Bucket', Value: cf.ref('Bucket') },
                         { Name: 'StackName', Value: cf.stackName },

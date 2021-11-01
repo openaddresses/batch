@@ -51,12 +51,30 @@ export default {
         await this.getTilejson();
         this.init();
     },
+    watch: {
+        'filter.layers.addresses': function() {
+            this.layer('addresses', this.filter.layers.addresses);
+        },
+        'filter.layers.buildings': function() {
+            this.layer('buildings', this.filter.layers.buildings);
+        },
+        'filter.layers.parcels': function() {
+            this.layer('parcels', this.filter.layers.parcels);
+        }
+    },
     methods: {
         getTilejson: async function() {
             try {
                 this.tilejson = await window.std('/api/map/fabric');
             } catch (err) {
                 this.$emit('err', err);
+            }
+        },
+        layer: function(layer, status) {
+            if (status) {
+                this.map.setLayoutProperty(layer, 'visibility', 'visible');
+            } else {
+                this.map.setLayoutProperty(layer, 'visibility', 'none');
             }
         },
         init: async function() {

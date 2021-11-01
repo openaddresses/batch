@@ -14,13 +14,22 @@ export default {
     name: 'Fabric',
     data: function() {
         return {
+            tilejson: {},
             map: ''
         }
     },
-    mounted: function() {
+    mounted: async function() {
+        await this.getTilejson();
         this.init();
     },
     methods: {
+        getTilejson: async function() {
+            try {
+                this.tilejson = await window.std('/api/map/fabric');
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
         init: async function() {
             try {
                 const res = await window.std('/api/map');
@@ -28,9 +37,9 @@ export default {
 
                 this.map = new mapboxgl.Map({
                     container: 'map',
-                    center: [-108.55118480513727, 39.073072429359],
-                    zoom: 10,
-                    style: 'mapbox://styles/mapbox/light-v9'
+                    center: this.tilejson.center,
+                    zoom: this.tilejson.minzoom,
+                    style: 'mapbox://styles/ingalls/ckvh0wwm8g2cw15r05ozt0ybr'
                 });
 
                 this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
@@ -38,8 +47,8 @@ export default {
                 this.map.on('load', () => {
                     this.map.addSource('fabric', {
                         type: 'vector',
-                        minzoom: 8,
-                        maxzoom: 15,
+                        minzoom: this.tilejson.minzoom,
+                        maxzoom: this.tilejson.maxzoom,
                         tiles: [
                             `${window.location.origin}/api/map/fabric/{z}/{x}/{y}.mvt`
                         ]

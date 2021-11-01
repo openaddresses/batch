@@ -2,6 +2,28 @@
     <div class='col col--12 h-full'>
         <div class='col col--12 relative h-full'>
             <div id='map' class='w-full h-full'></div>
+
+            <div class='absolute top right pt3'>
+                <button @click='filter.layers.buildings = !filter.layers.buildings' class='btn btn--stroke btn--s mx3 round color-gray' :class='{
+                    "color-gray": !filter.layers.buildings,
+                    "color-blue": filter.layers.buildings
+                }'>
+                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg>
+                </button>
+                <button @click='filter.layers.addresses = !filter.layers.addresses' class='btn btn--stroke btn--s mx3 round' :class='{
+                    "color-gray": !filter.layers.addresses,
+                    "color-blue": filter.layers.addresses
+                }'>
+                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg>
+                </button>
+                <button @click='filter.layers.parcels = !filter.layers.parcels' class='btn btn--stroke btn--s mx3 round' :class='{
+                    "color-gray": !filter.layers.parcels,
+                    "color-blue": filter.layers.parcels
+                }'>
+                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg>
+                </button>
+            </div>
+
         </div>
     </div>
 </template>
@@ -15,6 +37,13 @@ export default {
     data: function() {
         return {
             tilejson: {},
+            filter: {
+                layers: {
+                    addresses: true,
+                    parcels: true,
+                    buildings: true
+                }
+            },
             map: ''
         }
     },

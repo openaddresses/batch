@@ -68,7 +68,6 @@ async function router(schema, config) {
     await schema.get('/map/fabric', {
         res: 'res.TileJSON.json'
     }, async (req, res) => {
-        let tile;
         try {
             res.json(config.tb.tilejson());
         } catch (err) {

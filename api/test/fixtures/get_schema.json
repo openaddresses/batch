@@ -1,4 +1,9 @@
 {
+    "GET /schema": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "GET /dash/traffic": {
         "body": false,
         "query": false,
@@ -9,12 +14,12 @@
         "query": false,
         "res": true
     },
-    "DELETE /cache": {
+    "DELETE /cache/:cache_key": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /cache/:cache_key": {
+    "DELETE /cache": {
         "body": false,
         "query": false,
         "res": true
@@ -204,6 +209,31 @@
         "query": false,
         "res": true
     },
+    "GET /login/verify": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /login": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /login": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /login/forgot": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /login/reset": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
     "GET /map": {
         "body": false,
         "query": false,
@@ -213,6 +243,11 @@
         "body": false,
         "query": false,
         "res": false
+    },
+    "GET /map/fabric": {
+        "body": false,
+        "query": false,
+        "res": true
     },
     "GET /map/fabric/:z/:x/:y.mvt": {
         "body": false,
@@ -269,9 +304,19 @@
         "query": false,
         "res": true
     },
-    "GET /schema": {
+    "GET /token": {
         "body": false,
-        "query": true,
+        "query": false,
+        "res": true
+    },
+    "POST /token": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /token/:id": {
+        "body": false,
+        "query": false,
         "res": true
     },
     "POST /upload": {
@@ -296,46 +341,6 @@
     },
     "PATCH /user/:id": {
         "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /login/verify": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "GET /login": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /login": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /login/forgot": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /login/reset": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /token": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /token": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /token/:id": {
-        "body": false,
         "query": false,
         "res": true
     }

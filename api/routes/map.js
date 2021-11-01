@@ -54,6 +54,29 @@ async function router(schema, config) {
     });
 
     /**
+     * @api {get} /api/map/fabric Fabric TileJSON
+     * @apiVersion 1.0.0
+     * @apiName FabricVectorTile
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Return a TileJSON for the current fabric
+     *
+     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
+     */
+    await schema.get('/map/fabric', {
+        res: 'res.TileJSON.json'
+    }, async (req, res) => {
+        let tile;
+        try {
+            res.json(config.tb.tilejson());
+        } catch (err) {
+            return Err.respond(new Err(404, err, 'No Tile Found'), res);
+        }
+    });
+
+    /**
      * @api {get} /api/map/fabric/:z/:x/:y.mvt Fabric MVT
      * @apiVersion 1.0.0
      * @apiName FabricVectorTile

@@ -55,6 +55,19 @@ export default {
                     });
 
                     this.map.addLayer({
+                        id: `addresses`,
+                        type: 'circle',
+                        source: 'fabric',
+                        'source-layer': 'addresses',
+                        layout: { },
+                        filter: ['==', ['geometry-type'], 'Point'],
+                        paint: {
+                            'circle-radius': 4,
+                            'circle-color': 'rgba(0, 0, 0, 0.1)'
+                        }
+                    });
+
+                    this.map.addLayer({
                         id: `parcels`,
                         type: 'line',
                         source: 'fabric',

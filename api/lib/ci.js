@@ -278,6 +278,10 @@ class CI {
                 let master_body = '{}';
                 if (master_res.statusCode === 200) {
                     master_body = master_res.body;
+                } else {
+                    // This isn't always an error - if the source is new you can't compare against master as
+                    // it won't exist - hence the fallback to an empty object
+                    console.error(`Error: InternalDiff: HTTP:${master_res.statusCode}: ${master_res.body}`);
                 }
 
                 const master_json = JSON.parse(master_body);

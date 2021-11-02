@@ -14,23 +14,27 @@ class Token {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
+        let pgres;
         try {
-            await this.pool.query(sql`
+            pgres = await this.pool.query(sql`
                 DELETE FROM
                     users_tokens
                 WHERE
                     uid = ${auth.uid}
                     AND id = ${token_id}
+                RETURNING
+                    *
             `);
-
-            return {
-                status: 200,
-                message: 'Token Deleted'
-            };
-
         } catch (err) {
             throw new Err(500, err, 'Failed to delete token');
         }
+
+        if (!pgres.rows.length) throw new Err(401, null, 'You can only access your own tokens');
+
+        return {
+            status: 200,
+            message: 'Token Deleted'
+        };
     }
 
     async validate(token) {

@@ -1,7 +1,5 @@
 const test = require('tape');
 const Flight = require('./flight');
-const { sql } = require('slonik');
-const moment = require('moment');
 
 const flight = new Flight();
 flight.init(test);

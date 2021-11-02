@@ -24,7 +24,7 @@ test('GET /api/token', async (t) => {
             json: true,
             auth: {
                 bearer: flight.token.sponsor
-            },
+            }
         }, t);
 
         t.deepEquals(res.body, {
@@ -68,7 +68,7 @@ test('POST /api/token', async (t) => {
 
 test('POST /api/token (sponsor2)', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             url: '/api/token',
             method: 'POST',
             json: true,
@@ -92,7 +92,7 @@ test('GET /api/token', async (t) => {
             json: true,
             auth: {
                 bearer: token
-            },
+            }
         }, t);
 
 
@@ -118,7 +118,7 @@ test('DELETE /api/token/2 - Can only delete own tokens', async (t) => {
             json: true,
             auth: {
                 bearer: token
-            },
+            }
         }, false);
 
         t.equals(res.statusCode, 401);
@@ -140,7 +140,7 @@ test('DELETE /api/token/1', async (t) => {
             json: true,
             auth: {
                 bearer: token
-            },
+            }
         }, t);
 
 
@@ -161,7 +161,7 @@ test('GET /api/token - verify token was deleted', async (t) => {
             json: true,
             auth: {
                 bearer: token
-            },
+            }
         }, false);
 
         t.equals(res.statusCode, 401);

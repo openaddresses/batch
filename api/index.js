@@ -1,31 +1,24 @@
-'use strict';
-
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
 const Cacher = require('./lib/cacher');
-const Miss = Cacher.Miss;
-const session = require('express-session');
-const { ValidationError } = require('express-json-validator-middleware');
-const { Webhooks } = require('@octokit/webhooks');
-const Busboy = require('busboy');
 const Analytics = require('./lib/analytics');
 const path = require('path');
 const morgan = require('morgan');
-const util = require('./lib/util');
 const express = require('express');
 const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const TileBase = require('tilebase');
-const Schema = require('./lib/schema');
+const { Schema, Err } = require('@openaddresses/batch-schema');
+const { sql, createPool } = require('slonik');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate', 'email', 'no-cache'],
+    boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase'],
+    alias: {
+        no_tb: 'no-tilebase',
+        no_c: 'no-cache'
+    },
     string: ['postgres']
 });
-
-const pgSession = require('connect-pg-simple')(session);
-
-const Param = util.Param;
-const { Pool } = require('pg');
 
 const Config = require('./lib/config');
 const SiteMap = require('./lib/sitemap');
@@ -34,13 +27,13 @@ if (require.main === module) {
     configure(args);
 }
 
-function configure(args, cb) {
-    Config.env(args).then((config) => {
-        return server(args, config, cb);
-    }).catch((err) => {
+async function configure(args, cb) {
+    try {
+        return server(args, await Config.env(args), cb);
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
@@ -61,6 +54,7 @@ function configure(args, cb) {
  */
 
 async function server(args, config, cb) {
+<<<<<<< HEAD
     // these must be run after lib/config
     const Map = require('./lib/map');
     const ci = new (require('./lib/ci'))(config);
@@ -77,6 +71,17 @@ async function server(args, config, cb) {
     const tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
     console.log('ok - loaded TileBase');
     await tb.open();
+=======
+    let tb = false;
+    if (!args['no-tilebase']) {
+        console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+        console.log('ok - loaded TileBase');
+        await tb.open();
+    } else {
+        console.log('ok - TileBase Disabled');
+    }
+>>>>>>> 4216367e2bbdb933128338555dfb05ca0b7ceacd
 
     let postgres = process.env.POSTGRES;
 
@@ -90,11 +95,9 @@ async function server(args, config, cb) {
     let retry = 5;
     do {
         try {
-            pool = new Pool({
-                connectionString: postgres
-            });
+            pool = createPool(postgres);
 
-            await pool.query('SELECT NOW()');
+            await pool.query(sql`SELECT NOW()`);
         } catch (err) {
             pool = false;
 
@@ -111,15 +114,12 @@ async function server(args, config, cb) {
     } while (!pool);
 
     const analytics = new Analytics(pool);
-    const level = new (require('./lib/level'))(pool);
 
     config.cacher = new Cacher(args['no-cache']);
     config.pool = pool;
-
+    config.tb = tb;
 
     try {
-        await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-
         if (args.populate) {
             await Map.populate(pool);
         }
@@ -128,41 +128,19 @@ async function server(args, config, cb) {
     }
 
     const user = new (require('./lib/user'))(pool);
-    const email = new (require('./lib/email'))();
     const token = new (require('./lib/token'))(pool);
 
     const app = express();
 
-    const schema = new Schema(express.Router());
+    const schema = new Schema(express.Router(), {
+        schemas: path.resolve(__dirname, './schema')
+    });
 
     app.disable('x-powered-by');
     app.use(minify());
 
-    app.use(session({
-        name: args.prod ? '__Host-session' : 'session',
-        proxy: args.prod,
-        resave: false,
-        store: new pgSession({
-            pool: pool,
-            tableName : 'session'
-        }),
-        cookie: {
-            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: true,
-            secure: args.prod
-        },
-        saveUninitialized: true,
-        secret: config.CookieSecret
-    }));
-
     app.use(analytics.middleware());
     app.use(express.static('web/dist'));
-
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
-    }
 
     /**
      * @api {get} /api Get Metadata
@@ -227,10 +205,7 @@ async function server(args, config, cb) {
 
     // Unified Auth
     schema.router.use(async (req, res, next) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            req.auth = req.session.auth;
-            req.auth.type = 'session';
-        } else if (req.header('shared-secret')) {
+        if (req.header('shared-secret')) {
             if (req.header('shared-secret') !== config.SharedSecret) {
                 return res.status(401).json({
                     status: 401,
@@ -256,11 +231,32 @@ async function server(args, config, cb) {
                 });
             }
 
+            if (authorization[1].split('.')[0] === 'oa') {
+                try {
+                    req.auth = await token.validate(authorization[1]);
+                    req.auth.type = 'token';
+                } catch (err) {
+                    return Err.respond(err, res);
+                }
+            } else {
+                try {
+                    const decoded = jwt.verify(authorization[1], config.SharedSecret);
+                    req.auth = await user.user(decoded.u);
+                    req.auth.type = 'session';
+                } catch (err) {
+                    return res.status(401).json({
+                        status: 401,
+                        message: err.message
+                    });
+                }
+            }
+        } else if (req.query.token) {
             try {
-                req.auth = await token.validate(authorization[1]);
-                req.auth.type = 'token';
+                const decoded = jwt.verify(req.query.token, config.SharedSecret);
+                req.token = await user.user(decoded.u);
+                req.token.type = 'token';
             } catch (err) {
-                return Err.respond(err, res);
+                // Login/Verify uses non-jwt token
             }
         } else {
             req.auth = false;
@@ -269,458 +265,33 @@ async function server(args, config, cb) {
         return next();
     });
 
-    /**
-     * @api {post} /api/upload Create Upload
-     * @apiVersion 1.0.0
-     * @apiName upload
-     * @apiGroup Upload
-     * @apiPermission upload
-     *
-     * @apiDescription
-     *     Statically cache source data
-     *
-     *     If a source is unable to be pulled from directly, authenticated users can cache
-     *     data resources to the OpenAddresses S3 cache to be pulled from
-     */
-    await schema.post('/upload', null,
-        async (req, res) => {
-            try {
-                await user.is_flag(req, 'upload');
-            } catch (err) {
-                return Err.respond(err, res);
-            }
 
-            const busboy = new Busboy({ headers: req.headers });
+    await schema.api();
+    // Load dynamic routes directory
+    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+        if (!config.silent) console.error(`ok - loaded routes/${r}`);
+        await require('./routes/' + r)(schema, config);
+    }
 
-            const files = [];
-
-            busboy.on('file', (fieldname, file, filename) => {
-                files.push(Upload.put(req.auth.uid, filename, file));
-            });
-
-            busboy.on('finish', async () => {
-                try {
-                    res.json(await Promise.all(files));
-                } catch (err) {
-                    Err.respond(res, err);
-                }
-            });
-
-            return req.pipe(busboy);
-        });
-
-    /**
-     * @api {get} /api/user List Users
-     * @apiVersion 1.0.0
-     * @apiName ListUsers
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Return a list of users that have registered with the service
-     *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListUsers.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ListUsers.json} apiSuccess
-     */
-    await schema.get('/user', {
-        res: 'res.ListUsers.json'
-    }, async (req, res) => {
-        try {
-            await user.is_admin(req);
-
-            res.json(await user.list(req.query));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {post} /api/user Create User
-     * @apiVersion 1.0.0
-     * @apiName CreateUser
-     * @apiGroup User
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Create a new user
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateUser.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
-     */
-    await schema.post('/user', {
-        body: 'req.body.CreateUser.json',
-        res: 'res.User.json'
-    }, async (req, res) => {
-        try {
-            const usr = await user.register(req.body);
-
-            const forgot = await user.forgot(usr.username, 'verify');
-
-            if (args.email) await email.verify({
-                username: usr.username,
-                email: usr.email,
-                token: forgot.token
-            });
-
-            res.json(usr);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/user/:id Single User
-     * @apiVersion 1.0.0
-     * @apiName SingleUser
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Get all info about a single user
-     *
-     * @apiParam {Number} :id The UID of the user to update
-     *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.SingleUser.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
-     */
-    await schema.get('/user/:id', {
-        query: 'req.query.SingleUser.json',
-        res: 'res.User.json'
-    }, async (req, res) => {
-        try {
-            await Param.int(req, 'id');
-            await user.is_admin(req);
-
-            if (req.query.level) {
-                const usr = await user.user(req.params.id);
-                await level.single(usr.email);
-            }
-
-            res.json(await user.user(req.params.id));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {patch} /api/user/:id Update User
-     * @apiVersion 1.0.0
-     * @apiName PatchUser
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Update information about a given user
-     *
-     * @apiParam {Number} :id The UID of the user to update
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchUser.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
-     */
-    await schema.patch('/user/:id', {
-        body: 'req.body.PatchUser.json',
-        res: 'res.User.json'
-    }, async (req, res) => {
-        try {
-            await Param.int(req, 'id');
-            await user.is_admin(req);
-
-            res.json(await user.patch(req.params.id, req.body));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {post} /api/login/verify Verify User
-     * @apiVersion 1.0.0
-     * @apiName VerifyLogin
-     * @apiGroup Login
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Email Verification of new user
-     *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.get('/login/verify', {
-        query: 'req.query.VerifyLogin.json',
-        res: 'res.Standard.json'
-    }, async (req, res) => {
-        try {
-            res.json(await user.verify(req.query.token));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-
-    /**
-     * @api {get} /api/login Session Info
-     * @apiVersion 1.0.0
-     * @apiName GetLogin
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return information about the currently logged in user
-     *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.GetLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
-     */
-    await schema.get('/login', {
-        query: 'req.query.GetLogin.json',
-        res: 'res.Login.json'
-    }, async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            try {
-                if (req.query.level) await level.single(req.session.auth.email);
-                res.json(await user.user(req.session.auth.uid));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        } else {
-            return res.status(401).json({
-                status: 401,
-                message: 'Invalid session'
-            });
-        }
-    });
-
-    /**
-     * @api {post} /api/login Create Session
-     * @apiVersion 1.0.0
-     * @apiName CreateLogin
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Log a user into the service and create an authenticated cookie
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
-     */
-    await schema.post( '/login', {
-        body: 'req.body.CreateLogin.json',
-        res: 'res.Login.json'
-    }, async (req, res) => {
-        try {
-            req.session.auth = await user.login({
-                username: req.body.username,
-                password: req.body.password
-            });
-
-            return res.json({
-                uid: req.session.auth.uid,
-                level: req.session.auth.level,
-                username: req.session.auth.username,
-                email: req.session.auth.email,
-                access: req.session.auth.access,
-                flags: req.session.auth.flags
-            });
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {delete} /api/login Delete Session
-     * @apiVersion 1.0.0
-     * @apiName DeleteLogin
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Log a user out of the service
-     *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.delete( '/login', {
-        res: 'res.Standard.json'
-    }, async (req, res) => {
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    message: 'Failed to logout user'
-                });
-            }
-
-            return res.json({
-                status: 200,
-                message: 'The user has been logged ut'
-            });
+    schema.router.all('*', (req, res) => {
+        return res.status(404).json({
+            status: 404,
+            message: 'API endpoint does not exist!'
         });
     });
 
-    /**
-     * @api {post} /api/login/forgot Forgot Login
-     * @apiVersion 1.0.0
-     * @apiName ForgotLogin
-     * @apiGroup Login
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     If a user has forgotten their password, send them a password reset link to their email
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ForgotLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.post('/login/forgot', {
-        body: 'req.body.ForgotLogin.json',
-        res: 'res.Standard.json'
-    }, async (req, res) => {
-        try {
-            const reset = await user.forgot(req.body.user); // Username or email
+    schema.error();
 
-            if (args.email) await email.forgot(reset);
+    const srv = app.listen(4999, (err) => {
+        if (err) return err;
 
-            // To avoid email scraping - this will always return true, regardless of success
-            return res.json({ status: 200, message: 'Password Email Sent' });
-        } catch (err) {
-            return Err.respond(err, res);
-        }
+        if (cb) return cb(srv, config);
+
+        console.log('ok - http://localhost:4999');
     });
+}
 
-    /**
-     * @api {post} /api/login/reset Reset Login
-     * @apiVersion 1.0.0
-     * @apiName ResetLogin
-     * @apiGroup Login
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Once a user has obtained a password reset by email via the Forgot Login API,
-     *     use the token to reset the password
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ResetLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.post( '/login/reset', {
-        body: 'req.body.ResetLogin.json',
-        res: 'res.Standard.json'
-    }, async (req, res) => {
-        try {
-            return res.json(await user.reset({
-                token: req.body.token,
-                password: req.body.password
-            }));
-
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/token List Tokens
-     * @apiVersion 1.0.0
-     * @apiName ListTokens
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     List all tokens associated with the requester's account
-     *
-     * @apiSchema {jsonawait schema=./schema/res.ListTokens.json} apiSuccess
-     */
-    await schema.get( '/token', {
-        res: 'res.ListTokens.json'
-    }, async (req, res) => {
-        try {
-            await user.is_auth(req);
-
-            return res.json(await token.list(req.auth));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {post} /api/token Create Token
-     * @apiVersion 1.0.0
-     * @apiName CreateToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new API token for programatic access
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateToken.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.CreateToken.json} apiSuccess
-     */
-    await schema.post( '/token', {
-        body: 'req.body.CreateToken.json',
-        res: 'res.CreateToken.json'
-    }, async (req, res) => {
-        try {
-            await user.is_auth(req);
-
-            return res.json(await token.generate(req.auth, req.body.name));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {delete} /api/token/:id Delete Token
-     * @apiVersion 1.0.0
-     * @apiName DeleteToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete a user's API Token
-     *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.delete(
-        '/token/:id', {
-            res: 'res.Standard.json'
-        },
-        async (req, res) => {
-            try {
-                await Param.int(req, 'id');
-
-                await user.is_auth(req);
-
-                return res.json(await token.delete(req.auth, req.params.id));
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        }
-    );
-
-    /**
-     * @api {post} /api/schedule Scheduled Event
-     * @apiVersion 1.0.0
-     * @apiName Schedule
-     * @apiGroup Schedule
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Internal function to allow scheduled lambdas to kick off events
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.Schedule.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
-    await schema.post( '/schedule', {
-        body: 'req.body.Schedule.json',
-        res: 'res.Standard.json'
-    }, async (req, res) => {
-        try {
-            await user.is_admin(req);
-
-            await Schedule.event(pool, req.body);
-
-            return res.json({
-                status: 200,
-                message: 'Schedule Event Started'
-            });
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
+<<<<<<< HEAD
     /**
      * @api {get} /api/collections List Collections
      * @apiVersion 1.0.0
@@ -1881,11 +1452,12 @@ async function server(args, config, cb) {
     });
 }
 
+=======
+>>>>>>> 4216367e2bbdb933128338555dfb05ca0b7ceacd
 function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }
-
 
 module.exports = configure;

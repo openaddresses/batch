@@ -1,10 +1,10 @@
-'use strict';
-
 const cf = require('@mapbox/cloudfriend');
-const api = require('./api');
-const batch = require('./batch');
-const db = require('./db');
-const schedule = require('./schedule');
+const api = require('./lib/api');
+const batch = require('./lib/batch');
+const secret = require('./lib/secret');
+const db = require('./lib/db');
+const schedule = require('./lib/schedule');
+const kms = require('./lib/kms');
 const alarms = require('batch-alarms');
 
 const stack = {
@@ -39,10 +39,13 @@ module.exports = cf.merge(
     stack,
     db,
     api,
+    kms,
     batch,
+    secret,
     alarms({
         prefix: 'Batch',
         email: 'nick@ingalls.ca',
+        apache: cf.stackName,
         cluster: cf.ref('APIECSCluster'),
         service: cf.getAtt('APIService', 'Name'),
         loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName'),

@@ -1,5 +1,3 @@
-'use strict';
-
 const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ apiVersion: '2016-08-10', region: 'us-east-1' });
 const asg = new AWS.AutoScaling({ apiVersion: '2011-01-01', region: 'us-east-1' });
@@ -137,6 +135,16 @@ async function trigger(event) {
             jobName: 'OA_Collect',
             containerOverrides: {
                 command: ['./collect.js'],
+                environment: []
+            }
+        };
+    } else if (event.type === 'fabric') {
+        params = {
+            jobDefinition: jobDefinition,
+            jobQueue: mega_queue,
+            jobName: 'OA_Fabric',
+            containerOverrides: {
+                command: ['./fabric.js'],
                 environment: []
             }
         };

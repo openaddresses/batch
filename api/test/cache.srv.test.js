@@ -1,8 +1,5 @@
-'use strict';
-
 const test = require('tape');
-const request = require('request');
-const Flight = require('./init');
+const Flight = require('./flight');
 const memjs = require('memjs');
 
 const flight = new Flight();
@@ -24,16 +21,16 @@ test('Meta: Insert Key', async (t) => {
     t.end();
 });
 
-test('DELETE: api/cache', (t) => {
-    request({
-        url: 'http://localhost:4999/api/cache',
-        method: 'DELETE',
-        json: true,
-        headers: {
-            'shared-secret': '123'
-        }
-    }, async (err, res) => {
-        t.error(err, 'no error');
+test('DELETE: api/cache', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/cache',
+            method: 'DELETE',
+            json: true,
+            headers: {
+                'shared-secret': '123'
+            }
+        }, t);
 
         t.deepEquals(res.body, {
             status: 200,
@@ -44,32 +41,40 @@ test('DELETE: api/cache', (t) => {
         t.deepEquals((await client.get('data')).value, null);
         await client.quit();
 
-        t.end();
-    });
-});
-
-test('Meta: Insert Key', async (t) => {
-    const client = memjs.Client.create();
-    await client.set('data', JSON.stringify({ test: true }));
-    t.deepEquals(JSON.parse((await client.get('data')).value), {
-        test: true
-    });
-
-    await client.quit();
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
     t.end();
 });
 
-test('DELETE: api/cache/data', (t) => {
-    request({
-        url: 'http://localhost:4999/api/cache/data',
-        method: 'DELETE',
-        json: true,
-        headers: {
-            'shared-secret': '123'
-        }
-    }, async (err, res) => {
-        t.error(err, 'no error');
+test('Meta: Insert Key', async (t) => {
+    const client = memjs.Client.create();
+
+    try {
+        await client.set('data', JSON.stringify({ test: true }));
+        t.deepEquals(JSON.parse((await client.get('data')).value), {
+            test: true
+        });
+
+        await client.quit();
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('DELETE: api/cache/data', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/cache/data',
+            method: 'DELETE',
+            json: true,
+            headers: {
+                'shared-secret': '123'
+            }
+        }, t);
 
         t.deepEquals(res.body, {
             status: 200,
@@ -79,9 +84,9 @@ test('DELETE: api/cache/data', (t) => {
         const client = memjs.Client.create();
         t.deepEquals((await client.get('data')).value, null);
         await client.quit();
-
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 });
 
 flight.landing(test);

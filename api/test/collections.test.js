@@ -1,14 +1,12 @@
-'use strict';
-
 const test = require('tape');
 
-const { Pool } = require('pg');
+const Flight = require('./flight');
 const Collection = require('../lib/collections');
-const Flight = require('./init');
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 
 const flight = new Flight();
 flight.init(test);
+flight.takeoff(test);
 
 process.env.Bucket = 'v2.openaddresses.io';
 
@@ -106,17 +104,13 @@ test('Collection#patch()', (t) => {
 });
 
 test('Collection#generate()', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
         const collection = new Collection(
             'usa',
             ['us/**']
         );
 
-        await collection.generate(pool);
+        await collection.generate(flight.config.pool);
         t.equals(collection.id, 1, 'collection.id: 1');
         t.equals(collection.name, 'usa', 'collection.name: use');
         t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
@@ -133,24 +127,19 @@ test('Collection#generate()', async (t) => {
             ['us/**']
         );
 
-        await collection.generate(pool);
+        await collection.generate(flight.config.pool);
 
         t.fail('duplicate collections should fail');
     } catch (err) {
         t.deepEquals(err, new Err(400, null, 'duplicate collections not allowed'));
     }
 
-    pool.end();
     t.end();
 });
 
 test('Collection#list', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const list = await Collection.list(pool);
+        const list = await Collection.list(flight.config.pool);
 
         t.equals(list.length, 1, 'list.length: 1');
 
@@ -168,19 +157,14 @@ test('Collection#list', async (t) => {
         t.error(err, 'no errors');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Collection#data', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
         let param = false;
 
-        await Collection.data(pool, 1, {
+        await Collection.data(flight.config.pool, 1, {
             redirect: (p) => {
                 param = p;
             }
@@ -194,7 +178,7 @@ test('Collection#data', async (t) => {
     try {
         let param = false;
 
-        await Collection.data(pool, 2, {
+        await Collection.data(flight.config.pool, 2, {
             redirect: (p) => {
                 param = p;
             }
@@ -207,17 +191,12 @@ test('Collection#data', async (t) => {
         t.deepEquals(err, new Err(404, null, 'collection not found'));
     }
 
-    pool.end();
     t.end();
 });
 
 test('Collection#from()', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const collection = await Collection.from(pool, 1);
+        const collection = await Collection.from(flight.config.pool, 1);
 
         t.equals(collection.id, 1, 'collection.id: 1');
         t.equals(collection.name, 'usa', 'collection.name: use');
@@ -231,50 +210,45 @@ test('Collection#from()', async (t) => {
     }
 
     try {
-        await Collection.from(pool, 2);
+        await Collection.from(flight.config.pool, 2);
 
         t.fail('collection should not be found');
     } catch (err) {
         t.deepEquals(err, new Err(404, null, 'collection not found'));
     }
 
-    pool.end();
     t.end();
 });
 
 test('Collection#commit()', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
         const collection = new Collection(
             'global',
             ['wrong']
         );
 
-        await collection.generate(pool);
+        await collection.generate(flight.config.pool);
     } catch (err) {
         t.error(err, 'no errors');
     }
 
     try {
-        const collection = await Collection.from(pool, 3);
+        const collection = await Collection.from(flight.config.pool, 3);
 
         collection.patch({
             size: 1234,
             sources: ['**']
         });
 
-        await collection.commit(pool);
+        await collection.commit(flight.config.pool);
     } catch (err) {
         t.error(err, 'no errors');
     }
 
     try {
-        const collection = await Collection.from(pool, 3);
+        const collection = await Collection.from(flight.config.pool, 3);
 
-        await collection.commit(pool);
+        await collection.commit(flight.config.pool);
 
         t.equals(collection.id, 3, 'collection.id: 1');
         t.equals(collection.name, 'global', 'collection.name: use');
@@ -286,23 +260,18 @@ test('Collection#commit()', async (t) => {
         t.error(err, 'no errors');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Collection#delete()', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        await Collection.delete(pool, 3);
+        await Collection.delete(flight.config.pool, 3);
     } catch (err) {
         t.error(err, 'no errors');
     }
 
     try {
-        const list = await Collection.list(pool);
+        const list = await Collection.list(flight.config.pool);
 
         t.equals(list.length, 1, 'list.length: 1');
 
@@ -320,6 +289,7 @@ test('Collection#delete()', async (t) => {
         t.error(err, 'no errors');
     }
 
-    pool.end();
     t.end();
 });
+
+flight.landing(test);

@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 // Does not need to mark instance
 // as protected as it runs on a managed queue
 require('./lib/pre');
@@ -64,7 +62,7 @@ async function fetch() {
         const datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
-        await sources(tmp, datas);
+        await sources(oa, tmp, datas);
         console.error('ok - all sources fetched');
 
         for (const collection of collections) {
@@ -99,7 +97,7 @@ async function collect(tmp, collection, oa) {
     });
 }
 
-async function sources(tmp, datas) {
+async function sources(oa, tmp, datas) {
     const stats = {
         count: 0,
         sources: datas.length
@@ -107,7 +105,7 @@ async function sources(tmp, datas) {
 
     try {
         for (const data of datas) {
-            await get_source(tmp, data, stats);
+            await get_source(oa, tmp, data, stats);
         }
     } catch (err) {
         throw new Error(err);
@@ -116,13 +114,20 @@ async function sources(tmp, datas) {
     return stats;
 }
 
-function get_source(tmp, data, stats) {
+async function get_source(oa, tmp, data, stats) {
+    const dir = path.parse(data.source).dir;
+    const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
+    const source_meta = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson.meta`;
+
+    mkdirp(path.resolve(tmp, 'sources', dir));
+
+    const job = await oa.cmd('job', 'get', {
+        ':job': data.job
+    });
+
+    fs.writeFileSync(source_meta, JSON.stringify(job, null, 4));
+
     return new Promise((resolve, reject) => {
-        const dir = path.parse(data.source).dir;
-        const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
-
-        mkdirp(path.resolve(tmp, 'sources', dir));
-
         console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
         pipeline(
             s3.getObject({
@@ -151,20 +156,15 @@ function get_source(tmp, data, stats) {
     });
 }
 
-function upload_collection(file, name) {
-    return new Promise((resolve, reject) => {
-        s3.upload({
-            ContentType: 'application/zip',
-            Body: fs.createReadStream(file),
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/collection-${name}.zip`
-        }, (err) => {
-            console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
-            if (err) return reject(err);
+async function upload_collection(file, name) {
+    await s3.upload({
+        ContentType: 'application/zip',
+        Body: fs.createReadStream(file),
+        Bucket: process.env.Bucket,
+        Key: `${process.env.StackName}/collection-${name}.zip`
+    }).promise();
 
-            return resolve(true);
-        });
-    });
+    console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
 }
 
 function zip_datas(tmp, datas, name) {
@@ -191,6 +191,10 @@ function zip_datas(tmp, datas, name) {
         for (const data of datas) {
             archive.file(path.resolve(tmp, 'sources', data), {
                 name: data
+            });
+
+            archive.file(path.resolve(tmp, 'sources', data + '.meta'), {
+                name: data + '.meta'
             });
         }
 

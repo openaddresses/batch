@@ -33,15 +33,13 @@ export default {
     },
     methods: {
         verify: async function() {
+            this.loading = true;
             try {
-                await window.std(`/api/login/verify?token=${this.$route.query.token}`, {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-                this.loading = false;
+                await window.std(`/api/login/verify?token=${this.$route.query.token}`, {}, false);
             } catch(err) {
                 this.$emit('err', err);
             }
+            this.loading = false;
         }
     }
 }

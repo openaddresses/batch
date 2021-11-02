@@ -1,13 +1,13 @@
-'use strict';
-
 const Map = require('../lib/map');
 const Job = require('../lib/job');
-const { Pool } = require('pg');
 const test = require('tape');
-const Flight = require('./init');
+const Flight = require('./flight');
 const nock = require('nock');
+const { sql } = require('slonik');
 
 const flight = new Flight();
+flight.init(test);
+flight.takeoff(test);
 
 test('nocks', (t) => {
     nock.disableNetConnect();
@@ -59,15 +59,9 @@ test('nocks', (t) => {
     t.end();
 });
 
-flight.init(test);
-
 test('Map#get_feature - country', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        await pool.query(`
+        await flight.config.pool.query(sql`
             INSERT INTO map (
                 name,
                 code
@@ -84,11 +78,11 @@ test('Map#get_feature - country', async (t) => {
                 'addresses',
                 'fed'
             );
-            await job.generate(pool);
+            await job.generate(flight.config.pool);
             job.map = 1;
-            await job.commit(pool);
+            await job.commit(flight.config.pool);
 
-            t.deepEquals(await Map.get_feature(pool, 'us'), {
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -104,11 +98,11 @@ test('Map#get_feature - country', async (t) => {
                 'addresses',
                 'fed'
             );
-            await job.generate(pool);
+            await job.generate(flight.config.pool);
             job.map = 1;
-            await job.commit(pool);
+            await job.commit(flight.config.pool);
 
-            t.deepEquals(await Map.get_feature(pool, 'us'), {
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -124,11 +118,11 @@ test('Map#get_feature - country', async (t) => {
                 'buildings',
                 'fed'
             );
-            await job.generate(pool);
+            await job.generate(flight.config.pool);
             job.map = 1;
-            await job.commit(pool);
+            await job.commit(flight.config.pool);
 
-            t.deepEquals(await Map.get_feature(pool, 'us'), {
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -140,17 +134,12 @@ test('Map#get_feature - country', async (t) => {
         t.error(err);
     }
 
-    pool.end();
     t.end();
 });
 
 test('Map#match - county', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        await pool.query(`
+        await flight.config.pool.query(sql`
             INSERT INTO map (
                 name,
                 code
@@ -163,7 +152,7 @@ test('Map#match - county', async (t) => {
         t.error(err);
     }
 
-    t.deepEquals(await Map.get_feature(pool, 'us-42017'), {
+    t.deepEquals(await Map.get_feature(flight.config.pool, 'us-42017'), {
         id: 2,
         name: 'Bucks County',
         code: 'us-42017',
@@ -178,11 +167,11 @@ test('Map#match - county', async (t) => {
             'addresses',
             'city'
         );
-        await job.generate(pool);
-        await job.commit(pool);
+        await job.generate(flight.config.pool);
+        await job.commit(flight.config.pool);
 
-        await Map.match(pool, job);
-        t.deepEquals(await Map.get_feature(pool, 'us-42017'), {
+        await Map.match(flight.config.pool, job);
+        t.deepEquals(await Map.get_feature(flight.config.pool, 'us-42017'), {
             id: 2,
             name: 'Bucks County',
             code: 'us-42017',
@@ -198,11 +187,11 @@ test('Map#match - county', async (t) => {
             'buildings',
             'city'
         );
-        await job.generate(pool);
-        await job.commit(pool);
+        await job.generate(flight.config.pool);
+        await job.commit(flight.config.pool);
 
-        await Map.match(pool, job);
-        t.deepEquals(await Map.get_feature(pool, 'us-42017'), {
+        await Map.match(flight.config.pool, job);
+        t.deepEquals(await Map.get_feature(flight.config.pool, 'us-42017'), {
             id: 2,
             name: 'Bucks County',
             code: 'us-42017',
@@ -211,17 +200,12 @@ test('Map#match - county', async (t) => {
         }, 'buildings layer added');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Map#match - country', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        await pool.query(`
+        await flight.config.pool.query(sql`
             INSERT INTO map (
                 name,
                 code
@@ -231,7 +215,7 @@ test('Map#match - country', async (t) => {
             );
         `);
 
-        t.deepEquals(await Map.get_feature(pool, 'ca'), {
+        t.deepEquals(await Map.get_feature(flight.config.pool, 'ca'), {
             id: 3,
             name: 'Canada',
             code: 'ca',
@@ -246,11 +230,11 @@ test('Map#match - country', async (t) => {
                 'addresses',
                 'countrywide'
             );
-            await job.generate(pool);
-            await job.commit(pool);
+            await job.generate(flight.config.pool);
+            await job.commit(flight.config.pool);
 
-            await Map.match(pool, job);
-            t.deepEquals(await Map.get_feature(pool, 'ca'), {
+            await Map.match(flight.config.pool, job);
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'ca'), {
                 id: 3,
                 name: 'Canada',
                 code: 'ca',
@@ -266,11 +250,11 @@ test('Map#match - country', async (t) => {
                 'buildings',
                 'city'
             );
-            await job.generate(pool);
-            await job.commit(pool);
+            await job.generate(flight.config.pool);
+            await job.commit(flight.config.pool);
 
-            await Map.match(pool, job);
-            t.deepEquals(await Map.get_feature(pool, 'ca'), {
+            await Map.match(flight.config.pool, job);
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'ca'), {
                 id: 3,
                 name: 'Canada',
                 code: 'ca',
@@ -282,15 +266,10 @@ test('Map#match - country', async (t) => {
         t.error(err);
     }
 
-    pool.end();
     t.end();
 });
 
 test('Map#match - geom', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
         {
             const job = new Job(
@@ -299,11 +278,11 @@ test('Map#match - geom', async (t) => {
                 'addresses',
                 'city'
             );
-            await job.generate(pool);
-            await job.commit(pool);
+            await job.generate(flight.config.pool);
+            await job.commit(flight.config.pool);
 
-            await Map.match(pool, job);
-            t.deepEquals(await Map.get_feature(pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
+            await Map.match(flight.config.pool, job);
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
                 id: 4,
                 name: 'ca/yk/city_of_whitehorse',
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
@@ -319,11 +298,11 @@ test('Map#match - geom', async (t) => {
                 'buildings',
                 'city'
             );
-            await job.generate(pool);
-            await job.commit(pool);
+            await job.generate(flight.config.pool);
+            await job.commit(flight.config.pool);
 
-            await Map.match(pool, job);
-            t.deepEquals(await Map.get_feature(pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
+            await Map.match(flight.config.pool, job);
+            t.deepEquals(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
                 id: 4,
                 name: 'ca/yk/city_of_whitehorse',
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
@@ -335,9 +314,10 @@ test('Map#match - geom', async (t) => {
         t.error(err);
     }
 
-    pool.end();
     t.end();
 });
+
+flight.landing(test);
 
 test('end', (t) => {
     nock.cleanAll();

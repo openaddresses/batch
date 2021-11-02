@@ -1,5 +1,3 @@
-'use strict';
-
 const Bunny = require('../lib/bunny');
 const tape = require('tape');
 

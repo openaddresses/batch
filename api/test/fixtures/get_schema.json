@@ -1,5 +1,15 @@
 {
-    "DELETE /cache": {
+    "GET /schema": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /dash/traffic": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /dash/collections": {
         "body": false,
         "query": false,
         "res": true
@@ -9,83 +19,8 @@
         "query": false,
         "res": true
     },
-    "GET /schema": {
+    "DELETE /cache": {
         "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /upload": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /user": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /user": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /user/:id": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "PATCH /user/:id": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /login/verify": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "GET /login": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /login": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /login": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /login/forgot": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /login/reset": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /token": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /token": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /token/:id": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /schedule": {
-        "body": true,
         "query": false,
         "res": true
     },
@@ -114,26 +49,6 @@
         "query": false,
         "res": true
     },
-    "GET /map": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /map/borders/:z/:x/:y.mvt": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /map/fabric/:z/:x/:y.mvt": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /map/:z/:x/:y.mvt": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
     "GET /data": {
         "body": false,
         "query": true,
@@ -154,49 +69,9 @@
         "query": false,
         "res": true
     },
-    "GET /run": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /run": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /run/:run": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /run/:run/count": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "PATCH /run/:run": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /run/:run/jobs": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /run/:run/jobs": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /job": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
     "GET /job/error": {
         "body": false,
-        "query": false,
+        "query": true,
         "res": true
     },
     "GET /job/error/count": {
@@ -217,6 +92,46 @@
     "POST /job/error/:job": {
         "body": true,
         "query": false,
+        "res": true
+    },
+    "POST /export": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /export/:exportid/log": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /export": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /export/:exportid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /export/:exportid/output/export.zip": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "PATCH /export/:exportid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /github/event": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /job": {
+        "body": false,
+        "query": true,
         "res": true
     },
     "GET /job/:job": {
@@ -261,7 +176,7 @@
     },
     "GET /job/:job/log": {
         "body": false,
-        "query": false,
+        "query": true,
         "res": true
     },
     "PATCH /job/:job": {
@@ -269,47 +184,77 @@
         "query": false,
         "res": true
     },
-    "GET /dash/traffic": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /dash/collections": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /export": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /export/:exportid/log": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /export": {
+    "GET /level": {
         "body": false,
         "query": true,
         "res": true
     },
-    "GET /export/:exportid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /export/:exportid/output/export.zip": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "PATCH /export/:exportid": {
+    "POST /level": {
         "body": true,
         "query": false,
         "res": true
     },
-    "POST /github/event": {
+    "PATCH /level/:levelid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /level/:levelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /level/:levelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /login/verify": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /login": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /login": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /login/forgot": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /login/reset": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /map": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /map/borders/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /map/fabric": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /map/fabric/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /map/:z/:x/:y.mvt": {
         "body": false,
         "query": false,
         "res": false
@@ -318,5 +263,85 @@
         "body": false,
         "query": false,
         "res": false
+    },
+    "GET /run": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /run": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /run/:run": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /run/:run/count": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /run/:run": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /run/:run/jobs": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /run/:run/jobs": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /schedule": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /token": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /token": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /token/:id": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /upload": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /user": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /user": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /user/:id": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "PATCH /user/:id": {
+        "body": true,
+        "query": false,
+        "res": true
     }
 }

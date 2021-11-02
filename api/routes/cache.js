@@ -1,6 +1,4 @@
-'use strict';
-
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 
 async function router(schema, config) {
     /**
@@ -43,6 +41,7 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     schema.delete('/cache/:cache_key', {
+        ':cache_key': 'string',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {

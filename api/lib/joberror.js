@@ -1,8 +1,8 @@
-'use strict';
-
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const Job = require('./job');
 const Run = require('./run');
+const { sql } = require('slonik');
+const { Status } = require('./util');
 
 /**
  * @class JobError
@@ -21,18 +21,15 @@ class JobError {
         if (!this.message) throw new Err(400, null, 'Cannot generate a job error without a message');
 
         try {
-            await pool.query(`
+            await pool.query(sql`
                 INSERT INTO job_errors (
                     job,
                     message
                 ) VALUES (
-                    $1,
-                    $2
+                    ${this.job},
+                    ${this.message}
                 ) RETURNING *
-            `, [
-                this.job,
-                this.message
-            ]);
+            `);
 
             return  {
                 job: this.job,
@@ -45,7 +42,7 @@ class JobError {
 
     static async clear(pool) {
         try {
-            await pool.query(`
+            await pool.query(sql`
                 DELETE FROM
                     job_errors
             `);
@@ -58,14 +55,12 @@ class JobError {
 
     static async delete(pool, job_id) {
         try {
-            await pool.query(`
+            await pool.query(sql`
                 DELETE FROM
                     job_errors
                 WHERE
-                    job = $1
-            `, [
-                job_id
-            ]);
+                    job = ${job_id}
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to remove job from job_errors');
         }
@@ -106,10 +101,20 @@ class JobError {
         };
     }
 
-    static async list(pool) {
+    static async list(pool, query) {
+        if (!query) query = {};
+        if (!query.source) query.source = '';
+        if (!query.layer || query.layer === 'all') query.layer = '';
+        if (!query.status) query.status = Status.list();
+
+        query.source = '%' + query.source + '%';
+        query.layer = query.layer + '%';
+
+        Status.verify(query.status);
+
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     job.id,
                     job.status,
@@ -120,6 +125,10 @@ class JobError {
                 FROM
                     job_errors INNER JOIN job
                         ON job_errors.job = job.id
+                WHERE
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    AND job.layer ilike ${query.layer}
+                    AND job.source ilike ${query.source}
                 GROUP BY
                     job.id
                 ORDER BY
@@ -143,7 +152,7 @@ class JobError {
     static async get(pool, job_id) {
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     job.id,
                     job.status,
@@ -155,10 +164,10 @@ class JobError {
                     job_errors INNER JOIN job
                         ON job_errors.job = job.id
                 WHERE
-                    job_errors.job = $1
+                    job_errors.job = ${job_id}
                 GROUP BY
                     job.id
-            `, [job_id]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to get job_error');
         }
@@ -181,7 +190,7 @@ class JobError {
     static async count(pool) {
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     count(*) AS count
                 FROM

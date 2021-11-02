@@ -1,5 +1,3 @@
-'use strict';
-
 const crypto = require('crypto');
 const moment = require('moment');
 

@@ -61,13 +61,9 @@ export default {
 
                 await window.std('/api/login/forgot', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
+                    body: {
                         user: this.user
-                    })
+                    }
                 });
 
                 this.loading = false;

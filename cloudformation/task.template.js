@@ -1,6 +1,7 @@
-'use strict';
+
 
 const cf = require('@mapbox/cloudfriend');
+
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',
     Description: 'OpenAddresses Batch T3 Compute Environment',

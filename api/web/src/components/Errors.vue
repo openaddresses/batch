@@ -7,8 +7,29 @@
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
                     <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                 </button>
+
+                <button @click='showFilter = !showFilter' class='mr12 btn round btn--stroke fr color-gray'>
+                    <svg class='icon'><use xlink:href='#icon-search'/></svg>
+                </button>
+
+                <template v-if='showFilter'>
+                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
+                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
+
+                        <div class='col col--6 px6'>
+                            <QuerySource @source='filter.source = $event'/>
+                        </div>
+                        <div class='col col--3 px6'>
+                            <QueryLayer @layer='filter.layer = $event' />
+                        </div>
+                        <div class='col col--3 px6'>
+                            <QueryStatus @status='filter.status = $event'/>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
+
         <template v-if='loading'>
             <div class='flex flex--center-main w-full py24'>
                 <div class='loading'></div>
@@ -51,6 +72,9 @@
 
 <script>
 import Status from './Status.vue';
+import QueryStatus from './query/Status.vue';
+import QuerySource from './query/Source.vue';
+import QueryLayer from './query/Layer.vue';
 import ErrorsModerate from './ErrorsModerate.vue';
 
 export default {
@@ -59,6 +83,12 @@ export default {
     data: function() {
         return {
             loading: true,
+            showFilter: false,
+            filter: {
+                source: '',
+                layer: 'all',
+                status: 'All'
+            },
             problems: []
         };
     },
@@ -67,11 +97,23 @@ export default {
     },
     components: {
         Status,
+        QueryStatus,
+        QuerySource,
+        QueryLayer,
         ErrorsModerate
     },
     watch: {
         problems: function() {
             this.$emit('errors', this.problems.length);
+        },
+        'filter.source': function() {
+            this.refresh();
+        },
+        'filter.layer': function() {
+            this.refresh();
+        },
+        'filter.status': function() {
+            this.refresh();
         }
     },
     methods: {
@@ -81,7 +123,12 @@ export default {
         getProblems: async function() {
             try {
                 this.loading = true;
-                this.problems = await window.std('/api/job/error');
+                const url = new URL('/api/job/error', window.location.origin);
+                if (this.filter.source !== '') url.searchParams.set('source', this.filter.source);
+                if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
+                if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
+
+                this.problems = await window.std(url);
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);

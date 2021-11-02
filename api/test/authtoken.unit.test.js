@@ -1,23 +1,17 @@
-'use strict';
-
 const User = require('../lib/user');
 const Token = require('../lib/token');
 const test = require('tape');
-const { Pool } = require('pg');
-const Flight = require('./init');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
 flight.init(test);
+flight.takeoff(test);
 
 let TOKEN = '';
 
 test('Token#generate', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
-    const authtoken = new Token(pool);
+    const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.generate({
@@ -60,7 +54,7 @@ test('Token#generate', async (t) => {
     }
 
     try {
-        const auth = new User(pool);
+        const auth = new User(flight.config.pool);
         await auth.register({
             username: 'test',
             password: 'test',
@@ -81,16 +75,11 @@ test('Token#generate', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Token#list', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
-    const authtoken = new Token(pool);
+    const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.list({
@@ -121,16 +110,11 @@ test('Token#list', async (t) => {
         t.error(err, 'no errors');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Token#validate', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
-    const authtoken = new Token(pool);
+    const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.validate('test');
@@ -168,16 +152,11 @@ test('Token#validate', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Token#delete', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
-    const authtoken = new Token(pool);
+    const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.delete({
@@ -204,6 +183,7 @@ test('Token#delete', async (t) => {
         t.error(err);
     }
 
-    pool.end();
     t.end();
 });
+
+flight.landing(test);

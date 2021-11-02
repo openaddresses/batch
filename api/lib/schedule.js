@@ -1,19 +1,16 @@
-'use strict';
-
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const JobError = require('./joberror');
 const batch = require('./batch');
 const Level = require('./level');
+const { sql } = require('slonik');
 
 /**
  * @class Schedule
  */
 class Schedule {
     static async event(pool, event) {
-        if (event.type === 'collect') {
-            await Schedule.collect();
-        } else if (event.type === 'sources') {
-            await Schedule.sources(pool);
+        if (['fabric', 'collect', 'sources'].includes(event.type)) {
+            await Schedule.batch(event.type, pool);
         } else if (event.type === 'close') {
             await Schedule.close(pool);
         } else if (event.type === 'level') {
@@ -31,13 +28,19 @@ class Schedule {
         }
     }
 
-    static async collect() {
+    /**
+     * Generic function for triggering a batch job
+     * @param {String} type Type of batch job to trigger
+     */
+    static async batch(type, pool) {
+        if (type === 'sources') await JobError.clear(pool);
+
         try {
             return await batch.trigger({
-                type: 'collect'
+                type: type
             });
         } catch (err) {
-            throw new Err(500, err, 'failed to submit collect job to batch');
+            throw new Err(500, err, 'Failed to submit job to batch');
         }
     }
 
@@ -51,22 +54,10 @@ class Schedule {
         }
     }
 
-    static async sources(pool) {
-        await JobError.clear(pool);
-
-        try {
-            return await batch.trigger({
-                type: 'sources'
-            });
-        }  catch (err) {
-            throw new Err(500, err, 'failed to submit sources job to batch');
-        }
-    }
-
     static async close(pool) {
         // TODO Close old run/jobs
 
-        await pool.query(`
+        await pool.query(sql`
             DELETE FROM
                 users_reset
             WHERE

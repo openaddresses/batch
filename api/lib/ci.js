@@ -1,10 +1,8 @@
-'use strict';
-
 const assert = require('assert');
 const Run = require('./run');
 const { promisify } = require('util');
 const request = promisify(require('request'));
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const pkg = require('../package.json');
 
 /**

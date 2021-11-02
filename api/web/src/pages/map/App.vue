@@ -2,7 +2,7 @@
     <div id='app' class='col col--12 h-full relative'>
         <div class='cursor-pointer absolute top left px3 py3 round z1 bg-white'>
              <svg class='inline pt3 icon'><use xlink:href='#icon-chevron-left'/></svg>
-            <img @click='external("https://batch.openaddresses.io")' class='h24 w24 round' src='../../../public/logo.jpg'/>
+            <img @click='external("/")' class='h24 w24 round' src='../../../public/logo.jpg'/>
         </div>
         <Fabric/>
     </div>

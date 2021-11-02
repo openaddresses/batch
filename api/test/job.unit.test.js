@@ -1,14 +1,12 @@
-'use strict';
-
-const { Pool } = require('pg');
 const Job = require('../lib/job');
 const pkg = require('../package.json');
 const test = require('tape');
 const nock = require('nock');
-const Flight = require('./init');
+const Flight = require('./flight');
 
 const flight = new Flight();
 flight.init(test);
+flight.takeoff(test);
 
 test('Job()', (t) => {
     t.throws(() => {
@@ -156,10 +154,6 @@ test('Job#json', (t) => {
 });
 
 test('Job#generate', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
         const job = new Job(
             1,
@@ -169,7 +163,7 @@ test('Job#generate', async (t) => {
         );
 
         job.run = null;
-        await job.generate(pool);
+        await job.generate(flight.config.pool);
 
         t.fail('job.generate should fail');
     } catch (err) {
@@ -189,7 +183,7 @@ test('Job#generate', async (t) => {
         );
 
         job.source = null;
-        await job.generate(pool);
+        await job.generate(flight.config.pool);
 
         t.fail('job.generate should fail');
     } catch (err) {
@@ -209,7 +203,7 @@ test('Job#generate', async (t) => {
         );
 
         job.layer = null;
-        await job.generate(pool);
+        await job.generate(flight.config.pool);
 
         t.fail('job.generate should fail');
     } catch (err) {
@@ -229,7 +223,7 @@ test('Job#generate', async (t) => {
         );
 
         job.name = null;
-        await job.generate(pool);
+        await job.generate(flight.config.pool);
 
         t.fail('job.generate should fail');
     } catch (err) {
@@ -248,7 +242,7 @@ test('Job#generate', async (t) => {
             'city'
         );
 
-        await job.generate(pool);
+        await job.generate(flight.config.pool);
 
         t.equals(job.id, 1, 'job.id: 1');
         t.equals(job.run, 1, 'job.run: 1');
@@ -275,17 +269,12 @@ test('Job#generate', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Job#from', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        await Job.from(pool, 2);
+        await Job.from(flight.config.pool, 2);
         t.fail('Job#from should fail');
     } catch (err) {
         t.deepLooseEqual(err, {
@@ -296,7 +285,7 @@ test('Job#from', async (t) => {
     }
 
     try {
-        const job = await Job.from(pool, 1);
+        const job = await Job.from(flight.config.pool, 1);
 
         t.equals(job.id, 1, 'job.id: 1');
         t.equals(job.run, 1, 'job.run: 1');
@@ -323,17 +312,12 @@ test('Job#from', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
 test('Job#patch', async (t) => {
-    const pool = new Pool({
-        connectionString: 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
-
     try {
-        const job = await Job.from(pool, 1);
+        const job = await Job.from(flight.config.pool, 1);
 
         // These should not update
         job.id = 1;
@@ -343,13 +327,13 @@ test('Job#patch', async (t) => {
         job.version = '0.0.1';
         job.count = 123;
 
-        await job.commit(pool);
+        await job.commit(flight.config.pool);
     } catch (err) {
         t.error(err, 'no error');
     }
 
     try {
-        const job = await Job.from(pool, 1);
+        const job = await Job.from(flight.config.pool, 1);
 
         t.equals(job.id, 1, 'job.id: 1');
         t.equals(job.run, 1, 'job.run: 1');
@@ -376,7 +360,6 @@ test('Job#patch', async (t) => {
         t.error(err, 'no error');
     }
 
-    pool.end();
     t.end();
 });
 
@@ -409,3 +392,5 @@ test('close', (t) => {
     nock.enableNetConnect();
     t.end();
 });
+
+flight.landing(test);

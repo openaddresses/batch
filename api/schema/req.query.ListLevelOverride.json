@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "type": "integer",
+            "default": 100,
+            "maximum": 100,
+            "description": "Limit number of returned runs"
+        },
+        "page": {
+            "type": "integer",
+            "description": "The offset based on limit to return"
+        },
+        "filter": {
+            "type": "string",
+            "description": "Filter a complete or partial pattern"
+        },
+        "level": {
+            "$ref": "./util/level.json"
+        }
+    }
+}

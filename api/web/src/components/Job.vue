@@ -179,7 +179,7 @@ export default {
     methods: {
         datapls: function() {
             if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/job/${this.job.id}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${this.job.id}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");

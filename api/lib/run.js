@@ -1,11 +1,10 @@
-'use strict';
-
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const moment = require('moment');
 const Job = require('./job');
 const Data = require('./data');
 const util = require('./util');
 const { Status } = require('./util');
+const { sql } = require('slonik');
 
 class Run {
     constructor() {
@@ -78,25 +77,16 @@ class Run {
         if (!query.limit) query.limit = 100;
         if (!query.status) query.status = Status.list();
 
-        const where = [];
+        if (!query.after) query.after = null;
+        if (!query.before) query.before = null;
 
         Status.verify(query.status);
 
-        if (!query.run) {
-            query.run = false;
-        } else {
-            query.run = parseInt(query.run);
-            if (isNaN(query.run)) {
-                throw new Err(400, null, 'run param must be integer');
-            }
-
-            where.push(`run = ${query.run}`);
-        }
+        if (!query.run) query.run = null;
 
         if (query.after) {
             try {
-                const after = moment(query.after);
-                where.push(`run.created > '${after.toDate().toISOString()}'::TIMESTAMP`);
+                query.after = moment(query.after);
             } catch (err) {
                 throw new Err(400, null, 'after param is not recognized as a valid date');
             }
@@ -104,73 +94,44 @@ class Run {
 
         if (query.before) {
             try {
-                const before = moment(query.before);
-                where.push(`run.created < '${before.toDate().toISOString()}'::TIMESTAMP`);
+                query.before = moment(query.before);
             } catch (err) {
                 throw new Err(400, null, 'before param is not recognized as a valid date');
             }
         }
 
+
         let pgres;
         try {
-            if (!where.length) {
-                pgres = await pool.query(`
-                    SELECT
-                        runs.id,
-                        runs.live,
-                        runs.created,
-                        runs.github,
-                        runs.closed,
-                        ARRAY_AGG(job.status) AS status,
-                        COUNT(job.*) AS jobs
-                    FROM
-                        runs,
-                        job
-                    WHERE
-                        '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
-                        AND job.run = runs.id
-                    GROUP BY
-                        runs.id,
-                        runs.live,
-                        runs.created,
-                        runs.github,
-                        runs.closed
-                    ORDER BY
-                        runs.id DESC
-                    LIMIT $1
-                `, [
-                    query.limit
-                ]);
-            } else {
-                pgres = await pool.query(`
-                    SELECT
-                        runs.id,
-                        runs.live,
-                        runs.created,
-                        runs.github,
-                        runs.closed,
-                        ARRAY_AGG(job.status) AS status,
-                        COUNT(job.*) AS jobs
-                    FROM
-                        runs,
-                        job
-                    WHERE
-                        '{${query.status.join(',')}}'::TEXT[] @> ARRAY[job.status]
-                        AND job.run = runs.id
-                        AND ${where.join(' AND ')}
-                    GROUP BY
-                        runs.id,
-                        runs.live,
-                        runs.created,
-                        runs.github,
-                        runs.closed
-                    ORDER BY
-                        runs.id DESC
-                    LIMIT $1
-                `, [
-                    query.limit
-                ]);
-            }
+            pgres = await pool.query(sql`
+                SELECT
+                    runs.id,
+                    runs.live,
+                    runs.created,
+                    runs.github,
+                    runs.closed,
+                    ARRAY_AGG(job.status) AS status,
+                    COUNT(job.*) AS jobs
+                FROM
+                    runs
+                        LEFT JOIN job
+                        ON job.run = runs.id
+                WHERE
+                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    AND (${query.run}::BIGINT IS NULL OR run = ${query.run})
+                    AND (${query.after}::TIMESTAMP IS NULL OR runs.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before}::TIMESTAMP IS NULL OR runs.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
+                GROUP BY
+                    runs.id,
+                    runs.live,
+                    runs.created,
+                    runs.github,
+                    runs.closed
+                ORDER BY
+                    runs.id DESC
+                LIMIT
+                    ${query.limit}
+            `);
 
             return pgres.rows.map((run) => {
                 run.id = parseInt(run.id);
@@ -264,7 +225,7 @@ class Run {
      */
     static async jobs(pool, run_id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     id,
                     run,
@@ -285,8 +246,8 @@ class Run {
                 FROM
                     job
                 WHERE
-                    job.run = $1
-            `, [run_id]);
+                    job.run = ${run_id}
+            `);
 
             return pgres.rows.map((job) => {
                 job.id = parseInt(job.id);
@@ -304,14 +265,14 @@ class Run {
 
     static async from_sha(pool, sha) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
                     runs
                 WHERE
-                    github->>'sha' = $1
-            `, [sha]);
+                    github->>'sha' = ${sha}
+            `);
 
             const run = new Run();
 
@@ -331,14 +292,14 @@ class Run {
 
     static async from(pool, id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
                     runs
                 WHERE
-                    id = $1
-            `, [id]);
+                    id = ${id}
+            `);
 
             const run = new Run();
 
@@ -358,17 +319,17 @@ class Run {
 
     static async stats(pool, id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     status,
                     count(*) AS count
                 FROM
                     job
                 WHERE
-                    run = $1
+                    run = ${id}
                 GROUP BY
                     status
-            `, [id]);
+            `);
 
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'no run jobs by that id');
@@ -396,14 +357,14 @@ class Run {
 
     static async close(pool, id) {
         try {
-            await pool.query(`
+            await pool.query(sql`
                 UPDATE
                     runs
                 SET
                     closed = true
                 WHERE
-                    id = $1
-            `, [id]);
+                    id = ${id}
+            `);
 
             return true;
         } catch (err) {
@@ -431,20 +392,15 @@ class Run {
 
     async commit(pool) {
         try {
-            await pool.query(`
+            await pool.query(sql`
                 UPDATE runs
                     SET
-                        github = $2,
-                        closed = $3,
-                        live = $4
+                        github = ${this.github},
+                        closed = ${this.closed},
+                        live = ${this.live}
                     WHERE
-                        id = $1
-           `, [
-                this.id,
-                this.github,
-                this.closed,
-                this.live
-            ]);
+                        id = ${this.id}
+           `);
         } catch (err) {
             throw new Err(500, err, 'failed to save run');
         }
@@ -458,7 +414,7 @@ class Run {
 
         let pgres;
         try {
-            pgres = await pool.query(`
+            pgres = await pool.query(sql`
                 INSERT INTO runs (
                     created,
                     live,
@@ -466,14 +422,11 @@ class Run {
                     closed
                 ) VALUES (
                     NOW(),
-                    $1,
-                    $2,
+                    ${params.live},
+                    ${JSON.stringify(params.github)}::JSONB,
                     false
                 ) RETURNING *
-            `, [
-                params.live,
-                params.github
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to generate run');
         }

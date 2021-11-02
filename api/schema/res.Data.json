@@ -3,12 +3,12 @@
     "additionalProperties": false,
     "required": [
         "id",
+        "fabric",
         "source",
         "updated",
         "layer",
         "name",
         "job",
-        "s3",
         "size",
         "output"
     ],
@@ -16,11 +16,14 @@
         "id": {
             "type": "integer"
         },
+        "fabric": {
+            "type": "boolean"
+        },
         "source": {
             "type": "string"
         },
         "updated": {
-            "type": "string"
+            "$ref": "./util/updated.json"
         },
         "layer": {
             "type": "string"
@@ -32,30 +35,14 @@
             "type": "integer"
         },
         "s3": {
-            "type": "string"
+            "type": "string",
+            "description": "Sponsors have access to the direct S3 bucket"
         },
         "size": {
             "$ref": "./util/size.json"
         },
         "output": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "cache",
-                "output",
-                "preview"
-            ],
-            "properties": {
-                "cache": {
-                    "type": "boolean"
-                },
-                "output": {
-                    "type": "boolean"
-                },
-                "preview": {
-                    "type": "boolean"
-                }
-            }
+            "$ref": "./util/output.json"
         }
     }
 }

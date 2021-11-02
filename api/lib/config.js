@@ -1,5 +1,3 @@
-'use strict';
-
 const AWS = require('aws-sdk');
 const pkg = require('../package.json');
 const { createAppAuth } = require('@octokit/auth-app');
@@ -7,6 +5,7 @@ const { Octokit } = require('@octokit/rest');
 
 class Config {
     static async env(args = {}) {
+        this.args = args;
         this.limits = args.limit || {
             exports: 300
         };
@@ -84,24 +83,16 @@ class Config {
         return this;
     }
 
-    static secret(secretName) {
-        return new Promise((resolve, reject) => {
-            const client = new AWS.SecretsManager({
-                region: process.env.AWS_DEFAULT_REGION
-            });
-
-            client.getSecretValue({
-                SecretId: secretName
-            }, (err, data) => {
-                if (err) return reject(err);
-
-                try {
-                    return resolve(JSON.parse(data.SecretString));
-                } catch (err) {
-                    return reject(err);
-                }
-            });
+    static async secret(secretName) {
+        const client = new AWS.SecretsManager({
+            region: process.env.AWS_DEFAULT_REGION
         });
+
+        const data = await client.getSecretValue({
+            SecretId: secretName
+        }).promise();
+
+        return JSON.parse(data.SecretString);
     }
 }
 

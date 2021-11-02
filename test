@@ -4,12 +4,13 @@ set -euo pipefail
 
 test() {
     cd $1
-    yarn install
-    yarn lint
-    yarn cov || yarn test
+    npm install
+    npm run lint
+    npm run cov || npm test
     cd -
 }
 
+echo "CREATE DATABASE openaddresses_test" | psql "postgres://postgres@localhost:5432"
+
 test .
 test api/
-test task/

@@ -2,10 +2,21 @@
     <span v-on:click.stop.prevent='datapls(job.job)' v-if='job.output.output' class='fr dropdown h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
         <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
 
-        <div class='round dropdown-content'>
-            <div v-on:click.stop.prevent='datapls(job.job || job.id)' class='round bg-gray-faint-on-hover'>GeoJSON</div>
-            <div v-on:click.stop.prevent='datapls(job.job || job.id, "shapefile")' class='round bg-gray-faint-on-hover'>ShapeFile</div>
-            <div v-on:click.stop.prevent='datapls(job.job || job.id, "csv")' class='round bg-gray-faint-on-hover'>CSV</div>
+        <div class='round dropdown-content' style='width: 150px;'>
+            <div class='col col--12'>
+                <div v-on:click.stop.prevent='datapls(job.job || job.id)' class='round bg-gray-faint-on-hover'>
+                    GeoJSON+LD
+                    <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                </div>
+                <div v-on:click.stop.prevent='datapls(job.job || job.id, "shapefile")' class='round bg-gray-faint-on-hover'>
+                    ShapeFile
+                    <svg @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                </div>
+                <div v-on:click.stop.prevent='datapls(job.job || job.id, "csv")' class='round bg-gray-faint-on-hover'>
+                    CSV
+                    <svg @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr color-blue-on-hover' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                </div>
+            </div>
         </div>
     </span>
 </template>
@@ -25,7 +36,7 @@ export default {
                 return this.createExport(jobid, fmt);
             }
 
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");
@@ -35,13 +46,10 @@ export default {
                 this.loading = true;
                 const res = await window.std('/api/export', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         job_id: jobid,
                         format: fmt
-                    })
+                    }
                 });
 
                 this.$router.push({ path: `/export/${res.id}` });

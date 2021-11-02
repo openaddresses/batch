@@ -4,7 +4,6 @@
         "id",
         "live",
         "created",
-        "github",
         "closed"
     ],
     "additionalProperties": false,
@@ -16,17 +15,14 @@
             "type": "boolean"
         },
         "created": {
-            "type": "string"
+            "$ref": "./util/created.json"
+        },
+        "closed": {
+            "type": "boolean"
         },
         "github": {
             "type": "object",
             "description": "Used by the data-pls CI tool",
-            "required": [
-                "ref",
-                "sha",
-                "url",
-                "check"
-            ],
             "additionalProperties": false,
             "properties": {
                 "ref": {
@@ -46,9 +42,6 @@
                     "description": "Github check ID to update"
                 }
             }
-        },
-        "closed": {
-            "type": "boolean"
         }
     }
 }

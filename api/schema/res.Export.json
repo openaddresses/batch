@@ -29,11 +29,10 @@
             "$ref": "./util/format.json"
         },
         "created": {
-            "type": "string",
-            "description": "The timestamp at which the export was created"
+            "$ref": "./util/created.json"
         },
         "expiry": {
-            "type": "string",
+            "type": "integer",
             "description": "The timestamp at which the export will expire"
         },
         "size": {

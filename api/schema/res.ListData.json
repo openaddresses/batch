@@ -5,12 +5,12 @@
         "additionalProperties": false,
         "required": [
             "id",
+            "fabric",
             "source",
             "updated",
             "layer",
             "name",
             "job",
-            "s3",
             "size",
             "output"
         ],
@@ -23,11 +23,14 @@
                 "type": "integer",
                 "description": "Map ID that the job has been matched to"
             },
+            "fabric": {
+                "type": "boolean"
+            },
             "source": {
                 "type": "string"
             },
             "updated": {
-                "type": "string"
+                "$ref": "./util/updated.json"
             },
             "layer": {
                 "type": "string"
@@ -45,24 +48,7 @@
                 "$ref": "./util/size.json"
             },
             "output": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                    "cache",
-                    "output",
-                    "preview"
-                ],
-                "properties": {
-                    "cache": {
-                        "type": "boolean"
-                    },
-                    "output": {
-                        "type": "boolean"
-                    },
-                    "preview": {
-                        "type": "boolean"
-                    }
-                }
+                "$ref": "./util/output.json"
             }
         }
     }

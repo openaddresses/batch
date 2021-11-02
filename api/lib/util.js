@@ -1,8 +1,6 @@
-'use strict';
-
 const request = require('request');
 const pkg = require('../package.json');
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 
 class Status {
     static list() {
@@ -16,15 +14,6 @@ class Status {
             if (!list.includes(status)) {
                 throw new Err(400, null, 'Invalid status param');
             }
-        }
-    }
-}
-
-class Param {
-    static async int(req, name) {
-        req.params[name] = Number(req.params[name]);
-        if (isNaN(req.params[name])) {
-            throw new Err(400, null, `${name} param must be an integer`);
         }
     }
 }
@@ -72,7 +61,6 @@ function explode(url) {
 
 module.exports = {
     explode,
-    Param,
     Status
 };
 

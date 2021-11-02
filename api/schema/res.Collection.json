@@ -22,9 +22,12 @@
                 "type": "string"
             }
         },
-        "created": {
+        "s3": {
             "type": "string",
-            "description": "The date on which this collection was uploaded"
+            "description": "Sponsors have access to the direct S3 bucket"
+        },
+        "created": {
+            "$ref": "./util/created.json"
         },
         "size": {
             "$ref": "./util/size.json"

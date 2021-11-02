@@ -1,6 +1,4 @@
-'use strict';
-
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 

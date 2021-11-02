@@ -22,7 +22,7 @@
                 "type": "string"
             },
             "created": {
-                "type": "string"
+                "$ref": "./util/created.json"
             },
             "s3": {
                 "type": "string"

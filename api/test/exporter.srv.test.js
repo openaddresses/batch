@@ -1,9 +1,5 @@
-'use strict';
-
 const test = require('tape');
-const Flight = require('./init');
-const { promisify } = require('util');
-const request = promisify(require('request'));
+const Flight = require('./flight');
 
 const flight = new Flight();
 
@@ -16,8 +12,8 @@ flight.takeoff(test, {
 
 test('POST: /api/run', async (t) => {
     try {
-        const res = await request({
-            url: 'http://localhost:4999/api/run',
+        const res = await flight.request({
+            url: '/api/run',
             method: 'POST',
             json: true,
             headers: {
@@ -26,7 +22,7 @@ test('POST: /api/run', async (t) => {
             body: {
                 live: true
             }
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
 
@@ -43,8 +39,8 @@ test('POST: /api/run', async (t) => {
 
 test('POST: /api/run/:run/jobs', async (t) => {
     try {
-        const res = await request({
-            url: 'http://localhost:4999/api/run/1/jobs',
+        const res = await flight.request({
+            url: '/api/run/1/jobs',
             method: 'POST',
             json: true,
             headers: {
@@ -57,7 +53,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
                     name: 'dcgis'
                 }]
             }
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
 
@@ -72,24 +68,24 @@ test('POST: /api/run/:run/jobs', async (t) => {
     t.end();
 });
 
-let usr;
+flight.user(test, 'backer', false, {
+    level: 'backer'
+});
 
 test('POST /api/export - cannot export unsuccessful', async (t) =>  {
     try {
-        usr = await flight.token('test-backer', {
-            level: 'backer'
-        });
-
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
+            auth: {
+                bearer: flight.token.backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, false);
 
         t.equals(exp.statusCode, 400, 'http: 400');
 
@@ -107,8 +103,8 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
 
 test('PATCH /api/job/1', async (t) =>  {
     try {
-        const res = await request({
-            url: 'http://localhost:4999/api/job/1',
+        const res = await flight.request({
+            url: '/api/job/1',
             method: 'PATCH',
             json: true,
             headers: {
@@ -117,7 +113,7 @@ test('PATCH /api/job/1', async (t) =>  {
             body: {
                 status: 'Success'
             }
-        });
+        }, t);
 
         t.equals(res.statusCode, 200, 'http: 200');
     } catch (err) {
@@ -127,23 +123,26 @@ test('PATCH /api/job/1', async (t) =>  {
     t.end();
 });
 
+flight.user(test, 'non_backer');
+
 test('POST /api/export - no donor level', async (t) =>  {
     try {
-        const usr = await flight.token('test');
 
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
+            auth: {
+                bearer: flight.token.non_backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, false);
 
         t.deepEquals(exp.body, {
-            status: 401,
+            status: 403,
             message: 'Please donate to use this feature',
             messages: []
         });
@@ -156,16 +155,18 @@ test('POST /api/export - no donor level', async (t) =>  {
 
 test('POST /api/export - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
+            auth: {
+                bearer: flight.token.backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, t);
 
         t.equals(exp.statusCode, 200, 'http: 200');
 
@@ -192,12 +193,14 @@ test('POST /api/export - backer', async (t) =>  {
 
 test('GET /api/export - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'GET',
-            json: true,
-            jar: usr.jar
-        });
+            auth: {
+                bearer: flight.token.backer
+            },
+            json: true
+        }, t);
 
         t.ok(exp.body.exports[0].created, '.exports[0].created: <date>');
         delete exp.body.exports[0].created;
@@ -228,12 +231,14 @@ test('GET /api/export - backer', async (t) =>  {
 
 test('GET /api/export/100 - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export/100',
+        const exp = await flight.request({
+            url: '/api/export/100',
+            auth: {
+                bearer: flight.token.backer
+            },
             method: 'GET',
-            json: true,
-            jar: usr.jar
-        });
+            json: true
+        }, false);
 
         t.deepEquals(exp.body, { status: 404, message: 'no exports by that id', messages: [] });
     } catch (err) {
@@ -245,8 +250,8 @@ test('GET /api/export/100 - backer', async (t) =>  {
 
 test('PATCH /api/export/1 - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export/1',
+        const exp = await flight.request({
+            url: '/api/export/1',
             method: 'PATCH',
             json: true,
             headers: {
@@ -257,7 +262,7 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
                 status: 'Success',
                 loglink: 'i-am-a-loglink'
             }
-        });
+        }, t);
 
         t.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
@@ -282,12 +287,14 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
 
 test('GET /api/export/1 - backer', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export/1',
+        const exp = await flight.request({
+            url: '/api/export/1',
             method: 'GET',
-            json: true,
-            jar: usr.jar
-        });
+            auth: {
+                bearer: flight.token.backer
+            },
+            json: true
+        }, t);
 
         t.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
@@ -302,7 +309,7 @@ test('GET /api/export/1 - backer', async (t) =>  {
             size: 2134,
             status: 'Success',
             loglink: 'i-am-a-loglink'
-        });
+        }, t);
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -312,16 +319,18 @@ test('GET /api/export/1 - backer', async (t) =>  {
 
 test('POST /api/export - backer - exceeded limit', async (t) =>  {
     try {
-        const exp = await request({
-            url: 'http://localhost:4999/api/export',
+        const exp = await flight.request({
+            url: '/api/export',
             method: 'POST',
             json: true,
-            jar: usr.jar,
+            auth: {
+                bearer: flight.token.backer
+            },
             body: {
                 job_id: 1,
                 format: 'csv'
             }
-        });
+        }, false);
 
         t.equals(exp.statusCode, 400, 'http: 400');
 

@@ -1,6 +1,5 @@
-'use strict';
-
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
+const { sql } = require('slonik');
 
 /**
  * @class Analytics
@@ -28,7 +27,7 @@ class Analytics {
     }
 
     point(params) {
-        this.pool.query(`
+        this.pool.query(sql`
             INSERT INTO analytics (
                 ts,
                 sid,
@@ -38,19 +37,13 @@ class Analytics {
                 agent
             ) VALUES (
                 NOW(),
-                MD5($1),
-                $2,
-                $3,
-                $4,
-                $5
+                MD5(${params.sid}),
+                ${params.ip},
+                ${params.url},
+                ${params.method},
+                ${params.agent}
             );
-        `, [
-            params.sid,
-            params.ip,
-            params.url,
-            params.method,
-            params.agent
-        ]);
+        `);
     }
 
     /**
@@ -59,7 +52,7 @@ class Analytics {
     async collections() {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     a.count,
                     collections.name
@@ -77,7 +70,7 @@ class Analytics {
                         Count(*)
                 ) a INNER JOIN collections
                     ON a.collection = collections.id
-            `, []);
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to retrieve collections');
         }
@@ -94,7 +87,7 @@ class Analytics {
     async traffic() {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     s.x,
                     count(s.y) AS y
@@ -115,7 +108,7 @@ class Analytics {
                     x
                 ORDER BY
                     x DESC
-            `, []);
+            `);
         } catch (err) {
             throw new Err(500, err, 'failed to retrieve traffic');
         }

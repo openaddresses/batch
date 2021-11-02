@@ -45,7 +45,7 @@
                         <span class='ml12' v-text='c.name'/>
                     </div>
                     <div class='col col--2'>
-                        <span v-text='c.created.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                        <span v-text='fmt(c.created)'/>
                     </div>
                     <div class='col col--5'>
                         <span class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
@@ -77,20 +77,10 @@
                         <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
                         <div class='col col--9 px6'>
-                            <label>Source</label>
-                            <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
+                            <QuerySource @source='filter.source = $event'/>
                         </div>
                         <div class='col col--3 px6'>
-                            <label>Layer</label>
-                            <div class='w-full select-container'>
-                                <select v-model='filter.layer' class='select select--stroke'>
-                                    <option>all</option>
-                                    <option>addresses</option>
-                                    <option>buildings</option>
-                                    <option>parcels</option>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
+                            <QueryLayer @layer='filter.layer = $event'/>
                         </div>
                         <div class='col col--6 px6'>
                             <label class='switch-container mr6'>
@@ -167,7 +157,7 @@
 
                             </div>
                             <div @click='emitjob(job.job)' class='col col--2'>
-                                <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                                <span v-text='fmt(job.updated)'/>
                             </div>
                             <div class='col col--5'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
@@ -204,12 +194,16 @@
 
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
+import QuerySource from './query/Source.vue';
+import QueryLayer from './query/Layer.vue';
+import moment from 'moment-timezone';
 
 export default {
     name: 'Data',
     props: ['auth'],
     data: function() {
         return {
+            tz: moment.tz.guess(),
             loading: {
                 sources: false,
                 collections: false
@@ -263,6 +257,9 @@ export default {
         }
     },
     methods: {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+        },
         size: function(bytes) {
             if (bytes == 0) { return "0.00 B"; }
             var e = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -285,11 +282,11 @@ export default {
                 return this.$emit('perk');
             }
 
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz`);
+            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         collectionpls: function(c) {
             if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/collections/${c.id}/data`);
+            this.external(`${window.location.origin}/api/collections/${c.id}/data?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");
@@ -307,12 +304,9 @@ export default {
             try {
                 await window.std(`/api/data/${job.id}`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         fabric: job.fabric
-                    })
+                    }
                 });
             } catch (err) {
                 this.$emit('err', err);
@@ -374,6 +368,8 @@ export default {
     },
     components: {
         Coverage,
+        QuerySource,
+        QueryLayer,
         Download
     }
 }

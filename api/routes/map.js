@@ -28,9 +28,9 @@ async function router(schema, config) {
      * @apiDescription
      *   Get a single Map Object
      */
-    await schema.get( '/map/:mapid', null, async (req, res) => {
-        await Param.int(req, 'mapid');
-
+    await schema.get( '/map/:mapid', {
+        ':mapid': 'integer'
+    }, async (req, res) => {
         return res.json(await Map.from_id(config.pool, req.params.mapid));
     });
 

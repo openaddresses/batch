@@ -27,7 +27,7 @@
 
                     </div>
                     <div @click='emitjob(job.job)' class='col col--2'>
-                        <span v-text='job.updated.match(/\d{4}-\d{2}-\d{2}/)[0]'/>
+                        <span v-text='fmt(job.updated)'/>
                     </div>
                     <div class='col col--5'>
                         <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
@@ -61,6 +61,7 @@
 <script>
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
+import moment from 'moment-timezone';
 
 export default {
     name: 'Location',
@@ -70,6 +71,7 @@ export default {
     },
     data: function() {
         return {
+            tz: moment.tz.guess(),
             location: {},
             jobs: [],
             loading: false
@@ -80,6 +82,9 @@ export default {
         Coverage
     },
     methods: {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+        },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });
         },

@@ -20,7 +20,7 @@
 
             <button @click='external("/map")' class='btn btn--stroke btn--s btn--gray round mr12'>
                 Map
-                <span class='bg-blue-light round color-white px6'>new</span>
+                <span class='bg-blue-light round color-white px6'>Experimental</span>
             </button>
 
             <span class='fr'>

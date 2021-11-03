@@ -1,4 +1,4 @@
-FROM 847904970422.dkr.ecr.us-east-1.amazonaws.com/batch-machine:7.10.1
+FROM 847904970422.dkr.ecr.us-east-1.amazonaws.com/batch-machine:7.11.2
 
 RUN apk add nodejs npm yarn git jq
 

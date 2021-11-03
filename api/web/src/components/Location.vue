@@ -55,6 +55,10 @@
                 </div>
             </div>
         </template>
+
+        <div class='col col--12 py24 align-center'>
+            OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
+        </div>
     </div>
 </template>
 
@@ -74,7 +78,8 @@ export default {
             tz: moment.tz.guess(),
             location: {},
             jobs: [],
-            loading: false
+            loading: false,
+            types: []
         };
     },
     components: {
@@ -112,6 +117,7 @@ export default {
         getJobs: async function() {
             try {
                 this.jobs = await window.std(window.location.origin + `/api/data?map=${this.locid}`);
+                this.types = this.jobs.map(j => j.layer).sort();
             } catch(err) {
                 this.$emit('err', err);
             }

@@ -144,12 +144,7 @@ async function server(args, config, cb) {
     app.get('/sitemap.xml', async (req, res) => {
         try {
             res.type('application/xml');
-
-            const list = await config.cacher.get(Miss(req.query, 'sitemap'), async () => {
-                return await SiteMap.list(config.pool);
-            });
-
-            res.send(list);
+            res.send(await SiteMap.list(config.pool));
         } catch (err) {
             Err.respond(res, err);
         }

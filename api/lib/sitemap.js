@@ -1,4 +1,5 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
+const { sql } = require('slonik');
 
 /**
  * @class
@@ -15,7 +16,7 @@ class SiteMap {
                     </url>
             `.trim();
 
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     id,
                     code,

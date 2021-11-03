@@ -33,7 +33,7 @@ class Map {
 
     static async from_id(pool, mapid) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     id,
                     code,
@@ -43,24 +43,24 @@ class Map {
                 FROM
                     map
                 WHERE
-                    id = $1
+                    id = ${mapid}
                 GROUP BY
                     id,
                     code,
                     name,
                     geom
                 LIMIT 1
-            `, [ mapid ]);
+            `);
 
             if (pgres.rows.length === 0) return false;
 
             return {
-                id: parseInt(pgres.rows[0].id),
+                id: pgres.rows[0].id,
                 code: pgres.rows[0].code,
                 name: pgres.rows[0].name,
-                bbox: pgres.rows[0].bbox.replace('BOX(', '').replace(')', '').split(',').join(' ').split(' ').map(e => Number(e)),
-                geom: pgres.rows[0].geom,
-            }
+                bbox: pgres.rows[0].bbox.replace('BOX(', '').replace(')', '').split(',').join(' ').split(' ').map((e) => Number(e)),
+                geom: pgres.rows[0].geom
+            };
         } catch (err) {
             throw new Err(500, err, 'Failed to fetch map id');
         }

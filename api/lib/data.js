@@ -34,11 +34,8 @@ class Data {
         if (query.before) query.before = moment(query.before).format('YYYY-MM-DD');
         if (query.after) query.after = moment(query.after).format('YYYY-MM-DD');
 
-<<<<<<< HEAD
         if (!query.map) query.map = null;
-=======
         if (!query.fabric) query.fabric = null;
->>>>>>> 4216367e2bbdb933128338555dfb05ca0b7ceacd
 
         if (!query.point) {
             query.point = '';
@@ -76,20 +73,12 @@ class Data {
                                 ON job.map = map.id
                             ON results.job = job.id
                 WHERE
-<<<<<<< HEAD
-                    results.source ilike $1
-                    AND results.layer ilike $2
-                    AND results.name ilike $3
-                    AND ($5::TIMESTAMP IS NULL OR updated < $5::TIMESTAMP)
-                    AND ($6::TIMESTAMP IS NULL OR updated > $6::TIMESTAMP)
-                    AND ($7::BIGINT IS NULL OR job.map = $7)
-=======
                     results.source ilike ${query.source}
                     AND results.layer ilike ${query.layer}
                     AND results.name ilike ${query.name}
                     AND (${query.before}::TIMESTAMP IS NULL OR updated < ${query.before}::TIMESTAMP)
                     AND (${query.after}::TIMESTAMP IS NULL OR updated > ${query.after}::TIMESTAMP)
->>>>>>> 4216367e2bbdb933128338555dfb05ca0b7ceacd
+                    AND (${query.map}::BIGINT IS NULL OR job.map = ${query.map})
                     AND (
                         char_length(${query.point}) = 0
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText(${query.point}), 4326), map.geom, 1.0)
@@ -99,19 +88,7 @@ class Data {
                     results.source,
                     results.layer,
                     results.name
-<<<<<<< HEAD
-            `, [
-                query.source,
-                query.layer,
-                query.name,
-                query.point,
-                query.before,
-                query.after,
-                query.map
-            ]);
-=======
             `);
->>>>>>> 4216367e2bbdb933128338555dfb05ca0b7ceacd
 
             return pgres.rows.map((res) => {
                 res.id = parseInt(res.id);

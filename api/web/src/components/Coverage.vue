@@ -27,7 +27,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default {
     name: 'Coverage',
-    props: ['layer'],
+    props: ['layer', 'filter', 'bbox'],
     data: function() {
         return {
             layers: ['addresses', 'parcels', 'buildings'],
@@ -89,10 +89,14 @@ export default {
                 const res = await window.std('/api/map');
                 mapboxgl.accessToken = res.token;
 
-                this.map = new mapboxgl.Map({
+                const opts = {
                     container: 'map',
                     style: 'mapbox://styles/mapbox/light-v9'
-                });
+                };
+
+                if (this.bbox) opts.bounds = this.bbox;
+
+                this.map = new mapboxgl.Map(opts);
 
                 this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
@@ -116,35 +120,10 @@ export default {
                     });
 
                     this.map.on('click', (e) => {
-                        console.error(this.map.queryRenderedFeatures(e.point))
                         this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 
                     const base = '#0b6623';
-
-                    this.map.addLayer({
-                        id: `borders`,
-                        type: 'line',
-                        source: 'borders',
-                        'source-layer': 'data',
-                        layout: { },
-                        filter: ['==', ['geometry-type'], 'Polygon'],
-                        paint: {
-                            'line-color': 'rgba(0, 0, 0, 0.1)',
-                            'line-width': 1
-                        }
-                    });
-
-                    this.map.addLayer({
-                        'id': 'borders-label',
-                        'type': 'symbol',
-                        'minzoom': 7,
-                        'source-layer': 'data',
-                        'source': 'borders',
-                        'layout': {
-                            'text-field': ['get', 'name']
-                        }
-                    });
 
                     this.map.addLayer({
                         id: `coverage-poly`,
@@ -181,6 +160,16 @@ export default {
                             'circle-opacity': 1.0,
                         }
                     });
+
+                    for (const layer of ['coverage-poly', 'coverage-point']) {
+                        if (this.filter) {
+                            this.map.setFilter(layer, [
+                                '==',
+                                ['id'],
+                                parseInt(this.filter)
+                            ]);
+                        }
+                    }
 
                     for (const layer of ['addresses', 'parcels', 'buildings']) {
                         this.map.addLayer({
@@ -232,7 +221,45 @@ export default {
                                 'circle-stroke-width': 1
                             }
                         });
+
+                        if (this.filter) {
+                            this.map.setFilter(`coverage-${layer}-poly`, [
+                                '==',
+                                ['id'],
+                                parseInt(this.filter)
+                            ]);
+
+                            this.map.setFilter(`coverage-${layer}-point`, [
+                                '==',
+                                ['id'],
+                                parseInt(this.filter)
+                            ]);
+                        }
                     }
+
+                    this.map.addLayer({
+                        id: `borders`,
+                        type: 'line',
+                        source: 'borders',
+                        'source-layer': 'data',
+                        layout: { },
+                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        paint: {
+                            'line-color': 'rgba(0, 0, 0, 0.1)',
+                            'line-width': 1
+                        }
+                    });
+
+                    this.map.addLayer({
+                        'id': 'borders-label',
+                        'type': 'symbol',
+                        'minzoom': 7,
+                        'source-layer': 'data',
+                        'source': 'borders',
+                        'layout': {
+                            'text-field': ['get', 'name']
+                        }
+                    });
 
                     this.map.addSource('click', {
                         type: 'geojson',

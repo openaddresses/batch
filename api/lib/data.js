@@ -19,6 +19,7 @@ class Data {
      * @param {String} [query.after=Null] - Filter results run after the given date
      * @param {String} [query.point=false] - Filter results by geographic point
      * @param {Boolean} query.fabric - Filter results by if they are part of the fabric
+     * @param {Number} query.map - Filter results by associated mapid
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -33,6 +34,7 @@ class Data {
         if (query.before) query.before = moment(query.before).format('YYYY-MM-DD');
         if (query.after) query.after = moment(query.after).format('YYYY-MM-DD');
 
+        if (!query.map) query.map = null;
         if (!query.fabric) query.fabric = null;
 
         if (!query.point) {
@@ -62,7 +64,8 @@ class Data {
                     results.name,
                     results.job,
                     job.output,
-                    job.size
+                    job.size,
+                    job.map
                 FROM
                     results
                         INNER JOIN
@@ -75,6 +78,7 @@ class Data {
                     AND results.name ilike ${query.name}
                     AND (${query.before}::TIMESTAMP IS NULL OR updated < ${query.before}::TIMESTAMP)
                     AND (${query.after}::TIMESTAMP IS NULL OR updated > ${query.after}::TIMESTAMP)
+                    AND (${query.map}::BIGINT IS NULL OR job.map = ${query.map})
                     AND (
                         char_length(${query.point}) = 0
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText(${query.point}), 4326), map.geom, 1.0)
@@ -90,6 +94,7 @@ class Data {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
                 res.size = parseInt(res.size);
+                res.map = parseInt(res.map);
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
 
                 return res;
@@ -116,7 +121,8 @@ class Data {
                     job.output,
                     job.run,
                     job.count,
-                    job.stats
+                    job.stats,
+                    job.map
                 FROM
                     results INNER JOIN job
                         ON
@@ -143,6 +149,7 @@ class Data {
                     res.id = parseInt(res.id);
                     res.count = parseInt(res.count);
                     res.run = parseInt(res.run);
+                    res.map = parseInt(res.map);
                     res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;
                 })
@@ -192,7 +199,8 @@ class Data {
                     results.name,
                     results.job,
                     job.output,
-                    job.size
+                    job.size,
+                    job.map
                 FROM
                     results,
                     job
@@ -209,6 +217,7 @@ class Data {
                 res.id = parseInt(res.id);
                 res.job = parseInt(res.job);
                 res.size = parseInt(res.size);
+                res.map = parseInt(res.map);
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
                 return res;
             })[0];

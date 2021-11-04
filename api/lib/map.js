@@ -21,11 +21,49 @@ const sm = new SM({
     size: 256
 });
 
+/**
+ * @class
+ */
 class Map {
     static map() {
         return {
             token: process.env.MAPBOX_TOKEN
         };
+    }
+
+    static async from_id(pool, mapid) {
+        try {
+            const pgres = await pool.query(sql`
+                SELECT
+                    id,
+                    code,
+                    name,
+                    ST_Extent(geom) AS bbox,
+                    ST_AsGeoJSON(geom)::JSONB AS geom
+                FROM
+                    map
+                WHERE
+                    id = ${mapid}
+                GROUP BY
+                    id,
+                    code,
+                    name,
+                    geom
+                LIMIT 1
+            `);
+
+            if (pgres.rows.length === 0) return false;
+
+            return {
+                id: pgres.rows[0].id,
+                code: pgres.rows[0].code,
+                name: pgres.rows[0].name,
+                bbox: pgres.rows[0].bbox.replace('BOX(', '').replace(')', '').split(',').join(' ').split(' ').map((e) => Number(e)),
+                geom: pgres.rows[0].geom
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to fetch map id');
+        }
     }
 
     static async from(pool, code) {
@@ -118,9 +156,10 @@ class Map {
 
             const pgres = await pool.query(sql`
                 SELECT
-                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                    ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
                 FROM (
                     SELECT
+                        n.id,
                         n.code,
                         addresses,
                         buildings,
@@ -160,7 +199,8 @@ class Map {
                         n.buildings,
                         n.parcels,
                         n.code,
-                        n.geom
+                        n.geom,
+                        n.id
                 ) q
             `);
 

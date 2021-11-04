@@ -28,6 +28,9 @@ import Job from '../components/Job.vue';
 import Run from '../components/Run.vue';
 import JobLog from '../components/JobLog.vue';
 import JobRaw from '../components/JobRaw.vue';
+import Location from '../components/Location.vue';
+
+import NotFound from '../components/NotFound.vue';
 
 import Profile from '../components/Profile.vue';
 import ProfileDefault from '../components/profile/ProfileDefault.vue';
@@ -53,6 +56,8 @@ const router = new VueRouter({
         { path: '/job/:jobid', component: Job, props: true },
         { path: '/job/:jobid/log', component: JobLog, props: true },
         { path: '/job/:jobid/raw', component: JobRaw, props: true },
+
+        { path: '/location/:locid', component: Location, props: true },
 
         { path: '/data', component: Data },
         { path: '/data/:dataid/history', component: History, props: true },
@@ -82,7 +87,9 @@ const router = new VueRouter({
 
         { path: '/register', component: Register },
 
-        { path: '/upload', component: Upload }
+        { path: '/upload', component: Upload },
+
+        { path: '*', component: NotFound }
     ]
 });
 

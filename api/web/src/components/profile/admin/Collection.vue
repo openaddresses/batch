@@ -84,7 +84,6 @@ export default {
 
                 this.loading = true;
 
-                console.error(this.collection.id)
                 if (this.collection.id) {
                     await window.std(`/api/collections/${this.collection.id}`, {
                         method: 'PATCH',

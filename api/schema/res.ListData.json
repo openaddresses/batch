@@ -16,7 +16,12 @@
         ],
         "properties": {
             "id": {
-                "type": "integer"
+                "type": "integer",
+                "description": "Data ID"
+            },
+            "map": {
+                "type": "integer",
+                "description": "Map ID that the job has been matched to"
             },
             "fabric": {
                 "type": "boolean"

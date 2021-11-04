@@ -14,10 +14,25 @@ async function router(schema, config) {
      * @apiDescription
      *   Data required for map initialization
      */
-    await schema.get('/map', null,
-        (req, res) => {
-            return res.json(Map.map());
-        });
+    await schema.get( '/map', null, (req, res) => {
+        return res.json(Map.map());
+    });
+
+    /**
+     * @api {get} /api/map/:mapid Map Feature
+     * @apiVersion 1.0.0
+     * @apiName MapFeature
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Get a single Map Object
+     */
+    await schema.get( '/map/:mapid', {
+        ':mapid': 'integer'
+    }, async (req, res) => {
+        return res.json(await Map.from_id(config.pool, req.params.mapid));
+    });
 
     /**
      * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
@@ -27,6 +42,18 @@ async function router(schema, config) {
      * @apiPermission public
      *
      * @apiDescription
+     *   Get a single Map Object
+     */
+    await schema.get( '/map/:mapid', {
+        ':mapid': 'integer'
+    }, async (req, res) => {
+        return res.json(await Map.from_id(config.pool, req.params.mapid));
+    });
+
+    /**
+     * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
+     * @apiVersion 1.0.0
+     * @apiName BorderVectorTile
      *   Retrive borders Mapbox Vector Tiles
      *
      * @apiParam {Number} z Z coordinate
@@ -151,7 +178,6 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
-
 }
 
 module.exports = router;

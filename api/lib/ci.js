@@ -362,17 +362,6 @@ class CI {
     }
 
     /**
-     * Respond to issue events
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     * @param {Object} event - GitHub Event Object
-     */
-    async issue(pool, event) {
-        console.error('ISSUE', JSON.stringify(event));
-        return true;
-    }
-
-    /**
      * Respond to pull request events
      *
      * @param {Pool} pool - Postgres Pool instance
@@ -406,17 +395,6 @@ class CI {
             }
         }
 
-        return true;
-    }
-
-    /**
-     * Respond to issue comment request events
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     * @param {Object} event - GitHub Event Object
-     */
-    async comment(pool, event) {
-        console.error('COMMENT', JSON.stringify(event));
         return true;
     }
 }

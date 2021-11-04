@@ -34,10 +34,6 @@ async function router(schema, config) {
                 await ci.pull(config.pool, req.body);
 
                 res.json(true);
-            } else if (req.headers['x-github-event'] === 'issue_comment') {
-                await ci.issue(config.pool, req.body);
-
-                res.json(true);
             } else {
                 res.status(200).send('Accepted but ignored');
             }

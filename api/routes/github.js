@@ -30,7 +30,7 @@ async function router(schema, config) {
                 await ci.push(config.pool, req.body);
 
                 res.json(true);
-            } else if (req.headers['x-github-event'] === 'pull_request') {
+            } else if (req.headers['x-github-event'] === 'pull_request' && req.body.action !== 'closed') {
                 await ci.pull(config.pool, req.body);
 
                 res.json(true);

@@ -4,11 +4,13 @@ const memjs = require('memjs');
  * @class Cacher
  */
 class Cacher {
-    constructor(nocache = false) {
+    constructor(nocache = false, silent = false) {
         this.nocache = nocache;
 
-        if (nocache) console.error('ok - Memcached Disabled');
-        else console.error('ok - Memcached Enabled');
+        if (!silent) {
+            if (nocache) console.error('ok - Memcached Disabled');
+            else console.error('ok - Memcached Enabled');
+        }
 
         this.cache = memjs.Client.create();
     }

@@ -154,7 +154,8 @@ test('GET: api/data', async (t) => {
                 cache: false,
                 output: false,
                 preview: false
-            }
+            },
+            map: 1
         }], 'data: { ... }');
     } catch (err) {
         t.error(err, 'no error');

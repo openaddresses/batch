@@ -14,12 +14,12 @@
         "query": false,
         "res": true
     },
-    "DELETE /cache/:cache_key": {
+    "DELETE /cache": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /cache": {
+    "DELETE /cache/:cache_key": {
         "body": false,
         "query": false,
         "res": true
@@ -235,6 +235,11 @@
         "res": true
     },
     "GET /map": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /map/:mapid": {
         "body": false,
         "query": false,
         "res": false

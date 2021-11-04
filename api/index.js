@@ -12,7 +12,7 @@ const TileBase = require('tilebase');
 const { Schema, Err } = require('@openaddresses/batch-schema');
 const { sql, createPool } = require('slonik');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase'],
+    boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase', 'silent'],
     alias: {
         no_tb: 'no-tilebase',
         no_c: 'no-cache'
@@ -56,12 +56,12 @@ async function configure(args, cb) {
 async function server(args, config, cb) {
     let tb = false;
     if (!args['no-tilebase']) {
-        console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+        if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
         tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        console.log('ok - loaded TileBase');
+        if (!config.silent) console.log('ok - loaded TileBase');
         await tb.open();
     } else {
-        console.log('ok - TileBase Disabled');
+        if (!config.silent) console.log('ok - TileBase Disabled');
     }
 
     let postgres = process.env.POSTGRES;
@@ -96,7 +96,7 @@ async function server(args, config, cb) {
 
     const analytics = new Analytics(pool);
 
-    config.cacher = new Cacher(args['no-cache']);
+    config.cacher = new Cacher(args['no-cache'], config.silent);
     config.pool = pool;
     config.tb = tb;
 
@@ -263,7 +263,7 @@ async function server(args, config, cb) {
 
         if (cb) return cb(srv, config);
 
-        console.log('ok - http://localhost:4999');
+        if (!config.silent) console.log('ok - http://localhost:4999');
     });
 }
 

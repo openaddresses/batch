@@ -8,7 +8,7 @@
     "scripts": {
         "doc": "apidoc -i ./ -f index.js -f ./routes/ -e node_modules -e web --private",
         "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
-        "test": "tape test/*.test.js",
+        "test": "tape test/*.test.js | tap-dot",
         "start": "node index.js --email",
         "dev": "nodemon -i ./web index.js",
         "cov-html": "nyc tape 'test/**/*.js' && nyc report --reporter=html",
@@ -47,6 +47,7 @@
         "request": "^2.88.2",
         "slonik": "^24.0.0",
         "split": "^1.0.1",
+        "tap-dot": "^2.0.0",
         "tilebase": "^1.5.0"
     },
     "devDependencies": {

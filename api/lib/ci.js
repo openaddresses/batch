@@ -269,8 +269,10 @@ class CI {
             const master_sources = {};
 
             try {
+                const url = new URL(`https://raw.githubusercontent.com/openaddresses/openaddresses/master/${file.filename}`);
+
                 const master_res = await request({
-                    url: `https://raw.githubusercontent.com/openaddresses/openaddresses/master/${file.filename}`,
+                    url: url,
                     headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
                     method: 'GET'
                 });
@@ -281,7 +283,7 @@ class CI {
                 } else {
                     // This isn't always an error - if the source is new you can't compare against master as
                     // it won't exist - hence the fallback to an empty object
-                    console.error(`Error: InternalDiff: HTTP:${master_res.statusCode}: ${master_res.body}`);
+                    console.error(`Error: InternalDiff: ${url} HTTP:${master_res.statusCode}: ${master_res.body}`);
                 }
 
                 const master_json = JSON.parse(master_body);

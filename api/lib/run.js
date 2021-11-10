@@ -5,17 +5,15 @@ const Data = require('./data');
 const util = require('./util');
 const { Status } = require('./util');
 const { sql } = require('slonik');
+const Generic = require('./generic');
 
-class Run {
+class Run extends Generic {
+    static _table = 'runs';
+    static _patch = require('../schema/req.body.PatchRun.json');
+    static _res = require('../schema/res.Run.json');
+
     constructor() {
-        this.id = false;
-        this.created = false;
-        this.github = {};
-        this.live = false;
-        this.closed = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchRun.json').properties);
+        super();
     }
 
     /**
@@ -290,33 +288,6 @@ class Run {
         }
     }
 
-    static async from(pool, id) {
-        try {
-            const pgres = await pool.query(sql`
-                SELECT
-                    *
-                FROM
-                    runs
-                WHERE
-                    id = ${id}
-            `);
-
-            const run = new Run();
-
-            if (!pgres.rows.length) {
-                throw new Err(404, null, 'no run by that id');
-            }
-
-            for (const key of Object.keys(pgres.rows[0])) {
-                run[key] = pgres.rows[0][key];
-            }
-
-            return run;
-        } catch (err) {
-            throw new Err(500, err, 'failed to fetch run');
-        }
-    }
-
     static async stats(pool, id) {
         try {
             const pgres = await pool.query(sql`
@@ -372,30 +343,12 @@ class Run {
         }
     }
 
-    json() {
-        return {
-            id: parseInt(this.id),
-            live: this.live,
-            created: this.created,
-            github: this.github,
-            closed: this.closed
-        };
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
-    }
-
     async commit(pool) {
         try {
             await pool.query(sql`
                 UPDATE runs
                     SET
-                        github = ${this.github},
+                        github = ${this.github ? JSON.stringify(this.github) : null},
                         closed = ${this.closed},
                         live = ${this.live}
                     WHERE

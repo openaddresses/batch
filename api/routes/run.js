@@ -53,7 +53,7 @@ async function router(schema, config) {
 
             const run = await Run.generate(config.pool, req.body);
 
-            return res.json(run.json());
+            return res.json(run.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -136,10 +136,9 @@ async function router(schema, config) {
             if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
             run.patch(req.body);
-
             await run.commit(config.pool);
 
-            return res.json(run.json());
+            return res.json(run.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -30,7 +30,9 @@ class Schedule {
 
     /**
      * Generic function for triggering a batch job
+     *
      * @param {String} type Type of batch job to trigger
+     * @param {Pool} pool Instantiated Postgres Pool
      */
     static async batch(type, pool) {
         if (type === 'sources') await JobError.clear(pool);

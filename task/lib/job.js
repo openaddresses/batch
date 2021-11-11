@@ -56,7 +56,8 @@ class Job {
         this.assets = {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         };
     }
 
@@ -140,6 +141,19 @@ class Job {
         });
     }
 
+    async validate() {
+        try {
+            const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
+            await stats.calc();
+
+            this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
+            this.count = stats.stats.count;
+            this.stats = stats.stats[stats.layer];
+        } catch (err) {
+            return reject(new Error(err));
+        }
+    }
+
     async convert() {
         let output;
 
@@ -175,18 +189,6 @@ class Job {
                 fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),
                 async (err) => {
                     if (err) return reject(err);
-
-                    try {
-                        const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
-                        await stats.calc();
-
-                        this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
-                        this.count = stats.stats.count;
-                        this.stats = stats.stats[stats.layer];
-                    } catch (err) {
-                        return reject(new Error(err));
-                    }
-
                     return resolve(path.resolve(this.tmp, 'out.geojson'));
                 }
             );

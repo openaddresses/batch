@@ -7,7 +7,7 @@ const { sql } = require('slonik');
  */
 class LevelOverride extends Generic {
     static _table = 'level_override';
-    static _patch = Object.keys(require('../schema/req.body.PatchLevelOverride.json').properties);
+    static _patch = require('../schema/req.body.PatchLevelOverride.json');
     static _res = require('../schema/res.LevelOverride.json');
 
     constructor() {

@@ -15,7 +15,16 @@
         </div>
     </template>
 
-    <h3 class='fl txt-h4 py6'>Job Sample:</h3>
+    <div class='col col--12 py6'>
+        <h3 class='fl txt-h4'>Job Sample:</h3>
+
+        <label class='fr switch-container mt3'>
+            Show Raw
+            <input v-model='raw' type='checkbox' />
+            <div class='switch switch--blue ml6'></div>
+        </label>
+    </div>
+
 
     <template v-if='loading'>
         <div class='flex flex--center-main w-full py24'>
@@ -27,7 +36,7 @@
             <h1 class='txt-h4 cursor-default'>File is empty</h1>
         </div>
     </template>
-    <template v-else>
+    <template v-else-if='!raw'>
         <table class='table txt-xs mb60'>
             <thead>
                 <tr>
@@ -41,6 +50,13 @@
             </tbody>
         </table>
     </template>
+    <template v-else-if='raw'>
+        <textarea class='col col--12' rows='24' v-text='sample.map(s => JSON.stringify(s)).join("\n")' :style='{
+            "white-space": "pre",
+            "overflow-wrap": "normal",
+            "overflow-x": "scroll"
+        }'/>
+    </template>
 </div>
 </template>
 
@@ -52,6 +68,7 @@ export default {
     data: function() {
         return {
             loading: false,
+            raw: false,
             props: [],
             sample: [],
         };

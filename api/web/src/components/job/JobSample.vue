@@ -18,11 +18,10 @@
     <div class='col col--12 py6'>
         <h3 class='fl txt-h4'>Job Sample:</h3>
 
-        <label class='fr switch-container mt3'>
-            Show Raw
-            <input v-model='raw' type='checkbox' />
-            <div class='switch switch--blue ml6'></div>
-        </label>
+        <div class='flex-inline fr'>
+            <button @click='mode = "props"' :class='{ "btn--stroke": mode !== "props" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Props</button>
+            <button @click='mode = "raw"' :class='{ "btn--stroke": mode !== "raw" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Raw</button>
+        </div>
     </div>
 
 
@@ -36,7 +35,7 @@
             <h1 class='txt-h4 cursor-default'>File is empty</h1>
         </div>
     </template>
-    <template v-else-if='!raw'>
+    <template v-else-if='mode === "props"'>
         <table class='table txt-xs mb60'>
             <thead>
                 <tr>
@@ -50,7 +49,7 @@
             </tbody>
         </table>
     </template>
-    <template v-else-if='raw'>
+    <template v-else-if='mode === "raw"'>
         <textarea class='col col--12' rows='24' v-text='sample.map(s => JSON.stringify(s)).join("\n")' :style='{
             "white-space": "pre",
             "overflow-wrap": "normal",
@@ -67,8 +66,8 @@ export default {
     props: ['job'],
     data: function() {
         return {
-            loading: false,
-            raw: false,
+            mode: 'props',
+            loading: true,
             props: [],
             sample: [],
         };
@@ -79,6 +78,7 @@ export default {
     methods: {
         getSample: async function() {
             try {
+                this.loading = true;
                 const res = await window.std(`/api/job/${this.job.id}/output/sample`);
                 const props = {};
                 for (const r of res) {
@@ -89,6 +89,7 @@ export default {
 
                 this.props = Object.keys(props);
                 this.sample = res;
+                this.loading = false;
             } catch (err) {
                 this.$emit('err', err);
             }

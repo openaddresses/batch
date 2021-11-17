@@ -81,35 +81,10 @@
             </div>
 
             <template v-if='mode === "preview"'>
-                <template v-if='job.output.preview'>
-                    <img class='round' :src='`/api/job/${job.id}/output/source.png`'/>
-
-                    <h3 class='fl txt-h4 py6'>Job Sample:</h3>
-                    <table class='table txt-xs mb60'>
-                        <thead>
-                            <tr>
-                                <th :key='key' v-for='key of props' v-text='key'></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr :key='s.properties.hash' v-for='s of sample'>
-                                <th :key='s.properties.hash + ":" + key' v-for='key of props' v-text='s.properties[key]'></th>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </template>
-                <template v-else>
-                    <div class='col col--12 border border--gray-light round'>
-                        <div class='flex flex--center-main pt36'>
-                            <svg class='icon w60 h60 color-gray'><use href='#icon-info'/></svg>
-                        </div>
-
-                        <div class='flex flex--center-main pt12 pb36'>
-                            <h1 class='txt-h4 cursor-default'>No Preview Image Found</h1>
-                        </div>
-                    </div>
-                </template>
+                <JobSample
+                    @err='$emit("err", $event)'
+                    :job='job'
+                />
             </template>
             <template v-else-if='mode === "numeric"'>
                 <JobStats
@@ -134,6 +109,7 @@
 import ErrorsModerate from './ErrorsModerate.vue';
 import Download from './Download.vue';
 import Status from './Status.vue';
+import JobSample from './job/JobSample.vue';
 import JobStats from './job/JobStats.vue';
 import JobMap from './job/JobMap.vue';
 
@@ -144,8 +120,6 @@ export default {
         return {
             mode: 'preview',
             loading: false,
-            sample: [],
-            props: [],
             name: '',
             joberror: false,
             delta: {
@@ -171,6 +145,7 @@ export default {
     },
     components: {
         JobMap,
+        JobSample,
         Download,
         JobStats,
         ErrorsModerate,
@@ -191,7 +166,6 @@ export default {
             this.getJob();
             this.getError();
             this.getDelta();
-            this.getSample();
         },
         getError: async function() {
             try {
@@ -206,22 +180,6 @@ export default {
                 this.delta.master = res.master;
                 this.delta.compare = res.compare;
                 this.delta.delta = res.delta;
-            } catch (err) {
-                this.delta = false;
-            }
-        },
-        getSample: async function() {
-            try {
-                const res = await window.std(`/api/job/${this.jobid}/output/sample`);
-                const props = {};
-                for (const r of res) {
-                    for (const key of Object.keys(r.properties)) {
-                        props[key] = true;
-                    }
-                }
-
-                this.props = Object.keys(props);
-                this.sample = res;
             } catch (err) {
                 this.delta = false;
             }

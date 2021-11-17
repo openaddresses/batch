@@ -95,6 +95,10 @@ async function router(schema, config) {
         try {
             const data = await Data.from(config.pool, req.params.data);
 
+            if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
+                delete data.s3;
+            }
+
             return res.json(data);
         } catch (err) {
             return Err.respond(err, res);

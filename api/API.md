@@ -21,7 +21,7 @@ A valid API token must generated for programatic access
 
 _Example_
 ```
-Authorization: Bearer <api token>
+Authorization: Bearer {api token}
 ```
 
 #### Javascript Fetch Example
@@ -31,7 +31,7 @@ fetch('https://batch.openaddresses.io/api/data', {
     withCredentials: true,
     credentials: 'include',
     headers: {
-        'Authorization': 'oa.1234-your-token-here-5678',
+        'Authorization': 'Bearer oa.1234-your-token-here-5678',
         'Content-Type': 'application/json'
     }
 });

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const Cacher = require('./lib/cacher');
 const Analytics = require('./lib/analytics');
 const path = require('path');
@@ -118,6 +119,12 @@ async function server(args, config, cb) {
     });
 
     app.disable('x-powered-by');
+    app.use(cors({
+        origin: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
+    }));
+
     app.use(minify());
 
     app.use(analytics.middleware());

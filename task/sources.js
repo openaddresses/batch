@@ -2,6 +2,7 @@
 
 const { interactive } = require('./lib/pre');
 
+const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const os = require('os');
 const pkg = require('./package.json');
@@ -47,6 +48,10 @@ async function cli() {
     fs.mkdirSync(tmp);
 
     const meta = new Meta();
+    const oa = new OA({
+        url: process.env.OA_API,
+        secret: process.env.SharedSecret
+    });
 
     try {
         await meta.load();
@@ -65,13 +70,18 @@ async function cli() {
         console.error(`ok - ${jobs.length} jobs found`);
 
         console.error('ok - creating run');
-        const r = await run_create();
+        const r = await oa.cmd('run', 'create', {
+            live: true
+        });
         console.error(`ok - run: ${r.id} created`);
 
-
         console.error('ok - populating run');
-        await run_pop(r.id, jobs);
+        await oa.cmd('run', 'create_jobs', {
+            ':run': r.id,
+            jobs
+        });
         console.error('ok - run populated');
+
         await meta.protection(false);
     } catch (err) {
         console.error(err);
@@ -129,28 +139,6 @@ function list(tmp, sha) {
     return jobs;
 }
 
-async function run_create() {
-    return new Promise((resolve, reject) => {
-        request({
-            json: true,
-            url: `${process.env.OA_API}/api/run`,
-            method: 'POST',
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            },
-            body: {
-                live: true
-            }
-
-        }, (err, res) => {
-            if (err) return reject(err);
-            if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to create run`));
-            return resolve(res.body);
-        });
-    });
-}
-
 async function get_sha() {
     return new Promise((resolve, reject) => {
         request({
@@ -165,27 +153,6 @@ async function get_sha() {
             if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
             if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
             return resolve(res.body.sha);
-        });
-    });
-}
-
-async function run_pop(run_id, jobs) {
-    return new Promise((resolve, reject) => {
-        request({
-            json: true,
-            url: `${process.env.OA_API}/api/run/${run_id}/jobs`,
-            method: 'POST',
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            },
-            body: {
-                jobs: jobs
-            }
-        }, (err, res) => {
-            if (err) return reject(err);
-            if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
-            return resolve(res.body);
         });
     });
 }

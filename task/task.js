@@ -3,7 +3,7 @@
 const { interactive } = require('./lib/pre');
 
 const config = require('./package.json');
-const OA = require('lib-oa');
+const OA = require('@openaddresses/lib')
 const Job = require('./lib/job');
 const path = require('path');
 const CP = require('child_process');

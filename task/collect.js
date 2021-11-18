@@ -5,7 +5,7 @@
 const { interactive } = require('./lib/pre');
 
 const glob = require('glob');
-const OA = require('lib-oa');
+const OA = require('@openaddresses/lib');
 const os = require('os');
 const { Unzip } = require('zlib');
 const split = require('split');

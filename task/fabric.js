@@ -14,7 +14,7 @@ const Tippecanoe = require('./lib/tippecanoe');
 const AWS = require('aws-sdk');
 const Meta = require('./lib/meta');
 const { Unzip } = require('zlib');
-const OA = require('@openaddresses/lib')
+const OA = require('@openaddresses/lib');
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION

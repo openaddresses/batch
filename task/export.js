@@ -2,7 +2,7 @@
 
 const { interactive } = require('./lib/pre');
 
-const OA = require('@openaddresses/lib')
+const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
 const { pipeline } = require('stream');

@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-
-
-require('./lib/pre');
+const { interactive } = require('./lib/pre');
 
 const OA = require('lib-oa');
-const prompts = require('prompts');
 const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
 const { pipeline } = require('stream');
@@ -35,28 +32,11 @@ if (require.main === module) {
 }
 
 async function prompt() {
-    const p = await prompts([{
-        type: 'text',
-        name: 'OA_API',
-        message: 'OA API Base URL',
-        initial: 'http://localhost:5000'
-    },{
-        type: 'text',
-        name: 'Bucket',
-        message: 'AWS S3 bucket to push results to',
-        initial: 'v2.openaddresses.io'
-    },{
+    await interactive([{
         type: 'text',
         message: 'OA Export ID',
         name: 'OA_EXPORT_ID'
-    },{
-        type: 'text',
-        name: 'SharedSecret',
-        message: 'OA API SharedSecret',
-        initial: '123'
     }]);
-
-    Object.assign(process.env, p);
 
     return cli();
 }

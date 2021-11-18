@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('./lib/pre');
+const { interactive } = require('./lib/pre');
 
 const Meta = require('./lib/meta');
 const os = require('os');
@@ -12,7 +12,30 @@ const request = require('request');
 const { pipeline } = require('stream');
 const unzipper = require('unzipper');
 
+const args = require('minimist')(process.argv, {
+    boolean: ['interactive'],
+    alias: {
+        interactive: 'i'
+    }
+});
+
 if (require.main === module) {
+    if (args.interactive) return prompt();
+    return cli();
+}
+
+async function prompt() {
+    await interactive([{
+        type: 'text',
+        message: 'OA BRANCH',
+        name: 'OA_BRANCH',
+        default: 'master'
+    }]);
+
+    return cli();
+}
+
+async function cli() {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
     if (!process.env.OA_BRANCH) throw new Error('No OA_BRANCH env var defined');
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
@@ -23,14 +46,6 @@ if (require.main === module) {
     console.error(`ok - ${tmp}`);
     fs.mkdirSync(tmp);
 
-    try {
-        run(tmp);
-    } catch (err) {
-        throw new Error(err);
-    }
-}
-
-async function run(tmp) {
     const meta = new Meta();
 
     try {

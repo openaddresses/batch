@@ -2,7 +2,7 @@
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue
-require('./lib/pre');
+const { interactive } = require('./lib/pre');
 
 const glob = require('glob');
 const OA = require('lib-oa');
@@ -17,27 +17,36 @@ const mkdirp = require('mkdirp').sync;
 const AWS = require('aws-sdk');
 const archiver = require('archiver');
 
-const DRIVE = '/tmp';
-
-if (require.main === module) {
-    if (!process.env.OA_API) throw new Error('No OA_API env var defined');
-    if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
-    if (!process.env.StackName) process.env.StackName = 'local';
-    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
-
-    try {
-        fetch();
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
-}
-
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
 });
 
-async function fetch() {
+const DRIVE = '/tmp';
+
+const args = require('minimist')(process.argv, {
+    boolean: ['interactive'],
+    alias: {
+        interactive: 'i'
+    }
+});
+
+if (require.main === module) {
+    if (args.interactive) return prompt();
+    return cli();
+}
+
+async function prompt() {
+    await interactive();
+    return cli();
+
+}
+
+async function cli() {
+    if (!process.env.StackName) process.env.StackName = 'batch-prod';
+    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
+    if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
+    if (!process.env.OA_API) throw new Error('No OA_API env var defined');
+
     let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
 
     const oa = new OA({

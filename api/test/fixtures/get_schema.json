@@ -124,6 +124,16 @@
         "query": false,
         "res": true
     },
+    "GET /fabric": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /fabric/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "POST /github/event": {
         "body": false,
         "query": false,
@@ -245,16 +255,6 @@
         "res": false
     },
     "GET /map/borders/:z/:x/:y.mvt": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /map/fabric": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /map/fabric/:z/:x/:y.mvt": {
         "body": false,
         "query": false,
         "res": false

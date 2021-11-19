@@ -65,7 +65,7 @@ export default {
     methods: {
         getTilejson: async function() {
             try {
-                this.tilejson = await window.std('/api/map/fabric');
+                this.tilejson = await window.std('/api/fabric');
             } catch (err) {
                 this.$emit('err', err);
             }
@@ -97,7 +97,7 @@ export default {
                         minzoom: this.tilejson.minzoom,
                         maxzoom: this.tilejson.maxzoom,
                         tiles: [
-                            `${window.location.origin}/api/map/fabric/{z}/{x}/{y}.mvt`
+                            `${window.location.origin}/api/fabric/{z}/{x}/{y}.mvt`
                         ]
                     });
 

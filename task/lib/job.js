@@ -142,16 +142,12 @@ class Job {
     }
 
     async validate() {
-        try {
-            const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
-            await stats.calc();
+        const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
+        await stats.calc();
 
-            this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
-            this.count = stats.stats.count;
-            this.stats = stats.stats[stats.layer];
-        } catch (err) {
-            return reject(new Error(err));
-        }
+        this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
+        this.count = stats.stats.count;
+        this.stats = stats.stats[stats.layer];
     }
 
     async convert() {

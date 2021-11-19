@@ -19,7 +19,13 @@ class Stats {
             bounds: []
         };
 
-        this.validator = new Validator(this.layer);
+        let validated_path = false;
+        if (this.layer === 'addresses') {
+            validated_path = file + '.validated';
+            this.validator = new Validator(this.layer, fs.createWriteStream(validated_path));
+        } else {
+            this.validator = new Validator(this.layer);
+        }
 
         if (this.layer === 'addresses') {
             this.stats.addresses = {

@@ -1,11 +1,13 @@
-
-
 /**
- * @class Validator
+ * @class
+ *
+ * @param {string} layer OpenAddresses layer type - addresses/parcels/etc
+ * @param {Stream} stream Optional Stream to output validated features to
  */
 class Validator {
-    constructor(layer) {
+    constructor(layer, stream = false) {
         this.layer = layer;
+        this.stream = stream;
 
         if (layer === 'addresses') {
             this.stats = {

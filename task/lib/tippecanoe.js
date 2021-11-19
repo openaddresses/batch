@@ -1,18 +1,12 @@
-
-
 const CP = require('child_process');
 const stream = require('stream');
 
 /**
- * @class Tippecanoe
+ * Create a new Tippecanoe instance
+ *
+ * @class
  */
 class Tippecanoe {
-
-    /**
-     * Create a new Tippecanoe instance
-     *
-     * @constructor
-     */
     constructor() {
         try {
             CP.execSync('tippecanoe --version 2>&1');

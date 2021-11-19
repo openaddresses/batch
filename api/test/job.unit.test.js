@@ -54,7 +54,8 @@ test('Job()', (t) => {
     t.deepLooseEqual(job.output, {
         cache: false,
         output: false,
-        preview: false
+        preview: false,
+        validated: false
     }, 'job.output: <obj>');
     t.equals(job.loglink, false, 'job.loglink: false');
     t.equals(job.status, 'Pending', 'job.status: Pending');
@@ -140,7 +141,8 @@ test('Job#json', (t) => {
         output: {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         },
         loglink: false,
         license: false,
@@ -257,7 +259,8 @@ test('Job#generate', async (t) => {
         t.deepLooseEqual(job.output, {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         }, 'job.output: false');
         t.equals(job.loglink, null, 'job.loglink: <obj>');
         t.equals(job.status, 'Pending', 'job.status: Pending');
@@ -300,7 +303,8 @@ test('Job#from', async (t) => {
         t.deepLooseEqual(job.output, {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         }, 'job.output: false');
         t.equals(job.loglink, null, 'job.loglink: <obj>');
         t.equals(job.status, 'Pending', 'job.status: Pending');
@@ -348,7 +352,8 @@ test('Job#patch', async (t) => {
         t.deepLooseEqual(job.output, {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         }, 'job.output: false');
         t.equals(job.loglink, 'loglink123', 'job.loglink: <obj>');
         t.equals(job.status, 'Pending', 'job.status: Pending');

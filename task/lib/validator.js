@@ -120,7 +120,7 @@ class Validator {
         }
 
         // Sum lengths of all key/arrays in 'errs' and return boolean comp > 0
-        const is_valid = Object.keys(errs).map(e => errs[e].length).reduce((acc, a) => acc + a, 0) > 0;
+        const is_valid = Object.keys(errs).map((e) => errs[e].length).reduce((acc, a) => acc + a, 0) > 0;
 
         if (is_valid && this.stream) this.stream.write(JSON.stringify(feat) + '\n');
 

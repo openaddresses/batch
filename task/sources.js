@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
+const { interactive } = require('./lib/pre');
 
-
-require('./lib/pre');
-
+const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const os = require('os');
 const pkg = require('./package.json');
@@ -14,7 +13,30 @@ const request = require('request');
 const { pipeline } = require('stream');
 const unzipper = require('unzipper');
 
+const args = require('minimist')(process.argv, {
+    boolean: ['interactive'],
+    alias: {
+        interactive: 'i'
+    }
+});
+
 if (require.main === module) {
+    if (args.interactive) return prompt();
+    return cli();
+}
+
+async function prompt() {
+    await interactive([{
+        type: 'text',
+        message: 'OA BRANCH',
+        name: 'OA_BRANCH',
+        default: 'master'
+    }]);
+
+    return cli();
+}
+
+async function cli() {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
     if (!process.env.OA_BRANCH) throw new Error('No OA_BRANCH env var defined');
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
@@ -25,15 +47,11 @@ if (require.main === module) {
     console.error(`ok - ${tmp}`);
     fs.mkdirSync(tmp);
 
-    try {
-        run(tmp);
-    } catch (err) {
-        throw new Error(err);
-    }
-}
-
-async function run(tmp) {
     const meta = new Meta();
+    const oa = new OA({
+        url: process.env.OA_API,
+        secret: process.env.SharedSecret
+    });
 
     try {
         await meta.load();
@@ -52,13 +70,18 @@ async function run(tmp) {
         console.error(`ok - ${jobs.length} jobs found`);
 
         console.error('ok - creating run');
-        const r = await run_create();
+        const r = await oa.cmd('run', 'create', {
+            live: true
+        });
         console.error(`ok - run: ${r.id} created`);
 
-
         console.error('ok - populating run');
-        await run_pop(r.id, jobs);
+        await oa.cmd('run', 'create_jobs', {
+            ':run': r.id,
+            jobs
+        });
         console.error('ok - run populated');
+
         await meta.protection(false);
     } catch (err) {
         console.error(err);
@@ -116,28 +139,6 @@ function list(tmp, sha) {
     return jobs;
 }
 
-async function run_create() {
-    return new Promise((resolve, reject) => {
-        request({
-            json: true,
-            url: `${process.env.OA_API}/api/run`,
-            method: 'POST',
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            },
-            body: {
-                live: true
-            }
-
-        }, (err, res) => {
-            if (err) return reject(err);
-            if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to create run`));
-            return resolve(res.body);
-        });
-    });
-}
-
 async function get_sha() {
     return new Promise((resolve, reject) => {
         request({
@@ -152,27 +153,6 @@ async function get_sha() {
             if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
             if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
             return resolve(res.body.sha);
-        });
-    });
-}
-
-async function run_pop(run_id, jobs) {
-    return new Promise((resolve, reject) => {
-        request({
-            json: true,
-            url: `${process.env.OA_API}/api/run/${run_id}/jobs`,
-            method: 'POST',
-            headers: {
-                'shared-secret': process.env.SharedSecret
-            },
-            body: {
-                jobs: jobs
-            }
-        }, (err, res) => {
-            if (err) return reject(err);
-            if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
-            return resolve(res.body);
         });
     });
 }

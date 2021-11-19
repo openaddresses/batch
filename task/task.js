@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-require('./lib/pre');
+const { interactive } = require('./lib/pre');
 
 const config = require('./package.json');
-const OA = require('lib-oa');
+const OA = require('@openaddresses/lib');
 const Job = require('./lib/job');
 const path = require('path');
 const CP = require('child_process');
 const fs = require('fs');
-const prompts = require('prompts');
 const Meta = require('./lib/meta');
+
 const args = require('minimist')(process.argv, {
     boolean: ['interactive'],
     alias: {
@@ -23,33 +23,11 @@ if (require.main === module) {
 }
 
 async function prompt() {
-    const p = await prompts([{
+    await interactive([{
         type: 'text',
         message: 'OA Job ID',
         name: 'OA_JOB_ID'
-    },{
-        type: 'text',
-        name: 'StackName',
-        message: 'Name of the stack to push to',
-        initial: 'local'
-    },{
-        type: 'text',
-        name: 'Bucket',
-        message: 'AWS S3 bucket to push results to',
-        initial: 'v2.openaddresses.io'
-    },{
-        type: 'text',
-        name: 'OA_API',
-        message: 'OA API Base URL',
-        initial: 'http://localhost:5000'
-    },{
-        type: 'text',
-        name: 'SharedSecret',
-        message: 'OA API SharedSecret',
-        initial: '123'
     }]);
-
-    Object.assign(process.env, p);
 
     return cli();
 }

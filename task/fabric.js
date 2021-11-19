@@ -2,7 +2,7 @@
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue
-require('./lib/pre');
+const { interactive } = require('./lib/pre');
 
 const DRIVE = '/tmp';
 
@@ -10,12 +10,11 @@ const fs = require('fs');
 const TileBase = require('tilebase');
 const { pipeline } = require('stream');
 const path = require('path');
-const prompts = require('prompts');
 const Tippecanoe = require('./lib/tippecanoe');
 const AWS = require('aws-sdk');
 const Meta = require('./lib/meta');
 const { Unzip } = require('zlib');
-const OA = require('lib-oa');
+const OA = require('@openaddresses/lib');
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -29,15 +28,8 @@ const zooms = {
 
 const args = require('minimist')(process.argv, {
     boolean: ['interactive'],
-    string: ['stack', 'bucket', 'api', 'secret'],
     alias: {
         interactive: 'i'
-    },
-    default: {
-        stack: 'local',
-        bucket: 'v2.openaddresses.io',
-        api: 'http://localhost:5000',
-        secret: '123'
     }
 });
 
@@ -47,29 +39,7 @@ if (require.main === module) {
 }
 
 async function prompt() {
-    const p = await prompts([{
-        type: 'text',
-        name: 'StackName',
-        message: 'Name of the stack to push to',
-        initial: args.stack
-    },{
-        type: 'text',
-        name: 'Bucket',
-        message: 'AWS S3 bucket to push results to',
-        initial: args.bucket
-    },{
-        type: 'text',
-        name: 'OA_API',
-        message: 'OA API Base URL',
-        initial: args.api
-    },{
-        type: 'text',
-        name: 'SharedSecret',
-        message: 'OA API SharedSecret',
-        initial: args.secret
-    }]);
-
-    Object.assign(process.env, p);
+    await interactive();
 
     return cli();
 }

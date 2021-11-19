@@ -70,6 +70,7 @@ class Cacher {
      *
      * @param {Object} obj Object to test
      * @param {String} key Default Cache Key
+     * @return {Any}
      */
     static Miss(obj, key) {
         if (!obj) return key;

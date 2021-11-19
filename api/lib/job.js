@@ -188,6 +188,9 @@ class Job {
 
     /**
      * Create a Job object given a JSON blob
+     *
+     * @param {Object} json JSON Blob
+     * @returns {Job}
      */
     static from_json(json) {
         const job = new Job(

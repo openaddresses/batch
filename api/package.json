@@ -46,7 +46,7 @@
         "path-to-regexp": "^6.2.0",
         "pg": "^8.6.0",
         "request": "^2.88.2",
-        "slonik": "^24.0.0",
+        "slonik": "^25.1.0",
         "split": "^1.0.1",
         "tap-dot": "^2.0.0",
         "tilebase": "^1.5.0"

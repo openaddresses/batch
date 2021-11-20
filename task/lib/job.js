@@ -50,6 +50,9 @@ class Job {
         this.stats = {};
         this.size = 0;
 
+        // Was a validated file created
+        this.validated = false;
+
         // Store the specific data/conform information for a source
         this.specific = false;
 
@@ -143,7 +146,7 @@ class Job {
 
     async validate() {
         const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
-        await stats.calc();
+        this.validated = await stats.calc();
 
         this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
         this.count = stats.stats.count;
@@ -203,16 +206,19 @@ class Job {
             throw new Error('out.geojson not found');
         }
 
+        return await Job.gz(data[0]);
+    }
+
+    static gz(input) {
         return new Promise((resolve, reject) => {
-            const compressed = data[0] + '.gz';
+            const compressed = input + '.gz';
 
             pipeline(
-                fs.createReadStream(data[0]),
+                fs.createReadStream(input),
                 gzip(),
                 fs.createWriteStream(compressed),
                 (err) => {
                     if (err) return reject(err);
-
                     return resolve(compressed);
                 }
             );
@@ -224,51 +230,62 @@ class Job {
             return new Error('job state must be "processed" to perform asset upload');
         }
 
-        try {
-            const cache = await Job.find('cache.zip', this.tmp);
-            if (cache.length === 1) {
-                console.error('ok - found cache', cache[0]);
+        const cache = await Job.find('cache.zip', this.tmp);
+        if (cache.length === 1) {
+            console.error('ok - found cache', cache[0]);
 
-                await s3.putObject({
-                    ContentType: 'application/zip',
-                    Bucket: process.env.Bucket,
-                    Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
-                    Body: fs.createReadStream(cache[0])
-                }).promise();
+            await s3.putObject({
+                ContentType: 'application/zip',
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
+                Body: fs.createReadStream(cache[0])
+            }).promise();
 
-                console.error('ok - cache.zip uploaded');
-                this.assets.cache = true;
-            }
+            console.error('ok - cache.zip uploaded');
+            this.assets.cache = true;
+        }
 
-            const data = path.resolve(this.tmp, 'out.geojson.gz');
+        const data = path.resolve(this.tmp, 'out.geojson.gz');
 
-            this.size = fs.statSync(data).size;
+        this.size = fs.statSync(data).size;
+
+        await s3.putObject({
+            ContentType: 'application/gzip',
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
+            Body: fs.createReadStream(data)
+        }).promise();
+
+        console.error('ok - source.geojson.gz uploaded');
+        this.assets.output = true;
+
+        if (this.validated) {
+            this.validated = await Job.gz(this.validated);
 
             await s3.putObject({
                 ContentType: 'application/gzip',
                 Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
-                Body: fs.createReadStream(data)
+                Key: `${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
+                Body: fs.createReadStream(this.validated)
             }).promise();
-            console.error('ok - source.geojson.gz uploaded');
-            this.assets.output = true;
 
-            const preview = await Job.find('preview.png', this.tmp);
-            if (preview.length === 1) {
-                console.error('ok - found preview', preview[0]);
+            console.error('ok - validated.geojson.gz uploaded');
+            this.assets.validated = true;
+        }
 
-                await s3.putObject({
-                    ContentType: 'image/png',
-                    Bucket: process.env.Bucket,
-                    Key: `${process.env.StackName}/job/${this.job}/source.png`,
-                    Body: fs.createReadStream(preview[0])
-                }).promise();
+        const preview = await Job.find('preview.png', this.tmp);
+        if (preview.length === 1) {
+            console.error('ok - found preview', preview[0]);
 
-                console.error('ok - source.png uploaded');
-                this.assets.preview = true;
-            }
-        } catch (err) {
-            throw new Error(err);
+            await s3.putObject({
+                ContentType: 'image/png',
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${this.job}/source.png`,
+                Body: fs.createReadStream(preview[0])
+            }).promise();
+
+            console.error('ok - source.png uploaded');
+            this.assets.preview = true;
         }
 
         this.status = 'uploaded';

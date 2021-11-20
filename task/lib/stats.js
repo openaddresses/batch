@@ -56,6 +56,8 @@ class Stats {
                 validity: this.validator.stats
             };
         }
+
+        return validated_path;
     }
 
     calc() {

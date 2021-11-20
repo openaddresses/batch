@@ -1,5 +1,3 @@
-
-
 const fs = require('fs');
 const path = require('path');
 const Job = require('../lib/job');
@@ -32,6 +30,7 @@ test('Job#convert', async (t) => {
         );
 
         const out = await job.convert();
+        await job.validate();
         t.ok(out, 'output file');
 
         const file = String(fs.readFileSync(out)).split('\n').filter((row) => {

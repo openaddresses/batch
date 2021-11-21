@@ -59,6 +59,17 @@ full S3 URL to the file in question.
 It should be noted that files themselves  on S3 are subject to change and the current location
 of a file on S3 is not guarenteed. The API will always return the most up-to-date location.
 
-### Validated Data
+### Validated Data {Experimental}
 
+Validated data improves upon the authoratative data provided and curated by government entities.
 
+We currently only generate validated data for `address` sources
+
+- Remove data with no geometry/incorrect geometries
+- Remove data with no/invalid street numbers
+- Remove data with no/invalid street name
+
+Future Operations
+- Perform Abbreviation Expansion (`E` => `East`, etc)
+- Clip data to expected geographic area to ensure erroneous data isn't included (IE: Null Islands)
+- Add City/Postcode/Region/State data where it doesn't exist

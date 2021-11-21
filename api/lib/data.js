@@ -18,6 +18,7 @@ class Data {
      * @param {String} [query.before=Null] - Filter results run before the given date
      * @param {String} [query.after=Null] - Filter results run after the given date
      * @param {String} [query.point=false] - Filter results by geographic point
+     * @param {Boolean} [query.validated=Null] - Filter results by whether a validated source file has been produced
      * @param {Boolean} query.fabric - Filter results by if they are part of the fabric
      * @param {Number} query.map - Filter results by associated mapid
      */
@@ -36,6 +37,7 @@ class Data {
 
         if (!query.map) query.map = null;
         if (!query.fabric) query.fabric = null;
+        if (!query.validated) query.validated = null;
 
         if (!query.point) {
             query.point = '';
@@ -84,6 +86,7 @@ class Data {
                         OR ST_DWithin(ST_SetSRID(ST_PointFromText(${query.point}), 4326), map.geom, 1.0)
                     )
                     AND (${query.fabric}::BOOLEAN IS NULL OR results.fabric = ${!!query.fabric})
+                    AND (${query.validated}::BOOLEAN IS NULL OR (job.output->'validated')::BOOLEAN = ${!!query.validated})
                 ORDER BY
                     results.source,
                     results.layer,

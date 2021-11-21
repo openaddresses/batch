@@ -77,7 +77,11 @@
                         <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
                         <div class='col col--9 px6'>
-                            <QuerySource @source='filter.source = $event'/>
+                            <QuerySource
+                                showValidated=true
+                                @source='filter.source = $event'
+                                @validated='filter.validated = $event'
+                            />
                         </div>
                         <div class='col col--3 px6'>
                             <QueryLayer @layer='filter.layer = $event'/>
@@ -214,6 +218,7 @@ export default {
                     before: false,
                     after: false
                 },
+                validated: false,
                 point: false,
                 source: '',
                 layer: 'all',
@@ -253,6 +258,9 @@ export default {
             this.refresh();
         },
         'filter.source': function() {
+            this.refresh();
+        },
+        'filter.validated': function() {
             this.refresh();
         }
     },
@@ -322,6 +330,7 @@ export default {
                 if (this.filter.point) url.searchParams.set('point', this.filter.point.join(','));
                 if (this.filter.switches.after && this.filter.after) url.searchParams.set('after', this.filter.after);
                 if (this.filter.switches.before && this.filter.before) url.searchParams.set('before', this.filter.before);
+                if (this.filter.validated) url.searchParams.set('validated', this.filter.validated);
 
                 const res = await window.std(url);
                 const dataname = {};

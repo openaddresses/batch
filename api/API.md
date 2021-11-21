@@ -39,7 +39,18 @@ fetch('https://batch.openaddresses.io/api/data', {
 
 ## Backer Benefits
 
+### Custom Exports
+
+Backers have the ability to generate 300 custom exports per month for any of our sources.
+
+Current data formats that can be exported in are `csv` and `shapefiles`. GeoJSON files will
+always remain free to download for all users
+
 ## Sponsor Benefits
+
+Sponsors have access to all of the benefits that a Backer recieves as well as the following.
+
+### Direct AWS S3
 
 Sponsors have direct requester-pays access to our AWS S3 bucket for the fastest access.
 Endpoints that track data will return an `s3` key as part of the JSON response with a
@@ -47,3 +58,7 @@ full S3 URL to the file in question.
 
 It should be noted that files themselves  on S3 are subject to change and the current location
 of a file on S3 is not guarenteed. The API will always return the most up-to-date location.
+
+### Validated Data
+
+

@@ -15,21 +15,21 @@
                         <span @click='datapls(job.job || job.id)' class='txt-underline-on-hover cursor-pointer'>
                             GeoJSON+LD
                         </span>
-                        <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
                     </div>
 
                     <div class='col col--12'>
                         <span @click='datapls(job.job || job.id, "shapefile")' class='txt-underline-on-hover cursor-pointer'>
                             ShapeFile
                         </span>
-                        <svg @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <svg @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
                     </div>
 
                     <div class='col col--12'>
                         <span @click='datapls(job.job || job.id, "csv")' class='txt-underline-on-hover cursor-pointer'>
                             CSV
                         </span>
-                        <svg @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <svg @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
                     </div>
                 </div>
                 <div v-else-if='!job.output.validated' class='col col--12'>
@@ -38,10 +38,18 @@
                     </div>
                     <div class='align-center'>No Validated Data</div>
                 </div>
+                <div v-else-if='auth.level !== "sponsor"' class='col col--12'>
+                    <div class='flex flex--center-main'>
+                        <svg class='align-center icon color-gray' style='height: 40px; width: 40px;'><use href='#icon-info'/></svg>
+                    </div>
+                    <div class='align-center'>Sponsor Benefit</div>
+                </div>
                 <div v-else class='col col--12'>
-                    <div v-on:click.stop.prevent='datapls(job.job || job.id, "geojson", true)' class='round bg-gray-faint-on-hover'>
-                        GeoJSON+LD
-                        <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                    <div class='col col--12'>
+                        <span @click='datapls(job.job || job.id, "geojson", true)' class='txt-underline-on-hover cursor-pointer'>
+                            GeoJSON+LD
+                        </span>
+                        <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
                     </div>
                 </div>
             </div>

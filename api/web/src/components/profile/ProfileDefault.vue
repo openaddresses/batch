@@ -52,7 +52,7 @@
                 <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-user" /></svg>
 
                 <div class='align-center'>Basic</div>
-                <div class='align-center txt-s'>free</div>
+                <div class='align-center txt-s'>No Cost</div>
 
                 <div class='col col--12 pt12'>
                     <svg v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
@@ -66,7 +66,7 @@
             }'>
                 <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-coin" /></svg>
                 <div class='align-center'>Backer</div>
-                <div class='align-center txt-s'>&gt; $5</div>
+                <div class='align-center txt-s'>&gt;= $5</div>
 
                 <div class='col col--12 pt12'>
                     <svg v-if='profile.level === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
@@ -80,7 +80,7 @@
             }'>
                 <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-trophy" /></svg>
                 <div class='align-center'>Sponsor</div>
-                <div class='align-center txt-s'>&gt; $100</div>
+                <div class='align-center txt-s'>&gt;= $100</div>
 
                 <div class='col col--12 pt12'>
                     <svg v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
@@ -90,23 +90,18 @@
             </div>
 
             <div class='col col--4'>
-                <div class='txt-s align-center'>Basic Open Data</div>
-                <div class='txt-s align-center'>Rate Limited CDN</div>
+                <div class='txt-s align-center'>GeoJSON Format</div>
+                <div class='txt-s align-center'>CDN Data Access</div>
             </div>
 
             <div class='col col--4'>
                 <div class='txt-s align-center'>All Basic Features</div>
-                <div class='txt-s align-center'>300 Custom Exports / month</div>
+                <div class='txt-s align-center'>300 Custom Format Exports per Month</div>
             </div>
 
             <div class='col col--4'>
                 <div class='txt-s align-center'>All Backer Features</div>
                 <div class='txt-s align-center'>Direct AWS S3 Access</div>
-
-                <div class='align-center'>
-                    <span class='bg-blue-faint color-blue inline-block px6 py3 txt-xs txt-bold round'>Planned</span>
-                </div>
-
                 <div class='txt-s align-center'>Validated Data</div>
             </div>
         </div>
@@ -115,6 +110,17 @@
 
         <template v-if='profile.level !== "basic"'>
             <Exports :profile='profile' @err='$emit("err", $event)'/>
+        </template>
+        <template v-else>
+            <div class='col col--12 grid border-b border--gray-light pt24'>
+                <div class='col col--12'>
+                    <h2 class='txt-h4 ml12 pb12 fl'>Exports:</h2>
+                </div>
+            </div>
+
+            <div class='col col--12 align-center py12'>
+                Become a Backer of the project to export sources in custom formats
+            </div>
         </template>
     </div>
 </template>

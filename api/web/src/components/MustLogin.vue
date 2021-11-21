@@ -15,16 +15,13 @@
                 <div class='txt-l mb12 align-center'>Login Required</div>
                 <div class='txt-m align-center px12'>
                     <p class='my6'>
-                        The user must be authenticated to perform a download. One of our largest costs is
-                        S3 egress, authenticatd downloads allow us to prevent abuse and keep the project running and the data free!
+                        Only logged in users can perform downloads. One of our largest costs is
+                        S3 egress, authenticatd downloads allow us to prevent abuse and keep the project
+                        running and the data free!
                     </p>
                     <p class='my6'>
-                        Want faster downloads? Have AWS? The Jobs, Data, &amp; Collections API all return an `s3` property which links
-                        to a requester pays object on S3. For those that are able, this is the best way to download data.
-                    </p>
-                    <p class='my6'>
-                        OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
-                        Please consider <a class='color-blue txt-underline' href='https://opencollective.com/openaddresses'>donating</a> if you are able.
+                        Financial backers of the project can also export in CSV &amp; Shapefile, and sponsors
+                        recieve access to our validated data as well as direct AWS S3 access.
                     </p>
                </div>
 

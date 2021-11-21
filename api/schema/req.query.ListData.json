@@ -10,6 +10,10 @@
             "type": "string",
             "description": "Filter results by layer type"
         },
+        "validated": {
+            "type": "boolean",
+            "description": "Filter data by whether a validated file has been produced"
+        },
         "name": {
             "type": "string",
             "description": "Filter results by layer name"

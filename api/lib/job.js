@@ -366,6 +366,9 @@ class Job {
     }
 
     static preview(job_id, res) {
+        // TODO insert placeholder image
+        if (!job.output.preview) throw new Err(400, null, 'Job does not have preview');
+
         const s3 = new S3({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${job_id}/source.png`
@@ -383,8 +386,23 @@ class Job {
         return await s3.sample();
     }
 
+    static async validated(pool, job_id, res) {
+        const job = await Job.from(pool, job_id);
+
+        if (!job.output.validated) throw new Err(400, null, 'Job does not have validated data');
+
+        const s3 = new S3({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/job/${job_id}/validated.geojson.gz`
+        });
+
+        return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}.geojson.gz`);
+    }
+
     static async data(pool, job_id, res) {
         const job = await Job.from(pool, job_id);
+
+        if (!job.output.output) throw new Err(400, null, 'Job does not have output data');
 
         const s3 = new S3({
             Bucket: process.env.Bucket,

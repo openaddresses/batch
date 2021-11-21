@@ -149,6 +149,8 @@ class Job {
         await stats.calc();
 
         this.validated = stats.validated_path;
+        console.error(`ok - validated: ${this.validated}`);
+
         this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
         this.count = stats.stats.count;
         this.stats = stats.stats[stats.layer];

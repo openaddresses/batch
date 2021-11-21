@@ -19,10 +19,10 @@ class Stats {
             bounds: []
         };
 
-        let validated_path = false;
+        this.validated_path = false;
         if (this.layer === 'addresses') {
-            validated_path = file + '.validated';
-            this.validator = new Validator(this.layer, fs.createWriteStream(validated_path));
+            this.validated_path = file + '.validated';
+            this.validator = new Validator(this.layer, fs.createWriteStream(this.validated_path));
         } else {
             this.validator = new Validator(this.layer);
         }
@@ -56,8 +56,6 @@ class Stats {
                 validity: this.validator.stats
             };
         }
-
-        return validated_path;
     }
 
     calc() {

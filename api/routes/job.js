@@ -184,6 +184,41 @@ async function router(schema, config) {
     });
 
     /**
+     * @api {get} /api/job/:job/output/validated.geojson.gz Validated Data
+     * @apiVersion 1.0.0
+     * @apiName JobValidatedData
+     * @apiGroup Job
+     * @apiPermission public
+     *
+     * @apiDescription
+     *    Sponsors of our project recieve access to validated data as a way of saying thanks for
+     *    keeping our project alive.
+     *
+     *    Note: the user must be authenticated to perform a download. One of our largest costs is
+     *    S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+     *
+     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
+     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
+     *
+     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+     *    Please consider donating if you are able https://opencollective.com/openaddresses
+     *
+     * @apiParam {Number} :job Job ID
+     */
+    await schema.get('/job/:job/output/validated.geojson.gz', {
+        ':job': 'integer'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req, true);
+            await user.is_level(req, 'sponsor');
+
+            await Job.validated(config.pool, req.params.job, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/job/:job/output/source.geojson.gz Get Job Data
      * @apiVersion 1.0.0
      * @apiName SingleOutputData

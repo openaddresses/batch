@@ -393,7 +393,7 @@ class Job {
             Key: `${process.env.StackName}/job/${job_id}/validated.geojson.gz`
         });
 
-        return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}.geojson.gz`);
+        return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}-validated.geojson.gz`);
     }
 
     static async data(pool, job_id, res) {

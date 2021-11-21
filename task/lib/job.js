@@ -146,8 +146,9 @@ class Job {
 
     async validate() {
         const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
-        this.validated = await stats.calc();
+        await stats.calc();
 
+        this.validated = stats.validated_path;
         this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
         this.count = stats.stats.count;
         this.stats = stats.stats[stats.layer];

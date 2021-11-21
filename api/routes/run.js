@@ -75,7 +75,8 @@ async function router(schema, config) {
         res: 'res.Run.json'
     }, async (req, res) => {
         try {
-            res.json(await Run.from(config.pool, req.params.run));
+            const run = await Run.from(config.pool, req.params.run);
+            return res.json(run.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

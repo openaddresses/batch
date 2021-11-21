@@ -366,9 +366,6 @@ class Job {
     }
 
     static preview(job_id, res) {
-        // TODO insert placeholder image
-        if (!job.output.preview) throw new Err(400, null, 'Job does not have preview');
-
         const s3 = new S3({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${job_id}/source.png`

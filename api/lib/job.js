@@ -35,7 +35,8 @@ class Job {
         this.output = {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         };
         this.loglink = false;
         this.status = 'Pending';

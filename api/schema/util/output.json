@@ -4,7 +4,8 @@
     "required": [
         "cache",
         "output",
-        "preview"
+        "preview",
+        "validated"
     ],
     "properties": {
         "cache": {
@@ -14,6 +15,9 @@
             "type": "boolean"
         },
         "preview": {
+            "type": "boolean"
+        },
+        "validated": {
             "type": "boolean"
         }
     }

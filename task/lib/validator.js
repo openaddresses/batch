@@ -1,11 +1,13 @@
-
-
 /**
- * @class Validator
+ * @class
+ *
+ * @param {string} layer OpenAddresses layer type - addresses/parcels/etc
+ * @param {Stream} stream Optional Stream to output validated features to
  */
 class Validator {
-    constructor(layer) {
+    constructor(layer, stream = false) {
         this.layer = layer;
+        this.stream = stream;
 
         if (layer === 'addresses') {
             this.stats = {
@@ -116,6 +118,11 @@ class Validator {
         if (!errs.geometry.length && !errs.street.length && !errs.number.length) {
             ++this.stats.valid;
         }
+
+        // Sum lengths of all key/arrays in 'errs' and return boolean comp > 0
+        const is_valid = Object.keys(errs).map((e) => errs[e].length).reduce((acc, a) => acc + a, 0) === 0;
+
+        if (is_valid && this.stream) this.stream.write(JSON.stringify(feat) + '\n');
 
         return feat;
     }

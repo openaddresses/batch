@@ -1,7 +1,6 @@
 const pkg = require('../package.json');
 const test = require('tape');
 const Flight = require('./flight');
-const nock = require('nock');
 
 const flight = new Flight();
 
@@ -34,10 +33,6 @@ test('POST: /api/run', async (t) => {
 });
 
 test('POST: /api/run/:run/jobs', async (t) => {
-    nock('https://raw.githubusercontent.com')
-        .get('/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json')
-        .reply(200, require('./fixtures/dc-statewide.json'));
-
     try {
         const res = await flight.request({
             url: '/api/run/1/jobs',
@@ -78,7 +73,8 @@ test('PATCH: /api/job/:job', async (t) => {
                 output: {
                     cache: true,
                     output: true,
-                    preview: true
+                    preview: true,
+                    validated: true
                 },
                 count: 12610,
                 bounds: {
@@ -109,7 +105,8 @@ test('PATCH: /api/job/:job', async (t) => {
         t.deepEquals(res.body.output, {
             cache: true,
             output: true,
-            preview: true
+            preview: true,
+            validated: true
         }, 'job.output: { ... }');
         t.equals(res.body.loglink, null, 'job.loglink: null');
         t.equals(res.body.status, 'Success', 'job.status: Success');
@@ -138,7 +135,8 @@ test('GET: /api/job/:job', async (t) => {
         t.deepEquals(res.body.output, {
             cache: true,
             output: true,
-            preview: true
+            preview: true,
+            validated: true
         }, 'job.output: { ... }');
         t.equals(res.body.loglink, null, 'job.loglink: null');
         t.equals(res.body.status, 'Success', 'job.status: Success');
@@ -164,7 +162,7 @@ test('GET: /api/job', async (t) => {
         t.deepEquals(res.body, [{
             id: 1,
             run: 1,
-            map: null,
+            map: 1,
             source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json',
             source_name: 'us/dc/statewide',
             layer: 'addresses',
@@ -172,7 +170,8 @@ test('GET: /api/job', async (t) => {
             output: {
                 cache: true,
                 output: true,
-                preview: true
+                preview: true,
+                validated: true
             },
             loglink: null,
             status: 'Success',
@@ -186,10 +185,3 @@ test('GET: /api/job', async (t) => {
 });
 
 flight.landing(test);
-
-test('close', (t) => {
-    nock.cleanAll();
-    nock.enableNetConnect();
-    t.end();
-});
-

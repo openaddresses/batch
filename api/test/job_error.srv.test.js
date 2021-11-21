@@ -83,7 +83,8 @@ test('PATCH: api/job/:job', async (t) => {
         t.deepEquals(res.body.output, {
             cache: false,
             output: false,
-            preview: false
+            preview: false,
+            validated: false
         }, 'job.output: { ... }');
         t.equals(res.body.loglink, null, 'job.loglink: null');
         t.equals(res.body.status, 'Fail', 'job.status: Fail');

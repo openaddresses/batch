@@ -272,6 +272,8 @@ class Job {
 
             console.error('ok - validated.geojson.gz uploaded');
             this.assets.validated = true;
+        } else {
+            console.error('ok - validated geojson not found');
         }
 
         const preview = await Job.find('preview.png', this.tmp);

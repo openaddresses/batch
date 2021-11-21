@@ -15,7 +15,7 @@ async function secret(secretName) {
         SecretId: secretName
     }).promise();
 
-    return JSON.parse(data.SecretString);
+    return data.SecretString;
 }
 
 async function interactive(additional = []) {

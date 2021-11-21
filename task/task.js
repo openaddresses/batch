@@ -87,8 +87,8 @@ async function flow(job) {
 
         await job.convert();
         await job.validate();
-
         await job.compress();
+
         await job.upload();
         await job.update({
             status: 'Success',

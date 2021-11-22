@@ -12,10 +12,6 @@ class Run extends Generic {
     static _patch = require('../schema/req.body.PatchRun.json');
     static _res = require('../schema/res.Run.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Anytime a job is completed, a ping is sent to the run module
      * to determine if the run is finished

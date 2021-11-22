@@ -10,10 +10,6 @@ class LevelOverride extends Generic {
     static _patch = require('../schema/req.body.PatchLevelOverride.json');
     static _res = require('../schema/res.LevelOverride.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Return a list of level overrides
      *

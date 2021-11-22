@@ -26,9 +26,9 @@ async function router(schema, config) {
                 return await Collection.list(config.pool);
             });
 
-            if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
+            if (req.auth && req.auth.level && req.auth.level === 'sponsor') {
                 for (const c of collections) {
-                    delete c.s3;
+                    c.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${c.name}.zip`;
                 }
             }
 
@@ -92,7 +92,8 @@ async function router(schema, config) {
         try {
             await user.is_admin(req);
 
-            await Collection.delete(config.pool, req.params.collection);
+            const collection = await Collection.from(config.pool, req.params.collection);
+            await Collection.delete(config.pool);
 
             return res.json({
                 status: 200,
@@ -127,7 +128,7 @@ async function router(schema, config) {
             await collection.generate(config.pool);
 
             await config.cacher.del('collection');
-            return res.json(collection.json());
+            return res.json(collection.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -163,7 +164,7 @@ async function router(schema, config) {
             await collection.commit(config.pool);
             await config.cacher.del('collection');
 
-            return res.json(collection.json());
+            return res.json(collection.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

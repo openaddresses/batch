@@ -98,6 +98,7 @@ class Data {
                 res.job = parseInt(res.job);
                 res.size = parseInt(res.size);
                 res.map = parseInt(res.map);
+                res.http = `https://batch.openaddresses.io/api/job/${res.job}/output/source.geojson.gz`;
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
 
                 return res;

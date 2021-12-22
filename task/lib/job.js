@@ -1,4 +1,3 @@
-const Ajv = require('ajv');
 const wkt = require('wellknown');
 const turf = require('@turf/turf');
 const gzip = require('zlib').createGzip;
@@ -8,16 +7,9 @@ const path = require('path');
 const { pipeline } = require('stream');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
-const OA = require('oa');
+const OASchema = require('oa');
 const transform = require('parallel-transform');
 const Stats = require('./stats');
-
-const ajv = new Ajv();
-const addFormats = require('ajv-formats');
-addFormats(ajv);
-ajv.addMetaSchema(OA.geojson);
-
-const validate = ajv.compile(OA.schema[2]);
 
 const find = require('find');
 const s3 = new AWS.S3({
@@ -91,6 +83,7 @@ class Job {
             throw new Error('Source missing schema: 2');
         }
 
+        const validate = await OASchema.compile(true);
         const valid = validate(source);
 
         if (!valid) {

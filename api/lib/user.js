@@ -282,7 +282,7 @@ class User {
                 UPDATE users
                     SET
                         flags = ${JSON.stringify(user.flags)},
-                        access = ${user.access}}
+                        access = ${user.access}
                     WHERE
                         id = ${uid}
                     RETURNING *

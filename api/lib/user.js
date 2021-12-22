@@ -281,7 +281,7 @@ class User {
             pgres = await this.pool.query(sql`
                 UPDATE users
                     SET
-                        flags = ${user.flags},
+                        flags = ${JSON.stringify(user.flags)},
                         access = ${user.access}}
                     WHERE
                         id = ${uid}

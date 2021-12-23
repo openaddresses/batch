@@ -5,7 +5,7 @@ const formData = require('form-data');
 const mailgun = new Mailgun(formData);
 
 /**
- * @class Email
+ * @class
  */
 class Email {
     constructor(pg, arg = {}, srv = {}) {

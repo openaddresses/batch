@@ -188,7 +188,7 @@ async function router(schema, config) {
      * @apiVersion 1.0.0
      * @apiName JobValidatedData
      * @apiGroup Job
-     * @apiPermission public
+     * @apiPermission user
      *
      * @apiDescription
      *    Sponsors of our project recieve access to validated data as a way of saying thanks for
@@ -223,7 +223,7 @@ async function router(schema, config) {
      * @apiVersion 1.0.0
      * @apiName SingleOutputData
      * @apiGroup Job
-     * @apiPermission public
+     * @apiPermission user
      *
      * @apiDescription
      *    Note: the user must be authenticated to perform a download. One of our largest costs is
@@ -276,7 +276,7 @@ async function router(schema, config) {
      * @apiVersion 1.0.0
      * @apiName SingleOutputCache
      * @apiGroup Job
-     * @apiPermission public
+     * @apiPermission user
      *
      *  @apiDescription
      *    Note: the user must be authenticated to perform a download. One of our largest costs is

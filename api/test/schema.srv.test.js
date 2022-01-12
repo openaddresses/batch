@@ -51,7 +51,7 @@ test('GET: api/schema?method=FAKE', async (t) => {
                 dataPath: '.method',
                 schemaPath: '#/properties/method/enum',
                 params: {
-                    allowedValues: [ 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH' ]
+                    allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
                 },
                 message: 'should be equal to one of the allowed values'
             }]
@@ -183,8 +183,8 @@ test('POST: api/login', async (t) => {
                 schemaPath: '#/required',
                 params: {
                     missingProperty: 'password'
-               },
-               message: 'should have required property \'password\'' 
+                },
+                message: 'should have required property \'password\''
             }]
         });
     } catch (err) {

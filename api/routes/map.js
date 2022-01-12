@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Map = require('../lib/map');
 const Cacher = require('../lib/cacher');

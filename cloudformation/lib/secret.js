@@ -14,7 +14,7 @@ const stack = {
                 Name: cf.join([cf.stackName, '/api/signing-secret']),
                 KmsKeyId: cf.ref('OAKMS')
             }
-        },
+        }
 
     }
 };

@@ -1,3 +1,4 @@
+'use strict';
 const { promisify } = require('util');
 const pkg = require('../package.json');
 const request = promisify(require('request'));

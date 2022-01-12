@@ -1,3 +1,4 @@
+'use strict';
 const AWS = require('aws-sdk');
 const pkg = require('../package.json');
 const { createAppAuth } = require('@octokit/auth-app');

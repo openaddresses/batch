@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const email = new (require('../lib/email'))();
 const jwt = require('jsonwebtoken');

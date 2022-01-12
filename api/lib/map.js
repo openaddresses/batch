@@ -1,3 +1,4 @@
+'use strict';
 const fs = require('fs');
 const { sql } = require('slonik');
 const hash = require('object-hash');

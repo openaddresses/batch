@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const { Status } = require('./util');
 const batchjob = require('./batch').trigger;

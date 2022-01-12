@@ -1,11 +1,12 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const moment = require('moment');
 const Job = require('./job');
 const Data = require('./data');
 const util = require('./util');
 const { Status } = require('./util');
 const { sql } = require('slonik');
-const Generic = require('./generic');
 
 class Run extends Generic {
     static _table = 'runs';

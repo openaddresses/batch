@@ -20,7 +20,8 @@
         "@octokit/request": "^5.4.15",
         "@octokit/rest": "^18.11.3",
         "@octokit/webhooks": "9.17.0",
-        "@openaddresses/batch-schema": "^1.0.1",
+        "@openaddresses/batch-generic": "^1.2.0",
+        "@openaddresses/batch-schema": "^2.0.0",
         "@turf/turf": "^6.5.0",
         "aws-sdk": "^2.901.0",
         "bcrypt": "^5.0.0",
@@ -46,7 +47,7 @@
         "path-to-regexp": "^6.2.0",
         "pg": "^8.6.0",
         "request": "^2.88.2",
-        "slonik": "^25.1.0",
+        "slonik": "^27.0.0",
         "split": "^1.0.1",
         "tap-dot": "^2.0.0",
         "tilebase": "^1.5.0"

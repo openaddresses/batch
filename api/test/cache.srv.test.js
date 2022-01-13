@@ -1,3 +1,4 @@
+'use strict';
 const test = require('tape');
 const Flight = require('./flight');
 const memjs = require('memjs');

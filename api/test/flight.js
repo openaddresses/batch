@@ -1,3 +1,4 @@
+'use strict';
 process.env.StackName = 'test';
 
 const { sql } = require('slonik');
@@ -180,7 +181,7 @@ class Flight {
                     }
                 });
 
-                if (new_user.statusCode !== 200) throw new Error(new_user.body.message);
+                if (new_user.statusCode !== 200) throw new Error(JSON.stringify(new_user.body));
 
                 await this.config.pool.query(sql`
                      UPDATE users

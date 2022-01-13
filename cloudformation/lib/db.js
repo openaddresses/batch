@@ -66,7 +66,7 @@ const stack = {
                     'subnet-b978ade0'
                 ]
             }
-        },
+        }
     },
     Outputs: {
         DB: {

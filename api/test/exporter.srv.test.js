@@ -241,7 +241,7 @@ test('GET /api/export/100 - backer', async (t) =>  {
             json: true
         }, false);
 
-        t.deepEquals(exp.body, { status: 404, message: 'no exports by that id', messages: [] });
+        t.deepEquals(exp.body, { status: 404, message: 'exports not found', messages: [] });
     } catch (err) {
         t.error(err, 'no errors');
     }

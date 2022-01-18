@@ -37,7 +37,7 @@ async function router(schema, config) {
 
             const exp = await Exporter.generate(config.pool, req.body);
             await exp.batch();
-            return res.json(exp.json());
+            return res.json(exp.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -65,7 +65,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             const exp = await Exporter.from(config.pool, req.params.exportid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== exp.json().uid) throw new Err(403, null, 'You didn\'t create that export');
+            if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
             return res.json(await exp.log());
         } catch (err) {
@@ -118,7 +118,7 @@ async function router(schema, config) {
         res: 'res.Export.json'
     }, async (req, res) => {
         try {
-            const exp = (await Exporter.from(config.pool, req.params.exportid)).json();
+            const exp = (await Exporter.from(config.pool, req.params.exportid)).serialize();
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
             res.json(exp);
@@ -176,7 +176,7 @@ async function router(schema, config) {
             exp.patch(req.body);
             await exp.commit(config.pool);
 
-            return res.json(exp.json());
+            return res.json(exp.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -1,5 +1,6 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const { Status } = require('./util');
 const batchjob = require('./batch').trigger;
 const moment = require('moment');
@@ -11,35 +12,10 @@ const { sql } = require('slonik');
 /**
  * @class
  */
-class Exporter {
-    constructor() {
-        this.id = false;
-        this.uid = false;
-        this.job_id = false;
-        this.created = false;
-        this.expiry = false;
-        this.format = false;
-        this.size = 0;
-        this.status = false;
-        this.loglink = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchExport.json').properties);
-    }
-
-    json() {
-        return {
-            id: parseInt(this.id),
-            uid: parseInt(this.uid),
-            job_id: parseInt(this.job_id),
-            format: this.format,
-            created: this.created,
-            expiry: this.expiry,
-            size: parseInt(this.size),
-            status: this.status,
-            loglink: this.loglink
-        };
-    }
+class Exporter extends Generic {
+    static _table = 'exports';
+    static _res = require('../schema/res.Export.json');
+    static _patch = require('../schema/req.body.PatchExport.json');
 
     /**
      * List & Filter Exports
@@ -118,18 +94,7 @@ class Exporter {
             throw new Err(500, err, 'failed to fetch runs');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            exports: pgres.rows.map((exp) => {
-                exp.id = parseInt(exp.id);
-                exp.uid = parseInt(exp.uid);
-                exp.job_id = parseInt(exp.job_id);
-
-                delete exp.count;
-
-                return exp;
-            })
-        };
+        return this.deserialize(pgres.rows);
     }
 
     /**
@@ -151,7 +116,7 @@ class Exporter {
             `);
 
             if (!pgres.rows.length) return 0;
-            return parseInt(pgres.rows[0].count);
+            return pgres.rows[0].count;
         } catch (err) {
             throw new Err(500, err, 'Failed to get export count');
         }
@@ -171,53 +136,6 @@ class Exporter {
         return s3.stream(res, `export-${export_id}.zip`);
     }
 
-    /**
-     * Return a single exort
-     *
-     * @param {Pool} pool Postgres Pool Instance
-     * @param {Number} id Export ID
-     */
-    static async from(pool, id) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    *
-                FROM
-                    exports
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to fetch export');
-        }
-
-        const exp = new Exporter();
-
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'no exports by that id');
-        }
-
-        for (const key of Object.keys(pgres.rows[0])) {
-            exp[key] = pgres.rows[0][key];
-        }
-
-        exp.id = parseInt(exp.id);
-        exp.uid = parseInt(exp.uid);
-        exp.job_id = parseInt(exp.job_id);
-        if (exp.size) exp.size = parseInt(exp.size);
-
-        return exp;
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
-    }
-
     async commit(pool) {
         try {
             await pool.query(sql`
@@ -234,7 +152,6 @@ class Exporter {
         }
 
         return this;
-
     }
 
     /**
@@ -264,14 +181,7 @@ class Exporter {
             throw new Err(500, err, 'failed to generate exports');
         }
 
-        const exp = new Exporter();
-
-        pgres.rows[0].id = parseInt(pgres.rows[0].id);
-        for (const key of Object.keys(pgres.rows[0])) {
-            exp[key] = pgres.rows[0][key];
-        }
-
-        return exp;
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**

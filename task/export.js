@@ -153,8 +153,19 @@ function archive(tmp) {
 }
 
 function convert(tmp, loc, exp, job) {
+    let timeout = 600000;
+    if (
+        job.source_name.match(/statewide$/)
+        || job.source_name.match(/provincewide$/)
+        || job.source_name.match(/regionwide$/)
+    ) {
+        timeout = timeout * 2;
+    } else if (job.source_name.match(/countrywide$/)) {
+        timeout = timeout * 4;
+    }
+
     let ogr = ogr2ogr(loc)
-        .timeout(600000)
+        .timeout(timeout)
         .skipfailures()
         .onStderr((data) => {
             console.error(data);

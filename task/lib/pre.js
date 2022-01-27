@@ -1,3 +1,5 @@
+'use strict';
+
 const inquirer = require('inquirer');
 
 if (!process.env.AWS_DEFAULT_REGION) {

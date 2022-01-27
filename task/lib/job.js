@@ -1,3 +1,4 @@
+'use strict';
 const wkt = require('wellknown');
 const turf = require('@turf/turf');
 const gzip = require('zlib').createGzip;

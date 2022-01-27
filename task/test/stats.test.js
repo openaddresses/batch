@@ -1,4 +1,4 @@
-
+'use strict';
 
 const path = require('path');
 const Stats = require('../lib/stats');

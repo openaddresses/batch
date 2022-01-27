@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue

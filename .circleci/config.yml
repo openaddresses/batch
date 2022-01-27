@@ -4,7 +4,7 @@ jobs:
     build:
         docker:
             - image: ubuntu:20.04
-            - image: postgis/postgis:13-master
+            - image: postgis/postgis:14-master
               environment:
                   POSTGRES_HOST_AUTH_METHOD: trust
             - image: memcached:1.6

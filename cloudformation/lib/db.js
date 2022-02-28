@@ -22,6 +22,7 @@ const stack = {
             Type: 'AWS::RDS::DBInstance',
             Properties: {
                 Engine: 'postgres',
+                EnablePerformanceInsights: true,
                 DBName: 'openaddresses',
                 DBInstanceIdentifier: cf.stackName,
                 KmsKeyId: cf.ref('OAKMS'),

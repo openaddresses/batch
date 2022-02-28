@@ -125,7 +125,10 @@ class Map {
                         SELECT
                             map.name,
                             map.code,
-                            map.geom
+                            ST_Intersection(map.geom, ST_Transform(ST_SetSRID(ST_MakeBox2D(
+                                ST_MakePoint(${bbox[0]}, ${bbox[1]}),
+                                ST_MakePoint(${bbox[2]}, ${bbox[3]})
+                            ), 4326), 4326)
                         FROM
                             map
                         WHERE

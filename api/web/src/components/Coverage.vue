@@ -115,7 +115,7 @@ export default {
                         tiles: [
                             `${window.location.origin}/api/map/borders/{z}/{x}/{y}.mvt`
                         ],
-                        minzoom: 0,
+                        minzoom: 3,
                         maxzoom: 5
                     });
 

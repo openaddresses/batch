@@ -30,6 +30,9 @@
         "s3": {
             "type": ["boolean", "string"]
         },
+        "s3_validated": {
+            "type": ["boolean", "string"]
+        },
         "run": {
             "type": "integer"
         },

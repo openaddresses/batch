@@ -32,6 +32,7 @@ async function router(schema, config) {
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 for (const d of data) {
                     delete d.s3;
+                    delete d.s3_validated;
                 }
             }
 
@@ -98,6 +99,7 @@ async function router(schema, config) {
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 delete data.s3;
+                delete data.s3_validated;
             }
 
             return res.json(data);

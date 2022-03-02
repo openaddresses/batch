@@ -31,8 +31,8 @@ async function router(schema, config) {
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 for (const j of jobs) {
-                    delete job.s3;
-                    delete job.s3_validated;
+                    delete j.s3;
+                    delete j.s3_validated;
                 }
             }
 

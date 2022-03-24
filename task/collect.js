@@ -11,7 +11,7 @@ const os = require('os');
 const { Unzip } = require('zlib');
 const split = require('split');
 const transform = require('parallel-transform');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp').sync;
@@ -137,9 +137,10 @@ async function get_source(oa, tmp, data, stats) {
 
     fs.writeFileSync(source_meta, JSON.stringify(job, null, 4));
 
-    return new Promise((resolve, reject) => {
-        console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
-        pipeline(
+    console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
+
+    try {
+        await pipeline(
             s3.getObject({
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
@@ -151,19 +152,15 @@ async function get_source(oa, tmp, data, stats) {
 
                 stats.count++; return cb(null, line + '\n');
             }),
-            fs.createWriteStream(path.resolve(tmp, 'sources', dir, source)),
-            (err) => {
-                if (err) {
-                    console.error(err);
-                    console.error('not ok - ' + path.resolve(tmp, 'sources', dir, source));
-                    return reject(err);
-                }
-
-                console.error('ok - ' + path.resolve(tmp, 'sources',  dir, source));
-                return resolve();
-            }
+            fs.createWriteStream(path.resolve(tmp, 'sources', dir, source))
         );
-    });
+    } catch (err) {
+        console.error(err);
+        console.error('not ok - ' + path.resolve(tmp, 'sources', dir, source));
+        throw err;
+    }
+
+    console.error('ok - ' + path.resolve(tmp, 'sources',  dir, source));
 }
 
 async function upload_collection(file, name) {

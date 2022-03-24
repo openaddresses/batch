@@ -6,7 +6,7 @@ const { interactive } = require('./lib/pre');
 const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp').sync;
@@ -209,19 +209,14 @@ function convert(tmp, loc, exp, job) {
 }
 
 async function get_source(tmp, jobid) {
-    return new Promise((resolve, reject) => {
-        pipeline(
-            s3.getObject({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
-            }).createReadStream(),
-            Unzip(),
-            fs.createWriteStream(path.resolve(tmp, 'source.geojson')),
-            (err) => {
-                if (err) return reject(err);
+    await pipeline(
+        s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
+        }).createReadStream(),
+        Unzip(),
+        fs.createWriteStream(path.resolve(tmp, 'source.geojson'))
+    );
 
-                return resolve(path.resolve(tmp, 'source.geojson'));
-            }
-        );
-    });
+    return path.resolve(tmp, 'source.geojson');
 }

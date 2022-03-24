@@ -9,7 +9,7 @@ const DRIVE = '/tmp';
 
 const fs = require('fs');
 const TileBase = require('tilebase');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const path = require('path');
 const Tippecanoe = require('./lib/tippecanoe');
 const AWS = require('aws-sdk');
@@ -134,20 +134,15 @@ async function cli() {
     }
 }
 
-function get_source(out, data) {
-    return new Promise((resolve, reject) => {
-        console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
-        pipeline(
-            s3.getObject({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-            }).createReadStream(),
-            Unzip(),
-            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' }),
-            (err) => {
-                if (err) return reject(err);
-                return resolve();
-            }
-        );
-    });
+async function get_source(out, data) {
+    console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
+
+    await pipeline(
+        s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
+        }).createReadStream(),
+        Unzip(),
+        fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+    );
 }

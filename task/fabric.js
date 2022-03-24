@@ -8,7 +8,6 @@ const { interactive } = require('./lib/pre');
 const DRIVE = '/tmp';
 
 const fs = require('fs');
-const TileBase = require('tilebase');
 const { pipeline } = require('stream/promises');
 const path = require('path');
 const Tippecanoe = require('./lib/tippecanoe');
@@ -51,6 +50,8 @@ async function cli() {
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
+    const TileBase = (await import('tilebase')).default;
+
     const meta = new Meta();
 
     const oa = new OA({
@@ -63,7 +64,67 @@ async function cli() {
 
         const tippecanoe = new Tippecanoe();
 
-        const datas = await oa.cmd('data', 'list', {
+        // Build Borders File
+
+        let datas = await oa.cmd('data', 'list', {});
+
+        const borders = fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'));
+
+        const fetched = {};
+        for (const data of datas) {
+            if (!data.map) continue;
+            if (fetched[data.map]) continue;
+
+            const mapele = await oa.cmd('map', 'get', {
+                ':mapid': data.map
+            });
+
+            fetched[data.map] = true;
+
+            borders.write(JSON.stringify(mapele.geom) + '\n');
+        }
+
+        borders.close();
+
+        console.error(`ok - generating border tiles`);
+        await tippecanoe.tile(
+            fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
+            path.resolve(DRIVE, 'borders.mbtiles'),
+            {
+                layer: 'borders',
+                std: true,
+                force: true,
+                name: `OpenAddresses Borders`,
+                attribution: 'OpenAddresses',
+                description: `OpenAddresses Borders`,
+                limit: {
+                    features: false,
+                    size: false
+                },
+                zoom: {
+                    max: 6,
+                    min: 0
+                }
+            }
+        );
+
+        await TileBase.to_tb(
+            path.resolve(DRIVE, 'borders.mbtiles'),
+            path.resolve(DRIVE, 'borders.tilebase')
+        );
+
+        process.exit();
+
+        await s3.putObject({
+            ContentType: 'application/octet-stream',
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/borders.tilebase`,
+            Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
+        }).promise();
+
+        // Build Data Fabric
+
+        datas = await oa.cmd('data', 'list', {
             fabric: true
         });
 

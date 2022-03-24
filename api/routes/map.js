@@ -29,23 +29,7 @@ async function router(schema, config) {
      * @apiDescription
      *   Get a single Map Object
      */
-    await schema.get( '/map/:mapid', {
-        ':mapid': 'integer'
-    }, async (req, res) => {
-        return res.json(await Map.from_id(config.pool, req.params.mapid));
-    });
-
-    /**
-     * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
-     * @apiVersion 1.0.0
-     * @apiName BorderVectorTile
-     * @apiGroup Map
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Get a single Map Object
-     */
-    await schema.get( '/map/:mapid', {
+    await schema.get('/map/:mapid', {
         ':mapid': 'integer'
     }, async (req, res) => {
         return res.json(await Map.from_id(config.pool, req.params.mapid));

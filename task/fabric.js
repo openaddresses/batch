@@ -86,7 +86,7 @@ async function cli() {
 
         borders.close();
 
-        console.error(`ok - generating border tiles`);
+        console.error('ok - generating border tiles');
         await tippecanoe.tile(
             fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
             path.resolve(DRIVE, 'borders.mbtiles'),
@@ -94,9 +94,9 @@ async function cli() {
                 layer: 'borders',
                 std: true,
                 force: true,
-                name: `OpenAddresses Borders`,
+                name: 'OpenAddresses Borders',
                 attribution: 'OpenAddresses',
-                description: `OpenAddresses Borders`,
+                description: 'OpenAddresses Borders',
                 limit: {
                     features: false,
                     size: false
@@ -113,14 +113,16 @@ async function cli() {
             path.resolve(DRIVE, 'borders.tilebase')
         );
 
-        process.exit();
-
         await s3.putObject({
             ContentType: 'application/octet-stream',
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/borders.tilebase`,
             Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
         }).promise();
+
+        await fs.unlink(path.resolve(DRIVE, 'borders.geojson'));
+        await fs.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
+        await fs.unlink(path.resolve(DRIVE, 'borders.tilebase'));
 
         // Build Data Fabric
 

@@ -4,13 +4,13 @@ const { sql } = require('slonik');
 const hash = require('object-hash');
 const split = require('split');
 const SM = require('@mapbox/sphericalmercator');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const transform = require('parallel-transform');
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const Q = require('d3-queue').queue;
-
+const Generic = require('@openaddresses/batch-generic');
 const { Err } = require('@openaddresses/batch-schema');
+const { Transform } = require('stream');
 
 const MAP_LAYERS = [
     'district.geojson',
@@ -25,11 +25,41 @@ const sm = new SM({
 /**
  * @class
  */
-class Map {
+class Map extends Generic {
+    static _table = 'map';
+    static _res = require('../schema/res.Map.json');
+
     static map() {
         return {
             token: process.env.MAPBOX_TOKEN
         };
+    }
+
+    /**
+     * Stream all Map Features as Line Delimited GeoJSON
+     *
+     * @param {Pool} pool Instantiated Postgres Pool
+     * @param {Object} res Express Response
+     */
+    static async stream(pool, res) {
+        await pipeline(
+            await super.stream(pool),
+            new Transform({
+                objectMode: true,
+                transform: (chunk, encoding, cb) => {
+                    return cb(null, JSON.stringify({
+                        id: chunk.id,
+                        type: 'Feature',
+                        properties: {
+                            name: chunk.name,
+                            code: chunk.code
+                        },
+                        geometry: chunk.geom
+                    }) + '\n');
+                }
+            }),
+            res
+        );
     }
 
     static async from_id(pool, mapid) {
@@ -228,7 +258,6 @@ class Map {
 
             if (!pgres.rows.length) throw new Err(400, null, 'Feature not found');
 
-            pgres.rows[0].id = parseInt(pgres.rows[0].id);
             pgres.rows[0].layers = pgres.rows[0].layers.filter((layer) => !!layer);
 
             return pgres.rows[0];
@@ -333,54 +362,44 @@ class Map {
 
     static async populate(pool) {
         console.error('ok - populating map table');
-        const q = new Q();
 
         for (const layer of MAP_LAYERS) {
-            q.defer((layer, done) => {
-                pipeline(
-                    s3.getObject({
-                        Bucket: 'v2.openaddresses.io',
-                        Key: layer
-                    }).createReadStream(),
-                    split(),
-                    transform(100, (feat, cb) => {
-                        if (!feat || !feat.trim()) return cb(null, '');
+            await pipeline(
+                s3.getObject({
+                    Bucket: 'v2.openaddresses.io',
+                    Key: layer
+                }).createReadStream(),
+                split(),
+                transform(100, (feat, cb) => {
+                    if (!feat || !feat.trim()) return cb(null, '');
 
-                        try {
-                            feat = JSON.parse(feat);
-                        } catch (err) {
-                            return cb(err);
-                        }
+                    try {
+                        feat = JSON.parse(feat);
+                    } catch (err) {
+                        return cb(err);
+                    }
 
-                        pool.query(sql`
-                            INSERT INTO map (
-                                name,
-                                code,
-                                geom
-                            ) VALUES (
-                                ${feat.properties.name},
-                                ${feat.properties.code},
-                                ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(feat.geometry)}), 4326)
-                            );
-                        `, (err) => {
-                            if (err) return cb(err);
-                            return cb(null, '');
-                        });
-                    }),
-                    fs.createWriteStream('/dev/null'),
-                    done
-                );
-            }, layer);
+                    pool.query(sql`
+                        INSERT INTO map (
+                            name,
+                            code,
+                            geom
+                        ) VALUES (
+                            ${feat.properties.name},
+                            ${feat.properties.code},
+                            ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(feat.geometry)}), 4326)
+                        );
+                    `, (err) => {
+                        if (err) return cb(err);
+                        return cb(null, '');
+                    });
+                }),
+                fs.createWriteStream('/dev/null')
+            );
         }
 
-        return new Promise((resolve, reject) => {
-            q.awaitAll((err) => {
-                if (err) return reject(err);
-
-                console.error('ok - layers populated');
-                return resolve(true);
-            });
-        });
+        console.error('ok - layers populated');
+        return true;
     }
 }
 

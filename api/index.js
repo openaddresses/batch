@@ -12,7 +12,9 @@ const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const TileBase = require('tilebase');
 const { Schema, Err } = require('@openaddresses/batch-schema');
-const { sql, createPool } = require('slonik');
+const { sql, createPool, createTypeParserPreset } = require('slonik');
+const wkx = require('wkx');
+const bbox = require('@turf/bbox').default;
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase', 'silent'],
     alias: {
@@ -78,7 +80,20 @@ async function server(args, config, cb) {
     let retry = 5;
     do {
         try {
-            pool = createPool(postgres);
+            pool = createPool(postgres, {
+                typeParsers: [
+                    ...createTypeParserPreset(), {
+                        name: 'geometry',
+                        parse: (value) => {
+                            const geom = wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+
+                            geom.bounds = bbox(geom);
+
+                            return geom;
+                        }
+                    }
+                ]
+            });
 
             await pool.query(sql`SELECT NOW()`);
         } catch (err) {

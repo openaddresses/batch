@@ -15,8 +15,24 @@ async function router(schema, config) {
      * @apiDescription
      *   Data required for map initialization
      */
-    await schema.get( '/map', null, (req, res) => {
+    await schema.get('/map', null, (req, res) => {
         return res.json(Map.map());
+    });
+
+    /**
+     * @api {get} /api/map/features All Features
+     * @apiVersion 1.0.0
+     * @apiName MapFeatures
+     * @apiGroup Map
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Return all map objects in Line Delimited GeoJSON
+     */
+    await schema.get('/map/features', {
+        ':mapid': 'integer'
+    }, async (req, res) => {
+        return Map.stream(config.pool, res);
     });
 
     /**

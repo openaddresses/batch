@@ -44,16 +44,16 @@ async function prompt() {
 }
 
 async function cli() {
+    if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
-    if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
-    if (!process.env.OA_API) throw new Error('No OA_API env var defined');
+    if (!process.env.OA_API) process.env.OA_API = 'https://batch.openaddresses.io/api'
 
     const TileBase = (await import('tilebase')).default;
+    const OA = (await import('@openaddresses/lib')).default;
 
     const meta = new Meta();
 
-    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
@@ -65,28 +65,14 @@ async function cli() {
         const tippecanoe = new Tippecanoe();
 
         // Build Borders File
-        const features = await oa.cmd('map', 'features', {});
-        console.error(features);
+        await pipeline(
+            await oa.cmd('map', 'features', {}, {
+                stream: true
+            }),
+            fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'))
+        );
 
         let datas = await oa.cmd('data', 'list', {});
-
-        const borders = fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'));
-
-        const fetched = {};
-        for (const data of datas) {
-            if (!data.map) continue;
-            if (fetched[data.map]) continue;
-
-            const mapele = await oa.cmd('map', 'get', {
-                ':mapid': data.map
-            });
-
-            fetched[data.map] = true;
-
-            borders.write(JSON.stringify(mapele.geom) + '\n');
-        }
-
-        borders.close();
 
         console.error('ok - generating border tiles');
         await tippecanoe.tile(

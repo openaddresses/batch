@@ -62,15 +62,25 @@ async function server(args, config, cb) {
     let tb = false;
     const borders = false;
     if (!args['no-tilebase']) {
-        if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        if (!config.silent) console.log('ok - loaded TileBase (Fabric)');
-        await tb.open();
+        try {
+            if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+            config.tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+            if (!config.silent) console.log('ok - loaded TileBase (Fabric)');
+            await config.tb.open();
+        } catch (err) {
+            console.error(err);
+            config.tb = null;
+        }
 
-        if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
-        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
-        if (!config.silent) console.log('ok - loaded TileBase (Borders)');
-        await tb.open();
+        try {
+            if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
+            config.borders = new TileBase(`s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
+            if (!config.silent) console.log('ok - loaded TileBase (Borders)');
+            await config.borders.open();
+        } catch (err) {
+            console.error(err);
+            config.borders = null;
+        }
     } else {
         if (!config.silent) console.log('ok - TileBase Disabled');
     }
@@ -122,8 +132,6 @@ async function server(args, config, cb) {
 
     config.cacher = new Cacher(args['no-cache'], config.silent);
     config.pool = pool;
-    config.tb = tb;
-    config.borders = borders;
 
     try {
         if (args.populate) {

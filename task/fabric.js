@@ -48,7 +48,7 @@ async function cli() {
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
-    if (!process.env.OA_API) process.env.OA_API = 'https://batch.openaddresses.io/api'
+    if (!process.env.OA_API) process.env.OA_API = 'https://batch.openaddresses.io/api';
 
     const TileBase = (await import('tilebase')).default;
     const OA = (await import('@openaddresses/lib')).default;

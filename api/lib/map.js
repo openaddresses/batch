@@ -117,14 +117,6 @@ class Map extends Generic {
         }
     }
 
-    static async tbtile(tb, z, x, y) {
-        try {
-            return await tb.tile(z, x, y);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to fetch tile');
-        }
-    }
-
     static async tile(pool, z, x, y) {
         try {
             const bbox = sm.bbox(x, y, z, false, '900913');

@@ -73,7 +73,7 @@ async function router(schema, config) {
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
             const tile = await config.cacher.get(Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await Map.tbtile(config.borders, req.params.z, req.params.x, req.params.y);
+                return await config.borders.tile(req.params.z, req.params.x, req.params.y);
             }, false);
 
             res.type('application/vnd.mapbox-vector-tile');

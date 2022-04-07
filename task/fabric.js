@@ -8,6 +8,7 @@ const { interactive } = require('./lib/pre');
 const DRIVE = '/tmp';
 
 const fs = require('fs');
+const fsp = require('fs/promises');
 const { pipeline } = require('stream/promises');
 const path = require('path');
 const Tippecanoe = require('./lib/tippecanoe');
@@ -46,7 +47,7 @@ async function prompt() {
 async function cli() {
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.StackName) process.env.StackName = 'local';
-    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
+    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
     if (!process.env.OA_API) process.env.OA_API = 'https://batch.openaddresses.io/api'
 
     const TileBase = (await import('tilebase')).default;
@@ -106,9 +107,9 @@ async function cli() {
             Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
         }).promise();
 
-        await fs.unlink(path.resolve(DRIVE, 'borders.geojson'));
-        await fs.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
-        await fs.unlink(path.resolve(DRIVE, 'borders.tilebase'));
+        await fsp.unlink(path.resolve(DRIVE, 'borders.geojson'));
+        await fsp.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
+        await fsp.unlink(path.resolve(DRIVE, 'borders.tilebase'));
 
         // Build Data Fabric
         const datas = await oa.cmd('data', 'list', {

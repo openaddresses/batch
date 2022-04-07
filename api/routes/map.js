@@ -67,8 +67,6 @@ async function router(schema, config) {
         ':y': 'integer'
     }, async (req, res) => {
         try {
-            if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
-
             const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
@@ -76,9 +74,12 @@ async function router(schema, config) {
                 return await config.borders.tile(req.params.z, req.params.x, req.params.y);
             }, false);
 
-            res.type('application/vnd.mapbox-vector-tile');
-
-            return res.send(tile);
+            res.writeHead(200, {
+                'Content-Type': 'application/vnd.mapbox-vector-tile',
+                'Content-Encoding': 'gzip',
+                'cache-control': 'no-transform'
+            });
+            res.end(tile);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -59,8 +59,6 @@ async function configure(args, cb) {
 async function server(args, config, cb) {
     const TileBase = (await import('tilebase')).default;
 
-    let tb = false;
-    const borders = false;
     if (!args['no-tilebase']) {
         try {
             if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);

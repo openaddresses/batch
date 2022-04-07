@@ -3,7 +3,6 @@
 
 const { interactive } = require('./lib/pre');
 
-const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
 const { pipeline } = require('stream/promises');
@@ -51,6 +50,8 @@ async function cli() {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
     const meta = new Meta();
+
+    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret

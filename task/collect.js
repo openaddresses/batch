@@ -6,7 +6,6 @@
 const { interactive } = require('./lib/pre');
 
 const glob = require('glob');
-const OA = require('@openaddresses/lib');
 const os = require('os');
 const { Unzip } = require('zlib');
 const split = require('split');
@@ -49,6 +48,8 @@ async function cli() {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
     let tmp = path.resolve(os.tmpdir(), Math.random().toString(36).substring(2, 15));
+
+    const OA = (await import('@openaddresses/lib')).default;
 
     const oa = new OA({
         url: process.env.OA_API,

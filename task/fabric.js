@@ -14,7 +14,6 @@ const Tippecanoe = require('./lib/tippecanoe');
 const AWS = require('aws-sdk');
 const Meta = require('./lib/meta');
 const { Unzip } = require('zlib');
-const OA = require('@openaddresses/lib');
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -54,6 +53,7 @@ async function cli() {
 
     const meta = new Meta();
 
+    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
@@ -65,6 +65,8 @@ async function cli() {
         const tippecanoe = new Tippecanoe();
 
         // Build Borders File
+        const features = await oa.cmd('map', 'features', {});
+        console.error(features);
 
         let datas = await oa.cmd('data', 'list', {});
 

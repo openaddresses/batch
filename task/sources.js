@@ -3,7 +3,6 @@
 
 const { interactive } = require('./lib/pre');
 
-const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const os = require('os');
 const pkg = require('./package.json');
@@ -49,6 +48,7 @@ async function cli() {
     fs.mkdirSync(tmp);
 
     const meta = new Meta();
+    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret

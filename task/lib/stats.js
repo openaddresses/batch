@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const split = require('split');
 const turf = require('@turf/turf');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const transform = require('parallel-transform');
 const Validator = require('./validator');
 
@@ -60,41 +60,31 @@ class Stats {
         }
     }
 
-    calc() {
-        return new Promise((resolve, reject) => {
-            pipeline(
-                fs.createReadStream(path.resolve(this.file)),
-                split(),
-                transform(100, (data, cb) => {
-                    if (!data.trim().length) return cb(null, '');
+    async calc() {
+        await pipeline(
+            fs.createReadStream(path.resolve(this.file)),
+            split(),
+            transform(100, (data, cb) => {
+                if (!data.trim().length) return cb(null, '');
 
-                    let feat;
-                    try {
-                        feat = JSON.parse(data);
-                    } catch (err) {
-                        return reject(err);
-                    }
+                const feat = JSON.parse(data);
 
-                    this.stats.count++;
+                this.stats.count++;
 
-                    this.bounds(feat);
+                this.bounds(feat);
 
-                    this.validator.test(feat);
+                this.validator.test(feat);
 
-                    if (this.layer === 'addresses') {
-                        this.addresses(feat);
-                    }
-
-                    return cb(null, '');
-                }),
-                fs.createWriteStream('/dev/null'),
-                (err) => {
-                    if (err) return reject(err);
-
-                    return resolve(this.stats);
+                if (this.layer === 'addresses') {
+                    this.addresses(feat);
                 }
-            );
-        });
+
+                return cb(null, '');
+            }),
+            fs.createWriteStream('/dev/null')
+        );
+
+        return this.stats;
     }
 
     addresses(feat) {

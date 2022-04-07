@@ -5,7 +5,7 @@ const gzip = require('zlib').createGzip;
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
 const OASchema = require('oa');
@@ -159,36 +159,32 @@ class Job {
             throw new Error(err);
         }
 
-        return new Promise((resolve, reject) => {
-            if (output.length !== 1) return reject(new Error('out.csv not found'));
+        if (output.length !== 1) throw new Error('out.csv not found');
 
-            pipeline(
-                fs.createReadStream(output[0]),
-                csv({
-                    columns: true,
-                    delimiter: ','
-                }),
-                transform(100, (data, cb) => {
-                    const geom = wkt.parse(data.GEOM);
-                    delete data.GEOM;
-                    const props = {};
-                    for (const prop of Object.keys(data)) {
-                        props[prop.toLowerCase()] = data[prop];
-                    }
-
-                    return cb(null, JSON.stringify({
-                        type: 'Feature',
-                        properties: props,
-                        geometry: geom
-                    }) + '\n');
-                }),
-                fs.createWriteStream(path.resolve(this.tmp, 'out.geojson')),
-                async (err) => {
-                    if (err) return reject(err);
-                    return resolve(path.resolve(this.tmp, 'out.geojson'));
+        await pipeline(
+            fs.createReadStream(output[0]),
+            csv({
+                columns: true,
+                delimiter: ','
+            }),
+            transform(100, (data, cb) => {
+                const geom = wkt.parse(data.GEOM);
+                delete data.GEOM;
+                const props = {};
+                for (const prop of Object.keys(data)) {
+                    props[prop.toLowerCase()] = data[prop];
                 }
-            );
-        });
+
+                return cb(null, JSON.stringify({
+                    type: 'Feature',
+                    properties: props,
+                    geometry: geom
+                }) + '\n');
+            }),
+            fs.createWriteStream(path.resolve(this.tmp, 'out.geojson'))
+        );
+
+        return path.resolve(this.tmp, 'out.geojson');
     }
 
     async compress() {
@@ -206,20 +202,16 @@ class Job {
         return await Job.gz(data[0]);
     }
 
-    static gz(input) {
-        return new Promise((resolve, reject) => {
-            const compressed = input + '.gz';
+    static async gz(input) {
+        const compressed = input + '.gz';
 
-            pipeline(
-                fs.createReadStream(input),
-                gzip(),
-                fs.createWriteStream(compressed),
-                (err) => {
-                    if (err) return reject(err);
-                    return resolve(compressed);
-                }
-            );
-        });
+        await pipeline(
+            fs.createReadStream(input),
+            gzip(),
+            fs.createWriteStream(compressed)
+        );
+
+        return compressed;
     }
 
     async upload() {

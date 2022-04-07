@@ -8,14 +8,13 @@ const { interactive } = require('./lib/pre');
 const DRIVE = '/tmp';
 
 const fs = require('fs');
-const TileBase = require('tilebase');
-const { pipeline } = require('stream');
+const fsp = require('fs/promises');
+const { pipeline } = require('stream/promises');
 const path = require('path');
 const Tippecanoe = require('./lib/tippecanoe');
 const AWS = require('aws-sdk');
 const Meta = require('./lib/meta');
 const { Unzip } = require('zlib');
-const OA = require('@openaddresses/lib');
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -46,10 +45,13 @@ async function prompt() {
 }
 
 async function cli() {
-    if (!process.env.StackName) process.env.StackName = 'local';
-    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
-    if (!process.env.OA_API) throw new Error('No OA_API env var defined');
+    if (!process.env.StackName) process.env.StackName = 'local';
+    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
+    if (!process.env.OA_API) process.env.OA_API = 'https://batch.openaddresses.io/api';
+
+    const TileBase = (await import('tilebase')).default;
+    const OA = (await import('@openaddresses/lib')).default;
 
     const meta = new Meta();
 
@@ -63,6 +65,53 @@ async function cli() {
 
         const tippecanoe = new Tippecanoe();
 
+        // Build Borders File
+        await pipeline(
+            await oa.cmd('map', 'features', {}, {
+                stream: true
+            }),
+            fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'))
+        );
+
+        console.error('ok - generating border tiles');
+        await tippecanoe.tile(
+            fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
+            path.resolve(DRIVE, 'borders.mbtiles'),
+            {
+                layer: 'borders',
+                std: true,
+                force: true,
+                name: 'OpenAddresses Borders',
+                attribution: 'OpenAddresses',
+                description: 'OpenAddresses Borders',
+                limit: {
+                    features: false,
+                    size: false
+                },
+                zoom: {
+                    max: 6,
+                    min: 0
+                }
+            }
+        );
+
+        await TileBase.to_tb(
+            path.resolve(DRIVE, 'borders.mbtiles'),
+            path.resolve(DRIVE, 'borders.tilebase')
+        );
+
+        await s3.putObject({
+            ContentType: 'application/octet-stream',
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/borders.tilebase`,
+            Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
+        }).promise();
+
+        await fsp.unlink(path.resolve(DRIVE, 'borders.geojson'));
+        await fsp.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
+        await fsp.unlink(path.resolve(DRIVE, 'borders.tilebase'));
+
+        // Build Data Fabric
         const datas = await oa.cmd('data', 'list', {
             fabric: true
         });
@@ -134,20 +183,15 @@ async function cli() {
     }
 }
 
-function get_source(out, data) {
-    return new Promise((resolve, reject) => {
-        console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
-        pipeline(
-            s3.getObject({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-            }).createReadStream(),
-            Unzip(),
-            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' }),
-            (err) => {
-                if (err) return reject(err);
-                return resolve();
-            }
-        );
-    });
+async function get_source(out, data) {
+    console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
+
+    await pipeline(
+        s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
+        }).createReadStream(),
+        Unzip(),
+        fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+    );
 }

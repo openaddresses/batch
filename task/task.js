@@ -4,7 +4,6 @@
 const { interactive } = require('./lib/pre');
 
 const config = require('./package.json');
-const OA = require('@openaddresses/lib');
 const Job = require('./lib/job');
 const path = require('path');
 const CP = require('child_process');
@@ -42,6 +41,7 @@ async function cli() {
 
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
+    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret

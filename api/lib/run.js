@@ -8,14 +8,15 @@ const util = require('./util');
 const { Status } = require('./util');
 const { sql } = require('slonik');
 
+/**
+ * A Run is a collection of Jobs and associated metadata
+ *
+ * @class
+ */
 class Run extends Generic {
     static _table = 'runs';
     static _patch = require('../schema/req.body.PatchRun.json');
     static _res = require('../schema/res.Run.json');
-
-    constructor() {
-        super();
-    }
 
     /**
      * Anytime a job is completed, a ping is sent to the run module

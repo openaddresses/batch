@@ -3,10 +3,9 @@
 
 const { interactive } = require('./lib/pre');
 
-const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const ogr2ogr = require('ogr2ogr');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp').sync;
@@ -51,6 +50,8 @@ async function cli() {
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 
     const meta = new Meta();
+
+    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
@@ -209,19 +210,14 @@ function convert(tmp, loc, exp, job) {
 }
 
 async function get_source(tmp, jobid) {
-    return new Promise((resolve, reject) => {
-        pipeline(
-            s3.getObject({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
-            }).createReadStream(),
-            Unzip(),
-            fs.createWriteStream(path.resolve(tmp, 'source.geojson')),
-            (err) => {
-                if (err) return reject(err);
+    await pipeline(
+        s3.getObject({
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
+        }).createReadStream(),
+        Unzip(),
+        fs.createWriteStream(path.resolve(tmp, 'source.geojson'))
+    );
 
-                return resolve(path.resolve(tmp, 'source.geojson'));
-            }
-        );
-    });
+    return path.resolve(tmp, 'source.geojson');
 }

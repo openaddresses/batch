@@ -3,7 +3,6 @@
 
 const { interactive } = require('./lib/pre');
 
-const OA = require('@openaddresses/lib');
 const Meta = require('./lib/meta');
 const os = require('os');
 const pkg = require('./package.json');
@@ -11,7 +10,7 @@ const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
 const request = require('request');
-const { pipeline } = require('stream');
+const { pipeline } = require('stream/promises');
 const unzipper = require('unzipper');
 
 const args = require('minimist')(process.argv, {
@@ -49,6 +48,7 @@ async function cli() {
     fs.mkdirSync(tmp);
 
     const meta = new Meta();
+    const OA = (await import('@openaddresses/lib')).default;
     const oa = new OA({
         url: process.env.OA_API,
         secret: process.env.SharedSecret
@@ -92,26 +92,19 @@ async function cli() {
 }
 
 async function fetch(tmp) {
-    return new Promise((resolve, reject) => {
-        pipeline(
-            request(`https://github.com/openaddresses/openaddresses/archive/${process.env.OA_BRANCH}.zip`),
-            fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip')),
-            (err) => {
-                if (err) return reject(err);
+    await pipeline(
+        request(`https://github.com/openaddresses/openaddresses/archive/${process.env.OA_BRANCH}.zip`),
+        fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip'))
+    );
 
-                pipeline(
-                    fs.createReadStream(path.resolve(tmp, 'openaddresses.zip')),
-                    unzipper.Extract({
-                        path: path.resolve(tmp, 'openaddresses')
-                    }),
-                    (err) => {
-                        if (err) return reject(err);
-                        return resolve(true);
-                    }
-                );
-            }
-        );
-    });
+    await pipeline(
+        fs.createReadStream(path.resolve(tmp, 'openaddresses.zip')),
+        unzipper.Extract({
+            path: path.resolve(tmp, 'openaddresses')
+        })
+    );
+
+    return true;
 }
 
 function list(tmp, sha) {

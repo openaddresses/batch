@@ -300,6 +300,10 @@ class Job {
                 job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
             }
 
+            if (job.output && job.output.validated) {
+                job.s3_validated = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/validated.geojson.gz`;
+            }
+
             return job;
         });
     }
@@ -353,6 +357,10 @@ class Job {
 
         if (job.output && job.output.output) {
             job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
+        }
+
+        if (job.output && job.output.validated) {
+            job.s3_validated = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/validated.geojson.gz`;
         }
 
         return job;

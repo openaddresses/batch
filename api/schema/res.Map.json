@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "name",
+        "code",
+        "geom"
+    ],
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "code": {
+            "type": "string"
+        },
+        "geom": {
+            "type": "object"
+        }
+    }
+}

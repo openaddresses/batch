@@ -10,9 +10,10 @@ const express = require('express');
 const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
-const TileBase = require('tilebase');
 const { Schema, Err } = require('@openaddresses/batch-schema');
-const { sql, createPool } = require('slonik');
+const { sql, createPool, createTypeParserPreset } = require('slonik');
+const wkx = require('wkx');
+const bbox = require('@turf/bbox').default;
 const args = require('minimist')(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase', 'silent'],
     alias: {
@@ -56,12 +57,28 @@ async function configure(args, cb) {
  */
 
 async function server(args, config, cb) {
-    let tb = false;
+    const TileBase = (await import('tilebase')).default;
+
     if (!args['no-tilebase']) {
-        if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        if (!config.silent) console.log('ok - loaded TileBase');
-        await tb.open();
+        try {
+            if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+            config.tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
+            if (!config.silent) console.log('ok - loaded TileBase (Fabric)');
+            await config.tb.open();
+        } catch (err) {
+            console.error(err);
+            config.tb = null;
+        }
+
+        try {
+            if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
+            config.borders = new TileBase(`s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
+            if (!config.silent) console.log('ok - loaded TileBase (Borders)');
+            await config.borders.open();
+        } catch (err) {
+            console.error(err);
+            config.borders = null;
+        }
     } else {
         if (!config.silent) console.log('ok - TileBase Disabled');
     }
@@ -78,7 +95,20 @@ async function server(args, config, cb) {
     let retry = 5;
     do {
         try {
-            pool = createPool(postgres);
+            pool = createPool(postgres, {
+                typeParsers: [
+                    ...createTypeParserPreset(), {
+                        name: 'geometry',
+                        parse: (value) => {
+                            const geom = wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+
+                            geom.bounds = bbox(geom);
+
+                            return geom;
+                        }
+                    }
+                ]
+            });
 
             await pool.query(sql`SELECT NOW()`);
         } catch (err) {
@@ -100,7 +130,6 @@ async function server(args, config, cb) {
 
     config.cacher = new Cacher(args['no-cache'], config.silent);
     config.pool = pool;
-    config.tb = tb;
 
     try {
         if (args.populate) {

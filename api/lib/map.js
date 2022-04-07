@@ -117,67 +117,11 @@ class Map extends Generic {
         }
     }
 
-    static async fabric_tile(tb, z, x, y) {
+    static async tbtile(tb, z, x, y) {
         try {
             return await tb.tile(z, x, y);
         } catch (err) {
             throw new Err(500, err, 'Failed to fetch tile');
-        }
-    }
-
-    static async border_tile(pool, z, x, y) {
-        try {
-            const bbox = sm.bbox(x, y, z, false, '900913');
-
-            let code = null;
-            if (z < 2) code = '^[a-z]{2}$';
-            else if (z < 4) code = '^[a-z]{2}-[a-z]+$';
-            else if (z === 5) code = '^[a-z]{2}-[0-9]+$';
-
-            const pgres = await pool.query(sql`
-                SELECT
-                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
-                FROM (
-                    SELECT
-                        n.code,
-                        n.name,
-                        ST_AsMVTGeom(
-                            ST_Transform(geom, 3857),
-                            ST_SetSRID(ST_MakeBox2D(
-                                ST_MakePoint(${bbox[0]}, ${bbox[1]}),
-                                ST_MakePoint(${bbox[2]}, ${bbox[3]})
-                            ), 3857),
-                            4096,
-                            256,
-                            false
-                        ) AS geom
-                    FROM (
-                        SELECT
-                            map.name,
-                            map.code,
-                            map.geom
-                        FROM
-                            map
-                        WHERE
-                            (${code}::TEXT IS NULL OR code ~ ${code})
-                            AND ST_Intersects(
-                                map.geom,
-                                ST_Transform(ST_SetSRID(ST_MakeBox2D(
-                                    ST_MakePoint(${bbox[0]}, ${bbox[1]}),
-                                    ST_MakePoint(${bbox[2]}, ${bbox[3]})
-                                ), 3857), 4326)
-                        )
-                    ) n
-                    GROUP BY
-                        n.name,
-                        n.code,
-                        n.geom
-                ) q
-            `);
-
-            return pgres.rows[0].mvt;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate tile');
         }
     }
 

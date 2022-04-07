@@ -72,8 +72,6 @@ async function cli() {
             fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'))
         );
 
-        let datas = await oa.cmd('data', 'list', {});
-
         console.error('ok - generating border tiles');
         await tippecanoe.tile(
             fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
@@ -113,8 +111,7 @@ async function cli() {
         await fs.unlink(path.resolve(DRIVE, 'borders.tilebase'));
 
         // Build Data Fabric
-
-        datas = await oa.cmd('data', 'list', {
+        const datas = await oa.cmd('data', 'list', {
             fabric: true
         });
 

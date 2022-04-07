@@ -69,8 +69,11 @@ async function router(schema, config) {
         try {
             if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
-            const tile = await config.cacher.get(Miss(req.query, `tile-borders-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await Map.border_tile(config.pool, req.params.z, req.params.x, req.params.y);
+            const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
+            if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
+
+            tile = await config.cacher.get(Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                return await Map.tbtile(config.borders, req.params.z, req.params.x, req.params.y);
             }, false);
 
             res.type('application/vnd.mapbox-vector-tile');

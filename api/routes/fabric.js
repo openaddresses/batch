@@ -52,7 +52,7 @@ async function router(schema, config) {
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
             tile = await config.cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await Map.fabric_tile(config.tb, req.params.z, req.params.x, req.params.y);
+                return await Map.tbtile(config.tb, req.params.z, req.params.x, req.params.y);
             }, false);
 
             if (tile.length === 0) {

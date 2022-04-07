@@ -10,7 +10,6 @@ const express = require('express');
 const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
-const TileBase = require('tilebase');
 const { Schema, Err } = require('@openaddresses/batch-schema');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const wkx = require('wkx');
@@ -58,11 +57,19 @@ async function configure(args, cb) {
  */
 
 async function server(args, config, cb) {
+    const TileBase = (await import('tilebase')).default;
+
     let tb = false;
+    let borders = false;
     if (!args['no-tilebase']) {
         if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
         tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-        if (!config.silent) console.log('ok - loaded TileBase');
+        if (!config.silent) console.log('ok - loaded TileBase (Fabric)');
+        await tb.open();
+
+        if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
+        tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
+        if (!config.silent) console.log('ok - loaded TileBase (Borders)');
         await tb.open();
     } else {
         if (!config.silent) console.log('ok - TileBase Disabled');
@@ -116,6 +123,7 @@ async function server(args, config, cb) {
     config.cacher = new Cacher(args['no-cache'], config.silent);
     config.pool = pool;
     config.tb = tb;
+    config.borders = borders;
 
     try {
         if (args.populate) {

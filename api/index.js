@@ -60,7 +60,7 @@ async function server(args, config, cb) {
     const TileBase = (await import('tilebase')).default;
 
     let tb = false;
-    let borders = false;
+    const borders = false;
     if (!args['no-tilebase']) {
         if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
         tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);

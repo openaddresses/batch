@@ -72,7 +72,7 @@ async function router(schema, config) {
             const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
-            tile = await config.cacher.get(Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+            const tile = await config.cacher.get(Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                 return await Map.tbtile(config.borders, req.params.z, req.params.x, req.params.y);
             }, false);
 

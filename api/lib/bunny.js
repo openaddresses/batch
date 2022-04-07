@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 /**
- * @class Bunny
+ * @class
  */
 class Bunny {
 

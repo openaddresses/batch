@@ -3,7 +3,7 @@ const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 
 /**
- * @class Analytics
+ * @class
  */
 class Analytics {
     constructor(pool) {

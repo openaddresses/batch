@@ -41,25 +41,58 @@ class Map extends Generic {
      * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} res Express Response
      */
-    static async stream(pool, res) {
-        await pipeline(
-            await super.stream(pool),
-            new Transform({
-                objectMode: true,
-                transform: (chunk, encoding, cb) => {
-                    return cb(null, JSON.stringify({
-                        id: chunk.id,
-                        type: 'Feature',
-                        properties: {
-                            name: chunk.name,
-                            code: chunk.code
-                        },
-                        geometry: chunk.geom
-                    }) + '\n');
-                }
-            }),
-            res
-        );
+    static stream(pool, res) {
+        return new Promise((resolve) => {
+            pool.stream(sql`
+                SELECT
+                    n.id,
+                    n.code,
+                    addresses,
+                    buildings,
+                    parcels,
+                    ST_AsGeoJSON(geom)::JSON AS geometry
+                FROM (
+                    SELECT
+                        map.id,
+                        map.name,
+                        map.code,
+                        map.geom,
+                        job.layer = 'addresses' AS addresses,
+                        job.layer = 'buildings' AS buildings,
+                        job.layer = 'parcels' AS parcels
+                    FROM
+                        map INNER JOIN job ON map.id = job.map
+                ) n
+                GROUP BY
+                    n.addresses,
+                    n.buildings,
+                    n.parcels,
+                    n.code,
+                    n.geom,
+                    n.id
+            `, (stream) => {
+                const obj = new Transform({
+                    objectMode: true,
+                    transform: (chunk, encoding, cb) => {
+                        return cb({
+                            id: chunk.id,
+                            properties: {
+                                id: chunk.id,
+                                name: chunk.name,
+                                code: chunk.code,
+                                addresses: chunk.addresses,
+                                buildings: chunk.buildings,
+                                parcels: chunk.parcels
+                            },
+                            geometry: chunk.geometry
+                        });
+                    }
+                });
+
+                stream.pipe(obj);
+                return resolve(obj);
+            });
+        });
     }
 
     static async from_id(pool, mapid) {

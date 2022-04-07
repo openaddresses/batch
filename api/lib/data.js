@@ -5,7 +5,7 @@ const moment = require('moment');
 const { sql } = require('slonik');
 
 /**
- * @class Data
+ * @class
  */
 class Data {
     /**

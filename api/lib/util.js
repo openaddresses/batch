@@ -3,6 +3,9 @@ const request = require('request');
 const pkg = require('../package.json');
 const { Err } = require('@openaddresses/batch-schema');
 
+/**
+ * @class
+ */
 class Status {
     static list() {
         return require('../schema/util/status.json').enum;

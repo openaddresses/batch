@@ -6,7 +6,7 @@ const { sql } = require('slonik');
 const { Status } = require('./util');
 
 /**
- * @class JobError
+ * @class
  */
 class JobError {
     constructor(job, message) {

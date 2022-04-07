@@ -7,7 +7,7 @@ const User = require('./user');
 const Override = require('./level-override');
 
 /**
- * @class Level
+ * @class
  */
 class Level {
     /**

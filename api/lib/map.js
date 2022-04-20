@@ -42,45 +42,56 @@ class Map extends Generic {
      * @param {Object} res Express Response
      * @returns {Stream}
      */
-    static stream(pool) {
+    static stream(pool, res) {
         return new Promise((resolve) => {
             pool.stream(sql`
                 SELECT
-                    map.id,
+                    id,
+                    name,
                     code,
-                    ARRAY_AGG(layer) @> ARRAY['addresses'] AS addresses,
-                    ARRAY_AGG(layer) @> ARRAY['parcels'] AS parcels,
-                    ARRAY_AGG(layer) @> ARRAY['buildings'] AS buildings,
+                    n.layer @> ARRAY['addresses'] AS addresses,
+                    n.layer @> ARRAY['parcels'] AS parcels,
+                    n.layer @> ARRAY['buildings'] AS buildings,
                     ST_AsGeoJSON(geom)::JSON AS geometry
                 FROM
                     map
-                        LEFT JOIN job
-                            ON map.id = job.map
-                GROUP BY
-                    map.id,
-                    code,
-                    geom
+                        LEFT JOIN
+                            (
+                                SELECT
+                                    job.map,
+                                    ARRAY_AGG(job.layer) AS layer
+                                FROM
+                                    results,
+                                    job
+                                WHERE
+                                    results.job = job.id
+                                    AND map IS NOT NULL
+                                GROUP BY
+                                    map
+                            ) n
+                        ON
+                            map.id = n.map
             `, (stream) => {
                 const obj = new Transform({
                     objectMode: true,
                     transform: (chunk, encoding, cb) => {
-                        return cb({
-                            id: chunk.id,
+                        return cb(null, JSON.stringify({
+                            id: chunk.row.id,
                             properties: {
-                                id: chunk.id,
-                                name: chunk.name,
-                                code: chunk.code,
-                                addresses: chunk.addresses,
-                                buildings: chunk.buildings,
-                                parcels: chunk.parcels
+                                id: chunk.row.id,
+                                name: chunk.row.name,
+                                code: chunk.row.code,
+                                addresses: chunk.row.addresses,
+                                buildings: chunk.row.buildings,
+                                parcels: chunk.row.parcels
                             },
-                            geometry: chunk.geometry
-                        });
+                            geometry: chunk.row.geometry
+                        }) + '\n');
                     }
                 });
 
                 stream.pipe(obj);
-                return resolve(obj);
+                obj.pipe(res);
             });
         });
     }

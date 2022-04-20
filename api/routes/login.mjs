@@ -1,6 +1,5 @@
-'use strict';
 import { Err } from '@openaddresses/batch-schema';
-import email from '../lib/email.js';
+import Email from '../lib/email.js';
 import jwt from 'jsonwebtoken';
 
 export default async function router(schema, config) {

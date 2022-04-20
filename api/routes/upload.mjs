@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import Busboy from 'busboy';
 import Upload from '../lib/upload.js';

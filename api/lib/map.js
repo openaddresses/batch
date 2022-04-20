@@ -40,8 +40,9 @@ class Map extends Generic {
      *
      * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} res Express Response
+     * @returns {Stream}
      */
-    static stream(pool, res) {
+    static stream(pool) {
         return new Promise((resolve) => {
             pool.stream(sql`
                 SELECT

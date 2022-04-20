@@ -1,7 +1,7 @@
 import { Err } from '@openaddresses/batch-schema';
 import Run from '../lib/run.js';
 
-export default async function router(schema, confige) {
+export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
 
     /**

@@ -1,5 +1,5 @@
 import { Err } from '@openaddresses/batch-schema';
-import email from '../lib/email.js';
+import Email from '../lib/email.js';
 
 export default async function router(schema, config) {
     const email = new Email();

@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import Run from '../lib/run.js';
 import Job from '../lib/job.js';

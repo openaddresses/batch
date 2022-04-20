@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import Map from '../lib/map.js';
 import { Miss } from '../lib/cacher.js';

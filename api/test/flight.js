@@ -7,7 +7,7 @@ import request from 'request';
 import api from '../index.js';
 import Knex from 'knex';
 import KnexConfig from '../knexfile.js';
-import drop from './drop.mjs';
+import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
 import Ajv from 'ajv';
 

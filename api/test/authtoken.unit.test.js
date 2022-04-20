@@ -1,7 +1,7 @@
 import User from '../lib/user.js';
 import Token from '../lib/token.js';
 import test from 'tape';
-import Flight from './flight.mjs';
+import Flight from './flight.js';
 
 const flight = new Flight();
 

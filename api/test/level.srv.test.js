@@ -1,7 +1,7 @@
 import test from 'tape';
 import Level from '../lib/level.js';
 import LevelOverride from '../lib/level-override.js';
-import Flight from './flight.mjs';
+import Flight from './flight.js';
 import nock from 'nock';
 import moment from 'moment';
 

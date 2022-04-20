@@ -1,5 +1,5 @@
 import test from 'tape';
-import Flight from './flight.mjs';
+import Flight from './flight.js';
 
 const flight = new Flight();
 flight.init(test);

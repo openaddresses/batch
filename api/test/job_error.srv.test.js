@@ -1,5 +1,5 @@
 import test from 'tape';
-import Flight from './flight.mjs';
+import Flight from './flight.js';
 import fs from 'fs';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));

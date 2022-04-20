@@ -4,16 +4,6 @@
         "query": true,
         "res": true
     },
-    "GET /dash/traffic": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /dash/collections": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
     "DELETE /cache": {
         "body": false,
         "query": false,

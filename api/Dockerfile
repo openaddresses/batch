@@ -23,7 +23,8 @@ RUN npm install \
     && npm run doc
 
 RUN cd web \
-    && npm install \
+    && npm install -g yarn \
+    && yarn install --ignore-engines \
     && npm run build \
     && cd ..
 

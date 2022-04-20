@@ -2,7 +2,7 @@ import { Err } from '@openaddresses/batch-schema';
 import Map from '../lib/map.js';
 import Cacher from '../lib/cacher.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/map Coverage TileJSON
      * @apiVersion 1.0.0
@@ -117,5 +117,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

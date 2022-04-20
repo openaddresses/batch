@@ -30,7 +30,7 @@ export default async function router(schema, config) {
     await schema.get('/map/features', {
         ':mapid': 'integer'
     }, async (req, res) => {
-        await Map.stream(config.pool, res);
+        (await Map.stream(config.pool, res)).pipe(res);
     });
 
     /**

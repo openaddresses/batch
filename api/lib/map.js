@@ -39,10 +39,9 @@ class Map extends Generic {
      * Stream all Map Features as Line Delimited GeoJSON
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} res Express Response
      * @returns {Stream}
      */
-    static stream(pool, res) {
+    static stream(pool) {
         return new Promise((resolve) => {
             pool.stream(sql`
                 SELECT
@@ -91,7 +90,7 @@ class Map extends Generic {
                 });
 
                 stream.pipe(obj);
-                obj.pipe(res);
+                return resolve(obj);
             });
         });
     }

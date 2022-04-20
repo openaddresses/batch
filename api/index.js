@@ -3,7 +3,6 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const Cacher = require('./lib/cacher');
-const Analytics = require('./lib/analytics');
 const path = require('path');
 const morgan = require('morgan');
 const express = require('express');
@@ -126,8 +125,6 @@ async function server(args, config, cb) {
         }
     } while (!pool);
 
-    const analytics = new Analytics(pool);
-
     config.cacher = new Cacher(args['no-cache'], config.silent);
     config.pool = pool;
 
@@ -157,7 +154,6 @@ async function server(args, config, cb) {
 
     app.use(minify());
 
-    app.use(analytics.middleware());
     app.use(express.static('web/dist'));
 
     /**

@@ -78,7 +78,7 @@ async function cli() {
             fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
             path.resolve(DRIVE, 'borders.mbtiles'),
             {
-                layer: 'borders',
+                layer: 'data',
                 std: true,
                 force: true,
                 name: 'OpenAddresses Borders',

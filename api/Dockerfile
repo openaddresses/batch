@@ -25,7 +25,7 @@ RUN npm install \
 RUN cd web \
     && npm install -g yarn \
     && yarn install --ignore-engines \
-    && npm run build \
+    && NODE_OPTIONS=--openssl-legacy-provider npm run build \
     && cd ..
 
 CMD service nginx restart \

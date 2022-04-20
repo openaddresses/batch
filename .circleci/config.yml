@@ -23,8 +23,8 @@ jobs:
                 command: |
                   curl 'https://nodejs.org/dist/v18.0.0/node-v18.0.0-linux-x64.tar.gz' | tar -xzv \
                   && cp ./node-v18.0.0-linux-x64/bin/node /usr/bin/ \
-                  && ./node-18.0.0-linux-x64/bin/npm install -g yarn \
-                  && ./node-18.0.0-linux-x64/bin/npm install -g npm \
+                  && ./node-v18.0.0-linux-x64/bin/npm install -g yarn \
+                  && ./node-v18.0.0-linux-x64/bin/npm install -g npm \
                   && echo "export PATH=$(yarn global bin):$PATH" >> $BASH_ENV \
                   yarn install
 

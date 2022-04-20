@@ -279,7 +279,7 @@ async function server(args, config, cb) {
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        (await import('./routes/' + r)).default(schema, config);
+        await (await import('./routes/' + r)).default(schema, config);
     }
 
     schema.not_found();

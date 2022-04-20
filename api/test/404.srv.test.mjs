@@ -16,7 +16,8 @@ test('GET: /api/nonexistant', async (t) => {
         t.equals(res.statusCode, 404, 'http: 404');
         t.deepEquals(res.body, {
             status: 404,
-            message: 'API endpoint does not exist!'
+            message: 'API endpoint does not exist!',
+            messages: []
         });
 
     } catch (err) {

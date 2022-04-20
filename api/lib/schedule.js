@@ -6,7 +6,7 @@ const Level = require('./level');
 const { sql } = require('slonik');
 
 /**
- * @class Schedule
+ * @class
  */
 class Schedule {
     static async event(pool, event) {

@@ -8,7 +8,7 @@ const pkg = require('../package.json');
 const GH = require('./gh');
 
 /**
- * @class CI
+ * @class
  */
 class CI {
     /**

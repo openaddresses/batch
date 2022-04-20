@@ -15,7 +15,7 @@ const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const batchjob = require('./batch').trigger;
 
 /**
- * @class Job
+ * @class
  */
 class Job {
     constructor(run, source, layer, name) {

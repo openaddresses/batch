@@ -3,7 +3,6 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const Cacher = require('./lib/cacher');
-const Analytics = require('./lib/analytics');
 const path = require('path');
 const morgan = require('morgan');
 const express = require('express');
@@ -126,8 +125,6 @@ async function server(args, config, cb) {
         }
     } while (!pool);
 
-    const analytics = new Analytics(pool);
-
     config.cacher = new Cacher(args['no-cache'], config.silent);
     config.pool = pool;
 
@@ -157,7 +154,6 @@ async function server(args, config, cb) {
 
     app.use(minify());
 
-    app.use(analytics.middleware());
     app.use(express.static('web/dist'));
 
     /**
@@ -283,16 +279,10 @@ async function server(args, config, cb) {
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
+        await (await import('./routes/' + r)).default(schema, config);
     }
 
-    schema.router.all('*', (req, res) => {
-        return res.status(404).json({
-            status: 404,
-            message: 'API endpoint does not exist!'
-        });
-    });
-
+    schema.not_found();
     schema.error();
 
     const srv = app.listen(4999, (err) => {

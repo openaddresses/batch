@@ -1,6 +1,6 @@
 'use strict';
 /**
- * @class GH
+ * @class
  */
 class GH {
     constructor(url, ref, sha, check) {

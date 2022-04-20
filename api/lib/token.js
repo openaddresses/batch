@@ -5,6 +5,9 @@ const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class Token {
     constructor(pool) {
         this.pool = pool;

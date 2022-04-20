@@ -39,27 +39,60 @@ class Map extends Generic {
      * Stream all Map Features as Line Delimited GeoJSON
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} res Express Response
+     * @returns {Stream}
      */
-    static async stream(pool, res) {
-        await pipeline(
-            await super.stream(pool),
-            new Transform({
-                objectMode: true,
-                transform: (chunk, encoding, cb) => {
-                    return cb(null, JSON.stringify({
-                        id: chunk.id,
-                        type: 'Feature',
-                        properties: {
-                            name: chunk.name,
-                            code: chunk.code
-                        },
-                        geometry: chunk.geom
-                    }) + '\n');
-                }
-            }),
-            res
-        );
+    static stream(pool) {
+        return new Promise((resolve) => {
+            pool.stream(sql`
+                SELECT
+                    id,
+                    name,
+                    code,
+                    n.layer @> ARRAY['addresses'] AS addresses,
+                    n.layer @> ARRAY['parcels'] AS parcels,
+                    n.layer @> ARRAY['buildings'] AS buildings,
+                    ST_AsGeoJSON(geom)::JSON AS geometry
+                FROM
+                    map
+                        LEFT JOIN
+                            (
+                                SELECT
+                                    job.map,
+                                    ARRAY_AGG(job.layer) AS layer
+                                FROM
+                                    results,
+                                    job
+                                WHERE
+                                    results.job = job.id
+                                    AND map IS NOT NULL
+                                GROUP BY
+                                    map
+                            ) n
+                        ON
+                            map.id = n.map
+            `, (stream) => {
+                const obj = new Transform({
+                    objectMode: true,
+                    transform: (chunk, encoding, cb) => {
+                        return cb(null, JSON.stringify({
+                            id: chunk.row.id,
+                            properties: {
+                                id: chunk.row.id,
+                                name: chunk.row.name,
+                                code: chunk.row.code,
+                                addresses: chunk.row.addresses,
+                                buildings: chunk.row.buildings,
+                                parcels: chunk.row.parcels
+                            },
+                            geometry: chunk.row.geometry
+                        }) + '\n');
+                    }
+                });
+
+                stream.pipe(obj);
+                return resolve(obj);
+            });
+        });
     }
 
     static async from_id(pool, mapid) {

@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 
 /**
- * @class Upload
+ * @class
  */
 class Upload {
     static async put(uid, name, stream) {

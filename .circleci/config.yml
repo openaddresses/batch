@@ -14,17 +14,17 @@ jobs:
                 name: "Add ubuntu-toolchain"
                 command: |
                   apt-get update -y \
-                  && apt-get install -y build-essential git postgresql-client curl wget gnupg2
+                  && apt-get install -y build-essential git postgresql-client curl wget gnupg2 python3
 
             - checkout
 
             - run:
                 name: "Install NodeJS"
                 command: |
-                  curl 'https://nodejs.org/dist/v16.9.0/node-v16.9.0-linux-x64.tar.gz' | tar -xzv \
-                  && cp ./node-v16.9.0-linux-x64/bin/node /usr/bin/ \
-                  && ./node-v16.9.0-linux-x64/bin/npm install -g yarn \
-                  && ./node-v16.9.0-linux-x64/bin/npm install -g npm \
+                  curl 'https://nodejs.org/dist/v18.0.0/node-v18.0.0-linux-x64.tar.gz' | tar -xzv \
+                  && cp ./node-v18.0.0-linux-x64/bin/node /usr/bin/ \
+                  && ./node-v18.0.0-linux-x64/bin/npm install -g yarn \
+                  && ./node-v18.0.0-linux-x64/bin/npm install -g npm \
                   && echo "export PATH=$(yarn global bin):$PATH" >> $BASH_ENV \
                   yarn install
 

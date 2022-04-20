@@ -2,7 +2,7 @@
 const memjs = require('memjs');
 
 /**
- * @class Cacher
+ * @class
  */
 class Cacher {
     constructor(nocache = false, silent = false) {

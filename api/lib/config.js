@@ -4,6 +4,9 @@ const pkg = require('../package.json');
 const { createAppAuth } = require('@octokit/auth-app');
 const { Octokit } = require('@octokit/rest');
 
+/**
+ * @class
+ */
 class Config {
     static async env(args = {}) {
         this.args = args;

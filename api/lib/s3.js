@@ -4,6 +4,9 @@ const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const readline = require('readline');
 const zlib = require('zlib');
 
+/**
+ * @class
+ */
 class S3 {
     constructor(params) {
         this.params = params;

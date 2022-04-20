@@ -1,6 +1,6 @@
 exports.up = function(knex) {
     return knex.schema.raw(`
-        CREATE TABLE level_override (
+        CREATE TABLE IF NOT EXISTS level_override (
             id          BIGSERIAL,
             created     TIMESTAMP DEFAULT NOW(),
             updated     TIMESTAMP DEFAULT NOW(),

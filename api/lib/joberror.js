@@ -1,14 +1,13 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Job = require('./job');
-const Run = require('./run');
-const { sql } = require('slonik');
-const { Status } = require('./util');
+import { Err } from '@openaddresses/batch-schema';
+import Job from './job.js';
+import Run from './run.js';
+import { sql } from 'slonik';
+import { Status } from './util.js';
 
 /**
  * @class
  */
-class JobError {
+export default class JobError {
     constructor(job, message) {
         if (typeof job !== 'number') throw new Error('JobError.job must be numeric');
         if (typeof message !== 'string') throw new Error('JobError.message must be a string');
@@ -206,5 +205,3 @@ class JobError {
         };
     }
 }
-
-module.exports = JobError;

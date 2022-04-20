@@ -1,19 +1,23 @@
-'use strict';
-const fs = require('fs');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
-const Cacher = require('./lib/cacher');
-const path = require('path');
-const morgan = require('morgan');
-const express = require('express');
-const pkg = require('./package.json');
-const minify = require('express-minify');
-const bodyparser = require('body-parser');
-const { Schema, Err } = require('@openaddresses/batch-schema');
-const { sql, createPool, createTypeParserPreset } = require('slonik');
-const wkx = require('wkx');
-const bbox = require('@turf/bbox').default;
-const args = require('minimist')(process.argv, {
+import fs from 'fs';
+import jwt from 'jsonwebtoken';
+import cors from 'cors';
+import Cacher from './lib/cacher.js';
+import morgan from 'morgan';
+import express from 'express';
+import minify from 'express-minify';
+import bodyparser from 'body-parser';
+import { Schema, Err } from '@openaddresses/batch-schema';
+import { sql, createPool, createTypeParserPreset } from 'slonik';
+import wkx from 'wkx';
+import bbox from '@turf/bbox';
+import minimist from 'minimist';
+
+import User from './lib/user.js';
+import Token from './lib/token.js';
+
+
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
+const args = minimist(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase', 'silent'],
     alias: {
         no_tb: 'no-tilebase',
@@ -22,14 +26,14 @@ const args = require('minimist')(process.argv, {
     string: ['postgres']
 });
 
-const Config = require('./lib/config');
-const SiteMap = require('./lib/sitemap');
+import Config from './lib/config.js';
+import SiteMap from './lib/sitemap.js';
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     configure(args);
 }
 
-async function configure(args, cb) {
+export default async function configure(args, cb) {
     try {
         return server(args, await Config.env(args), cb);
     } catch (err) {
@@ -136,13 +140,13 @@ async function server(args, config, cb) {
         throw new Error(err);
     }
 
-    const user = new (require('./lib/user'))(pool);
-    const token = new (require('./lib/token'))(pool);
+    const user = new User(pool);
+    const token = new Token(pool);
 
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: path.resolve(__dirname, './schema')
+        schemas: String(new URL('./schema', import.meta.url)).replace('file://', '')
     });
 
     app.disable('x-powered-by');
@@ -277,7 +281,7 @@ async function server(args, config, cb) {
 
     await schema.api();
     // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+    for (const r of fs.readdirSync(String(new URL('./routes/', import.meta.url)).replace('file://', ''))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
         await (await import('./routes/' + r)).default(schema, config);
     }
@@ -299,5 +303,3 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     });
 }
-
-module.exports = configure;

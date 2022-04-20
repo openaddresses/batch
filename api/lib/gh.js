@@ -1,8 +1,7 @@
-'use strict';
 /**
  * @class
  */
-class GH {
+export default class GH {
     constructor(url, ref, sha, check) {
         this.url = url;
         this.ref = ref;
@@ -38,5 +37,3 @@ class GH {
         };
     }
 }
-
-module.exports = GH;

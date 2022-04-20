@@ -1,19 +1,15 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const { sql } = require('slonik');
+import fs from 'fs';
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class LevelOverride extends Generic {
+export default class LevelOverride extends Generic {
     static _table = 'level_override';
-    static _patch = require('../schema/req.body.PatchLevelOverride.json');
-    static _res = require('../schema/res.LevelOverride.json');
-
-    constructor() {
-        super();
-    }
+    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchLevelOverride.json', import.meta.url)));
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.LevelOverride.json', import.meta.url)));
 
     /**
      * Return a list of level overrides
@@ -118,5 +114,3 @@ class LevelOverride extends Generic {
         }
     }
 }
-
-module.exports = LevelOverride;

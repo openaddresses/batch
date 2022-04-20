@@ -1,6 +1,4 @@
-const path = require('path');
-
-module.exports = {
+export default {
     client: 'postgresql',
     connection: process.env.POSTGRES || 'postgres://postgres@localhost:5432/openaddresses',
     pool: {
@@ -10,6 +8,6 @@ module.exports = {
     migrations: {
         tableName: 'knex_migrations',
         stub: 'migrations/migration.stub',
-        directory: path.resolve(__dirname, './migrations')
+        directory: String(new URL('./migrations', import.meta.url)).replace('file://', '')
     }
 };

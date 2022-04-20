@@ -50,40 +50,6 @@ export default async function router(schema, config) {
     });
 
     /**
-     * @api {get} /api/map/borders/:z/:x/:y.mvt Borders MVT
-     * @apiVersion 1.0.0
-     * @apiName BorderVectorTile
-     *   Retrive borders Mapbox Vector Tiles
-     *
-     * @apiParam {Number} z Z coordinate
-     * @apiParam {Number} x X coordinate
-     * @apiParam {Number} y Y coordinate
-     */
-    await schema.get('/map/borders/:z/:x/:y.mvt', {
-        ':z': 'integer',
-        ':x': 'integer',
-        ':y': 'integer'
-    }, async (req, res) => {
-        try {
-            const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
-            if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
-
-            const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await config.borders.tile(req.params.z, req.params.x, req.params.y);
-            }, false);
-
-            res.writeHead(200, {
-                'Content-Type': 'application/vnd.mapbox-vector-tile',
-                'Content-Encoding': 'gzip',
-                'cache-control': 'no-transform'
-            });
-            res.end(tile);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
      * @api {get} /api/map/:z/:x/:y.mvt Coverage MVT
      * @apiVersion 1.0.0
      * @apiName VectorTile
@@ -103,15 +69,19 @@ export default async function router(schema, config) {
         ':y': 'integer'
     }, async (req, res) => {
         try {
-            if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
+            const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
+            if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
-            const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await Map.tile(config.pool, req.params.z, req.params.x, req.params.y);
+            const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+                return await config.borders.tile(req.params.z, req.params.x, req.params.y);
             }, false);
 
-            res.type('application/vnd.mapbox-vector-tile');
-
-            return res.send(tile);
+            res.writeHead(200, {
+                'Content-Type': 'application/vnd.mapbox-vector-tile',
+                'Content-Encoding': 'gzip',
+                'cache-control': 'no-transform'
+            });
+            res.end(tile);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -1,7 +1,7 @@
 import Map from '../lib/map.js';
 import Job from '../lib/job.js';
 import test from 'tape';
-import Flight from './flight.mjs';
+import Flight from './flight.js';
 import nock from 'nock';
 import { sql } from 'slonik';
 

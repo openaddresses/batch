@@ -1,14 +1,14 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const crypto = require('crypto');
-const { promisify } = require('util');
+import { Err } from '@openaddresses/batch-schema';
+import crypto from 'crypto';
+import { promisify } from 'util';
+import { sql } from 'slonik';
+
 const randomBytes = promisify(crypto.randomBytes);
-const { sql } = require('slonik');
 
 /**
  * @class
  */
-class Token {
+export default class Token {
     constructor(pool) {
         this.pool = pool;
     }
@@ -146,5 +146,3 @@ class Token {
         }
     }
 }
-
-module.exports = Token;

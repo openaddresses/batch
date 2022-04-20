@@ -107,16 +107,7 @@ export default {
                             `${window.location.origin}/api/map/{z}/{x}/{y}.mvt`
                         ],
                         minzoom: 0,
-                        maxzoom: 5
-                    });
-
-                    this.map.addSource('borders', {
-                        type: 'vector',
-                        tiles: [
-                            `${window.location.origin}/api/map/borders/{z}/{x}/{y}.mvt`
-                        ],
-                        minzoom: 3,
-                        maxzoom: 5
+                        maxzoom: 6
                     });
 
                     this.map.on('click', (e) => {
@@ -131,7 +122,16 @@ export default {
                         source: 'coverage',
                         'source-layer': 'data',
                         layout: { },
-                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        filter: [
+                            "all",
+                            ['==', ['geometry-type'], 'Polygon'],
+                            [
+                                'any',
+                                ["==", ['get', 'addresses'], true],
+                                ["==", ['get', 'buildings'], true],
+                                ["==", ['get', 'parcels'], true],
+                            ]
+                        ],
                         paint: {
                             'fill-color': base,
                             'fill-opacity': 0.8
@@ -240,7 +240,7 @@ export default {
                     this.map.addLayer({
                         id: `borders`,
                         type: 'line',
-                        source: 'borders',
+                        source: 'coverage',
                         'source-layer': 'data',
                         layout: { },
                         filter: ['==', ['geometry-type'], 'Polygon'],
@@ -255,7 +255,7 @@ export default {
                         'type': 'symbol',
                         'minzoom': 7,
                         'source-layer': 'data',
-                        'source': 'borders',
+                        'source': 'coverage',
                         'layout': {
                             'text-field': ['get', 'name']
                         }

@@ -1,14 +1,16 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const JobError = require('./joberror');
-const batch = require('./batch');
-const Level = require('./level');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import JobError from './joberror.js';
+import {
+    scale_in,
+    trigger
+} from './batch.js';
+import Level from './level.js';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Schedule {
+export default class Schedule {
     static async event(pool, event) {
         if (['fabric', 'collect', 'sources'].includes(event.type)) {
             await Schedule.batch(event.type, pool);
@@ -23,7 +25,7 @@ class Schedule {
 
     static async scale() {
         try {
-            return await batch.scale_in();
+            return await scale_in();
         } catch (err) {
             throw new Err(500, err, 'Failed to scale ASG down');
         }
@@ -39,7 +41,7 @@ class Schedule {
         if (type === 'sources') await JobError.clear(pool);
 
         try {
-            return await batch.trigger({
+            return await trigger({
                 type: type
             });
         } catch (err) {
@@ -68,5 +70,3 @@ class Schedule {
         `);
     }
 }
-
-module.exports = Schedule;

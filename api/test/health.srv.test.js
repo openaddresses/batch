@@ -1,23 +1,23 @@
+
 import test from 'tape';
-import Flight from './flight.mjs';
+import Flight from './flight.js';
 
 const flight = new Flight();
 flight.init(test);
 flight.takeoff(test);
 
-test('GET: /api/nonexistant', async (t) => {
+test('GET: /health', async (t) => {
     try {
         const res = await flight.request({
-            url: '/api/non-existant',
+            url: '/health',
             method: 'GET',
             json: true
         }, false);
 
-        t.equals(res.statusCode, 404, 'http: 404');
+        t.equals(res.statusCode, 200, 'http: 200');
         t.deepEquals(res.body, {
-            status: 404,
-            message: 'API endpoint does not exist!',
-            messages: []
+            healthy: true,
+            message: 'I work all day, I work all night to get the open the data!'
         });
 
     } catch (err) {

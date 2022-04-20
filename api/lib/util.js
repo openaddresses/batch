@@ -1,14 +1,15 @@
-'use strict';
-const request = require('request');
-const pkg = require('../package.json');
-const { Err } = require('@openaddresses/batch-schema');
+import fs from 'fs';
+import request from 'request';
+import { Err } from '@openaddresses/batch-schema';
+
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
  */
-class Status {
+export class Status {
     static list() {
-        return require('../schema/util/status.json').enum;
+        return JSON.parse(fs.readFileSync(new URL('../schema/util/status.json'))).enum;
     }
 
     static verify(statuses) {
@@ -22,7 +23,7 @@ class Status {
     }
 }
 
-function explode(url) {
+export function explode(url) {
     return new Promise((resolve, reject) => {
         request({
             url: url,
@@ -62,9 +63,3 @@ function explode(url) {
         });
     });
 }
-
-module.exports = {
-    explode,
-    Status
-};
-

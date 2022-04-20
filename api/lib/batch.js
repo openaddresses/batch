@@ -1,7 +1,6 @@
-'use strict';
-const AWS = require('aws-sdk');
-const batch = new AWS.Batch({ apiVersion: '2016-08-10', region: 'us-east-1' });
-const asg = new AWS.AutoScaling({ apiVersion: '2011-01-01', region: 'us-east-1' });
+import AWS from 'aws-sdk';
+const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
+const asg = new AWS.AutoScaling({ region: process.env.AWS_DEFAULT_REGION });
 
 const jobDefinition = process.env.JOB_DEFINITION;
 const t3_queue = process.env.T3_QUEUE;
@@ -11,7 +10,7 @@ const mega_queue = process.env.MEGA_QUEUE;
 /**
  * Scale Batch T3 ASG Cluster up to MaxSize as needed
  */
-async function scale_out() {
+export async function scale_out() {
     const desc = (await asg.describeAutoScalingGroups({
         AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
     }).promise()).AutoScalingGroups[0];
@@ -21,7 +20,7 @@ async function scale_out() {
     }
 }
 
-async function scale(desired) {
+export async function scale(desired) {
     console.log(`ok - scaling to ${desired} instances`);
 
     await asg.setDesiredCapacity({
@@ -33,7 +32,7 @@ async function scale(desired) {
 /**
  * Scale Batch T3 ASG Cluster down based on job queue size
  */
-async function scale_in() {
+export async function scale_in() {
     let queued = 0;
 
     // Number of EC2 instances in ASG (1 instance = 1 task currently)
@@ -81,7 +80,7 @@ async function scale_in() {
  *
  * @returns {Promise}
  */
-async function trigger(event) {
+export async function trigger(event) {
     let timeout = 60 * 60 * 6; // 6 Hours
     if (event.timeout && !isNaN(parseInt(event.timeout))) timeout = event.timeout;
 
@@ -175,9 +174,3 @@ async function trigger(event) {
         console.error('not ok - Failed to scale out ASG');
     }
 }
-
-module.exports = {
-    scale_out,
-    scale_in,
-    trigger
-};

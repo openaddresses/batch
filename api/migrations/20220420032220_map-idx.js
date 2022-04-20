@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         CREATE INDEX IF NOT EXISTS job_map_idx ON job(map);
         CREATE INDEX IF NOT EXISTS map_pkey ON map(id);
@@ -6,6 +6,6 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(``);
 }

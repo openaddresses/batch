@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         CREATE TABLE IF NOT EXISTS level_override (
             id          BIGSERIAL,
@@ -10,7 +10,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         DROP TABLE level_override;
     `);

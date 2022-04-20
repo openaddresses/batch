@@ -1,10 +1,10 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         UPDATE job
             SET output = output||'{"validated": false}'::JSONB;
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(``);
 }

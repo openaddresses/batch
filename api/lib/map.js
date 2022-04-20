@@ -46,31 +46,20 @@ class Map extends Generic {
         return new Promise((resolve) => {
             pool.stream(sql`
                 SELECT
-                    n.id,
-                    n.code,
-                    addresses,
-                    buildings,
-                    parcels,
+                    map.id,
+                    code,
+                    ARRAY_AGG(layer) @> ARRAY['addresses'] AS addresses,
+                    ARRAY_AGG(layer) @> ARRAY['parcels'] AS parcels,
+                    ARRAY_AGG(layer) @> ARRAY['buildings'] AS buildings,
                     ST_AsGeoJSON(geom)::JSON AS geometry
-                FROM (
-                    SELECT
-                        map.id,
-                        map.name,
-                        map.code,
-                        map.geom,
-                        job.layer = 'addresses' AS addresses,
-                        job.layer = 'buildings' AS buildings,
-                        job.layer = 'parcels' AS parcels
-                    FROM
-                        map INNER JOIN job ON map.id = job.map
-                ) n
+                FROM
+                    map
+                        LEFT JOIN job
+                            ON map.id = job.map
                 GROUP BY
-                    n.addresses,
-                    n.buildings,
-                    n.parcels,
-                    n.code,
-                    n.geom,
-                    n.id
+                    map.id,
+                    code,
+                    geom
             `, (stream) => {
                 const obj = new Transform({
                     objectMode: true,

@@ -1,15 +1,17 @@
-'use strict';
-const { promisify } = require('util');
-const pkg = require('../package.json');
-const request = promisify(require('request'));
-const moment = require('moment');
-const User = require('./user');
-const Override = require('./level-override');
+import { promisify } from 'util';
+import request from 'request';
+import moment from 'moment';
+import User from './user.js';
+import Override from './level-override.js';
+import fs from 'fs';
+
+const prequest = promisify(request);
+const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
  */
-class Level {
+export default class Level {
     /**
      * @constructor
      *
@@ -37,7 +39,7 @@ class Level {
             }
         }
 
-        const res = await request({
+        const res = await prequest({
             url: this.base,
             method: 'POST',
             json: true,
@@ -106,7 +108,7 @@ class Level {
      * Refresh the entire user list
      */
     async all() {
-        const res = await request({
+        const res = await prequest({
             url: this.base,
             method: 'POST',
             json: true,
@@ -197,6 +199,3 @@ class Level {
         return 'basic';
     }
 }
-
-
-module.exports = Level;

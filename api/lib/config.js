@@ -1,13 +1,14 @@
-'use strict';
-const AWS = require('aws-sdk');
-const pkg = require('../package.json');
-const { createAppAuth } = require('@octokit/auth-app');
-const { Octokit } = require('@octokit/rest');
+import AWS from 'aws-sdk';
+import { createAppAuth } from '@octokit/auth-app';
+import { Octokit } from '@octokit/rest';
+import fs from 'fs';
+
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
  */
-class Config {
+export default class Config {
     static async env(args = {}) {
         this.args = args;
         this.silent = args.silent;
@@ -101,5 +102,3 @@ class Config {
         return JSON.parse(data.SecretString);
     }
 }
-
-module.exports = Config;

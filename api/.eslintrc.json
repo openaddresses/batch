@@ -9,14 +9,9 @@
         "Promise": true
     },
     "parserOptions": {
-        "ecmaVersion": 13
+        "ecmaVersion": 13,
+        "sourceType": "module"
     },
-    "overrides": [{
-        "files": [ "*.mjs" ],
-        "parserOptions": {
-            "sourceType": "module"
-        }
-    }],
     "plugins": [ "node" ],
     "rules": {
         "no-console": 0,

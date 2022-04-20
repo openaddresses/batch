@@ -1,14 +1,14 @@
-'use strict';
-const Mailgen = require('mailgen');
-const Mailgun = require('mailgun.js');
-const { Err } = require('@openaddresses/batch-schema');
-const formData = require('form-data');
+import Mailgen from 'mailgen';
+import Mailgun from 'mailgun.js';
+import { Err } from '@openaddresses/batch-schema';
+import formData from 'form-data';
+
 const mailgun = new Mailgun(formData);
 
 /**
  * @class
  */
-class Email {
+export default class Email {
     constructor(pg, arg = {}, srv = {}) {
         this.pg = pg;
         this.arg = arg;
@@ -100,5 +100,3 @@ class Email {
         }
     }
 }
-
-module.exports = Email;

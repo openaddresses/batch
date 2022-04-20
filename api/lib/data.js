@@ -1,13 +1,12 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Map = require('./map');
-const moment = require('moment');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Map from './map.js';
+import moment from 'moment';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Data {
+export default class Data {
     /**
      * Return the last sucessful state for all data runs
      *
@@ -295,5 +294,3 @@ class Data {
         }
     }
 }
-
-module.exports = Data;

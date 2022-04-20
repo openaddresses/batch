@@ -1,11 +1,11 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const { sql } = require('slonik');
+import fs from 'fs';
+import { Err } from '@openaddresses/batch-schema';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Collection {
+export default class Collection {
     constructor(name, sources) {
         if (typeof name !== 'string') throw new Err(400, null, 'Collection.name must be a string');
         if (name.length === 0) throw new Err(400, null, 'Collection.name cannot be empty');
@@ -26,7 +26,7 @@ class Collection {
         this.s3 = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchCollection.json').properties);
+        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchCollection.json'))).properties);
     }
 
     json() {
@@ -189,5 +189,3 @@ class Collection {
 
     }
 }
-
-module.exports = Collection;

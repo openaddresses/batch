@@ -1,13 +1,13 @@
-'use strict';
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
+import readline from 'readline';
+import zlib from 'zlib';
+
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const readline = require('readline');
-const zlib = require('zlib');
 
 /**
  * @class
  */
-class S3 {
+export default class S3 {
     constructor(params) {
         this.params = params;
     }
@@ -67,5 +67,3 @@ class S3 {
         });
     }
 }
-
-module.exports = S3;

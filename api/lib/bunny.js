@@ -1,11 +1,10 @@
-'use strict';
-const crypto = require('crypto');
-const moment = require('moment');
+import crypto from 'crypto';
+import moment from 'moment';
 
 /**
  * @class
  */
-class Bunny {
+export default class Bunny {
 
     /**
      * @param {String} token Bunny CDN Signing Token
@@ -33,5 +32,3 @@ class Bunny {
         return String(url);
     }
 }
-
-module.exports = Bunny;

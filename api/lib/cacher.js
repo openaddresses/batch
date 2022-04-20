@@ -1,10 +1,9 @@
-'use strict';
-const memjs = require('memjs');
+import memjs from 'memjs';
 
 /**
  * @class
  */
-class Cacher {
+export default class Cacher {
     constructor(nocache = false, silent = false) {
         this.nocache = nocache;
 
@@ -105,5 +104,3 @@ class Cacher {
         }
     }
 }
-
-module.exports = Cacher;

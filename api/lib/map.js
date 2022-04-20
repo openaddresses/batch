@@ -1,16 +1,16 @@
-'use strict';
-const fs = require('fs');
-const { sql } = require('slonik');
-const hash = require('object-hash');
-const split = require('split');
-const SM = require('@mapbox/sphericalmercator');
-const { pipeline } = require('stream/promises');
-const transform = require('parallel-transform');
-const AWS = require('aws-sdk');
+import fs from 'fs';
+import { sql } from 'slonik';
+import hash from 'object-hash';
+import split from 'split';
+import SM from '@mapbox/sphericalmercator';
+import { pipeline } from 'stream/promises';
+import transform from 'parallel-transform';
+import AWS from 'aws-sdk';
+import Generic from '@openaddresses/batch-generic';
+import { Err } from '@openaddresses/batch-schema';
+import { Transform } from 'stream';
+
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const Generic = require('@openaddresses/batch-generic');
-const { Err } = require('@openaddresses/batch-schema');
-const { Transform } = require('stream');
 
 const MAP_LAYERS = [
     'district.geojson',
@@ -25,9 +25,9 @@ const sm = new SM({
 /**
  * @class
  */
-class Map extends Generic {
+export default class Map extends Generic {
     static _table = 'map';
-    static _res = require('../schema/res.Map.json');
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Map.json', import.meta.url)));
 
     static map() {
         return {
@@ -387,5 +387,3 @@ function eq(a, b) {
 
     return true;
 }
-
-module.exports = Map;

@@ -1,16 +1,17 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const { promisify } = require('util');
+import fs from 'fs';
+import { Err } from '@openaddresses/batch-schema';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import { promisify } from 'util';
+import moment from 'moment';
+import { sql } from 'slonik';
+
 const randomBytes = promisify(crypto.randomBytes);
-const moment = require('moment');
-const { sql } = require('slonik');
 
 /**
  * @class
  */
-class User {
+export default class User {
     /**
      * @constructor
      *
@@ -19,7 +20,7 @@ class User {
     constructor(pool) {
         this.pool = pool;
 
-        this.attrs = Object.keys(require('../schema/req.body.PatchUser.json').properties);
+        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchUser.json', import.meta.url))).properties);
     }
 
     /**
@@ -526,5 +527,3 @@ class User {
         }
     }
 }
-
-module.exports = User;

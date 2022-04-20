@@ -1,16 +1,18 @@
-'use strict';
-const assert = require('assert');
-const Run = require('./run');
-const { promisify } = require('util');
-const request = promisify(require('request'));
-const { Err } = require('@openaddresses/batch-schema');
-const pkg = require('../package.json');
-const GH = require('./gh');
+import assert from 'assert';
+import fs from 'fs';
+import Run from './run.js';
+import { promisify } from 'util';
+import request from 'request';
+import { Err } from '@openaddresses/batch-schema';
+import GH from './gh.js';
+
+const prequest = promisify(request);
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
  */
-class CI {
+export default class CI {
     /**
      * @constructor
      *
@@ -204,7 +206,7 @@ class CI {
     async filediff(ref) {
         console.error(`ok - FileDiff: ${ref}`);
 
-        const res = await request({
+        const res = await prequest({
             url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
             json: true,
             headers: {
@@ -235,7 +237,7 @@ class CI {
             try {
                 const url = new URL(`https://raw.githubusercontent.com/openaddresses/openaddresses/master/${file.filename}`);
 
-                const master_res = await request({
+                const master_res = await prequest({
                     url: url,
                     headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
                     method: 'GET'
@@ -261,7 +263,7 @@ class CI {
                     }
                 }
 
-                const branch_json = JSON.parse((await request({
+                const branch_json = JSON.parse((await prequest({
                     url: file.raw,
                     headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
                     method: 'GET'
@@ -364,5 +366,3 @@ class CI {
         return true;
     }
 }
-
-module.exports = CI;

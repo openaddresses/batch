@@ -1,22 +1,22 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const moment = require('moment');
-const Job = require('./job');
-const Data = require('./data');
-const util = require('./util');
-const { Status } = require('./util');
-const { sql } = require('slonik');
+import fs from 'fs';
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import moment from 'moment';
+import Job from './job.js';
+import Data from './data.js';
+import { explode } from './util.js';
+import { Status } from './util.js';
+import { sql } from 'slonik';
 
 /**
  * A Run is a collection of Jobs and associated metadata
  *
  * @class
  */
-class Run extends Generic {
+export default class Run extends Generic {
     static _table = 'runs';
-    static _patch = require('../schema/req.body.PatchRun.json');
-    static _res = require('../schema/res.Run.json');
+    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchRun.json', import.meta.url)));
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Run.json', import.meta.url)));
 
     /**
      * Anytime a job is completed, a ping is sent to the run module
@@ -180,7 +180,7 @@ class Run extends Generic {
                 jobs.push(job);
             } else if (typeof job === 'string') {
                 try {
-                    jobs = jobs.concat(await util.explode(job));
+                    jobs = jobs.concat(await explode(job));
                 } catch (err) {
                     console.error(`not ok - skipping ${job} as invalid: ${err.message}`);
                 }
@@ -396,5 +396,3 @@ class Run extends Generic {
         return run;
     }
 }
-
-module.exports = Run;

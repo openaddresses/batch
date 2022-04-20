@@ -1,11 +1,10 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class SiteMap {
+export default class SiteMap {
     static async list(pool) {
         try {
             let map = `
@@ -41,5 +40,3 @@ class SiteMap {
         }
     }
 }
-
-module.exports = SiteMap;

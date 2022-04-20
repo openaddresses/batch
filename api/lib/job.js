@@ -1,23 +1,26 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const moment = require('moment');
-const turf = require('@turf/turf');
-const request = require('request');
-const AWS = require('aws-sdk');
-const Data = require('./data');
-const S3 = require('./s3');
-const pkg  = require('../package.json');
-const { Status } = require('./util');
-const { sql  } = require('slonik');
-const stringify = require('csv-stringify/lib/sync');
+import { Err } from '@openaddresses/batch-schema';
+import moment from 'moment';
+import {
+    difference,
+    area
+} from '@turf/turf';
+import request from 'request';
+import AWS from 'aws-sdk';
+import Data from './data.js';
+import S3 from './s3.js';
+import { Status } from './util.js';
+import { sql } from 'slonik';
+import stringify from 'csv-stringify/lib/sync.js';
+import fs from 'fs';
+import { trigger } from './batch.js';
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const batchjob = require('./batch').trigger;
+const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
  */
-class Job {
+export default class Job {
     constructor(run, source, layer, name) {
         if (typeof run !== 'number') throw new Error('Job.run must be numeric');
         if (typeof source !== 'string') throw new Error('Job.source must be a string');
@@ -49,7 +52,7 @@ class Job {
         this.s3 = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchJob.json').properties);
+        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchJob.json'))).properties);
 
         this.raw = false;
     }
@@ -116,14 +119,14 @@ class Job {
             }
         }
 
-        const geom = turf.difference(master.bounds, compare.bounds);
+        const geom = difference(master.bounds, compare.bounds);
         return {
             compare: {
                 id: compare.id,
                 count: compare.count,
                 stats: compare.stats,
                 bounds: {
-                    area: turf.area(compare.bounds),
+                    area: area(compare.bounds),
                     geom: compare.bounds
                 }
             },
@@ -132,7 +135,7 @@ class Job {
                 count: master.count,
                 stats: master.stats,
                 bounds: {
-                    area: turf.area(master.bounds),
+                    area: area(master.bounds),
                     geom: master.bounds
                 }
             },
@@ -140,7 +143,7 @@ class Job {
                 count: master.count - compare.count,
                 stats: stats,
                 bounds: {
-                    area: turf.area(master.bounds) - turf.area(compare.bounds),
+                    area: area(master.bounds) - area(compare.bounds),
                     diff_area: geom ? geom : 0,
                     geom: geom
                 }
@@ -549,7 +552,7 @@ class Job {
             return true;
         } else {
             try {
-                return await batchjob({
+                return await trigger({
                     type: ci ? 'job-ci' : 'job',
                     job: this.id,
                     source: this.source,
@@ -562,5 +565,3 @@ class Job {
         }
     }
 }
-
-module.exports = Job;

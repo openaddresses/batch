@@ -1,21 +1,22 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const { Status } = require('./util');
-const batchjob = require('./batch').trigger;
-const moment = require('moment');
-const AWS = require('aws-sdk');
-const S3 = require('./s3');
+import fs from 'fs';
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import { Status } from './util.js';
+import { trigger } from './batch.js';
+import moment from 'moment';
+import AWS from 'aws-sdk';
+import S3 from './s3.js';
+import { sql } from 'slonik';
+
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const { sql } = require('slonik');
 
 /**
  * @class
  */
-class Exporter extends Generic {
+export default class Exporter extends Generic {
     static _table = 'exports';
-    static _res = require('../schema/res.Export.json');
-    static _patch = require('../schema/req.body.PatchExport.json');
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Export.json', import.meta.url)));
+    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchExport.json', import.meta.url)));
 
     /**
      * List & Filter Exports
@@ -194,7 +195,7 @@ class Exporter extends Generic {
             return true;
         } else {
             try {
-                return await batchjob({
+                return await trigger({
                     type: 'export',
                     id: this.id,
                     job: this.job_id,
@@ -229,5 +230,3 @@ class Exporter extends Generic {
     }
 
 }
-
-module.exports = Exporter;

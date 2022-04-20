@@ -1,9 +1,7 @@
-'use strict';
-const test = require('tape');
-
-const Flight = require('./flight');
-const Collection = require('../lib/collections');
-const { Err } = require('@openaddresses/batch-schema');
+import test from 'tape';
+import Flight from './flight.mjs';
+import Collection from '../lib/collections.js';
+import { Err } from '@openaddresses/batch-schema';
 
 const flight = new Flight();
 flight.init(test);

@@ -1,7 +1,6 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
-const memjs = require('memjs');
+import test from 'tape';
+import Flight from './flight.mjs';
+import memjs from 'memjs';
 
 const flight = new Flight();
 

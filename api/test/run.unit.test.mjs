@@ -1,7 +1,6 @@
-'use strict';
-const Run = require('../lib/run');
-const test = require('tape');
-const Flight = require('./flight');
+import Run from '../lib/run.js';
+import test from 'tape';
+import Flight from './flight.mjs';
 
 const flight = new Flight();
 flight.init(test);

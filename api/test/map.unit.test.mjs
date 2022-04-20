@@ -1,10 +1,9 @@
-'use strict';
-const Map = require('../lib/map');
-const Job = require('../lib/job');
-const test = require('tape');
-const Flight = require('./flight');
-const nock = require('nock');
-const { sql } = require('slonik');
+import Map from '../lib/map.js';
+import Job from '../lib/job.js';
+import test from 'tape';
+import Flight from './flight.mjs';
+import nock from 'nock';
+import { sql } from 'slonik';
 
 const flight = new Flight();
 flight.init(test);

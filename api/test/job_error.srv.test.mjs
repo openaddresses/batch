@@ -1,8 +1,8 @@
-'use strict';
-const pkg = require('../package.json');
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.mjs';
+import fs from 'fs';
 
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 const flight = new Flight();
 
 flight.init(test);

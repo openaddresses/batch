@@ -1,8 +1,7 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
-const { sql } = require('slonik');
-const moment = require('moment');
+import test from 'tape';
+import Flight from './flight.mjs';
+import { sql } from 'slonik';
+import moment from 'moment';
 
 const flight = new Flight();
 flight.init(test);

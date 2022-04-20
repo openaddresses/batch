@@ -1,8 +1,6 @@
-'use strict';
-
-const CI = require('../lib/ci');
-const test = require('tape');
-const nock = require('nock');
+import CI from '../lib/ci.js';
+import test from 'tape';
+import nock from 'nock';
 
 test('CI()', (t) => {
     t.end();

@@ -1,10 +1,9 @@
-'use strict';
-const test = require('tape');
-const Level = require('../lib/level');
-const LevelOverride = require('../lib/level-override');
-const Flight = require('./flight');
-const nock = require('nock');
-const moment = require('moment');
+import test from 'tape';
+import Level from '../lib/level.js';
+import LevelOverride from '../lib/level-override.js';
+import Flight from './flight.mjs';
+import nock from 'nock';
+import moment from 'moment';
 
 const flight = new Flight();
 

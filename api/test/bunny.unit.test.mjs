@@ -1,6 +1,5 @@
-'use strict';
-const Bunny = require('../lib/bunny');
-const tape = require('tape');
+import Bunny from '../lib/bunny.js';
+import tape from 'tape';
 
 tape('Bunny#sign', (t) => {
     const bunny = new Bunny('123');

@@ -1,17 +1,16 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const test = require('tape');
+import fs from 'fs';
+import path from 'path';
+import test from 'tape';
 
-const glob = require('glob');
-const $RefParser = require('json-schema-ref-parser');
-const Ajv = require('ajv');
+import glob from 'glob';
+import $RefParser from 'json-schema-ref-parser';
+import Ajv from 'ajv';
 
 const ajv = new Ajv({
     allErrors: true
 });
 
-glob.sync(path.resolve(__dirname, '../schema/**/*.json')).forEach((source) => {
+glob.sync('../schema/**/*.json').forEach((source) => {
     test(`schema/${path.parse(source).base}`, async (t) => {
         try {
             const file = fs.readFileSync(source);

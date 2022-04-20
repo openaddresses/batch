@@ -1,8 +1,7 @@
-'use strict';
-const User = require('../lib/user');
-const Token = require('../lib/token');
-const test = require('tape');
-const Flight = require('./flight');
+import User from '../lib/user.js';
+import Token from '../lib/token.js';
+import test from 'tape';
+import Flight from './flight.mjs';
 
 const flight = new Flight();
 

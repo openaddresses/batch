@@ -11,8 +11,8 @@
         "test": "tape test/*.test.mjs | tap-dot",
         "start": "node index.js --email",
         "dev": "nodemon -i ./web index.js",
-        "cov-html": "nyc tape 'test/**/*.js' && nyc report --reporter=html",
-        "cov": "nyc tape 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
+        "cov-html": "nyc tape 'test/**/*.mjs' && nyc report --reporter=html",
+        "cov": "nyc tape 'test/**/*.mjs' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },
     "dependencies": {
         "@mapbox/sphericalmercator": "^1.1.0",

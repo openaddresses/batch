@@ -1,9 +1,10 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const email = new (require('../lib/email'))();
-const jwt = require('jsonwebtoken');
+import { Err } from '@openaddresses/batch-schema';
+import email from '../lib/email.js';
+import jwt from 'jsonwebtoken';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
+    const email = new Email();
     const user = new (require('../lib/user'))(config.pool);
     const level = new (require('../lib/level'))(config.pool);
 
@@ -161,5 +162,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

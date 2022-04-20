@@ -1,9 +1,9 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Busboy = require('busboy');
-const Upload = require('../lib/upload');
+import { Err } from '@openaddresses/batch-schema';
+import Busboy from 'busboy';
+import Upload from '../lib/upload.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
 
     /**
@@ -57,5 +57,3 @@ async function router(schema, config) {
         return req.pipe(busboy);
     });
 }
-
-module.exports = router;

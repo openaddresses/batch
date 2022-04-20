@@ -1,10 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Data = require('../lib/data');
-const Cacher = require('../lib/cacher');
-const Miss = Cacher.Miss;
+import { Err } from '@openaddresses/batch-schema';
+import Data from '../lib/data.js';
+import { Miss } from '../lib/cacher.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
 
     /**
@@ -135,5 +133,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

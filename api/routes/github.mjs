@@ -1,8 +1,7 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const { Webhooks } = require('@octokit/webhooks');
+import { Err } from '@openaddresses/batch-schema';
+import { Webhooks } from '@octokit/webhooks';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {post} /api/github/event Github Webhook
      * @apiVersion 1.0.0
@@ -43,5 +42,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

@@ -1,8 +1,8 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const LevelOverride = require('../lib/level-override');
+import { Err } from '@openaddresses/batch-schema';
+import LevelOverride from '../lib/level-override.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
 
     /**
@@ -148,5 +148,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

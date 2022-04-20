@@ -1,9 +1,8 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Cacher = require('../lib/cacher');
-const Miss = Cacher.Miss;
+import { Err } from '@openaddresses/batch-schema';
+import { Miss } from '../lib/cacher.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/fabric Fabric TileJSON
      * @apiVersion 1.0.0
@@ -65,5 +64,3 @@ async function router(schema, config) {
         res.end(tile);
     });
 }
-
-module.exports = router;

@@ -1,7 +1,6 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
+import { Err } from '@openaddresses/batch-schema';
 
-async function router(schema) {
+export default async function router(schema) {
     /**
      * @api {post} /api/opencollective/event OpenCollective
      * @apiVersion 1.0.0
@@ -24,4 +23,3 @@ async function router(schema) {
     });
 }
 
-module.exports = router;

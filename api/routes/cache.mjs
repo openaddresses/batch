@@ -1,7 +1,6 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
+import { Err } from '@openaddresses/batch-schema';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {delete} /api/cache Flush Cache
      * @apiVersion 1.0.0
@@ -57,5 +56,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

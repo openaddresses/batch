@@ -1,7 +1,6 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
+import { Err } from '@openaddresses/batch-schema';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
     const token = new (require('../lib/token'))(config.pool);
 
@@ -80,5 +79,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

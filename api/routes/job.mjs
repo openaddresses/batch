@@ -1,9 +1,9 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Run = require('../lib/run');
-const Job = require('../lib/job');
+import { Err } from '@openaddresses/batch-schema';
+import Run from '../lib/run.js';
+import Job from '../lib/job.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
     const ci = new (require('../lib/ci'))(config);
 
@@ -384,5 +384,3 @@ async function router(schema, config) {
     });
 
 }
-
-module.exports = router;

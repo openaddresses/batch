@@ -1,8 +1,7 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Map = require('../lib/map');
-const Cacher = require('../lib/cacher');
-const Miss = Cacher.Miss;
+import { Err } from '@openaddresses/batch-schema';
+import Map from '../lib/map.js';
+import { Miss } from '../lib/cacher.js';
 
 async function router(schema, config) {
     /**

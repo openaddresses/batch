@@ -76,6 +76,7 @@ class Map extends Generic {
                     transform: (chunk, encoding, cb) => {
                         return cb(null, JSON.stringify({
                             id: chunk.row.id,
+                            type: 'Feature',
                             properties: {
                                 id: chunk.row.id,
                                 name: chunk.row.name,

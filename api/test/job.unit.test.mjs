@@ -61,7 +61,7 @@ test('Job()', (t) => {
     }, 'job.output: <obj>');
     t.equals(job.loglink, false, 'job.loglink: false');
     t.equals(job.status, 'Pending', 'job.status: Pending');
-    t.equals(job.version, require('../package.json').version, 'job.version: <version>');
+    t.equals(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
     t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
     t.equals(job.raw, false, 'job.raw: false');
 
@@ -266,7 +266,7 @@ test('Job#generate', async (t) => {
         }, 'job.output: false');
         t.equals(job.loglink, null, 'job.loglink: <obj>');
         t.equals(job.status, 'Pending', 'job.status: Pending');
-        t.equals(job.version, require('../package.json').version, 'job.version: <version>');
+        t.equals(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
         t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
         t.equals(job.raw, false, 'job.raw: false');
 

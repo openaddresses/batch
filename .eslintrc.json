@@ -11,6 +11,12 @@
     "parserOptions": {
         "ecmaVersion": 13
     },
+    "overrides": [{
+        "files": [ "*.mjs" ],
+        "parserOptions": {
+            "sourceType": "module"
+        }
+    }],
     "plugins": [ "node" ],
     "rules": {
         "no-console": 0,

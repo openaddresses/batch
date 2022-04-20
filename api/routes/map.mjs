@@ -1,7 +1,6 @@
-
 import { Err } from '@openaddresses/batch-schema';
 import Map from '../lib/map.js';
-import { Miss } from '../lib/cacher.js';
+import Cacher from '../lib/cacher.js';
 
 async function router(schema, config) {
     /**
@@ -69,7 +68,7 @@ async function router(schema, config) {
             const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
-            const tile = await config.cacher.get(Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+            const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                 return await config.borders.tile(req.params.z, req.params.x, req.params.y);
             }, false);
 
@@ -106,7 +105,7 @@ async function router(schema, config) {
         try {
             if (req.params.z > 5) throw new Error(400, null, 'Up to z5 is supported');
 
-            const tile = await config.cacher.get(Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+            const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                 return await Map.tile(config.pool, req.params.z, req.params.x, req.params.y);
             }, false);
 

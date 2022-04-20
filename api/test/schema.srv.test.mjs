@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import test from 'tape';
 import Flight from './flight.mjs';
 
@@ -18,7 +17,7 @@ test('GET: api/schema', async (t) => {
             json: true
         }, t);
 
-        const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
+        const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
 
         t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
 

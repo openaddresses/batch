@@ -1,6 +1,5 @@
-
 import { Err } from '@openaddresses/batch-schema';
-import { Miss } from '../lib/cacher.js';
+import Cacher from '../lib/cacher.js';
 
 export default async function router(schema, config) {
     /**
@@ -49,7 +48,7 @@ export default async function router(schema, config) {
             const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
-            tile = await config.cacher.get(Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
+            tile = await config.cacher.get(Cacher.Miss(req.query, `tile-fabric-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
                 return await config.tb.tile(req.params.z, req.params.x, req.params.y);
             }, false);
         } catch (err) {

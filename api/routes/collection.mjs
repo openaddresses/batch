@@ -1,6 +1,6 @@
 import { Err } from '@openaddresses/batch-schema';
 import Collection from '../lib/collections.js';
-import { Miss } from '../lib/cacher.js';
+import Cacher from '../lib/cacher.js';
 
 export default async function router(schema, config) {
     const user = new (require('../lib/user'))(config.pool);
@@ -21,7 +21,7 @@ export default async function router(schema, config) {
         res: 'res.ListCollections.json'
     }, async (req, res) => {
         try {
-            const collections = await config.cacher.get(Miss(req.query, 'collection'), async () => {
+            const collections = await config.cacher.get(Cacher.Miss(req.query, 'collection'), async () => {
                 return await Collection.list(config.pool);
             });
 

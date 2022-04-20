@@ -1,5 +1,6 @@
 import { Err } from '@openaddresses/batch-schema';
 import { Webhooks } from '@octokit/webhooks';
+import CI from '../lib/ci.js';
 
 export default async function router(schema, config) {
     /**
@@ -15,7 +16,7 @@ export default async function router(schema, config) {
     await schema.post('/github/event', null, async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
-        const ci = new (require('../lib/ci'))(config);
+        const ci = new CI(config);
 
         const ghverify = new Webhooks({
             secret: process.env.GithubSecret

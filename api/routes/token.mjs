@@ -1,8 +1,10 @@
 import { Err } from '@openaddresses/batch-schema';
+import User from '../lib/user.js';
+import Token from '../lib/token.js';
 
 export default async function router(schema, config) {
-    const user = new (require('../lib/user'))(config.pool);
-    const token = new (require('../lib/token'))(config.pool);
+    const user = new User(config.pool);
+    const token = new Token(config.pool);
 
     /**
      * @api {get} /api/token List Tokens

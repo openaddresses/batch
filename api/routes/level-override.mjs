@@ -1,9 +1,9 @@
-
 import { Err } from '@openaddresses/batch-schema';
 import LevelOverride from '../lib/level-override.js';
+import User from '../lib/user.js';
 
 export default async function router(schema, config) {
-    const user = new (require('../lib/user'))(config.pool);
+    const user = new User(config.pool);
 
     /**
      * @api {get} /api/level List Override

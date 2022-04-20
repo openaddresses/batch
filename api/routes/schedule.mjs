@@ -1,8 +1,9 @@
 import { Err } from '@openaddresses/batch-schema';
 import Schedule from '../lib/schedule.js';
+import User from '../lib/user.js';
 
 export default async function router(schema, config) {
-    const user = new (require('../lib/user'))(config.pool);
+    const user = new User(config.pool);
 
     /**
      * @api {post} /api/schedule Scheduled Event

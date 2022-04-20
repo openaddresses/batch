@@ -1,9 +1,10 @@
 import { Err } from '@openaddresses/batch-schema';
 import Job from '../lib/job.js';
 import Exporter from '../lib/exporter.js';
+import User from '../lib/user.js';
 
 export default async function router(schema, config) {
-    const user = new (require('../lib/user'))(config.pool);
+    const user = new User(config.pool);
 
     /**
      * @api {post} /api/export Create Export

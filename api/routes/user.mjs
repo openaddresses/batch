@@ -1,10 +1,12 @@
 import { Err } from '@openaddresses/batch-schema';
 import Email from '../lib/email.js';
+import User from '../lib/user.js';
+import Level from '../lib/level.js';
 
 export default async function router(schema, config) {
     const email = new Email();
-    const user = new (require('../lib/user'))(config.pool);
-    const level = new (require('../lib/level'))(config.pool);
+    const user = new User(config.pool);
+    const level = new Level(config.pool);
 
     /**
      * @api {get} /api/user List Users

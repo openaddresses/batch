@@ -1,9 +1,11 @@
 import { Err } from '@openaddresses/batch-schema';
 import JobError from '../lib/joberror.js';
+import User from '../lib/user.js';
+import CI from '../lib/ci.js';
 
 export default async function router(schema, config) {
-    const user = new (require('../lib/user'))(config.pool);
-    const ci = new (require('../lib/ci'))(config);
+    const user = new User(config.pool);
+    const ci = new CI(config);
 
     /**
      * @api {get} /api/job/error Get Job Errors

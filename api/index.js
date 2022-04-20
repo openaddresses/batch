@@ -282,13 +282,7 @@ async function server(args, config, cb) {
         (await import('./routes/' + r)).default(schema, config);
     }
 
-    schema.router.all('*', (req, res) => {
-        return res.status(404).json({
-            status: 404,
-            message: 'API endpoint does not exist!'
-        });
-    });
-
+    schema.not_found();
     schema.error();
 
     const srv = app.listen(4999, (err) => {

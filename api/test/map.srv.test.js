@@ -8,7 +8,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('Populate Map', async (t) => {
+test('Populate Map', async () => {
     try {
         await flight.config.pool.query(sql`
             INSERT INTO map (
@@ -38,7 +38,7 @@ test('Populate Map', async (t) => {
     }
 });
 
-test('GET: api/map/features', async (t) => {
+test('GET: api/map/features', async () => {
     try {
         const res = await flight.fetch('/api/map/features', {
             method: 'GET'

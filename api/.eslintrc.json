@@ -6,7 +6,8 @@
     },
     "globals": {
         "Map": true,
-        "Promise": true
+        "Promise": true,
+        "fetch": true
     },
     "parserOptions": {
         "ecmaVersion": 13,

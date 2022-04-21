@@ -8,7 +8,7 @@ flight.init();
 flight.takeoff();
 flight.user('admin', true);
 
-test('POST: api/level', async (t) => {
+test('POST: api/level', async () => {
     try {
         const res = await flight.fetch('/api/level', {
             method: 'POST',
@@ -36,7 +36,7 @@ test('POST: api/level', async (t) => {
     }
 });
 
-test('POST: api/level', async (t) => {
+test('POST: api/level', async () => {
     try {
         const res = await flight.fetch('/api/level', {
             method: 'POST',
@@ -64,7 +64,7 @@ test('POST: api/level', async (t) => {
     }
 });
 
-test('PATCH: api/level/2', async (t) => {
+test('PATCH: api/level/2', async () => {
     try {
         const res = await flight.fetch('/api/level/2', {
             method: 'PATCH',
@@ -92,7 +92,7 @@ test('PATCH: api/level/2', async (t) => {
     }
 });
 
-test('GET: api/level/2', async (t) => {
+test('GET: api/level/2', async () => {
     try {
         const res = await flight.fetch('/api/level/2', {
             auth: {
@@ -115,7 +115,7 @@ test('GET: api/level/2', async (t) => {
     }
 });
 
-test('GET: api/level/1', async (t) => {
+test('GET: api/level/1', async () => {
     try {
         const res = await flight.fetch('/api/level/1', {
             auth: {
@@ -138,7 +138,7 @@ test('GET: api/level/1', async (t) => {
     }
 });
 
-test('DELETE: api/level/2', async (t) => {
+test('DELETE: api/level/2', async () => {
     try {
         const res = await flight.fetch('/api/level/2', {
             method: 'DELETE',
@@ -157,7 +157,7 @@ test('DELETE: api/level/2', async (t) => {
     }
 });
 
-test('GET: api/level/2', async (t) => {
+test('GET: api/level/2', async () => {
     try {
         const res = await flight.fetch('/api/level/2', {
             auth: {
@@ -175,7 +175,7 @@ test('GET: api/level/2', async (t) => {
     }
 });
 
-test('GET: api/level', async (t) => {
+test('GET: api/level', async () => {
     try {
         const res = await flight.fetch('/api/level', {
             auth: {

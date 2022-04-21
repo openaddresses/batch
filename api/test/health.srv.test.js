@@ -6,10 +6,10 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('GET: /health', async (t) => {
+test('GET: /health', async () => {
     try {
         const res = await flight.fetch('/health', {
-            method: 'GET',
+            method: 'GET'
         }, false);
 
         assert.equal(res.status, 200, 'http: 200');

@@ -11,7 +11,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('Job()', (t) => {
+test('Job()', () => {
     assert.throws(() => {
         new Job();
     }, /Job.run must be numeric/, 'Job.run must be numeric');
@@ -67,7 +67,7 @@ test('Job()', (t) => {
     assert.equal(job.raw, false, 'job.raw: false');
 });
 
-test('Job#get_raw', async (t) => {
+test('Job#get_raw', async () => {
     nock('https://raw.githubusercontent.com')
         .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
         .reply(200, {
@@ -82,7 +82,7 @@ test('Job#get_raw', async (t) => {
     );
 
     try {
-        const raw = await job.get_raw()
+        const raw = await job.get_raw();
         assert.deepEqual(raw, {
             schema: 2
         }, 'job.raw: { <job> }');
@@ -101,7 +101,7 @@ test('Job#get_raw', async (t) => {
     }
 });
 
-test('Job#fullname', (t) => {
+test('Job#fullname', () => {
     const job = new Job(
         1,
         'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
@@ -112,7 +112,7 @@ test('Job#fullname', (t) => {
     assert.equal(job.fullname(), 'us/pa/bucks', 'Job.fullname(): us/pa/bucks');
 });
 
-test('Job#json', (t) => {
+test('Job#json', () => {
     const job = new Job(
         1,
         'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
@@ -147,7 +147,7 @@ test('Job#json', (t) => {
     });
 });
 
-test('Job#generate', async (t) => {
+test('Job#generate', async () => {
     try {
         const job = new Job(
             1,
@@ -265,7 +265,7 @@ test('Job#generate', async (t) => {
     }
 });
 
-test('Job#from', async (t) => {
+test('Job#from', async () => {
     try {
         await Job.from(flight.config.pool, 2);
         assert.fail('Job#from should fail');
@@ -307,7 +307,7 @@ test('Job#from', async (t) => {
     }
 });
 
-test('Job#patch', async (t) => {
+test('Job#patch', async () => {
     try {
         const job = await Job.from(flight.config.pool, 1);
 
@@ -354,7 +354,7 @@ test('Job#patch', async (t) => {
     }
 });
 
-test('close', (t) => {
+test('close', () => {
     nock.cleanAll();
     nock.enableNetConnect();
 });

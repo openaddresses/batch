@@ -10,10 +10,10 @@ flight.takeoff();
 
 const UPDATE = process.env.UPDATE;
 
-test('GET: api/schema', async (t) => {
+test('GET: api/schema', async () => {
     try {
         const res = await flight.fetch('/api/schema', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
@@ -28,10 +28,10 @@ test('GET: api/schema', async (t) => {
     }
 });
 
-test('GET: api/schema?method=FAKE', async (t) => {
+test('GET: api/schema?method=FAKE', async () => {
     try {
         const res = await flight.fetch('/api/schema?method=fake', {
-            method: 'GET',
+            method: 'GET'
         }, false);
 
         assert.equal(res.status, 400, 'http: 400');
@@ -54,7 +54,7 @@ test('GET: api/schema?method=FAKE', async (t) => {
     }
 });
 
-test('GET: api/schema?method=GET', async (t) => {
+test('GET: api/schema?method=GET', async () => {
     try {
         const res = await flight.fetch('/api/schema?method=GET', {
             method: 'GET'
@@ -72,10 +72,10 @@ test('GET: api/schema?method=GET', async (t) => {
     }
 });
 
-test('GET: api/schema?url=123', async (t) => {
+test('GET: api/schema?url=123', async () => {
     try {
         const res = await flight.fetch('/api/schema?url=123', {
-            method: 'GET',
+            method: 'GET'
         }, false);
 
         assert.equal(res.status, 400, 'http: 400');
@@ -89,10 +89,10 @@ test('GET: api/schema?url=123', async (t) => {
     }
 });
 
-test('GET: api/schema?method=POST&url=/login', async (t) => {
+test('GET: api/schema?method=POST&url=/login', async () => {
     try {
         const res = await flight.fetch('/api/schema?method=POST&url=/login', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, {
@@ -133,7 +133,7 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
     }
 });
 
-test('POST: api/login', async (t) => {
+test('POST: api/login', async () => {
     try {
         const res = await flight.fetch('/api/login', {
             method: 'POST',

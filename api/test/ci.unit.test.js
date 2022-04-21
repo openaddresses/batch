@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'assert';
 import nock from 'nock';
 
-test('CI#internaldiff - No File On Master', async (t) => {
+test('CI#internaldiff - No File On Master', async () => {
     nock('https://raw.githubusercontent.com')
         .get('/openaddresses/openaddresses/123/sources/us/mt/statewide.json')
         .reply(200, JSON.stringify({
@@ -27,7 +27,7 @@ test('CI#internaldiff - No File On Master', async (t) => {
     }]);
 });
 
-test('CI#internaldiff - Internal Diff', async (t) => {
+test('CI#internaldiff - Internal Diff', async () => {
     nock('https://raw.githubusercontent.com')
         .get('/openaddresses/openaddresses/123/sources/us/mt/statewide.json')
         .reply(200, JSON.stringify({
@@ -65,7 +65,7 @@ test('CI#internaldiff - Internal Diff', async (t) => {
     }]);
 });
 
-test('close', (t) => {
+test('close', () => {
     nock.cleanAll();
     nock.enableNetConnect();
 });

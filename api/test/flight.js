@@ -44,7 +44,7 @@ export default class Flight {
      * Clear and restore an empty database schema
      */
     init() {
-        test('start: database', async (t) => {
+        test('start: database', async () => {
             try {
                 await drop();
                 KnexConfig.connection = process.env.Postgres || 'postgres://postgres@localhost:5432/openaddresses_test';
@@ -76,7 +76,7 @@ export default class Flight {
     async fetch(url, req, t) {
         if (t === undefined) throw new Error('flight.request requires two arguments - pass (<url>, <req>, false) to disable schema testing');
 
-        let defs = {
+        const defs = {
             verify: false,
             json: true
         };
@@ -105,9 +105,9 @@ export default class Flight {
         }
 
         if (req.auth && req.auth.bearer) {
-            req.headers['Authorization'] = `Bearer ${req.auth.bearer}`
+            req.headers['Authorization'] = `Bearer ${req.auth.bearer}`;
         } else if (req.auth && req.auth.username && req.auth.password) {
-            req.headers['Authorization'] = 'Basic ' + btoa(req.auth.username + ":" + req.auth.password)
+            req.headers['Authorization'] = 'Basic ' + btoa(req.auth.username + ':' + req.auth.password);
         }
 
         delete req.auth;
@@ -171,14 +171,14 @@ export default class Flight {
      * @param {Object} custom custom config options
      */
     takeoff(custom = {}) {
-        test('test server takeoff', async (t) => {
+        test('test server takeoff', async () => {
             const srv = await api(Object.assign({
                 postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
                 'no-cache': true,
                 'no-tilebase': true,
                 silent: true,
                 test: true
-            }, custom))
+            }, custom));
 
             assert.equal(srv.length, 2);
 
@@ -198,7 +198,7 @@ export default class Flight {
      * @param {String} [opts.level=basic]
      */
     user(username, admin = false, opts = {}) {
-        test('Create Token', async (t) => {
+        test('Create Token', async () => {
             try {
                 const res = await fetch(new URL('/api/user', this.base), {
                     method: 'POST',
@@ -267,7 +267,7 @@ export default class Flight {
      * Shutdown an existing server test instance
      */
     landing() {
-        test('test server landing - api', async (t) => {
+        test('test server landing - api', async () => {
             if (this.srv) {
                 assert.ok(this.srv, 'server object returned');
                 await this.srv.close();

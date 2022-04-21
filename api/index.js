@@ -59,7 +59,7 @@ export default async function configure(args, cb) {
  *   This API endpoint does not require authentication
  */
 
-async function server(args, config, cb) {
+async function server(args, config) {
     const TileBase = (await import('tilebase')).default;
 
     if (!args['no-tilebase']) {
@@ -292,9 +292,9 @@ async function server(args, config, cb) {
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {
             if (err) return reject(err);
-            return resolve([srv, config]);
 
             if (!config.silent) console.log('ok - http://localhost:4999');
+            return resolve([srv, config]);
         });
     });
 }

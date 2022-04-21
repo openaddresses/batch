@@ -11,7 +11,7 @@ flight.takeoff({
     }
 });
 
-test('POST: /api/run', async (t) => {
+test('POST: /api/run', async () => {
     try {
         const res = await flight.fetch('/api/run', {
             method: 'POST',
@@ -32,7 +32,7 @@ test('POST: /api/run', async (t) => {
     }
 });
 
-test('POST: /api/run/:run/jobs', async (t) => {
+test('POST: /api/run/:run/jobs', async () => {
     try {
         const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
@@ -61,7 +61,7 @@ flight.user('backer', false, {
     level: 'backer'
 });
 
-test('POST /api/export - cannot export unsuccessful', async (t) =>  {
+test('POST /api/export - cannot export unsuccessful', async () =>  {
     try {
         const exp = await flight.fetch('/api/export', {
             method: 'POST',
@@ -86,9 +86,9 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
     }
 });
 
-test('PATCH /api/job/1', async (t) =>  {
+test('PATCH /api/job/1', async () =>  {
     try {
-        const res = await flight.fetch('/api/job/1', {
+        await flight.fetch('/api/job/1', {
             method: 'PATCH',
             headers: {
                 'shared-secret': '123'
@@ -96,7 +96,7 @@ test('PATCH /api/job/1', async (t) =>  {
             body: {
                 status: 'Success'
             }
-        }, t);
+        }, true);
     } catch (err) {
         assert.ifError(err, 'no errors');
     }
@@ -104,7 +104,7 @@ test('PATCH /api/job/1', async (t) =>  {
 
 flight.user('non_backer');
 
-test('POST /api/export - no donor level', async (t) =>  {
+test('POST /api/export - no donor level', async () =>  {
     try {
 
         const exp = await flight.fetch('/api/export', {
@@ -128,7 +128,7 @@ test('POST /api/export - no donor level', async (t) =>  {
     }
 });
 
-test('POST /api/export - backer', async (t) =>  {
+test('POST /api/export - backer', async () =>  {
     try {
         const exp = await flight.fetch('/api/export', {
             method: 'POST',
@@ -160,13 +160,13 @@ test('POST /api/export - backer', async (t) =>  {
     }
 });
 
-test('GET /api/export - backer', async (t) =>  {
+test('GET /api/export - backer', async () =>  {
     try {
         const exp = await flight.fetch('/api/export', {
             method: 'GET',
             auth: {
                 bearer: flight.token.backer
-            },
+            }
         }, true);
 
         assert.ok(exp.body.exports[0].created, '.exports[0].created: <date>');
@@ -194,13 +194,13 @@ test('GET /api/export - backer', async (t) =>  {
     }
 });
 
-test('GET /api/export/100 - backer', async (t) =>  {
+test('GET /api/export/100 - backer', async () =>  {
     try {
         const exp = await flight.fetch('/api/export/100', {
             auth: {
                 bearer: flight.token.backer
             },
-            method: 'GET',
+            method: 'GET'
         }, false);
 
         assert.deepEqual(exp.body, { status: 404, message: 'exports not found', messages: [] });
@@ -209,7 +209,7 @@ test('GET /api/export/100 - backer', async (t) =>  {
     }
 });
 
-test('PATCH /api/export/1 - backer', async (t) =>  {
+test('PATCH /api/export/1 - backer', async () =>  {
     try {
         const exp = await flight.fetch('/api/export/1', {
             method: 'PATCH',
@@ -242,13 +242,13 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
     }
 });
 
-test('GET /api/export/1 - backer', async (t) =>  {
+test('GET /api/export/1 - backer', async () =>  {
     try {
         const exp = await flight.fetch('/api/export/1', {
             method: 'GET',
             auth: {
                 bearer: flight.token.backer
-            },
+            }
         }, true);
 
         assert.ok(exp.body.created, '.created: <date>');
@@ -264,13 +264,13 @@ test('GET /api/export/1 - backer', async (t) =>  {
             size: 2134,
             status: 'Success',
             loglink: 'i-am-a-loglink'
-        }, t);
+        });
     } catch (err) {
         assert.ifError(err, 'no errors');
     }
 });
 
-test('POST /api/export - backer - exceeded limit', async (t) =>  {
+test('POST /api/export - backer - exceeded limit', async () =>  {
     try {
         const exp = await flight.fetch('/api/export', {
             method: 'POST',

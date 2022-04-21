@@ -9,7 +9,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('POST: api/run', async (t) => {
+test('POST: api/run', async () => {
     try {
         const res = await flight.fetch('/api/run', {
             method: 'POST',
@@ -31,7 +31,7 @@ test('POST: api/run', async (t) => {
     }
 });
 
-test('POST: api/run/:run/jobs', async (t) => {
+test('POST: api/run/:run/jobs', async () => {
     try {
         const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
@@ -54,7 +54,7 @@ test('POST: api/run/:run/jobs', async (t) => {
     }
 });
 
-test('PATCH: api/job/:job', async (t) => {
+test('PATCH: api/job/:job', async () => {
     try {
         const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
@@ -86,7 +86,7 @@ test('PATCH: api/job/:job', async (t) => {
     }
 });
 
-test('POST: api/job/error', async (t) => {
+test('POST: api/job/error', async () => {
     try {
         const res = await flight.fetch('/api/job/error', {
             method: 'POST',
@@ -108,10 +108,10 @@ test('POST: api/job/error', async (t) => {
     }
 });
 
-test('GET: api/job/error', async (t) => {
+test('GET: api/job/error', async () => {
     try {
         const res = await flight.fetch('/api/job/error', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, [{
@@ -127,10 +127,10 @@ test('GET: api/job/error', async (t) => {
     }
 });
 
-test('GET: api/job/error/1', async (t) => {
+test('GET: api/job/error/1', async () => {
     try {
         const res = await flight.fetch('/api/job/error/1', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, {
@@ -146,7 +146,7 @@ test('GET: api/job/error/1', async (t) => {
     }
 });
 
-test('POST: api/job/error', async (t) => {
+test('POST: api/job/error', async () => {
     try {
         const res = await flight.fetch('/api/job/error', {
             method: 'POST',
@@ -168,10 +168,10 @@ test('POST: api/job/error', async (t) => {
     }
 });
 
-test('GET: api/job/error', async (t) => {
+test('GET: api/job/error', async () => {
     try {
         const res = await flight.fetch('/api/job/error', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, [{
@@ -188,11 +188,11 @@ test('GET: api/job/error', async (t) => {
     }
 });
 
-test('GET: api/job/error/1', async (t) => {
+test('GET: api/job/error/1', async () => {
     try {
         const res = await flight.fetch('/api/job/error/1', {
-            method: 'GET',
-        }, t);
+            method: 'GET'
+        }, true);
 
         assert.deepEqual(res.body, {
             id: 1,
@@ -207,7 +207,7 @@ test('GET: api/job/error/1', async (t) => {
     }
 });
 
-test('POST: api/job/error/1', async (t) => {
+test('POST: api/job/error/1', async () => {
     try {
         const res = await flight.fetch('/api/job/error/1', {
             method: 'POST',
@@ -217,7 +217,7 @@ test('POST: api/job/error/1', async (t) => {
             body: {
                 moderate: 'reject'
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             job: 1,
@@ -228,7 +228,7 @@ test('POST: api/job/error/1', async (t) => {
     }
 });
 
-test('GET: api/job/error', async (t) => {
+test('GET: api/job/error', async () => {
     try {
         const res = await flight.fetch('/api/job/error', {
             method: 'GET',
@@ -247,10 +247,10 @@ test('GET: api/job/error', async (t) => {
     }
 });
 
-test('GET: api/job/error/1', async (t) => {
+test('GET: api/job/error/1', async () => {
     try {
         const res = await flight.fetch('/api/job/error/1', {
-            method: 'GET',
+            method: 'GET'
         }, false);
 
         assert.equal(res.status, 404, 'http: 404');

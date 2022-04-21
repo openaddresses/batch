@@ -12,7 +12,7 @@ const ajv = new Ajv({
 });
 
 for (const source of glob.sync('../schema/**/*.json')) {
-    test(`schema/${path.parse(source).base}`, async (t) => {
+    test(`schema/${path.parse(source).base}`, async () => {
         try {
             const file = fs.readFileSync(source);
             assert.ok(file.length, 'file loaded');

@@ -10,7 +10,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('nocks', (t) => {
+test('nocks', () => {
     nock.disableNetConnect();
 
     nock('https://github.com')
@@ -58,7 +58,7 @@ test('nocks', (t) => {
         });
 });
 
-test('Map#get_feature - country', async (t) => {
+test('Map#get_feature - country', async () => {
     try {
         await flight.config.pool.query(sql`
             INSERT INTO map (
@@ -134,7 +134,7 @@ test('Map#get_feature - country', async (t) => {
     }
 });
 
-test('Map#match - county', async (t) => {
+test('Map#match - county', async () => {
     try {
         await flight.config.pool.query(sql`
             INSERT INTO map (
@@ -198,7 +198,7 @@ test('Map#match - county', async (t) => {
     }
 });
 
-test('Map#match - country', async (t) => {
+test('Map#match - country', async () => {
     try {
         await flight.config.pool.query(sql`
             INSERT INTO map (
@@ -262,7 +262,7 @@ test('Map#match - country', async (t) => {
     }
 });
 
-test('Map#match - geom', async (t) => {
+test('Map#match - geom', async () => {
     try {
         {
             const job = new Job(
@@ -310,7 +310,7 @@ test('Map#match - geom', async (t) => {
 
 flight.landing();
 
-test('end', (t) => {
+test('end', () => {
     nock.cleanAll();
     nock.enableNetConnect();
 });

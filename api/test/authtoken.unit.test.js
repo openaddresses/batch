@@ -11,7 +11,7 @@ flight.takeoff();
 
 let TOKEN = '';
 
-test('Token#generate', async (t) => {
+test('Token#generate', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
@@ -77,7 +77,7 @@ test('Token#generate', async (t) => {
     }
 });
 
-test('Token#list', async (t) => {
+test('Token#list', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
@@ -110,7 +110,7 @@ test('Token#list', async (t) => {
     }
 });
 
-test('Token#validate', async (t) => {
+test('Token#validate', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
@@ -150,7 +150,7 @@ test('Token#validate', async (t) => {
     }
 });
 
-test('Token#delete', async (t) => {
+test('Token#delete', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
@@ -176,7 +176,7 @@ test('Token#delete', async (t) => {
             message: 'Token Deleted'
         });
     } catch (err) {
-        asserError(err);
+        assert.ifError(err);
     }
 });
 

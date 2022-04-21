@@ -7,7 +7,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('Run#generate', async (t) => {
+test('Run#generate', async () => {
     try {
         const run = await Run.generate(flight.config.pool, {
             live: true,
@@ -37,7 +37,7 @@ test('Run#generate', async (t) => {
     }
 });
 
-test('Run#populate', async (t) => {
+test('Run#populate', async () => {
     try {
         const pop = await Run.populate(flight.config.pool, 1, [{
             source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
@@ -81,7 +81,7 @@ test('Run#populate', async (t) => {
     assert.equal(e.safe, 'Run is already closed');
 });
 
-test('Run#list', async (t) => {
+test('Run#list', async () => {
     try {
         const runs = await Run.list(flight.config.pool);
 
@@ -149,7 +149,7 @@ test('Run#list', async (t) => {
     }
 });
 
-test('Run#jobs', async (t) => {
+test('Run#jobs', async () => {
     try {
         const jobs = await Run.jobs(flight.config.pool, 1);
 

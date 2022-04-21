@@ -12,7 +12,7 @@ flight.init();
 flight.takeoff();
 flight.user('test_all');
 
-test('Level#all', async (t) =>  {
+test('Level#all', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -77,7 +77,7 @@ test('Level#all', async (t) =>  {
 flight.user('hello');
 
 
-test('Level#user - override', async (t) =>  {
+test('Level#user - override', async () =>  {
     const level = new Level(flight.config.pool);
 
     await LevelOverride.generate(flight.config.pool, {
@@ -90,7 +90,7 @@ test('Level#user - override', async (t) =>  {
             method: 'GET',
             auth: {
                 bearer: flight.token.hello
-            },
+            }
         }, true);
 
         assert.deepEqual(usr_pre.body.level, 'basic');
@@ -112,7 +112,7 @@ test('Level#user - override', async (t) =>  {
 
 flight.user('test_single');
 
-test('Level#user', async (t) =>  {
+test('Level#user', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -154,8 +154,8 @@ test('Level#user', async (t) =>  {
             auth: {
                 bearer: flight.token.test_single
             },
-            method: 'GET',
-        }, t);
+            method: 'GET'
+        }, true);
 
         assert.deepEqual(usr_pre.body.level, 'basic');
 
@@ -177,7 +177,7 @@ test('Level#user', async (t) =>  {
 
 flight.user('test_single1');
 
-test('Level#user - no contrib', async (t) =>  {
+test('Level#user - no contrib', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -233,7 +233,7 @@ test('Level#user - no contrib', async (t) =>  {
 
 flight.user('test_single_none');
 
-test('Level#user - no match', async (t) =>  {
+test('Level#user - no match', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -255,7 +255,7 @@ test('Level#user - no match', async (t) =>  {
             auth: {
                 bearer: flight.token.test_single_none
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(usr_pre.body.level, 'basic');
 
@@ -266,7 +266,7 @@ test('Level#user - no match', async (t) =>  {
             auth: {
                 bearer: flight.token.test_single_none
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(usr_post.body.level, 'basic');
     } catch (err) {
@@ -276,7 +276,7 @@ test('Level#user - no match', async (t) =>  {
 
 flight.landing();
 
-test('close', (t) => {
+test('close', () => {
     nock.cleanAll();
     nock.enableNetConnect();
 });

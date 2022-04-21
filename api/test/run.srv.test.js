@@ -10,7 +10,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('POST: api/run', async (t) => {
+test('POST: api/run', async () => {
     try {
         const res = await flight.fetch('/api/run', {
             method: 'POST',
@@ -31,10 +31,10 @@ test('POST: api/run', async (t) => {
     }
 });
 
-test('GET: api/run', async (t) => {
+test('GET: api/run', async () => {
     try {
         const res = await flight.fetch('/api/run', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.equal(res.status, 200, 'http: 200');
@@ -46,7 +46,7 @@ test('GET: api/run', async (t) => {
     }
 });
 
-test('POST: api/run/:run/jobs', async (t) => {
+test('POST: api/run/:run/jobs', async () => {
     try {
         const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
@@ -69,10 +69,10 @@ test('POST: api/run/:run/jobs', async (t) => {
     }
 });
 
-test('GET: api/data', async (t) => {
+test('GET: api/data', async () => {
     try {
         const res = await flight.fetch('/api/data', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, [], 'run.length: 0');
@@ -81,7 +81,7 @@ test('GET: api/data', async (t) => {
     }
 });
 
-test('PATCH: api/job/:job', async (t) => {
+test('PATCH: api/job/:job', async () => {
     try {
         const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
@@ -115,10 +115,10 @@ test('PATCH: api/job/:job', async (t) => {
     }
 });
 
-test('GET: api/data', async (t) => {
+test('GET: api/data', async () => {
     try {
         const res = await flight.fetch('/api/data', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.ok(res.body[0].updated, 'data.updated: <truthy>');

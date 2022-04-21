@@ -8,10 +8,10 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('GET: api/user (no auth)', async (t) => {
+test('GET: api/user (no auth)', async () => {
     try {
         const res = await flight.fetch('/api/user', {
-            method: 'GET',
+            method: 'GET'
         }, false);
         assert.equal(res.status, 403, 'http: 403');
     } catch (err) {
@@ -19,7 +19,7 @@ test('GET: api/user (no auth)', async (t) => {
     }
 });
 
-test('POST: api/user', async (t) => {
+test('POST: api/user', async () => {
     try {
         const res = await flight.fetch('/api/user', {
             method: 'POST',
@@ -44,7 +44,7 @@ test('POST: api/user', async (t) => {
     }
 });
 
-test('POST: api/login (failed)', async (t) => {
+test('POST: api/login (failed)', async () => {
     try {
         const res = await flight.fetch('/api/login', {
             method: 'POST',
@@ -60,7 +60,7 @@ test('POST: api/login (failed)', async (t) => {
     }
 });
 
-test('POST: api/login (not confirmed)', async (t) => {
+test('POST: api/login (not confirmed)', async () => {
     try {
         const res = await flight.fetch('/api/login', {
             method: 'POST',
@@ -81,7 +81,7 @@ test('POST: api/login (not confirmed)', async (t) => {
     }
 });
 
-test('META: Validate User', async (t) => {
+test('META: Validate User', async () => {
     try {
         await flight.config.pool.query(sql`
             UPDATE users SET validated = True;
@@ -92,7 +92,7 @@ test('META: Validate User', async (t) => {
 });
 
 let token;
-test('POST: api/login (success)', async (t) => {
+test('POST: api/login (success)', async () => {
     try {
         const res = await flight.fetch('/api/login', {
             method: 'POST',
@@ -120,7 +120,7 @@ test('POST: api/login (success)', async (t) => {
     }
 });
 
-test('GET: api/login', async (t) => {
+test('GET: api/login', async () => {
     try {
         const res = await flight.fetch('/api/login', {
             auth: {
@@ -152,13 +152,13 @@ flight.user('sponsor', false, {
     level: 'sponsor'
 });
 
-test('GET: api/user', async (t) => {
+test('GET: api/user', async () => {
     try {
         const res = await flight.fetch('/api/user', {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, {
@@ -205,14 +205,14 @@ test('GET: api/user', async (t) => {
     }
 });
 
-test('GET: api/user?level=backer', async (t) => {
+test('GET: api/user?level=backer', async () => {
     try {
         const res = await flight.fetch('/api/user?level=backer', {
             auth: {
                 bearer: flight.token.admin
             },
             method: 'GET'
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 1,
@@ -230,13 +230,13 @@ test('GET: api/user?level=backer', async (t) => {
     }
 });
 
-test('GET: api/user?level=sponsor', async (t) => {
+test('GET: api/user?level=sponsor', async () => {
     try {
         const res = await flight.fetch('/api/user?level=sponsor', {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, {
@@ -255,7 +255,7 @@ test('GET: api/user?level=sponsor', async (t) => {
     }
 });
 
-test('GET: api/user?filter=ADMIN', async (t) => {
+test('GET: api/user?filter=ADMIN', async () => {
     try {
         const res = await flight.fetch('/api/user?filter=ADMIN', {
             auth: {
@@ -280,13 +280,13 @@ test('GET: api/user?filter=ADMIN', async (t) => {
     }
 });
 
-test('GET: api/user?access=admin', async (t) => {
+test('GET: api/user?access=admin', async () => {
     try {
         const res = await flight.fetch('/api/user?access=admin', {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.deepEqual(res.body, {
@@ -305,7 +305,7 @@ test('GET: api/user?access=admin', async (t) => {
     }
 });
 
-test('GET: api/user?before=<NOW>', async (t) => {
+test('GET: api/user?before=<NOW>', async () => {
     try {
         const res = await flight.fetch(`/api/user?before=${encodeURIComponent(moment().toDate().toISOString())}`, {
             auth: {
@@ -358,7 +358,7 @@ test('GET: api/user?before=<NOW>', async (t) => {
     }
 });
 
-test('GET: api/user?after=<NOW>', async (t) => {
+test('GET: api/user?after=<NOW>', async () => {
     try {
         const res = await flight.fetch(`/api/user?after=${encodeURIComponent(moment().toDate().toISOString())}`, {
             auth: {

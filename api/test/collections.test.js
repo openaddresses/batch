@@ -10,7 +10,7 @@ flight.takeoff();
 
 process.env.Bucket = 'v2.openaddresses.io';
 
-test('Collection()', (t) => {
+test('Collection()', () => {
     assert.throws(() => {
         new Collection();
     }, new Err(400, null, 'Collection.name must be a string'), 'Collection.name must be a string');
@@ -44,7 +44,7 @@ test('Collection()', (t) => {
     assert.equal(collection.s3, false, 'collection.s3: false');
 });
 
-test('Collection#json()', (t) => {
+test('Collection#json()', () => {
     const collection = new Collection(
         'usa',
         ['us/**']
@@ -67,7 +67,7 @@ test('Collection#json()', (t) => {
     });
 });
 
-test('Collection#patch()', (t) => {
+test('Collection#patch()', () => {
     const collection = new Collection(
         'usa',
         ['us/**']
@@ -97,7 +97,7 @@ test('Collection#patch()', (t) => {
     assert.equal(collection.size, 123, 'collection.size: 123');
 });
 
-test('Collection#generate()', async (t) => {
+test('Collection#generate()', async () => {
     try {
         const collection = new Collection(
             'usa',
@@ -129,7 +129,7 @@ test('Collection#generate()', async (t) => {
     }
 });
 
-test('Collection#list', async (t) => {
+test('Collection#list', async () => {
     try {
         const list = await Collection.list(flight.config.pool);
 
@@ -150,7 +150,7 @@ test('Collection#list', async (t) => {
     }
 });
 
-test('Collection#data', async (t) => {
+test('Collection#data', async () => {
     try {
         let param = false;
 
@@ -182,7 +182,7 @@ test('Collection#data', async (t) => {
     }
 });
 
-test('Collection#from()', async (t) => {
+test('Collection#from()', async () => {
     try {
         const collection = await Collection.from(flight.config.pool, 1);
 
@@ -206,7 +206,7 @@ test('Collection#from()', async (t) => {
     }
 });
 
-test('Collection#commit()', async (t) => {
+test('Collection#commit()', async () => {
     try {
         const collection = new Collection(
             'global',
@@ -247,7 +247,7 @@ test('Collection#commit()', async (t) => {
     }
 });
 
-test('Collection#delete()', async (t) => {
+test('Collection#delete()', async () => {
     try {
         await Collection.delete(flight.config.pool, 3);
     } catch (err) {

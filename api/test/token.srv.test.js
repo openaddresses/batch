@@ -16,7 +16,7 @@ flight.user('sponsor2', false, {
 
 let token;
 
-test('GET /api/token', async (t) => {
+test('GET /api/token', async () => {
     try {
         const res = await flight.fetch('/api/token', {
             method: 'GET',
@@ -34,7 +34,7 @@ test('GET /api/token', async (t) => {
     }
 });
 
-test('POST /api/token', async (t) => {
+test('POST /api/token', async () => {
     try {
         const res = await flight.fetch('/api/token', {
             method: 'POST',
@@ -62,7 +62,7 @@ test('POST /api/token', async (t) => {
     }
 });
 
-test('POST /api/token (sponsor2)', async (t) => {
+test('POST /api/token (sponsor2)', async () => {
     try {
         await flight.fetch('/api/token', {
             method: 'POST',
@@ -78,7 +78,7 @@ test('POST /api/token (sponsor2)', async (t) => {
     }
 });
 
-test('GET /api/token', async (t) => {
+test('GET /api/token', async () => {
     try {
         const res = await flight.fetch('/api/token', {
             method: 'GET',
@@ -101,7 +101,7 @@ test('GET /api/token', async (t) => {
     }
 });
 
-test('DELETE /api/token/2 - Can only delete own tokens', async (t) => {
+test('DELETE /api/token/2 - Can only delete own tokens', async () => {
     try {
         const res = await flight.fetch('/api/token/2', {
             method: 'DELETE',
@@ -121,7 +121,7 @@ test('DELETE /api/token/2 - Can only delete own tokens', async (t) => {
     }
 });
 
-test('DELETE /api/token/1', async (t) => {
+test('DELETE /api/token/1', async () => {
     try {
         const res = await flight.fetch('/api/token/1', {
             method: 'DELETE',
@@ -140,7 +140,7 @@ test('DELETE /api/token/1', async (t) => {
     }
 });
 
-test('GET /api/token - verify token was deleted', async (t) => {
+test('GET /api/token - verify token was deleted', async () => {
     try {
         const res = await flight.fetch('/api/token', {
             method: 'GET',

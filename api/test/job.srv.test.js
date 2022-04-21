@@ -9,7 +9,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('POST: /api/run', async (t) => {
+test('POST: /api/run', async () => {
     try {
         const res = await flight.fetch('/api/run', {
             method: 'POST',
@@ -30,7 +30,7 @@ test('POST: /api/run', async (t) => {
     }
 });
 
-test('POST: /api/run/:run/jobs', async (t) => {
+test('POST: /api/run/:run/jobs', async () => {
     try {
         const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
@@ -53,7 +53,7 @@ test('POST: /api/run/:run/jobs', async (t) => {
     }
 });
 
-test('PATCH: /api/job/:job', async (t) => {
+test('PATCH: /api/job/:job', async () => {
     try {
         const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
@@ -108,7 +108,7 @@ test('PATCH: /api/job/:job', async (t) => {
     }
 });
 
-test('GET: /api/job/:job', async (t) => {
+test('GET: /api/job/:job', async () => {
     try {
         const res = await flight.fetch('/api/job/1', {
             method: 'GET'
@@ -134,10 +134,10 @@ test('GET: /api/job/:job', async (t) => {
     }
 });
 
-test('GET: /api/job', async (t) => {
+test('GET: /api/job', async () => {
     try {
         const res = await flight.fetch('/api/job', {
-            method: 'GET',
+            method: 'GET'
         }, true);
 
         assert.ok(res.body[0].created);

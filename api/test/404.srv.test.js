@@ -6,7 +6,7 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('GET: /api/nonexistant', async (t) => {
+test('GET: /api/nonexistant', async () => {
     try {
         const res = await flight.fetch('/api/non-existant', {
             method: 'GET'

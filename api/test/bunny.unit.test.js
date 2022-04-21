@@ -2,7 +2,7 @@ import Bunny from '../lib/bunny.js';
 import test from 'node:test';
 import assert from 'assert';
 
-test('Bunny#sign', (t) => {
+test('Bunny#sign', () => {
     const bunny = new Bunny('123');
 
     assert.equal(

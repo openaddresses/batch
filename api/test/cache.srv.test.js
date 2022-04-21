@@ -10,7 +10,7 @@ flight.takeoff({
     'no-cache': false
 });
 
-test('Meta: Insert Key', async (t) => {
+test('Meta: Insert Key', async () => {
     const client = memjs.Client.create();
     await client.set('data', JSON.stringify({ test: true }));
     assert.deepEqual(JSON.parse((await client.get('data')).value), {
@@ -20,7 +20,7 @@ test('Meta: Insert Key', async (t) => {
     await client.quit();
 });
 
-test('DELETE: api/cache', async (t) => {
+test('DELETE: api/cache', async () => {
     try {
         const res = await flight.fetch('/api/cache', {
             method: 'DELETE',
@@ -44,7 +44,7 @@ test('DELETE: api/cache', async (t) => {
     }
 });
 
-test('Meta: Insert Key', async (t) => {
+test('Meta: Insert Key', async () => {
     const client = memjs.Client.create();
 
     try {
@@ -59,7 +59,7 @@ test('Meta: Insert Key', async (t) => {
     }
 });
 
-test('DELETE: api/cache/data', async (t) => {
+test('DELETE: api/cache/data', async () => {
     try {
         const res = await flight.fetch('/api/cache/data', {
             method: 'DELETE',

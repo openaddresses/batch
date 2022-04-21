@@ -74,7 +74,7 @@ test('Level#all', async (t) =>  {
     }
 });
 
-flight.user(test, 'hello');
+flight.user('hello');
 
 
 test('Level#user - override', async (t) =>  {

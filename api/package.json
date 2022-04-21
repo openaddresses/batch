@@ -12,11 +12,11 @@
     "scripts": {
         "doc": "apidoc -i ./ -f index.js -f ./routes/ -e node_modules -e web --private",
         "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
-        "test": "tape test/*.test.js | tap-dot",
+        "test": "tape test/**.test.js",
         "start": "node index.js --email",
         "dev": "nodemon -i ./web index.js",
-        "cov-html": "nyc tape 'test/**/*.js' && nyc report --reporter=html",
-        "cov": "nyc tape 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
+        "cov-html": "nyc node 'test/**/*.js' && nyc report --reporter=html",
+        "cov": "nyc node 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },
     "dependencies": {
         "@mapbox/sphericalmercator": "^1.1.0",
@@ -54,7 +54,7 @@
         "request": "^2.88.2",
         "slonik": "^28.0.0",
         "split": "^1.0.1",
-        "tap-dot": "^2.0.0",
+        "tape": "^5.5.3",
         "tilebase": "^3.0.0",
         "wkx": "^0.5.0"
     },
@@ -67,8 +67,7 @@
         "glob": "7.2.0",
         "nock": "^13.0.8",
         "nodemon": "^2.0.7",
-        "nyc": "^15.1.0",
-        "tape": "^5.2.0"
+        "nyc": "^15.1.0"
     },
     "apidoc": {
         "name": "OpenAddresses API",

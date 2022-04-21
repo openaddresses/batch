@@ -11,17 +11,15 @@ flight.takeoff();
 
 test('POST: api/run', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run',
+        const res = await flight.fetch('/api/run', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 live: true
             }
-        }, t);
+        }, true);
 
         assert.equal(res.body.id, 1, 'run.id: 1');
         assert.ok(res.body.created, 'run.created: <truthy>');
@@ -35,10 +33,8 @@ test('POST: api/run', async (t) => {
 
 test('POST: api/run/:run/jobs', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run/1/jobs',
+        const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -47,7 +43,7 @@ test('POST: api/run/:run/jobs', async (t) => {
                     'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json'
                 ]
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             run: 1,
@@ -60,17 +56,15 @@ test('POST: api/run/:run/jobs', async (t) => {
 
 test('PATCH: api/job/:job', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/1',
+        const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 status: 'Fail'
             }
-        }, t);
+        }, true);
 
         assert.equal(res.body.id, 1, 'job.id: 1');
         assert.equal(res.body.run, 1, 'job.run: 1');
@@ -94,10 +88,8 @@ test('PATCH: api/job/:job', async (t) => {
 
 test('POST: api/job/error', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -105,7 +97,7 @@ test('POST: api/job/error', async (t) => {
                 job: 1,
                 message: 'Something went wrong!'
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             job: 1,
@@ -118,11 +110,9 @@ test('POST: api/job/error', async (t) => {
 
 test('GET: api/job/error', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, [{
             id: 1,
@@ -139,11 +129,9 @@ test('GET: api/job/error', async (t) => {
 
 test('GET: api/job/error/1', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
+        const res = await flight.fetch('/api/job/error/1', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             id: 1,
@@ -160,10 +148,8 @@ test('GET: api/job/error/1', async (t) => {
 
 test('POST: api/job/error', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -171,7 +157,7 @@ test('POST: api/job/error', async (t) => {
                 job: 1,
                 message: 'Another Something went wrong!'
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             job: 1,
@@ -184,11 +170,9 @@ test('POST: api/job/error', async (t) => {
 
 test('GET: api/job/error', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, [{
             id: 1,
@@ -206,10 +190,8 @@ test('GET: api/job/error', async (t) => {
 
 test('GET: api/job/error/1', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
+        const res = await flight.fetch('/api/job/error/1', {
             method: 'GET',
-            json: true
         }, t);
 
         assert.deepEqual(res.body, {
@@ -227,10 +209,8 @@ test('GET: api/job/error/1', async (t) => {
 
 test('POST: api/job/error/1', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
+        const res = await flight.fetch('/api/job/error/1', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -250,8 +230,7 @@ test('POST: api/job/error/1', async (t) => {
 
 test('GET: api/job/error', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'GET',
             json: true
         }, false);
@@ -270,10 +249,8 @@ test('GET: api/job/error', async (t) => {
 
 test('GET: api/job/error/1', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
+        const res = await flight.fetch('/api/job/error/1', {
             method: 'GET',
-            json: true
         }, false);
 
         assert.equal(res.status, 404, 'http: 404');

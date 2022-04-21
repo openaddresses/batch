@@ -8,10 +8,8 @@ flight.takeoff();
 
 test('GET: /health', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/health',
+        const res = await flight.fetch('/health', {
             method: 'GET',
-            json: true
         }, false);
 
         assert.equal(res.status, 200, 'http: 200');

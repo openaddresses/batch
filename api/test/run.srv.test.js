@@ -12,17 +12,15 @@ flight.takeoff();
 
 test('POST: api/run', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run',
+        const res = await flight.fetch('/api/run', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 live: true
             }
-        }, t);
+        }, true);
 
         assert.equal(res.body.id, 1, 'run.id: 1');
         assert.ok(res.body.created, 'run.created: <truthy>');
@@ -35,11 +33,9 @@ test('POST: api/run', async (t) => {
 
 test('GET: api/run', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run',
+        const res = await flight.fetch('/api/run', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.equal(res.status, 200, 'http: 200');
 
@@ -52,10 +48,8 @@ test('GET: api/run', async (t) => {
 
 test('POST: api/run/:run/jobs', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run/1/jobs',
+        const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -64,7 +58,7 @@ test('POST: api/run/:run/jobs', async (t) => {
                     'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json'
                 ]
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             run: 1,

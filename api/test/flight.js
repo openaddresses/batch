@@ -69,15 +69,39 @@ export default class Flight {
      *
      * @param {String} url URL to request
      * @param {Object} req Request Object
-     * @param {boolean} t Test Response output against known schema
+     * @param {boolean|object} t If true validate schema & use defaults. If false, don't validate schema and use defaults
+     * @param {boolean} [t.verify] Verify Schema Validation
+     * @param {boolean} [t.json=true] Expect JSON in response
      */
     async fetch(url, req, t) {
+        if (t === undefined) throw new Error('flight.request requires two arguments - pass (<url>, <req>, false) to disable schema testing');
+
+        let defs = {
+            verify: false,
+            json: true
+        };
+
+        if (t === true) {
+            defs.verify = true;
+        } else if (t === false) {
+            defs.verify = false;
+        } else {
+            Object.assign(defs, t);
+        }
+
         url = new URL(url, this.base);
 
         if (!req.headers) req.headers = {};
         if (typeof req.body === 'object') {
             req.headers['Content-Type'] = 'application/json';
             req.body = JSON.stringify(req.body);
+        }
+
+        if (!defs.verify) {
+            const _res = await fetch(url, req);
+            const body = defs.json ? await _res.json() : await _res.text();
+            const res = new FlightResponse(_res, body);
+            return res;
         }
 
         if (req.auth && req.auth.bearer) {
@@ -87,14 +111,6 @@ export default class Flight {
         }
 
         delete req.auth;
-
-        if (t === undefined) {
-            throw new Error('flight.request requires two arguments - pass (<req>, false) to disable schema testing');
-        } else if (!t) {
-            const _res = await fetch(url, req);
-            const res = new FlightResponse(_res, await _res.json());
-            return res;
-        }
 
         if (!req.method) req.method = 'GET';
 
@@ -196,7 +212,8 @@ export default class Flight {
                     })
                 });
 
-                const new_user = new FlightResponse(res, await res.json());
+                const body = defs.json ? await _res.json() : await _res.text();
+                const new_user = new FlightResponse(res, body);
 
                 if (new_user.status !== 200) throw new Error(JSON.stringify(new_user.body));
 

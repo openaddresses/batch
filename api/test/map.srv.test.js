@@ -40,10 +40,12 @@ test('Populate Map', async (t) => {
 
 test('GET: api/map/features', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/map/features',
+        const res = await flight.fetch('/api/map/features', {
             method: 'GET'
-        }, false);
+        }, {
+            verify: false,
+            json: false
+        });
 
         assert.equal(res.body.split('\n').length, 3);
     } catch (err) {

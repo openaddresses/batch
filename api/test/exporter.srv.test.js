@@ -1,10 +1,11 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test, {
+flight.init();
+flight.takeoff({
     limit: {
         exports: 1
     }
@@ -12,37 +13,29 @@ flight.takeoff(test, {
 
 test('POST: /api/run', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run',
+        const res = await flight.fetch('/api/run', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 live: true
             }
-        }, t);
+        }, true);
 
-        t.equals(res.statusCode, 200, 'http: 200');
-
-        t.equals(res.body.id, 1, 'run.id: 1');
-        t.ok(res.body.created, 'run.created: <truthy>');
-        t.deepEquals(res.body.github, {}, 'run.github: {}');
-        t.deepEquals(res.body.closed, false, 'run.closed: false');
+        assert.equal(res.body.id, 1, 'run.id: 1');
+        assert.ok(res.body.created, 'run.created: <truthy>');
+        assert.deepEqual(res.body.github, {}, 'run.github: {}');
+        assert.deepEqual(res.body.closed, false, 'run.closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('POST: /api/run/:run/jobs', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/run/1/jobs',
+        const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -53,31 +46,25 @@ test('POST: /api/run/:run/jobs', async (t) => {
                     name: 'dcgis'
                 }]
             }
-        }, t);
+        }, true);
 
-        t.equals(res.statusCode, 200, 'http: 200');
-
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             run: 1,
             jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.user(test, 'backer', false, {
+flight.user('backer', false, {
     level: 'backer'
 });
 
 test('POST /api/export - cannot export unsuccessful', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export',
+        const exp = await flight.fetch('/api/export', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.backer
             },
@@ -87,26 +74,22 @@ test('POST /api/export - cannot export unsuccessful', async (t) =>  {
             }
         }, false);
 
-        t.equals(exp.statusCode, 400, 'http: 400');
+        assert.equal(exp.status, 400, 'http: 400');
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             status: 400,
             message: 'Cannot export a job that was not successful',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('PATCH /api/job/1', async (t) =>  {
     try {
-        const res = await flight.request({
-            url: '/api/job/1',
+        const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -114,24 +97,18 @@ test('PATCH /api/job/1', async (t) =>  {
                 status: 'Success'
             }
         }, t);
-
-        t.equals(res.statusCode, 200, 'http: 200');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.user(test, 'non_backer');
+flight.user('non_backer');
 
 test('POST /api/export - no donor level', async (t) =>  {
     try {
 
-        const exp = await flight.request({
-            url: '/api/export',
+        const exp = await flight.fetch('/api/export', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.non_backer
             },
@@ -141,24 +118,20 @@ test('POST /api/export - no donor level', async (t) =>  {
             }
         }, false);
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             status: 403,
             message: 'Please donate to use this feature',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('POST /api/export - backer', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export',
+        const exp = await flight.fetch('/api/export', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.backer
             },
@@ -166,16 +139,14 @@ test('POST /api/export - backer', async (t) =>  {
                 job_id: 1,
                 format: 'csv'
             }
-        }, t);
+        }, true);
 
-        t.equals(exp.statusCode, 200, 'http: 200');
-
-        t.ok(exp.body.created, '.created: <date>');
+        assert.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
-        t.ok(exp.body.expiry, '.expiry: <date>');
+        assert.ok(exp.body.expiry, '.expiry: <date>');
         delete exp.body.expiry;
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             id: 1,
             uid: 1,
             job_id: 1,
@@ -185,29 +156,25 @@ test('POST /api/export - backer', async (t) =>  {
             loglink: null
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('GET /api/export - backer', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export',
+        const exp = await flight.fetch('/api/export', {
             method: 'GET',
             auth: {
                 bearer: flight.token.backer
             },
-            json: true
-        }, t);
+        }, true);
 
-        t.ok(exp.body.exports[0].created, '.exports[0].created: <date>');
+        assert.ok(exp.body.exports[0].created, '.exports[0].created: <date>');
         delete exp.body.exports[0].created;
-        t.ok(exp.body.exports[0].expiry, '.exports[0].expiry: <date>');
+        assert.ok(exp.body.exports[0].expiry, '.exports[0].expiry: <date>');
         delete exp.body.exports[0].expiry;
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             total: 1,
             exports: [{
                 id: 1,
@@ -223,37 +190,29 @@ test('GET /api/export - backer', async (t) =>  {
             }]
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('GET /api/export/100 - backer', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export/100',
+        const exp = await flight.fetch('/api/export/100', {
             auth: {
                 bearer: flight.token.backer
             },
             method: 'GET',
-            json: true
         }, false);
 
-        t.deepEquals(exp.body, { status: 404, message: 'exports not found', messages: [] });
+        assert.deepEqual(exp.body, { status: 404, message: 'exports not found', messages: [] });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('PATCH /api/export/1 - backer', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export/1',
+        const exp = await flight.fetch('/api/export/1', {
             method: 'PATCH',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -262,14 +221,14 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
                 status: 'Success',
                 loglink: 'i-am-a-loglink'
             }
-        }, t);
+        }, true);
 
-        t.ok(exp.body.created, '.created: <date>');
+        assert.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
-        t.ok(exp.body.expiry, '.expiry: <date>');
+        assert.ok(exp.body.expiry, '.expiry: <date>');
         delete exp.body.expiry;
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             id: 1,
             uid: 1,
             job_id: 1,
@@ -279,29 +238,25 @@ test('PATCH /api/export/1 - backer', async (t) =>  {
             loglink: 'i-am-a-loglink'
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('GET /api/export/1 - backer', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export/1',
+        const exp = await flight.fetch('/api/export/1', {
             method: 'GET',
             auth: {
                 bearer: flight.token.backer
             },
-            json: true
-        }, t);
+        }, true);
 
-        t.ok(exp.body.created, '.created: <date>');
+        assert.ok(exp.body.created, '.created: <date>');
         delete exp.body.created;
-        t.ok(exp.body.expiry, '.expiry: <date>');
+        assert.ok(exp.body.expiry, '.expiry: <date>');
         delete exp.body.expiry;
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             id: 1,
             uid: 1,
             job_id: 1,
@@ -311,18 +266,14 @@ test('GET /api/export/1 - backer', async (t) =>  {
             loglink: 'i-am-a-loglink'
         }, t);
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 test('POST /api/export - backer - exceeded limit', async (t) =>  {
     try {
-        const exp = await flight.request({
-            url: '/api/export',
+        const exp = await flight.fetch('/api/export', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.backer
             },
@@ -332,18 +283,16 @@ test('POST /api/export - backer - exceeded limit', async (t) =>  {
             }
         }, false);
 
-        t.equals(exp.statusCode, 400, 'http: 400');
+        assert.equal(exp.status, 400, 'http: 400');
 
-        t.deepEquals(exp.body, {
+        assert.deepEqual(exp.body, {
             status: 400,
             message: 'Reached Monthly Export Limit',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 flight.landing(test);

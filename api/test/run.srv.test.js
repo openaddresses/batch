@@ -1,13 +1,14 @@
 import fs from 'fs';
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('POST: api/run', async (t) => {
     try {
@@ -23,15 +24,13 @@ test('POST: api/run', async (t) => {
             }
         }, t);
 
-        t.equals(res.body.id, 1, 'run.id: 1');
-        t.ok(res.body.created, 'run.created: <truthy>');
-        t.deepEquals(res.body.github, {}, 'run.github: {}');
-        t.deepEquals(res.body.closed, false, 'run.closed: false');
+        assert.equal(res.body.id, 1, 'run.id: 1');
+        assert.ok(res.body.created, 'run.created: <truthy>');
+        assert.deepEqual(res.body.github, {}, 'run.github: {}');
+        assert.deepEqual(res.body.closed, false, 'run.closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/run', async (t) => {
@@ -42,15 +41,13 @@ test('GET: api/run', async (t) => {
             json: true
         }, t);
 
-        t.equals(res.statusCode, 200, 'http: 200');
+        assert.equal(res.status, 200, 'http: 200');
 
         // Run will not return as it has not yet been populated
-        t.equals(res.body.length, 0, 'run.length: 0');
+        assert.equal(res.body.length, 0, 'run.length: 0');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('POST: api/run/:run/jobs', async (t) => {
@@ -69,15 +66,13 @@ test('POST: api/run/:run/jobs', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             run: 1,
             jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/data', async (t) => {
@@ -88,12 +83,10 @@ test('GET: api/data', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, [], 'run.length: 0');
+        assert.deepEqual(res.body, [], 'run.length: 0');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('PATCH: api/job/:job', async (t) => {
@@ -110,28 +103,26 @@ test('PATCH: api/job/:job', async (t) => {
             }
         }, t);
 
-        t.equals(res.statusCode, 200, 'http: 200');
+        assert.equal(res.status, 200, 'http: 200');
 
-        t.equals(res.body.id, 1, 'job.id: 1');
-        t.equals(res.body.run, 1, 'job.run: 1');
-        t.ok(res.body.created, 'job.created: <truthy>');
-        t.equals(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json', 'job.source: <url>');
-        t.equals(res.body.layer, 'addresses', 'job.layer: addresses');
-        t.equals(res.body.name, 'dcgis', 'job.name: dcgis');
-        t.deepEquals(res.body.output, {
+        assert.equal(res.body.id, 1, 'job.id: 1');
+        assert.equal(res.body.run, 1, 'job.run: 1');
+        assert.ok(res.body.created, 'job.created: <truthy>');
+        assert.equal(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json', 'job.source: <url>');
+        assert.equal(res.body.layer, 'addresses', 'job.layer: addresses');
+        assert.equal(res.body.name, 'dcgis', 'job.name: dcgis');
+        assert.deepEqual(res.body.output, {
             cache: false,
             output: false,
             preview: false,
             validated: false
         }, 'job.output: { ... }');
-        t.equals(res.body.loglink, null, 'job.loglink: null');
-        t.equals(res.body.status, 'Success', 'job.status: Success');
-        t.equals(res.body.version, pkg.version, 'job.version: <semver>');
+        assert.equal(res.body.loglink, null, 'job.loglink: null');
+        assert.equal(res.body.status, 'Success', 'job.status: Success');
+        assert.equal(res.body.version, pkg.version, 'job.version: <semver>');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/data', async (t) => {
@@ -142,10 +133,10 @@ test('GET: api/data', async (t) => {
             json: true
         }, t);
 
-        t.ok(res.body[0].updated, 'data.updated: <truthy>');
+        assert.ok(res.body[0].updated, 'data.updated: <truthy>');
         delete res.body[0].updated;
 
-        t.deepEquals(res.body, [{
+        assert.deepEqual(res.body, [{
             id: 1,
             source: 'us/dc/statewide',
             fabric: false,
@@ -162,10 +153,8 @@ test('GET: api/data', async (t) => {
             map: 1
         }], 'data: { ... }');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

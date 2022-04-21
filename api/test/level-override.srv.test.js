@@ -1,11 +1,12 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
-flight.user(test, 'admin', true);
+flight.init();
+flight.takeoff();
+flight.user('admin', true);
 
 test('POST: api/level', async (t) => {
     try {
@@ -22,21 +23,19 @@ test('POST: api/level', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             pattern: '/^hello@openaddresses.io$/',
             level: 'sponsor'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('POST: api/level', async (t) => {
@@ -54,21 +53,19 @@ test('POST: api/level', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 2,
             pattern: '/^.*@example.com$/',
             level: 'sponsor'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('PATCH: api/level/2', async (t) => {
@@ -85,21 +82,19 @@ test('PATCH: api/level/2', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 2,
             pattern: '/^.*@example.com$/',
             level: 'backer'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/level/2', async (t) => {
@@ -112,21 +107,19 @@ test('GET: api/level/2', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 2,
             pattern: '/^.*@example.com$/',
             level: 'backer'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/level/1', async (t) => {
@@ -139,21 +132,19 @@ test('GET: api/level/1', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             pattern: '/^hello@openaddresses.io$/',
             level: 'sponsor'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('DELETE: api/level/2', async (t) => {
@@ -167,16 +158,14 @@ test('DELETE: api/level/2', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             status: 200,
             message: 'Delete Level Override'
 
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/level/2', async (t) => {
@@ -189,16 +178,14 @@ test('GET: api/level/2', async (t) => {
             }
         }, false);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             status: 404,
             message: 'level_override not found',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/level', async (t) => {
@@ -214,7 +201,7 @@ test('GET: api/level', async (t) => {
         delete res.body.level_override[0].created;
         delete res.body.level_override[0].updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             level_override: [{
                 id: 1,
@@ -223,10 +210,8 @@ test('GET: api/level', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

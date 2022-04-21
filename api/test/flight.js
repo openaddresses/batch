@@ -1,9 +1,9 @@
 process.env.StackName = 'test';
 
+import test from 'node:test';
+import assert from 'assert';
 import { sql } from 'slonik';
 import fs from 'fs';
-import { promisify } from 'util';
-import request from 'request';
 import api from '../index.js';
 import Knex from 'knex';
 import KnexConfig from '../knexfile.js';
@@ -11,10 +11,23 @@ import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
 import Ajv from 'ajv';
 
-const prequest = promisify(request);
 const ajv = new Ajv({
     allErrors: true
 });
+
+/**
+ * @class
+ */
+class FlightResponse {
+    constructor(res, body) {
+        this.res = res;
+
+        this.ok = res.ok;
+        this.headers = res.headers;
+        this.status = res.status;
+        this.body = body;
+    }
+}
 
 /**
  * @class
@@ -29,10 +42,8 @@ export default class Flight {
 
     /**
      * Clear and restore an empty database schema
-     *
-     * @param {Tape} test Tape test instance
      */
-    init(test) {
+    init() {
         test('start: database', async (t) => {
             try {
                 await drop();
@@ -41,7 +52,7 @@ export default class Flight {
                 await knex.migrate.latest();
                 await knex.destroy();
             } catch (err) {
-                t.error(err);
+                assert.ifError(err);
             }
 
             this.schema = JSON.parse(fs.readFileSync(new URL('./fixtures/get_schema.json', import.meta.url)));
@@ -50,30 +61,45 @@ export default class Flight {
             for (const route of Object.keys(this.schema)) {
                 this.routes[route] = new RegExp(pathToRegexp(route.split(' ').join(' /api')));
             }
-
-            t.end();
         });
     }
 
     /**
      * Request data from the API & Ensure the output schema matches the response
      *
+     * @param {String} url URL to request
      * @param {Object} req Request Object
-     * @param {Object} t Options test argument - if not present doesn't test API response
+     * @param {boolean} t Test Response output against known schema
      */
-    async request(req, t) {
-        req.url = new URL(req.url, this.base);
+    async fetch(url, req, t) {
+        url = new URL(url, this.base);
+
+        if (!req.headers) req.headers = {};
+        if (typeof req.body === 'object') {
+            req.headers['Content-Type'] = 'application/json';
+            req.body = JSON.stringify(req.body);
+        }
+
+        if (req.auth && req.auth.bearer) {
+            req.headers['Authorization'] = `Bearer ${req.auth.bearer}`
+        } else if (req.auth && req.auth.username && req.auth.password) {
+            req.headers['Authorization'] = 'Basic ' + btoa(req.auth.username + ":" + req.auth.password)
+        }
+
+        delete req.auth;
 
         if (t === undefined) {
             throw new Error('flight.request requires two arguments - pass (<req>, false) to disable schema testing');
         } else if (!t) {
-            return await prequest(req);
+            const _res = await fetch(url, req);
+            const res = new FlightResponse(_res, await _res.json());
+            return res;
         }
 
         if (!req.method) req.method = 'GET';
 
         let match = false;
-        const spath = `${req.method.toUpperCase()} ${req.url.pathname}/`;
+        const spath = `${req.method.toUpperCase()} ${url.pathname}/`;
 
         const matches = [];
         for (const r of Object.keys(this.routes)) {
@@ -83,7 +109,7 @@ export default class Flight {
         }
 
         if (!matches.length) {
-            t.fail(`Cannot find schema match for: ${spath}`);
+            assert.fail(`Cannot find schema match for: ${spath}`);
             return;
         } else if (matches.length === 1) {
             match = matches[0];
@@ -96,34 +122,28 @@ export default class Flight {
         schemaurl.searchParams.append('method', match.split(' ')[0]);
         schemaurl.searchParams.append('url', match.split(' ')[1]);
 
-        const rawschema = await prequest({
-            json: true,
-            url: schemaurl
-        });
+        const rawschema = await (await fetch(schemaurl)).json();
 
-        if (!rawschema.body.res) throw new Error('Cannot validate resultant schema - no result schema defined');
+        if (!rawschema.res) throw new Error('Cannot validate resultant schema - no result schema defined');
 
-        const schema = ajv.compile(rawschema.body.res);
+        const schema = ajv.compile(rawschema.res);
 
+        const _res = await fetch(url, req);
+        const res = new FlightResponse(_res, await _res.json());
 
-        const res = await prequest(req);
-
-        t.equals(res.statusCode, 200, 'statusCode: 200');
-
-        if (res.statusCode === 200) {
-
+        if (res.ok) {
             schema(res.body);
 
             if (!schema.errors) return res;
 
             for (const error of schema.errors) {
                 console.error(error);
-                t.fail(`${error.schemaPath}: ${error.message}`);
+                assert.fail(`${error.schemaPath}: ${error.message}`);
             }
         } else {
             // Just print the body instead of spewing
             // 100 schema validation errors for an error response
-            t.fail(JSON.stringify(res.body));
+            assert.fail(JSON.stringify(res.body));
         }
 
         return res;
@@ -132,56 +152,53 @@ export default class Flight {
     /**
      * Bootstrap a new server test instance
      *
-     * @param {Tape} test tape instance to run takeoff action on
      * @param {Object} custom custom config options
      */
-    takeoff(test, custom = {}) {
-        test('test server takeoff', (t) => {
-            api(Object.assign({
+    takeoff(custom = {}) {
+        test('test server takeoff', async (t) => {
+            const srv = await api(Object.assign({
                 postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
                 'no-cache': true,
                 'no-tilebase': true,
                 silent: true,
                 test: true
-            }, custom), (srv, config) => {
-                t.ok(srv, 'server object returned');
-                t.ok(config, 'config object returned');
+            }, custom))
 
-                this.srv = srv;
+            assert.equal(srv.length, 2);
 
-                this.base = 'http://localhost:4999';
+            this.srv = srv[0];
+            this.config = srv[1];
 
-                this.config = config;
-
-                t.end();
-            });
+            this.base = 'http://localhost:4999';
         });
     }
 
     /**
      * Create a new user and return an API token for that user
      *
-     * @param {Object} test Tape runner
      * @param {String} username Username for user to create
      * @param {boolean} admin Should the user be set to admin
      * @param {Object} opts Optional Objects
      * @param {String} [opts.level=basic]
      */
-    user(test, username, admin = false, opts = {}) {
-        test.test('Create Token', async (t) => {
+    user(username, admin = false, opts = {}) {
+        test('Create Token', async (t) => {
             try {
-                const new_user = await prequest({
-                    url: new URL('/api/user', this.base),
-                    json: true,
+                const res = await fetch(new URL('/api/user', this.base), {
                     method: 'POST',
-                    body: {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
                         username: username,
                         password: username,
                         email: `${username}@openaddresses.io`
-                    }
+                    })
                 });
 
-                if (new_user.statusCode !== 200) throw new Error(JSON.stringify(new_user.body));
+                const new_user = new FlightResponse(res, await res.json());
+
+                if (new_user.status !== 200) throw new Error(JSON.stringify(new_user.body));
 
                 await this.config.pool.query(sql`
                      UPDATE users
@@ -212,44 +229,39 @@ export default class Flight {
                     `);
                 }
 
-                const new_login = await prequest({
-                    url: new URL('/api/login', this.base),
-                    json: true,
+                const new_login = await fetch(new URL('/api/login', this.base), {
                     method: 'POST',
-                    body: {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
                         username: username,
                         password: username
-                    }
+                    })
                 });
 
-                this.token[username] = new_login.body.token;
+                this.token[username] = (await new_login.json()).token;
             } catch (err) {
-                t.error(err);
+                assert.ifError(err);
             }
-
-            t.end();
         });
     }
 
     /**
      * Shutdown an existing server test instance
-     *
-     * @param {Tape} test tape instance to run landing action on
      */
-    landing(test) {
+    landing() {
         test('test server landing - api', async (t) => {
             if (this.srv) {
-                t.ok(this.srv, 'server object returned');
+                assert.ok(this.srv, 'server object returned');
                 await this.srv.close();
             }
 
-            t.ok(this.config.pool, 'pool object returned');
+            assert.ok(this.config.pool, 'pool object returned');
             await this.config.pool.end();
 
-            t.ok(this.config.cacher, 'cacher object returned');
+            assert.ok(this.config.cacher, 'cacher object returned');
             await this.config.cacher.cache.quit();
-
-            t.end();
         });
     }
 }

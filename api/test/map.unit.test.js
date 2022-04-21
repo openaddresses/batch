@@ -1,13 +1,14 @@
 import Map from '../lib/map.js';
 import Job from '../lib/job.js';
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 import nock from 'nock';
 import { sql } from 'slonik';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('nocks', (t) => {
     nock.disableNetConnect();
@@ -55,8 +56,6 @@ test('nocks', (t) => {
                 'town': 'whitehorse'
             }
         });
-
-    t.end();
 });
 
 test('Map#get_feature - country', async (t) => {
@@ -82,7 +81,7 @@ test('Map#get_feature - country', async (t) => {
             job.map = 1;
             await job.commit(flight.config.pool);
 
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'us'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -102,7 +101,7 @@ test('Map#get_feature - country', async (t) => {
             job.map = 1;
             await job.commit(flight.config.pool);
 
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'us'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -122,7 +121,7 @@ test('Map#get_feature - country', async (t) => {
             job.map = 1;
             await job.commit(flight.config.pool);
 
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'us'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -131,10 +130,8 @@ test('Map#get_feature - country', async (t) => {
             }, 'additions retain array');
         }
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
-
-    t.end();
 });
 
 test('Map#match - county', async (t) => {
@@ -149,10 +146,10 @@ test('Map#match - county', async (t) => {
             );
         `);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.deepEquals(await Map.get_feature(flight.config.pool, 'us-42017'), {
+    assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
         id: 2,
         name: 'Bucks County',
         code: 'us-42017',
@@ -171,7 +168,7 @@ test('Map#match - county', async (t) => {
         await job.commit(flight.config.pool);
 
         await Map.match(flight.config.pool, job);
-        t.deepEquals(await Map.get_feature(flight.config.pool, 'us-42017'), {
+        assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
             id: 2,
             name: 'Bucks County',
             code: 'us-42017',
@@ -191,7 +188,7 @@ test('Map#match - county', async (t) => {
         await job.commit(flight.config.pool);
 
         await Map.match(flight.config.pool, job);
-        t.deepEquals(await Map.get_feature(flight.config.pool, 'us-42017'), {
+        assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
             id: 2,
             name: 'Bucks County',
             code: 'us-42017',
@@ -199,8 +196,6 @@ test('Map#match - county', async (t) => {
             layers: ['addresses', 'buildings']
         }, 'buildings layer added');
     }
-
-    t.end();
 });
 
 test('Map#match - country', async (t) => {
@@ -215,7 +210,7 @@ test('Map#match - country', async (t) => {
             );
         `);
 
-        t.deepEquals(await Map.get_feature(flight.config.pool, 'ca'), {
+        assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
             id: 3,
             name: 'Canada',
             code: 'ca',
@@ -234,7 +229,7 @@ test('Map#match - country', async (t) => {
             await job.commit(flight.config.pool);
 
             await Map.match(flight.config.pool, job);
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'ca'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
                 id: 3,
                 name: 'Canada',
                 code: 'ca',
@@ -254,7 +249,7 @@ test('Map#match - country', async (t) => {
             await job.commit(flight.config.pool);
 
             await Map.match(flight.config.pool, job);
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'ca'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
                 id: 3,
                 name: 'Canada',
                 code: 'ca',
@@ -263,10 +258,8 @@ test('Map#match - country', async (t) => {
             }, 'buildings layer added');
         }
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
-
-    t.end();
 });
 
 test('Map#match - geom', async (t) => {
@@ -282,7 +275,7 @@ test('Map#match - geom', async (t) => {
             await job.commit(flight.config.pool);
 
             await Map.match(flight.config.pool, job);
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
                 id: 4,
                 name: 'ca/yk/city_of_whitehorse',
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
@@ -302,7 +295,7 @@ test('Map#match - geom', async (t) => {
             await job.commit(flight.config.pool);
 
             await Map.match(flight.config.pool, job);
-            t.deepEquals(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
+            assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
                 id: 4,
                 name: 'ca/yk/city_of_whitehorse',
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
@@ -311,16 +304,13 @@ test('Map#match - geom', async (t) => {
             }, 'buildings layer added');
         }
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();
 
 test('end', (t) => {
     nock.cleanAll();
     nock.enableNetConnect();
-    t.end();
 });

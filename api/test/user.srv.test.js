@@ -1,11 +1,12 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 import { sql } from 'slonik';
 import moment from 'moment';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('GET: api/user (no auth)', async (t) => {
     try {
@@ -14,12 +15,10 @@ test('GET: api/user (no auth)', async (t) => {
             method: 'GET',
             json: true
         }, false);
-        t.equals(res.statusCode, 403, 'http: 403');
+        assert.equal(res.status, 403, 'http: 403');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('POST: api/user', async (t) => {
@@ -35,7 +34,7 @@ test('POST: api/user', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             level: 'basic',
             username: 'ingalls'    ,
@@ -45,10 +44,8 @@ test('POST: api/user', async (t) => {
         }, 'user');
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('POST: api/login (failed)', async (t) => {
@@ -63,12 +60,10 @@ test('POST: api/login (failed)', async (t) => {
             }
         }, false);
 
-        t.equals(res.statusCode, 403, 'http: 403');
+        assert.equal(res.status, 403, 'http: 403');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('POST: api/login (not confirmed)', async (t) => {
@@ -83,16 +78,14 @@ test('POST: api/login (not confirmed)', async (t) => {
             }
         }, false);
 
-        t.equals(res.statusCode, 403, 'http: 403');
-        t.deepEquals(res.body, {
+        assert.equal(res.status, 403, 'http: 403');
+        assert.deepEqual(res.body, {
             status: 403, message: 'User has not confirmed email', messages: []
         });
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('META: Validate User', async (t) => {
@@ -101,10 +94,8 @@ test('META: Validate User', async (t) => {
             UPDATE users SET validated = True;
         `);
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 let token;
@@ -120,11 +111,11 @@ test('POST: api/login (success)', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.token);
+        assert.ok(res.body.token);
         token = res.body.token;
         delete res.body.token;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             uid: 1,
             username: 'ingalls',
             level: 'basic',
@@ -134,10 +125,8 @@ test('POST: api/login (success)', async (t) => {
         });
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/login', async (t) => {
@@ -151,7 +140,7 @@ test('GET: api/login', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             uid: 1,
             username: 'ingalls'    ,
             level: 'basic',
@@ -161,10 +150,8 @@ test('GET: api/login', async (t) => {
         }, 'user');
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 flight.user(test, 'admin', true);
@@ -187,7 +174,7 @@ test('GET: api/user', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 5,
             users: [{
                 id: 5,
@@ -227,10 +214,8 @@ test('GET: api/user', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/user?level=backer', async (t) => {
@@ -244,7 +229,7 @@ test('GET: api/user?level=backer', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             users: [{
                 id: 4,
@@ -256,10 +241,8 @@ test('GET: api/user?level=backer', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/user?level=sponsor', async (t) => {
@@ -273,7 +256,7 @@ test('GET: api/user?level=sponsor', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             users: [{
                 id: 5,
@@ -285,10 +268,8 @@ test('GET: api/user?level=sponsor', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/user?filter=ADMIN', async (t) => {
@@ -302,7 +283,7 @@ test('GET: api/user?filter=ADMIN', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             users: [{
                 id: 2,
@@ -314,10 +295,8 @@ test('GET: api/user?filter=ADMIN', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/user?access=admin', async (t) => {
@@ -331,7 +310,7 @@ test('GET: api/user?access=admin', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             users: [{
                 id: 2,
@@ -343,10 +322,8 @@ test('GET: api/user?access=admin', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/user?before=<NOW>', async (t) => {
@@ -360,7 +337,7 @@ test('GET: api/user?before=<NOW>', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 5,
             users: [{
                 id: 5,
@@ -400,10 +377,8 @@ test('GET: api/user?before=<NOW>', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/user?after=<NOW>', async (t) => {
@@ -417,15 +392,13 @@ test('GET: api/user?after=<NOW>', async (t) => {
             json: true
         }, t);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 0,
             users: []
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

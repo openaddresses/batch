@@ -1,30 +1,27 @@
-import test from 'tape';
+import test from 'node:test';
 import Flight from './flight.js';
+import assert from 'assert';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('GET: /api/nonexistant', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/non-existant',
-            method: 'GET',
-            json: true
+        const res = await flight.fetch('/api/non-existant', {
+            method: 'GET'
         }, false);
 
-        t.equals(res.statusCode, 404, 'http: 404');
-        t.deepEquals(res.body, {
+        assert.equal(res.status, 404, 'http: 404');
+        assert.deepEqual(await res.body, {
             status: 404,
             message: 'API endpoint does not exist!',
             messages: []
         });
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.fail(err);
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

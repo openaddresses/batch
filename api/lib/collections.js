@@ -26,7 +26,7 @@ export default class Collection {
         this.s3 = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchCollection.json'))).properties);
+        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchCollection.json', import.meta.url))).properties);
     }
 
     json() {

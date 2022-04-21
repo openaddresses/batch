@@ -1,4 +1,5 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Level from '../lib/level.js';
 import LevelOverride from '../lib/level-override.js';
 import Flight from './flight.js';
@@ -7,9 +8,9 @@ import moment from 'moment';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
-flight.user(test, 'test_all');
+flight.init();
+flight.takeoff();
+flight.user('test_all');
 
 test('Level#all', async (t) =>  {
     nock('https://api.opencollective.com')
@@ -58,7 +59,7 @@ test('Level#all', async (t) =>  {
             json: true
         }, t);
 
-        t.equals(usr_pre.body.level, 'basic');
+        assert.equal(usr_pre.body.level, 'basic');
 
         await level.all();
 
@@ -71,12 +72,10 @@ test('Level#all', async (t) =>  {
             json: true
         }, t);
 
-        t.deepEquals(usr_post.body.level, 'sponsor');
+        assert.deepEqual(usr_post.body.level, 'sponsor');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 flight.user(test, 'hello');
@@ -100,7 +99,7 @@ test('Level#user - override', async (t) =>  {
             json: true
         }, t);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('hello@openaddresses.io');
 
@@ -113,12 +112,10 @@ test('Level#user - override', async (t) =>  {
             json: true
         }, t);
 
-        t.deepEquals(usr_post.body.level, 'sponsor');
+        assert.deepEqual(usr_post.body.level, 'sponsor');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 flight.user(test, 'test_single');
@@ -170,7 +167,7 @@ test('Level#user', async (t) =>  {
             json: true
         }, t);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('test_single@openaddresses.io');
 
@@ -183,12 +180,10 @@ test('Level#user', async (t) =>  {
             json: true
         }, t);
 
-        t.deepEquals(usr_post.body.level, 'backer');
+        assert.deepEqual(usr_post.body.level, 'backer');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 flight.user(test, 'test_single1');
@@ -232,7 +227,7 @@ test('Level#user - no contrib', async (t) =>  {
             }
         }, t);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('test_single1@openaddresses.io');
 
@@ -245,12 +240,10 @@ test('Level#user - no contrib', async (t) =>  {
             }
         }, t);
 
-        t.deepEquals(usr_post.body.level, 'basic');
+        assert.deepEqual(usr_post.body.level, 'basic');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
 flight.user(test, 'test_single_none');
@@ -281,7 +274,7 @@ test('Level#user - no match', async (t) =>  {
             }
         }, t);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('test_single_none@openaddresses.io');
 
@@ -294,18 +287,15 @@ test('Level#user - no match', async (t) =>  {
             }
         }, t);
 
-        t.deepEquals(usr_post.body.level, 'basic');
+        assert.deepEqual(usr_post.body.level, 'basic');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();
 
 test('close', (t) => {
     nock.cleanAll();
     nock.enableNetConnect();
-    t.end();
 });

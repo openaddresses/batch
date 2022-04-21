@@ -6,6 +6,9 @@
     "main": "index.js",
     "license": "MIT",
     "private": true,
+    "engines": {
+        "node": ">= 18"
+    },
     "scripts": {
         "doc": "apidoc -i ./ -f index.js -f ./routes/ -e node_modules -e web --private",
         "lint": "eslint index.js routes/**.js lib/**.js test/**.js",

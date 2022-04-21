@@ -1,11 +1,12 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 import { sql } from 'slonik';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('Populate Map', async (t) => {
     try {
@@ -33,10 +34,8 @@ test('Populate Map', async (t) => {
             );
         `);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
-
-    t.end();
 });
 
 test('GET: api/map/features', async (t) => {
@@ -46,12 +45,10 @@ test('GET: api/map/features', async (t) => {
             method: 'GET'
         }, false);
 
-        t.equals(res.body.split('\n').length, 3);
+        assert.equal(res.body.split('\n').length, 3);
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

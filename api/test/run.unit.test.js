@@ -1,10 +1,11 @@
 import Run from '../lib/run.js';
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('Run#generate', async (t) => {
     try {
@@ -13,12 +14,12 @@ test('Run#generate', async (t) => {
             github: {}
         });
 
-        t.equals(run.id, 1, 'run.id: 1');
-        t.ok(run.created, 'run.created: <truthy>');
-        t.deepEquals(run.github, {}, 'run.github: {}');
-        t.equals(run.closed, false, 'run.closed: false');
+        assert.equal(run.id, 1, 'run.id: 1');
+        assert.ok(run.created, 'run.created: <truthy>');
+        assert.deepEqual(run.github, {}, 'run.github: {}');
+        assert.equal(run.closed, false, 'run.closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     try {
@@ -27,15 +28,13 @@ test('Run#generate', async (t) => {
             github: {}
         });
 
-        t.equals(run.id, 2, 'run.id: 1');
-        t.ok(run.created, 'run.created: <truthy>');
-        t.deepEquals(run.github, {}, 'run.github: {}');
-        t.equals(run.closed, false, 'run.closed: false');
+        assert.equal(run.id, 2, 'run.id: 1');
+        assert.ok(run.created, 'run.created: <truthy>');
+        assert.deepEqual(run.github, {}, 'run.github: {}');
+        assert.equal(run.closed, false, 'run.closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('Run#populate', async (t) => {
@@ -46,12 +45,12 @@ test('Run#populate', async (t) => {
             name: 'city'
         }]);
 
-        t.deepEquals(pop, {
+        assert.deepEqual(pop, {
             run: 1,
             jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     try {
@@ -61,12 +60,12 @@ test('Run#populate', async (t) => {
             name: 'city'
         }]);
 
-        t.deepEquals(pop, {
+        assert.deepEqual(pop, {
             run: 2,
             jobs: [2]
         }, 'Run 2 populated');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     let e;
@@ -79,30 +78,28 @@ test('Run#populate', async (t) => {
     } catch (err) {
         e = err;
     }
-    t.equals(e.safe, 'Run is already closed');
-
-    t.end();
+    assert.equal(e.safe, 'Run is already closed');
 });
 
 test('Run#list', async (t) => {
     try {
         const runs = await Run.list(flight.config.pool);
 
-        t.equals(runs.length, 2, 'Runs.length: 2');
+        assert.equal(runs.length, 2, 'Runs.length: 2');
 
-        t.equals(runs[0].id, 2, 'run[0].id: 2');
-        t.equals(runs[1].id, 1, 'run[1].id: 1');
+        assert.equal(runs[0].id, 2, 'run[0].id: 2');
+        assert.equal(runs[1].id, 1, 'run[1].id: 1');
 
-        t.ok(runs[0].created, 'run[0].created: <truthy>');
-        t.ok(runs[1].created, 'run[1].created: <truthy>');
+        assert.ok(runs[0].created, 'run[0].created: <truthy>');
+        assert.ok(runs[1].created, 'run[1].created: <truthy>');
 
-        t.deepEquals(runs[0].github, {}, 'run[0].github: {}');
-        t.deepEquals(runs[1].github, {}, 'run[1].github: {}');
+        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
+        assert.deepEqual(runs[1].github, {}, 'run[1].github: {}');
 
-        t.equals(runs[0].closed, true, 'run[0].closed: false');
-        t.equals(runs[1].closed, true, 'run[1].closed: false');
+        assert.equal(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(runs[1].closed, true, 'run[1].closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     try {
@@ -110,14 +107,14 @@ test('Run#list', async (t) => {
             limit: 1
         });
 
-        t.equals(runs.length, 1, 'Runs.length: 1');
+        assert.equal(runs.length, 1, 'Runs.length: 1');
 
-        t.equals(runs[0].id, 2, 'run[0].id: 2');
-        t.ok(runs[0].created, 'run[0].created: <truthy>');
-        t.deepEquals(runs[0].github, {}, 'run[0].github: {}');
-        t.equals(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(runs[0].id, 2, 'run[0].id: 2');
+        assert.ok(runs[0].created, 'run[0].created: <truthy>');
+        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
+        assert.equal(runs[0].closed, true, 'run[0].closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     try {
@@ -125,14 +122,14 @@ test('Run#list', async (t) => {
             run: 1
         });
 
-        t.equals(runs.length, 1, 'Runs.length: 1');
+        assert.equal(runs.length, 1, 'Runs.length: 1');
 
-        t.equals(runs[0].id, 1, 'run[0].id: 1');
-        t.ok(runs[0].created, 'run[0].created: <truthy>');
-        t.deepEquals(runs[0].github, {}, 'run[0].github: {}');
-        t.equals(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(runs[0].id, 1, 'run[0].id: 1');
+        assert.ok(runs[0].created, 'run[0].created: <truthy>');
+        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
+        assert.equal(runs[0].closed, true, 'run[0].closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     try {
@@ -141,31 +138,27 @@ test('Run#list', async (t) => {
             limit: 1
         });
 
-        t.equals(runs.length, 1, 'Runs.length: 1');
+        assert.equal(runs.length, 1, 'Runs.length: 1');
 
-        t.equals(runs[0].id, 1, 'run[0].id: 1');
-        t.ok(runs[0].created, 'run[0].created: <truthy>');
-        t.deepEquals(runs[0].github, {}, 'run[0].github: {}');
-        t.equals(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(runs[0].id, 1, 'run[0].id: 1');
+        assert.ok(runs[0].created, 'run[0].created: <truthy>');
+        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
+        assert.equal(runs[0].closed, true, 'run[0].closed: false');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('Run#jobs', async (t) => {
     try {
         const jobs = await Run.jobs(flight.config.pool, 1);
 
-        t.equals(jobs.length, 1, 'jobs.length: 1');
-        t.ok(jobs[0].created, 'jobs[0].created: <date>');
+        assert.equal(jobs.length, 1, 'jobs.length: 1');
+        assert.ok(jobs[0].created, 'jobs[0].created: <date>');
         delete jobs[0].created;
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

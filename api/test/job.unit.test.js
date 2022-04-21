@@ -1,32 +1,33 @@
 import Job from '../lib/job.js';
 import fs from 'fs';
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import nock from 'nock';
 import Flight from './flight.js';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 test('Job()', (t) => {
-    t.throws(() => {
+    assert.throws(() => {
         new Job();
     }, /Job.run must be numeric/, 'Job.run must be numeric');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Job(1);
     }, /Job.source must be a string/, 'Job.source must be a string');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Job(
             1,
             'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json'
         );
     }, /Job.layer must be a string/, 'Job.layer must be a string');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Job(
             1,
             'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
@@ -41,31 +42,29 @@ test('Job()', (t) => {
         'city'
     );
 
-    t.equals(job.id, false, 'job.id: false');
-    t.equals(job.run, 1, 'job.run: 1');
-    t.equals(job.map, null, 'job.map: null');
-    t.equals(job.created, false, 'job.created: false');
-    t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
-    t.equals(job.layer, 'addresses', 'job.layer: addresses');
-    t.equals(job.count, 0, 'job.count: 0');
-    t.equals(job.bounds, false, 'job.bounds: false');
-    t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-    t.equals(job.name, 'city', 'job.name: city');
-    t.equals(job.license, false, 'job.license: null');
-    t.equals(job.size, 0, 'job.size: 0');
-    t.deepLooseEqual(job.output, {
+    assert.equal(job.id, false, 'job.id: false');
+    assert.equal(job.run, 1, 'job.run: 1');
+    assert.equal(job.map, null, 'job.map: null');
+    assert.equal(job.created, false, 'job.created: false');
+    assert.equal(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+    assert.equal(job.layer, 'addresses', 'job.layer: addresses');
+    assert.equal(job.count, 0, 'job.count: 0');
+    assert.equal(job.bounds, false, 'job.bounds: false');
+    assert.deepEqual(job.stats, {}, 'job.stats: {}');
+    assert.equal(job.name, 'city', 'job.name: city');
+    assert.equal(job.license, false, 'job.license: null');
+    assert.equal(job.size, 0, 'job.size: 0');
+    assert.deepEqual(job.output, {
         cache: false,
         output: false,
         preview: false,
         validated: false
     }, 'job.output: <obj>');
-    t.equals(job.loglink, false, 'job.loglink: false');
-    t.equals(job.status, 'Pending', 'job.status: Pending');
-    t.equals(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
-    t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-    t.equals(job.raw, false, 'job.raw: false');
-
-    t.end();
+    assert.equal(job.loglink, false, 'job.loglink: false');
+    assert.equal(job.status, 'Pending', 'job.status: Pending');
+    assert.equal(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
+    assert.deepEqual(job.stats, {}, 'job.stats: {}');
+    assert.equal(job.raw, false, 'job.raw: false');
 });
 
 test('Job#get_raw', (t) => {
@@ -82,9 +81,9 @@ test('Job#get_raw', (t) => {
         'city'
     );
 
-    t.test('Job.get_raw - 1st call', (q) => {
+    assert.test('Job.get_raw - 1st call', (q) => {
         job.get_raw().then((raw) =>{
-            q.deepLooseEqual(raw, {
+            q.deepEqual(raw, {
                 schema: 2
             }, 'job.raw: { <job> }');
 
@@ -94,19 +93,17 @@ test('Job#get_raw', (t) => {
         });
     });
 
-    t.test('Job.get_raw - 2nd call', (q) => {
+    assert.test('Job.get_raw - 2nd call', (q) => {
         job.get_raw().then((raw) =>{
-            q.deepLooseEqual(raw, {
+            q.deepEqual(raw, {
                 schema: 2
             }, 'job.raw: { <job> }');
 
             q.end();
         }).catch((err) => {
-            t.error(err, 'no error');
+            assert.ifError(err, 'no error');
         });
     });
-
-    t.end();
 });
 
 test('Job#fullname', (t) => {
@@ -117,8 +114,7 @@ test('Job#fullname', (t) => {
         'city'
     );
 
-    t.equals(job.fullname(), 'us/pa/bucks', 'Job.fullname(): us/pa/bucks');
-    t.end();
+    assert.equal(job.fullname(), 'us/pa/bucks', 'Job.fullname(): us/pa/bucks');
 });
 
 test('Job#json', (t) => {
@@ -129,7 +125,7 @@ test('Job#json', (t) => {
         'city'
     );
 
-    t.deepLooseEqual(job.json(), {
+    assert.deepEqual(job.json(), {
         id: false,
         s3: false,
         run: 1,
@@ -154,7 +150,6 @@ test('Job#json', (t) => {
         bounds: false,
         stats: {}
     });
-    t.end();
 });
 
 test('Job#generate', async (t) => {
@@ -169,9 +164,9 @@ test('Job#generate', async (t) => {
         job.run = null;
         await job.generate(flight.config.pool);
 
-        t.fail('job.generate should fail');
+        assert.fail('job.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a run'
@@ -189,9 +184,9 @@ test('Job#generate', async (t) => {
         job.source = null;
         await job.generate(flight.config.pool);
 
-        t.fail('job.generate should fail');
+        assert.fail('job.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a source'
@@ -209,9 +204,9 @@ test('Job#generate', async (t) => {
         job.layer = null;
         await job.generate(flight.config.pool);
 
-        t.fail('job.generate should fail');
+        assert.fail('job.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a layer'
@@ -229,9 +224,9 @@ test('Job#generate', async (t) => {
         job.name = null;
         await job.generate(flight.config.pool);
 
-        t.fail('job.generate should fail');
+        assert.fail('job.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 400,
             err: null,
             safe: 'Cannot generate a job without a name'
@@ -248,41 +243,39 @@ test('Job#generate', async (t) => {
 
         await job.generate(flight.config.pool);
 
-        t.equals(job.id, 1, 'job.id: 1');
-        t.equals(job.run, 1, 'job.run: 1');
-        t.equals(job.map, null, 'job.map: null');
-        t.ok(job.created, 'job.created: <date>');
-        t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
-        t.equals(job.layer, 'addresses', 'job.layer: addresses');
-        t.equals(job.count, null, 'job.count: null');
-        t.equals(job.bounds, null, 'job.bounds: null');
-        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-        t.equals(job.name, 'city', 'job.name: city');
-        t.deepLooseEqual(job.output, {
+        assert.equal(job.id, 1, 'job.id: 1');
+        assert.equal(job.run, 1, 'job.run: 1');
+        assert.equal(job.map, null, 'job.map: null');
+        assert.ok(job.created, 'job.created: <date>');
+        assert.equal(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+        assert.equal(job.layer, 'addresses', 'job.layer: addresses');
+        assert.equal(job.count, null, 'job.count: null');
+        assert.equal(job.bounds, null, 'job.bounds: null');
+        assert.deepEqual(job.stats, {}, 'job.stats: {}');
+        assert.equal(job.name, 'city', 'job.name: city');
+        assert.deepEqual(job.output, {
             cache: false,
             output: false,
             preview: false,
             validated: false
         }, 'job.output: false');
-        t.equals(job.loglink, null, 'job.loglink: <obj>');
-        t.equals(job.status, 'Pending', 'job.status: Pending');
-        t.equals(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
-        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-        t.equals(job.raw, false, 'job.raw: false');
+        assert.equal(job.loglink, null, 'job.loglink: <obj>');
+        assert.equal(job.status, 'Pending', 'job.status: Pending');
+        assert.equal(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
+        assert.deepEqual(job.stats, {}, 'job.stats: {}');
+        assert.equal(job.raw, false, 'job.raw: false');
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('Job#from', async (t) => {
     try {
         await Job.from(flight.config.pool, 2);
-        t.fail('Job#from should fail');
+        assert.fail('Job#from should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 404,
             err: null,
             safe: 'no job by that id'
@@ -292,33 +285,31 @@ test('Job#from', async (t) => {
     try {
         const job = await Job.from(flight.config.pool, 1);
 
-        t.equals(job.id, 1, 'job.id: 1');
-        t.equals(job.run, 1, 'job.run: 1');
-        t.equals(job.map, null, 'job.map: null');
-        t.ok(job.created, 'job.created: <date>');
-        t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
-        t.equals(job.layer, 'addresses', 'job.layer: addresses');
-        t.equals(job.count, null, 'job.count: null');
-        t.equals(job.bounds, null, 'job.bounds: null');
-        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-        t.equals(job.name, 'city', 'job.name: city');
-        t.deepLooseEqual(job.output, {
+        assert.equal(job.id, 1, 'job.id: 1');
+        assert.equal(job.run, 1, 'job.run: 1');
+        assert.equal(job.map, null, 'job.map: null');
+        assert.ok(job.created, 'job.created: <date>');
+        assert.equal(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+        assert.equal(job.layer, 'addresses', 'job.layer: addresses');
+        assert.equal(job.count, null, 'job.count: null');
+        assert.equal(job.bounds, null, 'job.bounds: null');
+        assert.deepEqual(job.stats, {}, 'job.stats: {}');
+        assert.equal(job.name, 'city', 'job.name: city');
+        assert.deepEqual(job.output, {
             cache: false,
             output: false,
             preview: false,
             validated: false
         }, 'job.output: false');
-        t.equals(job.loglink, null, 'job.loglink: <obj>');
-        t.equals(job.status, 'Pending', 'job.status: Pending');
-        t.equals(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
-        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-        t.equals(job.raw, false, 'job.raw: false');
+        assert.equal(job.loglink, null, 'job.loglink: <obj>');
+        assert.equal(job.status, 'Pending', 'job.status: Pending');
+        assert.equal(job.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url))).version, 'job.version: <version>');
+        assert.deepEqual(job.stats, {}, 'job.stats: {}');
+        assert.equal(job.raw, false, 'job.raw: false');
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
 test('Job#patch', async (t) => {
@@ -335,69 +326,42 @@ test('Job#patch', async (t) => {
 
         await job.commit(flight.config.pool);
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
 
     try {
         const job = await Job.from(flight.config.pool, 1);
 
-        t.equals(job.id, 1, 'job.id: 1');
-        t.equals(job.run, 1, 'job.run: 1');
-        t.equals(job.map, null, 'job.map: null');
-        t.ok(job.created, 'job.created: <date>');
-        t.equals(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
-        t.equals(job.layer, 'addresses', 'job.layer: addresses');
-        t.equals(job.count, 123, 'job.count: null');
-        t.equals(job.bounds, null, 'job.bounds: null');
-        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-        t.equals(job.name, 'city', 'job.name: city');
-        t.deepLooseEqual(job.output, {
+        assert.equal(job.id, 1, 'job.id: 1');
+        assert.equal(job.run, 1, 'job.run: 1');
+        assert.equal(job.map, null, 'job.map: null');
+        assert.ok(job.created, 'job.created: <date>');
+        assert.equal(job.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json', 'job.source: <url>');
+        assert.equal(job.layer, 'addresses', 'job.layer: addresses');
+        assert.equal(job.count, 123, 'job.count: null');
+        assert.equal(job.bounds, null, 'job.bounds: null');
+        assert.deepEqual(job.stats, {}, 'job.stats: {}');
+        assert.equal(job.name, 'city', 'job.name: city');
+        assert.deepEqual(job.output, {
             cache: false,
             output: false,
             preview: false,
             validated: false
         }, 'job.output: false');
-        t.equals(job.loglink, 'loglink123', 'job.loglink: <obj>');
-        t.equals(job.status, 'Pending', 'job.status: Pending');
-        t.equals(job.version, '0.0.1', 'job.version: <version>');
-        t.deepLooseEqual(job.stats, {}, 'job.stats: {}');
-        t.equals(job.raw, false, 'job.raw: false');
+        assert.equal(job.loglink, 'loglink123', 'job.loglink: <obj>');
+        assert.equal(job.status, 'Pending', 'job.status: Pending');
+        assert.equal(job.version, '0.0.1', 'job.version: <version>');
+        assert.deepEqual(job.stats, {}, 'job.stats: {}');
+        assert.equal(job.raw, false, 'job.raw: false');
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
-});
-
-test('Job#preview', (t) => {
-    t.end();
-});
-
-test('Job#data', (t) => {
-    t.end();
-});
-
-test('Job#cache', (t) => {
-    t.end();
-});
-
-test('Job#commit', (t) => {
-    t.end();
-});
-
-test('Job#log', (t) => {
-    t.end();
-});
-
-test('Job#batch', (t) => {
-    t.end();
 });
 
 test('close', (t) => {
     nock.cleanAll();
     nock.enableNetConnect();
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

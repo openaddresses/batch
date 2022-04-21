@@ -289,12 +289,13 @@ async function server(args, config, cb) {
     schema.not_found();
     schema.error();
 
-    const srv = app.listen(4999, (err) => {
-        if (err) return err;
+    return new Promise((resolve, reject) => {
+        const srv = app.listen(4999, (err) => {
+            if (err) return reject(err);
+            return resolve([srv, config]);
 
-        if (cb) return cb(srv, config);
-
-        if (!config.silent) console.log('ok - http://localhost:4999');
+            if (!config.silent) console.log('ok - http://localhost:4999');
+        });
     });
 }
 

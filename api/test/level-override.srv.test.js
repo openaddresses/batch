@@ -10,10 +10,8 @@ flight.user('admin', true);
 
 test('POST: api/level', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level',
+        const res = await flight.fetch('/api/level', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.admin
             },
@@ -21,7 +19,7 @@ test('POST: api/level', async (t) => {
                 pattern: '/^hello@openaddresses.io$/',
                 level: 'sponsor'
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.created);
         delete res.body.created;
@@ -40,10 +38,8 @@ test('POST: api/level', async (t) => {
 
 test('POST: api/level', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level',
+        const res = await flight.fetch('/api/level', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.admin
             },
@@ -51,7 +47,7 @@ test('POST: api/level', async (t) => {
                 pattern: '/^.*@example.com$/',
                 level: 'sponsor'
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.created);
         delete res.body.created;
@@ -70,8 +66,7 @@ test('POST: api/level', async (t) => {
 
 test('PATCH: api/level/2', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
+        const res = await flight.fetch('/api/level/2', {
             method: 'PATCH',
             json: true,
             auth: {
@@ -80,7 +75,7 @@ test('PATCH: api/level/2', async (t) => {
             body: {
                 level: 'backer'
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.created);
         delete res.body.created;
@@ -99,13 +94,11 @@ test('PATCH: api/level/2', async (t) => {
 
 test('GET: api/level/2', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
-            json: true,
+        const res = await flight.fetch('/api/level/2', {
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.created);
         delete res.body.created;
@@ -124,13 +117,11 @@ test('GET: api/level/2', async (t) => {
 
 test('GET: api/level/1', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level/1',
-            json: true,
+        const res = await flight.fetch('/api/level/1', {
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.created);
         delete res.body.created;
@@ -149,14 +140,12 @@ test('GET: api/level/1', async (t) => {
 
 test('DELETE: api/level/2', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
-            json: true,
+        const res = await flight.fetch('/api/level/2', {
             method: 'DELETE',
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             status: 200,
@@ -170,9 +159,7 @@ test('DELETE: api/level/2', async (t) => {
 
 test('GET: api/level/2', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
-            json: true,
+        const res = await flight.fetch('/api/level/2', {
             auth: {
                 bearer: flight.token.admin
             }
@@ -190,13 +177,11 @@ test('GET: api/level/2', async (t) => {
 
 test('GET: api/level', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/level',
-            json: true,
+        const res = await flight.fetch('/api/level', {
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
         delete res.body.level_override[0].created;
         delete res.body.level_override[0].updated;

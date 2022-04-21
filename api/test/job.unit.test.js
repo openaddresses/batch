@@ -67,7 +67,7 @@ test('Job()', (t) => {
     assert.equal(job.raw, false, 'job.raw: false');
 });
 
-test('Job#get_raw', (t) => {
+test('Job#get_raw', async (t) => {
     nock('https://raw.githubusercontent.com')
         .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
         .reply(200, {
@@ -81,29 +81,24 @@ test('Job#get_raw', (t) => {
         'city'
     );
 
-    assert.test('Job.get_raw - 1st call', (q) => {
-        job.get_raw().then((raw) =>{
-            q.deepEqual(raw, {
-                schema: 2
-            }, 'job.raw: { <job> }');
+    try {
+        const raw = await job.get_raw()
+        assert.deepEqual(raw, {
+            schema: 2
+        }, 'job.raw: { <job> }');
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
 
-            q.end();
-        }).catch((err) => {
-            q.error(err, 'no error');
-        });
-    });
+    try {
+        const raw = await job.get_raw();
 
-    assert.test('Job.get_raw - 2nd call', (q) => {
-        job.get_raw().then((raw) =>{
-            q.deepEqual(raw, {
-                schema: 2
-            }, 'job.raw: { <job> }');
-
-            q.end();
-        }).catch((err) => {
-            assert.ifError(err, 'no error');
-        });
-    });
+        assert.deepEqual(raw, {
+            schema: 2
+        }, 'job.raw: { <job> }');
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
 });
 
 test('Job#fullname', (t) => {

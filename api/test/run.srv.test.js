@@ -71,11 +71,9 @@ test('POST: api/run/:run/jobs', async (t) => {
 
 test('GET: api/data', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/data',
+        const res = await flight.fetch('/api/data', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, [], 'run.length: 0');
     } catch (err) {
@@ -85,17 +83,15 @@ test('GET: api/data', async (t) => {
 
 test('PATCH: api/job/:job', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/job/1',
+        const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 status: 'Success'
             }
-        }, t);
+        }, true);
 
         assert.equal(res.status, 200, 'http: 200');
 
@@ -121,11 +117,9 @@ test('PATCH: api/job/:job', async (t) => {
 
 test('GET: api/data', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/data',
+        const res = await flight.fetch('/api/data', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.ok(res.body[0].updated, 'data.updated: <truthy>');
         delete res.body[0].updated;

@@ -12,11 +12,9 @@ const UPDATE = process.env.UPDATE;
 
 test('GET: api/schema', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/schema',
+        const res = await flight.fetch('/api/schema', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
 
@@ -32,10 +30,8 @@ test('GET: api/schema', async (t) => {
 
 test('GET: api/schema?method=FAKE', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/schema?method=fake',
+        const res = await flight.fetch('/api/schema?method=fake', {
             method: 'GET',
-            json: true
         }, false);
 
         assert.equal(res.status, 400, 'http: 400');
@@ -60,10 +56,8 @@ test('GET: api/schema?method=FAKE', async (t) => {
 
 test('GET: api/schema?method=GET', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/schema?method=GET',
-            method: 'GET',
-            json: true
+        const res = await flight.fetch('/api/schema?method=GET', {
+            method: 'GET'
         }, false);
 
         assert.equal(res.status, 400, 'http: 400');
@@ -80,10 +74,8 @@ test('GET: api/schema?method=GET', async (t) => {
 
 test('GET: api/schema?url=123', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/schema?url=123',
+        const res = await flight.fetch('/api/schema?url=123', {
             method: 'GET',
-            json: true
         }, false);
 
         assert.equal(res.status, 400, 'http: 400');
@@ -99,13 +91,10 @@ test('GET: api/schema?url=123', async (t) => {
 
 test('GET: api/schema?method=POST&url=/login', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/schema?method=POST&url=/login',
+        const res = await flight.fetch('/api/schema?method=POST&url=/login', {
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
-        assert.equal(res.status, 200, 'http: 200');
         assert.deepEqual(res.body, {
             body: {
                 type: 'object',
@@ -146,10 +135,8 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
 
 test('POST: api/login', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/login',
+        const res = await flight.fetch('/api/login', {
             method: 'POST',
-            json: true,
             body: {
                 fake: 123,
                 username: 123

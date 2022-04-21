@@ -18,14 +18,12 @@ let token;
 
 test('GET /api/token', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: flight.token.sponsor
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 0,
@@ -38,17 +36,15 @@ test('GET /api/token', async (t) => {
 
 test('POST /api/token', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.sponsor
             },
             body: {
                 name: 'Default Token'
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.token);
         token = res.body.token;
@@ -68,17 +64,15 @@ test('POST /api/token', async (t) => {
 
 test('POST /api/token (sponsor2)', async (t) => {
     try {
-        await flight.request({
-            url: '/api/token',
+        await flight.fetch('/api/token', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.sponsor2
             },
             body: {
                 name: 'Default Token'
             }
-        }, t);
+        }, true);
     } catch (err) {
         assert.ifError(err, 'no errors');
     }
@@ -86,15 +80,12 @@ test('POST /api/token (sponsor2)', async (t) => {
 
 test('GET /api/token', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: token
             }
-        }, t);
-
+        }, true);
 
         delete res.body.tokens[0].created;
 
@@ -112,10 +103,8 @@ test('GET /api/token', async (t) => {
 
 test('DELETE /api/token/2 - Can only delete own tokens', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/token/2',
+        const res = await flight.fetch('/api/token/2', {
             method: 'DELETE',
-            json: true,
             auth: {
                 bearer: token
             }
@@ -134,14 +123,12 @@ test('DELETE /api/token/2 - Can only delete own tokens', async (t) => {
 
 test('DELETE /api/token/1', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/token/1',
+        const res = await flight.fetch('/api/token/1', {
             method: 'DELETE',
-            json: true,
             auth: {
                 bearer: token
             }
-        }, t);
+        }, true);
 
 
         assert.deepEqual(res.body, {
@@ -155,10 +142,8 @@ test('DELETE /api/token/1', async (t) => {
 
 test('GET /api/token - verify token was deleted', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: token
             }

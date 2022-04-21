@@ -212,8 +212,7 @@ export default class Flight {
                     })
                 });
 
-                const body = defs.json ? await _res.json() : await _res.text();
-                const new_user = new FlightResponse(res, body);
+                const new_user = new FlightResponse(res, await res.json());
 
                 if (new_user.status !== 200) throw new Error(JSON.stringify(new_user.body));
 

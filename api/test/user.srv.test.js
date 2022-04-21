@@ -10,10 +10,8 @@ flight.takeoff();
 
 test('GET: api/user (no auth)', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user',
+        const res = await flight.fetch('/api/user', {
             method: 'GET',
-            json: true
         }, false);
         assert.equal(res.status, 403, 'http: 403');
     } catch (err) {
@@ -23,16 +21,14 @@ test('GET: api/user (no auth)', async (t) => {
 
 test('POST: api/user', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user',
+        const res = await flight.fetch('/api/user', {
             method: 'POST',
-            json: true,
             body: {
                 username: 'ingalls',
                 password: 'password123',
                 email: 'ingalls@example.com'
             }
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             id: 1,
@@ -50,10 +46,8 @@ test('POST: api/user', async (t) => {
 
 test('POST: api/login (failed)', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/login',
+        const res = await flight.fetch('/api/login', {
             method: 'POST',
-            json: true,
             body: {
                 username: 'ingalls',
                 password: 'password124'
@@ -68,8 +62,7 @@ test('POST: api/login (failed)', async (t) => {
 
 test('POST: api/login (not confirmed)', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/login',
+        const res = await flight.fetch('/api/login', {
             method: 'POST',
             json: true,
             body: {
@@ -101,15 +94,13 @@ test('META: Validate User', async (t) => {
 let token;
 test('POST: api/login (success)', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/login',
+        const res = await flight.fetch('/api/login', {
             method: 'POST',
-            json: true,
             body: {
                 username: 'ingalls',
                 password: 'password123'
             }
-        }, t);
+        }, true);
 
         assert.ok(res.body.token);
         token = res.body.token;
@@ -131,14 +122,12 @@ test('POST: api/login (success)', async (t) => {
 
 test('GET: api/login', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/login',
+        const res = await flight.fetch('/api/login', {
             auth: {
                 bearer: token
             },
-            method: 'GET',
-            json: true
-        }, t);
+            method: 'GET'
+        }, true);
 
         assert.deepEqual(res.body, {
             uid: 1,
@@ -154,25 +143,23 @@ test('GET: api/login', async (t) => {
     }
 });
 
-flight.user(test, 'admin', true);
-flight.user(test, 'basic');
-flight.user(test, 'backer', false, {
+flight.user('admin', true);
+flight.user('basic');
+flight.user('backer', false, {
     level: 'backer'
 });
-flight.user(test, 'sponsor', false, {
+flight.user('sponsor', false, {
     level: 'sponsor'
 });
 
 test('GET: api/user', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user',
+        const res = await flight.fetch('/api/user', {
             auth: {
                 bearer: flight.token.admin
             },
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 5,
@@ -220,13 +207,11 @@ test('GET: api/user', async (t) => {
 
 test('GET: api/user?level=backer', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user?level=backer',
+        const res = await flight.fetch('/api/user?level=backer', {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
-            json: true
+            method: 'GET'
         }, t);
 
         assert.deepEqual(res.body, {
@@ -247,14 +232,12 @@ test('GET: api/user?level=backer', async (t) => {
 
 test('GET: api/user?level=sponsor', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user?level=sponsor',
+        const res = await flight.fetch('/api/user?level=sponsor', {
             auth: {
                 bearer: flight.token.admin
             },
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 1,
@@ -274,14 +257,12 @@ test('GET: api/user?level=sponsor', async (t) => {
 
 test('GET: api/user?filter=ADMIN', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user?filter=ADMIN',
+        const res = await flight.fetch('/api/user?filter=ADMIN', {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
-            json: true
-        }, t);
+            method: 'GET'
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 1,
@@ -301,14 +282,12 @@ test('GET: api/user?filter=ADMIN', async (t) => {
 
 test('GET: api/user?access=admin', async (t) => {
     try {
-        const res = await flight.request({
-            url: '/api/user?access=admin',
+        const res = await flight.fetch('/api/user?access=admin', {
             auth: {
                 bearer: flight.token.admin
             },
             method: 'GET',
-            json: true
-        }, t);
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 1,
@@ -328,14 +307,12 @@ test('GET: api/user?access=admin', async (t) => {
 
 test('GET: api/user?before=<NOW>', async (t) => {
     try {
-        const res = await flight.request({
-            url: `/api/user?before=${encodeURIComponent(moment().toDate().toISOString())}`,
+        const res = await flight.fetch(`/api/user?before=${encodeURIComponent(moment().toDate().toISOString())}`, {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
-            json: true
-        }, t);
+            method: 'GET'
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 5,
@@ -383,14 +360,12 @@ test('GET: api/user?before=<NOW>', async (t) => {
 
 test('GET: api/user?after=<NOW>', async (t) => {
     try {
-        const res = await flight.request({
-            url: `/api/user?after=${encodeURIComponent(moment().toDate().toISOString())}`,
+        const res = await flight.fetch(`/api/user?after=${encodeURIComponent(moment().toDate().toISOString())}`, {
             auth: {
                 bearer: flight.token.admin
             },
-            method: 'GET',
-            json: true
-        }, t);
+            method: 'GET'
+        }, true);
 
         assert.deepEqual(res.body, {
             total: 0,

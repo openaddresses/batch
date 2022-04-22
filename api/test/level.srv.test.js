@@ -161,8 +161,7 @@ test('Level#user', async () =>  {
 
         await level.single('test_single@openaddresses.io');
 
-        const usr_post = await flight.fetch({
-            url: '/api/login',
+        const usr_post = await flight.fetch('/api/login', {
             method: 'GET',
             auth: {
                 bearer: flight.token.test_single

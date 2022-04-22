@@ -13,6 +13,7 @@ test('GET: api/user (no auth)', async () => {
         const res = await flight.fetch('/api/user', {
             method: 'GET'
         }, false);
+
         assert.equal(res.status, 403, 'http: 403');
     } catch (err) {
         assert.ifError(err, 'no error');

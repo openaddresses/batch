@@ -4,12 +4,12 @@ import test from 'node:test';
 import assert from 'assert';
 import { sql } from 'slonik';
 import fs from 'fs';
-import api from '../index.js';
 import Knex from 'knex';
 import KnexConfig from '../knexfile.js';
 import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
 import Ajv from 'ajv';
+import api from '../index.js';
 
 const ajv = new Ajv({
     allErrors: true
@@ -97,13 +97,6 @@ export default class Flight {
             req.body = JSON.stringify(req.body);
         }
 
-        if (!defs.verify) {
-            const _res = await fetch(url, req);
-            const body = defs.json ? await _res.json() : await _res.text();
-            const res = new FlightResponse(_res, body);
-            return res;
-        }
-
         if (req.auth && req.auth.bearer) {
             req.headers['Authorization'] = `Bearer ${req.auth.bearer}`;
         } else if (req.auth && req.auth.username && req.auth.password) {
@@ -111,6 +104,13 @@ export default class Flight {
         }
 
         delete req.auth;
+
+        if (!defs.verify) {
+            const _res = await fetch(url, req);
+            const body = defs.json ? await _res.json() : await _res.text();
+            const res = new FlightResponse(_res, body);
+            return res;
+        }
 
         if (!req.method) req.method = 'GET';
 
@@ -153,7 +153,6 @@ export default class Flight {
             if (!schema.errors) return res;
 
             for (const error of schema.errors) {
-                console.error(error);
                 assert.fail(`${error.schemaPath}: ${error.message}`);
             }
         } else {

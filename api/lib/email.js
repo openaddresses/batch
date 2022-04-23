@@ -1,5 +1,5 @@
+import AWS from 'aws-sdk';
 import Mailgen from 'mailgen';
-import Mailgun from 'mailgun.js';
 import { Err } from '@openaddresses/batch-schema';
 import formData from 'form-data';
 
@@ -9,25 +9,19 @@ const mailgun = new Mailgun(formData);
  * @class
  */
 export default class Email {
-    constructor(pg, arg = {}, srv = {}) {
-        this.pg = pg;
-        this.arg = arg;
-        this.srv = srv;
+    constructor(config) {
+        this.config = config;
+        this.ses = new AWS.SES({
+            region: process.env.AWS_DEFAULT_REGION
+        });
 
-        if (process.env.MAILGUN_API_KEY) {
-            this.mg = mailgun.client({
-                username: 'api',
-                key: process.env.MAILGUN_API_KEY
-            });
-
-            this.mailGenerator = new Mailgen({
-                theme: 'default',
-                product: {
-                    name: 'OpenAddresses',
-                    link: 'https://batch.openaddresses.io'
-                }
-            });
-        }
+        this.mailGenerator = new Mailgen({
+            theme: 'default',
+            product: {
+                name: 'OpenAddresses',
+                link: 'https://batch.openaddresses.io'
+            }
+        });
     }
 
     /**
@@ -39,8 +33,6 @@ export default class Email {
      * @param {String} user.token
      */
     async verify(user) {
-        if (!this.mg) return;
-
         const email = {
             body: {
                 name: user.email,
@@ -58,20 +50,13 @@ export default class Email {
         };
 
         try {
-            await this.mg.messages.create('robot.openaddresses.io', {
-                to: user.email,
-                from: 'hello@openaddresses.io',
-                html: this.mailGenerator.generate(email),
-                subject: 'OpenAddresses Email Confirmation'
-            });
+            return this.send(user.email, 'OpenAddresses Email Confirmation', this.mailGenerator.generate(email));
         } catch (err) {
             throw new Err(500, err, 'Internal User Confirmation Error');
         }
     }
 
     async forgot(user) {
-        if (!this.mg) return;
-
         const email = {
             body: {
                 name: user.email,
@@ -89,14 +74,37 @@ export default class Email {
         };
 
         try {
-            await this.mg.messages.create('robot.openaddresses.io', {
-                to: user.email,
-                from: 'hello@openaddresses.io',
-                html: this.mailGenerator.generate(email),
-                subject: 'OpenAddresses Password Reset'
-            });
+            return this.send(user.email, 'OpenAddresses Password Reset', this.mailGenerator.generate(email));
         } catch (err) {
             throw new Err(500, err, 'Internal User Forgot Error');
         }
     }
+
+    /**
+     * Send an email via the AWS SES Service
+     * Note: All emails are sent from robot@<domain>
+     *
+     * @param {string} email email recipient
+     * @param {string} subject email subject
+     * @param {string} body HTML body to send
+     */
+    async send(email, subject, body) {
+        return await this.ses.sendEmail({
+            Destination: {
+                ToAddresses: [email]
+            },
+            Source: 'no-reply@openaddresses.io',
+            Message: {
+                Subject: {
+                    Data: subject
+                },
+                Body: {
+                    Html: {
+                        Data: body
+                    }
+                }
+            }
+        }).promise();
+    }
+
 }

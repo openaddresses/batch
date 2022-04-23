@@ -121,6 +121,13 @@ const stack = {
                         },{
                             Effect: 'Allow',
                             Action: [
+                                'ses:SendEmail',
+                                'ses:SendRawEmail'
+                            ],
+                            Resource: ['*']
+                        },{
+                            Effect: 'Allow',
+                            Action: [
                                 'logs:DescribeLogGroups',
                                 'logs:DescribeLogStreams',
                                 'logs:FilterLogEvents',

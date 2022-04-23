@@ -1,9 +1,6 @@
 import AWS from 'aws-sdk';
 import Mailgen from 'mailgen';
 import { Err } from '@openaddresses/batch-schema';
-import formData from 'form-data';
-
-const mailgun = new Mailgun(formData);
 
 /**
  * @class

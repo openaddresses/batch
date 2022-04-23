@@ -1,30 +1,26 @@
-
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
-test('GET: /health', async (t) => {
+test('GET: /health', async () => {
     try {
-        const res = await flight.request({
-            url: '/health',
-            method: 'GET',
-            json: true
+        const res = await flight.fetch('/health', {
+            method: 'GET'
         }, false);
 
-        t.equals(res.statusCode, 200, 'http: 200');
-        t.deepEquals(res.body, {
+        assert.equal(res.status, 200, 'http: 200');
+        assert.deepEqual(res.body, {
             healthy: true,
             message: 'I work all day, I work all night to get the open the data!'
         });
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

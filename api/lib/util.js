@@ -9,7 +9,7 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.ur
  */
 export class Status {
     static list() {
-        return JSON.parse(fs.readFileSync(new URL('../schema/util/status.json'))).enum;
+        return JSON.parse(fs.readFileSync(new URL('../schema/util/status.json', import.meta.url))).enum;
     }
 
     static verify(statuses) {

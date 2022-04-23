@@ -1,32 +1,33 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 import Collection from '../lib/collections.js';
 import { Err } from '@openaddresses/batch-schema';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 process.env.Bucket = 'v2.openaddresses.io';
 
-test('Collection()', (t) => {
-    t.throws(() => {
+test('Collection()', () => {
+    assert.throws(() => {
         new Collection();
     }, new Err(400, null, 'Collection.name must be a string'), 'Collection.name must be a string');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Collection('');
     }, new Err(400, null, 'Collection.name cannot be empty'), 'Collection.name cannot be empty');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Collection('*4d$');
     }, new Err(400, null, 'Collection.name may only contain a-z 0-9 and -'), 'Collection.name may only contain a-z 0-9 and -');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Collection('global');
     }, new Err(400, null, 'Collection.sources must be an array'), 'Collection.sources must be an array');
 
-    t.throws(() => {
+    assert.throws(() => {
         new Collection('global', [true]);
     }, new Err(400, null, 'Collection.sources array must contain strings'), 'Collection.sources array must contain strings');
 
@@ -35,30 +36,28 @@ test('Collection()', (t) => {
         ['**']
     );
 
-    t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.name, 'global', 'collection.name: global');
-    t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["**"]');
-    t.equals(collection.created, false, 'collection.created: false');
-    t.equals(collection.size, 0, 'collection.size: 0');
-    t.equals(collection.s3, false, 'collection.s3: false');
-
-    t.end();
+    assert.equal(collection.id, false, 'collection.id: false');
+    assert.equal(collection.name, 'global', 'collection.name: global');
+    assert.deepEqual(collection.sources, ['**'], 'collection.sources:  ["**"]');
+    assert.equal(collection.created, false, 'collection.created: false');
+    assert.equal(collection.size, 0, 'collection.size: 0');
+    assert.equal(collection.s3, false, 'collection.s3: false');
 });
 
-test('Collection#json()', (t) => {
+test('Collection#json()', () => {
     const collection = new Collection(
         'usa',
         ['us/**']
     );
 
-    t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.name, 'usa', 'collection.name: usa');
-    t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
-    t.equals(collection.created, false, 'collection.created: false');
-    t.equals(collection.size, 0, 'collection.size: 0');
-    t.equals(collection.s3, false, 'collection.s3: false');
+    assert.equal(collection.id, false, 'collection.id: false');
+    assert.equal(collection.name, 'usa', 'collection.name: usa');
+    assert.deepEqual(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
+    assert.equal(collection.created, false, 'collection.created: false');
+    assert.equal(collection.size, 0, 'collection.size: 0');
+    assert.equal(collection.s3, false, 'collection.s3: false');
 
-    t.deepEquals(collection.json(), {
+    assert.deepEqual(collection.json(), {
         id: NaN,
         name: 'usa',
         sources: ['us/**'],
@@ -66,22 +65,20 @@ test('Collection#json()', (t) => {
         size: 0,
         s3: false
     });
-
-    t.end();
 });
 
-test('Collection#patch()', (t) => {
+test('Collection#patch()', () => {
     const collection = new Collection(
         'usa',
         ['us/**']
     );
 
-    t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.name, 'usa', 'collection.name: use');
-    t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
-    t.equals(collection.created, false, 'collection.created: false');
-    t.equals(collection.size, 0, 'collection.size: 0');
-    t.equals(collection.s3, false, 'collection.s3: false');
+    assert.equal(collection.id, false, 'collection.id: false');
+    assert.equal(collection.name, 'usa', 'collection.name: use');
+    assert.deepEqual(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
+    assert.equal(collection.created, false, 'collection.created: false');
+    assert.equal(collection.size, 0, 'collection.size: 0');
+    assert.equal(collection.s3, false, 'collection.s3: false');
 
     collection.patch({
         name: 'global',
@@ -90,19 +87,17 @@ test('Collection#patch()', (t) => {
     });
 
     // Cannot be changed
-    t.equals(collection.id, false, 'collection.id: false');
-    t.equals(collection.s3, false, 'collection.s3: false');
+    assert.equal(collection.id, false, 'collection.id: false');
+    assert.equal(collection.s3, false, 'collection.s3: false');
 
     // Can be changed
-    t.equals(collection.name, 'global', 'collection.name: global');
-    t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["**"]');
-    t.equals(collection.created, false, 'collection.created: false');
-    t.equals(collection.size, 123, 'collection.size: 123');
-
-    t.end();
+    assert.equal(collection.name, 'global', 'collection.name: global');
+    assert.deepEqual(collection.sources, ['**'], 'collection.sources:  ["**"]');
+    assert.equal(collection.created, false, 'collection.created: false');
+    assert.equal(collection.size, 123, 'collection.size: 123');
 });
 
-test('Collection#generate()', async (t) => {
+test('Collection#generate()', async () => {
     try {
         const collection = new Collection(
             'usa',
@@ -110,14 +105,14 @@ test('Collection#generate()', async (t) => {
         );
 
         await collection.generate(flight.config.pool);
-        t.equals(collection.id, 1, 'collection.id: 1');
-        t.equals(collection.name, 'usa', 'collection.name: use');
-        t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
-        t.ok(collection.created, 'collection.created: <data>');
-        t.equals(collection.size, 0, 'collection.size: 0');
-        t.equals(collection.s3, 's3://v2.openaddresses.io/test/collection-usa.zip', 'collection.s3: s3://v2.openaddresses.io/test/collection-usa.zip');
+        assert.equal(collection.id, 1, 'collection.id: 1');
+        assert.equal(collection.name, 'usa', 'collection.name: use');
+        assert.deepEqual(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
+        assert.ok(collection.created, 'collection.created: <data>');
+        assert.equal(collection.size, 0, 'collection.size: 0');
+        assert.equal(collection.s3, 's3://v2.openaddresses.io/test/collection-usa.zip', 'collection.s3: s3://v2.openaddresses.io/test/collection-usa.zip');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 
     try {
@@ -128,24 +123,22 @@ test('Collection#generate()', async (t) => {
 
         await collection.generate(flight.config.pool);
 
-        t.fail('duplicate collections should fail');
+        assert.fail('duplicate collections should fail');
     } catch (err) {
-        t.deepEquals(err, new Err(400, null, 'duplicate collections not allowed'));
+        assert.deepEqual(err, new Err(400, null, 'duplicate collections not allowed'));
     }
-
-    t.end();
 });
 
-test('Collection#list', async (t) => {
+test('Collection#list', async () => {
     try {
         const list = await Collection.list(flight.config.pool);
 
-        t.equals(list.length, 1, 'list.length: 1');
+        assert.equal(list.length, 1, 'list.length: 1');
 
-        t.ok(list[0].created, 'list[0].created: <date>');
+        assert.ok(list[0].created, 'list[0].created: <date>');
         delete list[0].created;
 
-        t.same(list[0], {
+        assert.deepEqual(list[0], {
             id: 1,
             name: 'usa',
             sources: ['us/**'],
@@ -153,13 +146,11 @@ test('Collection#list', async (t) => {
             s3: 's3://v2.openaddresses.io/test/collection-usa.zip'
         }, 'list[0]: <object>');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-test('Collection#data', async (t) => {
+test('Collection#data', async () => {
     try {
         let param = false;
 
@@ -169,9 +160,9 @@ test('Collection#data', async (t) => {
             }
         });
 
-        t.equals(param, 'https://v2.openaddresses.io/test/collection-usa.zip', 'html data url');
+        assert.equal(param, 'https://v2.openaddresses.io/test/collection-usa.zip', 'html data url');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 
     try {
@@ -183,43 +174,39 @@ test('Collection#data', async (t) => {
             }
         });
 
-        t.equals(param, 'https://v2.openaddresses.io/test/collection-usa.zip', 'html data url');
+        assert.equal(param, 'https://v2.openaddresses.io/test/collection-usa.zip', 'html data url');
 
-        t.fail('collection should not be found');
+        assert.fail('collection should not be found');
     } catch (err) {
-        t.deepEquals(err, new Err(404, null, 'collection not found'));
+        assert.deepEqual(err, new Err(404, null, 'collection not found'));
     }
-
-    t.end();
 });
 
-test('Collection#from()', async (t) => {
+test('Collection#from()', async () => {
     try {
         const collection = await Collection.from(flight.config.pool, 1);
 
-        t.equals(collection.id, 1, 'collection.id: 1');
-        t.equals(collection.name, 'usa', 'collection.name: use');
-        t.deepEquals(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
-        t.ok(collection.created, 'collection.created: <date>');
-        t.equals(collection.size, 0, 'collection.size: 0');
-        t.equals(collection.s3, 's3://v2.openaddresses.io/test/collection-usa.zip', 'collection.s3: <s3 path>');
+        assert.equal(collection.id, 1, 'collection.id: 1');
+        assert.equal(collection.name, 'usa', 'collection.name: use');
+        assert.deepEqual(collection.sources, ['us/**'], 'collection.sources:  ["us/**"]');
+        assert.ok(collection.created, 'collection.created: <date>');
+        assert.equal(collection.size, 0, 'collection.size: 0');
+        assert.equal(collection.s3, 's3://v2.openaddresses.io/test/collection-usa.zip', 'collection.s3: <s3 path>');
 
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 
     try {
         await Collection.from(flight.config.pool, 2);
 
-        t.fail('collection should not be found');
+        assert.fail('collection should not be found');
     } catch (err) {
-        t.deepEquals(err, new Err(404, null, 'collection not found'));
+        assert.deepEqual(err, new Err(404, null, 'collection not found'));
     }
-
-    t.end();
 });
 
-test('Collection#commit()', async (t) => {
+test('Collection#commit()', async () => {
     try {
         const collection = new Collection(
             'global',
@@ -228,7 +215,7 @@ test('Collection#commit()', async (t) => {
 
         await collection.generate(flight.config.pool);
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 
     try {
@@ -241,7 +228,7 @@ test('Collection#commit()', async (t) => {
 
         await collection.commit(flight.config.pool);
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 
     try {
@@ -249,35 +236,33 @@ test('Collection#commit()', async (t) => {
 
         await collection.commit(flight.config.pool);
 
-        t.equals(collection.id, 3, 'collection.id: 1');
-        t.equals(collection.name, 'global', 'collection.name: use');
-        t.deepEquals(collection.sources, ['**'], 'collection.sources:  ["us/**"]');
-        t.ok(collection.created, 'collection.created: <date>');
-        t.equals(collection.size, 1234, 'collection.size: 0');
-        t.equals(collection.s3, 's3://v2.openaddresses.io/test/collection-global.zip', 'collection.s3: <s3 path>');
+        assert.equal(collection.id, 3, 'collection.id: 1');
+        assert.equal(collection.name, 'global', 'collection.name: use');
+        assert.deepEqual(collection.sources, ['**'], 'collection.sources:  ["us/**"]');
+        assert.ok(collection.created, 'collection.created: <date>');
+        assert.equal(collection.size, 1234, 'collection.size: 0');
+        assert.equal(collection.s3, 's3://v2.openaddresses.io/test/collection-global.zip', 'collection.s3: <s3 path>');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-test('Collection#delete()', async (t) => {
+test('Collection#delete()', async () => {
     try {
         await Collection.delete(flight.config.pool, 3);
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 
     try {
         const list = await Collection.list(flight.config.pool);
 
-        t.equals(list.length, 1, 'list.length: 1');
+        assert.equal(list.length, 1, 'list.length: 1');
 
-        t.ok(list[0].created, 'list[0].created: <date>');
+        assert.ok(list[0].created, 'list[0].created: <date>');
         delete list[0].created;
 
-        t.same(list[0], {
+        assert.deepEqual(list[0], {
             id: 1,
             name: 'usa',
             sources: ['us/**'],
@@ -285,10 +270,8 @@ test('Collection#delete()', async (t) => {
             s3: 's3://v2.openaddresses.io/test/collection-usa.zip'
         }, 'list[0]: <object>');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

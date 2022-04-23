@@ -1,18 +1,17 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
-flight.user(test, 'admin', true);
+flight.init();
+flight.takeoff();
+flight.user('admin', true);
 
-test('POST: api/level', async (t) => {
+test('POST: api/level', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level',
+        const res = await flight.fetch('/api/level', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.admin
             },
@@ -20,31 +19,27 @@ test('POST: api/level', async (t) => {
                 pattern: '/^hello@openaddresses.io$/',
                 level: 'sponsor'
             }
-        }, t);
+        }, true);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             pattern: '/^hello@openaddresses.io$/',
             level: 'sponsor'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('POST: api/level', async (t) => {
+test('POST: api/level', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level',
+        const res = await flight.fetch('/api/level', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.admin
             },
@@ -52,29 +47,26 @@ test('POST: api/level', async (t) => {
                 pattern: '/^.*@example.com$/',
                 level: 'sponsor'
             }
-        }, t);
+        }, true);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 2,
             pattern: '/^.*@example.com$/',
             level: 'sponsor'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('PATCH: api/level/2', async (t) => {
+test('PATCH: api/level/2', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
+        const res = await flight.fetch('/api/level/2', {
             method: 'PATCH',
             json: true,
             auth: {
@@ -83,138 +75,118 @@ test('PATCH: api/level/2', async (t) => {
             body: {
                 level: 'backer'
             }
-        }, t);
+        }, true);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 2,
             pattern: '/^.*@example.com$/',
             level: 'backer'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/level/2', async (t) => {
+test('GET: api/level/2', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
-            json: true,
+        const res = await flight.fetch('/api/level/2', {
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 2,
             pattern: '/^.*@example.com$/',
             level: 'backer'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/level/1', async (t) => {
+test('GET: api/level/1', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level/1',
-            json: true,
+        const res = await flight.fetch('/api/level/1', {
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
-        t.ok(res.body.updated);
+        assert.ok(res.body.updated);
         delete res.body.updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             pattern: '/^hello@openaddresses.io$/',
             level: 'sponsor'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('DELETE: api/level/2', async (t) => {
+test('DELETE: api/level/2', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
-            json: true,
+        const res = await flight.fetch('/api/level/2', {
             method: 'DELETE',
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             status: 200,
             message: 'Delete Level Override'
 
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/level/2', async (t) => {
+test('GET: api/level/2', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level/2',
-            json: true,
+        const res = await flight.fetch('/api/level/2', {
             auth: {
                 bearer: flight.token.admin
             }
         }, false);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             status: 404,
             message: 'level_override not found',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/level', async (t) => {
+test('GET: api/level', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/level',
-            json: true,
+        const res = await flight.fetch('/api/level', {
             auth: {
                 bearer: flight.token.admin
             }
-        }, t);
+        }, true);
 
         delete res.body.level_override[0].created;
         delete res.body.level_override[0].updated;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             level_override: [{
                 id: 1,
@@ -223,10 +195,8 @@ test('GET: api/level', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

@@ -1,103 +1,95 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
-flight.user(test, 'sponsor', false, {
+flight.user('sponsor', false, {
     level: 'sponsor'
 });
 
-flight.user(test, 'sponsor2', false, {
+flight.user('sponsor2', false, {
     level: 'sponsor'
 });
 
 let token;
 
-test('GET /api/token', async (t) => {
+test('GET /api/token', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: flight.token.sponsor
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 0,
             tokens: []
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-test('POST /api/token', async (t) => {
+test('POST /api/token', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.sponsor
             },
             body: {
                 name: 'Default Token'
             }
-        }, t);
+        }, true);
 
-        t.ok(res.body.token);
+        assert.ok(res.body.token);
         token = res.body.token;
         delete res.body.token;
 
-        t.ok(res.body.created);
+        assert.ok(res.body.created);
         delete res.body.created;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             name: 'Default Token'
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-test('POST /api/token (sponsor2)', async (t) => {
+test('POST /api/token (sponsor2)', async () => {
     try {
-        await flight.request({
-            url: '/api/token',
+        await flight.fetch('/api/token', {
             method: 'POST',
-            json: true,
             auth: {
                 bearer: flight.token.sponsor2
             },
             body: {
                 name: 'Default Token'
             }
-        }, t);
+        }, true);
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-test('GET /api/token', async (t) => {
+test('GET /api/token', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: token
             }
-        }, t);
-
+        }, true);
 
         delete res.body.tokens[0].created;
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             total: 1,
             tokens: [{
                 id: 1,
@@ -105,73 +97,67 @@ test('GET /api/token', async (t) => {
             }]
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-test('DELETE /api/token/2 - Can only delete own tokens', async (t) => {
+test('DELETE /api/token/2 - Can only delete own tokens', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/token/2',
+        const res = await flight.fetch('/api/token/2', {
             method: 'DELETE',
-            json: true,
             auth: {
                 bearer: token
             }
         }, false);
 
-        t.equals(res.statusCode, 401);
-        t.deepEquals(res.body, {
+        assert.equal(res.status, 401);
+        assert.deepEqual(res.body, {
             status: 401,
             message: 'You can only access your own tokens',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-test('DELETE /api/token/1', async (t) => {
+test('DELETE /api/token/1', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/token/1',
+        const res = await flight.fetch('/api/token/1', {
             method: 'DELETE',
-            json: true,
             auth: {
                 bearer: token
             }
-        }, t);
+        }, true);
 
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             status: 200,
             message: 'Token Deleted'
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-test('GET /api/token - verify token was deleted', async (t) => {
+test('GET /api/token - verify token was deleted', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/token',
+        const res = await flight.fetch('/api/token', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: token
             }
         }, false);
 
-        t.equals(res.statusCode, 401);
-        t.deepEquals(res.body, {
+        assert.equal(res.status, 401);
+        assert.deepEqual(res.body, {
             status: 401,
             message: 'Invalid token',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
 });
 
-flight.landing(test);
+flight.landing();

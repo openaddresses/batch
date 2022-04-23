@@ -1,4 +1,5 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Level from '../lib/level.js';
 import LevelOverride from '../lib/level-override.js';
 import Flight from './flight.js';
@@ -7,11 +8,11 @@ import moment from 'moment';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
-flight.user(test, 'test_all');
+flight.init();
+flight.takeoff();
+flight.user('test_all');
 
-test('Level#all', async (t) =>  {
+test('Level#all', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -49,40 +50,34 @@ test('Level#all', async (t) =>  {
     const level = new Level(flight.config.pool);
 
     try {
-        const usr_pre = await flight.request({
-            url: '/api/login',
+        const usr_pre = await flight.fetch('/api/login', {
             auth: {
                 bearer: flight.token.test_all
             },
-            method: 'GET',
-            json: true
-        }, t);
+            method: 'GET'
+        }, true);
 
-        t.equals(usr_pre.body.level, 'basic');
+        assert.equal(usr_pre.body.level, 'basic');
 
         await level.all();
 
-        const usr_post = await flight.request({
-            url: '/api/login',
+        const usr_post = await flight.fetch('/api/login', {
             method: 'GET',
             auth: {
                 bearer: flight.token.test_all
-            },
-            json: true
-        }, t);
+            }
+        }, true);
 
-        t.deepEquals(usr_post.body.level, 'sponsor');
+        assert.deepEqual(usr_post.body.level, 'sponsor');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.user(test, 'hello');
+flight.user('hello');
 
 
-test('Level#user - override', async (t) =>  {
+test('Level#user - override', async () =>  {
     const level = new Level(flight.config.pool);
 
     await LevelOverride.generate(flight.config.pool, {
@@ -91,39 +86,33 @@ test('Level#user - override', async (t) =>  {
     });
 
     try {
-        const usr_pre = await flight.request({
-            url: '/api/login',
+        const usr_pre = await flight.fetch('/api/login', {
             method: 'GET',
             auth: {
                 bearer: flight.token.hello
-            },
-            json: true
-        }, t);
+            }
+        }, true);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('hello@openaddresses.io');
 
-        const usr_post = await flight.request({
-            url: '/api/login',
+        const usr_post = await flight.fetch('/api/login', {
             method: 'GET',
             auth: {
                 bearer: flight.token.hello
-            },
-            json: true
-        }, t);
+            }
+        }, true);
 
-        t.deepEquals(usr_post.body.level, 'sponsor');
+        assert.deepEqual(usr_post.body.level, 'sponsor');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.user(test, 'test_single');
+flight.user('test_single');
 
-test('Level#user', async (t) =>  {
+test('Level#user', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -161,39 +150,33 @@ test('Level#user', async (t) =>  {
     const level = new Level(flight.config.pool);
 
     try {
-        const usr_pre = await flight.request({
-            url: '/api/login',
+        const usr_pre = await flight.fetch('/api/login', {
             auth: {
                 bearer: flight.token.test_single
             },
-            method: 'GET',
-            json: true
-        }, t);
+            method: 'GET'
+        }, true);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('test_single@openaddresses.io');
 
-        const usr_post = await flight.request({
-            url: '/api/login',
+        const usr_post = await flight.fetch('/api/login', {
             method: 'GET',
             auth: {
                 bearer: flight.token.test_single
-            },
-            json: true
-        }, t);
+            }
+        }, true);
 
-        t.deepEquals(usr_post.body.level, 'backer');
+        assert.deepEqual(usr_post.body.level, 'backer');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.user(test, 'test_single1');
+flight.user('test_single1');
 
-test('Level#user - no contrib', async (t) =>  {
+test('Level#user - no contrib', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -223,39 +206,33 @@ test('Level#user - no contrib', async (t) =>  {
     const level = new Level(flight.config.pool);
 
     try {
-        const usr_pre = await flight.request({
-            url: '/api/login',
+        const usr_pre = await flight.fetch('/api/login', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: flight.token.test_single1
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('test_single1@openaddresses.io');
 
-        const usr_post = await flight.request({
-            url: '/api/login',
+        const usr_post = await flight.fetch('/api/login', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: flight.token.test_single1
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(usr_post.body.level, 'basic');
+        assert.deepEqual(usr_post.body.level, 'basic');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.user(test, 'test_single_none');
+flight.user('test_single_none');
 
-test('Level#user - no match', async (t) =>  {
+test('Level#user - no match', async () =>  {
     nock('https://api.opencollective.com')
         .post('/graphql/v2')
         .reply(200, {
@@ -272,40 +249,33 @@ test('Level#user - no match', async (t) =>  {
     const level = new Level(flight.config.pool);
 
     try {
-        const usr_pre = await flight.request({
-            url: '/api/login',
+        const usr_pre = await flight.fetch('/api/login', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: flight.token.test_single_none
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(usr_pre.body.level, 'basic');
+        assert.deepEqual(usr_pre.body.level, 'basic');
 
         await level.single('test_single_none@openaddresses.io');
 
-        const usr_post = await flight.request({
-            url: '/api/login',
+        const usr_post = await flight.fetch('/api/login', {
             method: 'GET',
-            json: true,
             auth: {
                 bearer: flight.token.test_single_none
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(usr_post.body.level, 'basic');
+        assert.deepEqual(usr_post.body.level, 'basic');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();
 
-test('close', (t) => {
+test('close', () => {
     nock.cleanAll();
     nock.enableNetConnect();
-    t.end();
 });

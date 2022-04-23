@@ -1,45 +1,40 @@
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 import fs from 'fs';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
-test('POST: api/run', async (t) => {
+test('POST: api/run', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/run',
+        const res = await flight.fetch('/api/run', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 live: true
             }
-        }, t);
+        }, true);
 
-        t.equals(res.body.id, 1, 'run.id: 1');
-        t.ok(res.body.created, 'run.created: <truthy>');
-        t.deepEquals(res.body.github, {}, 'run.github: {}');
-        t.deepEquals(res.body.closed, false, 'run.closed: false');
+        assert.equal(res.body.id, 1, 'run.id: 1');
+        assert.ok(res.body.created, 'run.created: <truthy>');
+        assert.deepEqual(res.body.github, {}, 'run.github: {}');
+        assert.deepEqual(res.body.closed, false, 'run.closed: false');
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('POST: api/run/:run/jobs', async (t) => {
+test('POST: api/run/:run/jobs', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/run/1/jobs',
+        const res = await flight.fetch('/api/run/1/jobs', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -48,61 +43,53 @@ test('POST: api/run/:run/jobs', async (t) => {
                     'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json'
                 ]
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             run: 1,
             jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('PATCH: api/job/:job', async (t) => {
+test('PATCH: api/job/:job', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/1',
+        const res = await flight.fetch('/api/job/1', {
             method: 'PATCH',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 status: 'Fail'
             }
-        }, t);
+        }, true);
 
-        t.equals(res.body.id, 1, 'job.id: 1');
-        t.equals(res.body.run, 1, 'job.run: 1');
-        t.ok(res.body.created, 'job.created: <truthy>');
-        t.equals(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json', 'job.source: <url>');
-        t.equals(res.body.layer, 'addresses', 'job.layer: addresses');
-        t.equals(res.body.name, 'dcgis', 'job.name: dcgis');
-        t.deepEquals(res.body.output, {
+        assert.equal(res.body.id, 1, 'job.id: 1');
+        assert.equal(res.body.run, 1, 'job.run: 1');
+        assert.ok(res.body.created, 'job.created: <truthy>');
+        assert.equal(res.body.source, 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json', 'job.source: <url>');
+        assert.equal(res.body.layer, 'addresses', 'job.layer: addresses');
+        assert.equal(res.body.name, 'dcgis', 'job.name: dcgis');
+        assert.deepEqual(res.body.output, {
             cache: false,
             output: false,
             preview: false,
             validated: false
         }, 'job.output: { ... }');
-        t.equals(res.body.loglink, null, 'job.loglink: null');
-        t.equals(res.body.status, 'Fail', 'job.status: Fail');
-        t.equals(res.body.version, pkg.version, 'job.version: <semver>');
+        assert.equal(res.body.loglink, null, 'job.loglink: null');
+        assert.equal(res.body.status, 'Fail', 'job.status: Fail');
+        assert.equal(res.body.version, pkg.version, 'job.version: <semver>');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('POST: api/job/error', async (t) => {
+test('POST: api/job/error', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -110,28 +97,24 @@ test('POST: api/job/error', async (t) => {
                 job: 1,
                 message: 'Something went wrong!'
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             job: 1,
             message: 'Something went wrong!'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/job/error', async (t) => {
+test('GET: api/job/error', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
-            method: 'GET',
-            json: true
-        }, t);
+        const res = await flight.fetch('/api/job/error', {
+            method: 'GET'
+        }, true);
 
-        t.deepEquals(res.body, [{
+        assert.deepEqual(res.body, [{
             id: 1,
             status: 'Fail',
             messages: ['Something went wrong!'],
@@ -140,21 +123,17 @@ test('GET: api/job/error', async (t) => {
             name: 'dcgis'
         }]);
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/job/error/1', async (t) => {
+test('GET: api/job/error/1', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
-            method: 'GET',
-            json: true
-        }, t);
+        const res = await flight.fetch('/api/job/error/1', {
+            method: 'GET'
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             status: 'Fail',
             messages: ['Something went wrong!'],
@@ -163,18 +142,14 @@ test('GET: api/job/error/1', async (t) => {
             name: 'dcgis'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('POST: api/job/error', async (t) => {
+test('POST: api/job/error', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
@@ -182,28 +157,24 @@ test('POST: api/job/error', async (t) => {
                 job: 1,
                 message: 'Another Something went wrong!'
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             job: 1,
             message: 'Another Something went wrong!'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/job/error', async (t) => {
+test('GET: api/job/error', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
-            method: 'GET',
-            json: true
-        }, t);
+        const res = await flight.fetch('/api/job/error', {
+            method: 'GET'
+        }, true);
 
-        t.deepEquals(res.body, [{
+        assert.deepEqual(res.body, [{
             id: 1,
             status: 'Fail',
             messages: ['Something went wrong!', 'Another Something went wrong!'],
@@ -213,21 +184,17 @@ test('GET: api/job/error', async (t) => {
         }]);
 
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/job/error/1', async (t) => {
+test('GET: api/job/error/1', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
-            method: 'GET',
-            json: true
-        }, t);
+        const res = await flight.fetch('/api/job/error/1', {
+            method: 'GET'
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             id: 1,
             status: 'Fail',
             messages: ['Something went wrong!', 'Another Something went wrong!'],
@@ -236,75 +203,62 @@ test('GET: api/job/error/1', async (t) => {
             name: 'dcgis'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('POST: api/job/error/1', async (t) => {
+test('POST: api/job/error/1', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
+        const res = await flight.fetch('/api/job/error/1', {
             method: 'POST',
-            json: true,
             headers: {
                 'shared-secret': '123'
             },
             body: {
                 moderate: 'reject'
             }
-        }, t);
+        }, true);
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             job: 1,
             moderate: 'reject'
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/job/error', async (t) => {
+test('GET: api/job/error', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error',
+        const res = await flight.fetch('/api/job/error', {
             method: 'GET',
             json: true
         }, false);
 
-        t.equals(res.statusCode, 404, 'http: 404');
+        assert.equal(res.status, 404, 'http: 404');
 
-        t.deepEquals(res.body, {
+        assert.deepEqual(res.body, {
             status: 404,
             message: 'No job errors found',
             messages: []
         });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('GET: api/job/error/1', async (t) => {
+test('GET: api/job/error/1', async () => {
     try {
-        const res = await flight.request({
-            url: '/api/job/error/1',
-            method: 'GET',
-            json: true
+        const res = await flight.fetch('/api/job/error/1', {
+            method: 'GET'
         }, false);
 
-        t.equals(res.statusCode, 404, 'http: 404');
+        assert.equal(res.status, 404, 'http: 404');
 
-        t.deepEquals(res.body, { status: 404, message: 'No job errors found', messages: [] });
+        assert.deepEqual(res.body, { status: 404, message: 'No job errors found', messages: [] });
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

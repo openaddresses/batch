@@ -1,14 +1,13 @@
 import Bunny from '../lib/bunny.js';
-import tape from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 
-tape('Bunny#sign', (t) => {
+test('Bunny#sign', () => {
     const bunny = new Bunny('123');
 
-    t.equals(
+    assert.equal(
         bunny.sign('https://v2.openaddresses.io/batch-prod/collection-global.zip', 1609484400),
         'https://v2.openaddresses.io/batch-prod/collection-global.zip?token=82EYgkUPhv%2FL9szDzOkUU8Lqw4m8%2F35j3qXyX0zXaX4%3D&expires=1609484400',
         'expected token'
     );
-
-    t.end();
 });

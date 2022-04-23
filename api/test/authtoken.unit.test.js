@@ -1,25 +1,26 @@
 import User from '../lib/user.js';
 import Token from '../lib/token.js';
-import test from 'tape';
+import test from 'node:test';
+import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
 
-flight.init(test);
-flight.takeoff(test);
+flight.init();
+flight.takeoff();
 
 let TOKEN = '';
 
-test('Token#generate', async (t) => {
+test('Token#generate', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.generate({
             type: 'token'
         });
-        t.fail('token.generate should fail');
+        assert.fail('token.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 400,
             err: null,
             safe: 'Only a user session can create a token'
@@ -30,9 +31,9 @@ test('Token#generate', async (t) => {
         await authtoken.generate({
             type: 'session'
         });
-        t.fail('token.generate should fail');
+        assert.fail('token.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 500,
             err: null,
             safe: 'Server could not determine user id'
@@ -44,9 +45,9 @@ test('Token#generate', async (t) => {
             uid: 1,
             type: 'session'
         });
-        t.fail('token.generate should fail');
+        assert.fail('token.generate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 400,
             err: null,
             safe: 'Token name required'
@@ -67,27 +68,25 @@ test('Token#generate', async (t) => {
         }, 'New Token');
 
         TOKEN = token.token;
-        t.deepLooseEqual(Object.keys(token).sort(), ['created', 'id', 'name', 'token'], 'token: <keys>');
-        t.equals(token.token.length, 67, 'token.token: <67 chars>');
-        t.equals(token.id, 1, 'token.id: 1');
-        t.ok(token.created, 'token.created: <date>');
+        assert.deepEqual(Object.keys(token).sort(), ['created', 'id', 'name', 'token'], 'token: <keys>');
+        assert.equal(token.token.length, 67, 'token.token: <67 chars>');
+        assert.equal(token.id, 1, 'token.id: 1');
+        assert.ok(token.created, 'token.created: <date>');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('Token#list', async (t) => {
+test('Token#list', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.list({
             type: 'session'
         });
-        t.fail('token.list should fail');
+        assert.fail('token.list should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 500,
             err: null,
             safe: 'Server could not determine user id'
@@ -100,28 +99,26 @@ test('Token#list', async (t) => {
             type: 'session'
         });
 
-        t.equals(tokens.total, 1, 'tokens.total: 1');
-        t.equals(tokens.tokens.length,  1, 'tokens.tokens.length: 1');
-        t.deepLooseEqual(Object.keys(tokens.tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
-        t.notOk(tokens.tokens[0].token, 'tokens[0].token: <undefined>');
-        t.equals(tokens.tokens[0].id, 1, 'tokens[0].id: 1');
-        t.ok(tokens.tokens[0].created, 'tokens[0].created: <date>');
+        assert.equal(tokens.total, 1, 'tokens.total: 1');
+        assert.equal(tokens.tokens.length,  1, 'tokens.tokens.length: 1');
+        assert.deepEqual(Object.keys(tokens.tokens[0]).sort(), ['created', 'id', 'name'], 'tokens[0]: <keys>');
+        assert.ok(!tokens.tokens[0].token, 'tokens[0].token: <undefined>');
+        assert.equal(tokens.tokens[0].id, 1, 'tokens[0].id: 1');
+        assert.ok(tokens.tokens[0].created, 'tokens[0].created: <date>');
     } catch (err) {
-        t.error(err, 'no errors');
+        assert.ifError(err, 'no errors');
     }
-
-    t.end();
 });
 
-test('Token#validate', async (t) => {
+test('Token#validate', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.validate('test');
 
-        t.fail('token.validate should fail');
+        assert.fail('token.validate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 401,
             err: null,
             safe: 'Invalid token'
@@ -132,9 +129,9 @@ test('Token#validate', async (t) => {
         // There is an infinitely small chance this test could pass if the random token matches this
         await authtoken.validate('oa.31a28cf8684a6b32566d096500b93f5bb5cb897bc7f227ba8932555d89cfb433');
 
-        t.fail('token.validate should fail');
+        assert.fail('token.validate should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 401,
             err: null,
             safe: 'Invalid token'
@@ -144,27 +141,26 @@ test('Token#validate', async (t) => {
     try {
         const auth = await authtoken.validate(TOKEN);
 
-        t.equals(auth.uid, 1, 'auth.uid: 1');
-        t.equals(auth.username, 'test', 'auth.username: test');
-        t.equals(auth.access, 'user', 'auth.access: user');
-        t.equals(auth.email, 'test@openaddresses.io', 'auth.email: test@openaddresses.io');
+        assert.equal(auth.uid, 1, 'auth.uid: 1');
+        assert.equal(auth.username, 'test', 'auth.username: test');
+        assert.equal(auth.access, 'user', 'auth.access: user');
+        assert.equal(auth.email, 'test@openaddresses.io', 'auth.email: test@openaddresses.io');
     } catch (err) {
-        t.error(err, 'no error');
+        assert.ifError(err, 'no error');
     }
-
-    t.end();
 });
 
-test('Token#delete', async (t) => {
+test('Token#delete', async () => {
     const authtoken = new Token(flight.config.pool);
 
     try {
         await authtoken.delete({
             type: 'session'
         });
-        t.fail('token.delete should fail');
+
+        assert.fail('token.delete should fail');
     } catch (err) {
-        t.deepLooseEqual(err, {
+        assert.deepEqual(err, {
             status: 500,
             err: null,
             safe: 'Server could not determine user id'
@@ -172,7 +168,7 @@ test('Token#delete', async (t) => {
     }
 
     try {
-        t.deepLooseEqual(await authtoken.delete({
+        assert.deepEqual(await authtoken.delete({
             uid: 1,
             type: 'session'
         }, 1), {
@@ -180,10 +176,8 @@ test('Token#delete', async (t) => {
             message: 'Token Deleted'
         });
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
-
-    t.end();
 });
 
-flight.landing(test);
+flight.landing();

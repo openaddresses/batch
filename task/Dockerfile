@@ -12,3 +12,4 @@ RUN apk add git jq
 WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch
 
+RUN npm install

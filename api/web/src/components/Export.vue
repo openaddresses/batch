@@ -10,6 +10,13 @@
 
                 <h2 class='txt-h4 ml12 fl mb6'>
                     Export #<span v-text='exportid'/>
+                    <div class='cursor-pointer fr dropdown'>
+                        <svg class='icon' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg>
+
+                        <div class='round dropdown-content'>
+                            <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
+                        </div>
+                    </div>
                 </h2>
 
                 <button @click='refresh' class='btn round btn--stroke fr color-gray'>
@@ -122,6 +129,20 @@ export default {
             } catch(err) {
                 this.$emit('err', err);
             }
+        },
+        createRerun: async function() {
+            try {
+                this.loading = true;
+                await window.std(`/api/export/${this.exportid}`, {
+                    method: 'PUT'
+                });
+
+                this.refresh();
+            } catch (err) {
+                this.$emit('err', err);
+            }
+
+            this.loading = false;
         }
     },
     components: {

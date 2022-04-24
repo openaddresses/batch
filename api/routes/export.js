@@ -143,7 +143,7 @@ export default async function router(schema, config) {
      *
      * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
      */
-    await schema.get('/export/:exportid', {
+    await schema.put('/export/:exportid', {
         ':exportid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
@@ -155,7 +155,7 @@ export default async function router(schema, config) {
             exp.status = 'Pending';
             exp.loglink = null;
             exp.size = null;
-            await exp.commit();
+            await exp.commit(config.pool);
 
             await exp.batch();
 

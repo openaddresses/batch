@@ -254,11 +254,6 @@
         "query": false,
         "res": false
     },
-    "GET /map/borders/:z/:x/:y.mvt": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
     "GET /map/:z/:x/:y.mvt": {
         "body": false,
         "query": false,

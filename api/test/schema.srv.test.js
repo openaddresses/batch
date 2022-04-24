@@ -18,11 +18,11 @@ test('GET: api/schema', async () => {
 
         const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
 
-        assert.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
-
         if (UPDATE) {
             fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
+
+        assert.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
     } catch (err) {
         assert.ifError(err, 'no error');
     }

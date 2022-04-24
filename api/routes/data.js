@@ -51,7 +51,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Update an existing data object
      *
-     * @apiParam {Number} :data Data ID
+     * @apiParam {Number} :data Data
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchData.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
@@ -85,7 +85,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Return all information about a specific data segment
      *
-     * @apiParam {Number} :data Data ID
+     * @apiParam {Number} :data Data
      *
      * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
      */
@@ -117,7 +117,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Return the job history for a given data component
      *
-     * @apiParam {Number} :data Data ID
+     * @apiParam {Number} :data Data
      *
      * @apiSchema {jsonschema=../schema/res.DataHistory.json} apiSuccess
      */

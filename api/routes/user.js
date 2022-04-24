@@ -80,7 +80,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Get all info about a single user
      *
-     * @apiParam {Number} :id The UID of the user to update
+     * @apiParam {Number} :id User ID
      *
      * @apiSchema (Query) {jsonawait schema=./schema/req.query.SingleUser.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
@@ -114,7 +114,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Update information about a given user
      *
-     * @apiParam {Number} :id The UID of the user to update
+     * @apiParam {Number} :id User ID
      *
      * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchUser.json} apiParam
      * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess

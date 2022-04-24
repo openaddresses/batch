@@ -27,9 +27,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Return all map objects in Line Delimited GeoJSON
      */
-    await schema.get('/map/features', {
-        ':mapid': 'integer'
-    }, async (req, res) => {
+    await schema.get('/map/features', {}, async (req, res) => {
         (await Map.stream(config.pool, res)).pipe(res);
     });
 

@@ -1,6 +1,13 @@
+FROM node:18-alpine AS node
 FROM 847904970422.dkr.ecr.us-east-1.amazonaws.com/batch-machine:7.13.1
 
-RUN apk add nodejs npm yarn git jq
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/share /usr/local/share
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
+
+RUN apk add git jq
 
 WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch

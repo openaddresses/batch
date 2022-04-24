@@ -208,6 +208,8 @@ export default {
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading = false;
         }
     }
 }

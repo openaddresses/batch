@@ -27,7 +27,7 @@ const zooms = {
 };
 
 const args = require('minimist')(process.argv, {
-    boolean: ['interactive'],
+    boolean: ['interactive', 'fabric', 'border'],
     alias: {
         interactive: 'i'
     }
@@ -65,117 +65,121 @@ async function cli() {
 
         const tippecanoe = new Tippecanoe();
 
-        // Build Borders File
-        await pipeline(
-            await oa.cmd('map', 'features', {}, {
-                stream: true
-            }),
-            fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'))
-        );
+        if (args.border || (!args.border && !args.fabric)) {
+            // Build Borders File
+            await pipeline(
+                await oa.cmd('map', 'features', {}, {
+                    stream: true
+                }),
+                fs.createWriteStream(path.resolve(DRIVE, 'borders.geojson'))
+            );
 
-        console.error('ok - generating border tiles');
-        await tippecanoe.tile(
-            fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
-            path.resolve(DRIVE, 'borders.mbtiles'),
-            {
-                layer: 'data',
-                std: true,
-                force: true,
-                name: 'OpenAddresses Borders',
-                attribution: 'OpenAddresses',
-                description: 'OpenAddresses Borders',
-                limit: {
-                    features: false,
-                    size: false
-                },
-                zoom: {
-                    max: 6,
-                    min: 0
-                }
-            }
-        );
-
-        await TileBase.to_tb(
-            path.resolve(DRIVE, 'borders.mbtiles'),
-            path.resolve(DRIVE, 'borders.tilebase')
-        );
-
-        await s3.putObject({
-            ContentType: 'application/octet-stream',
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/borders.tilebase`,
-            Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
-        }).promise();
-
-        await fsp.unlink(path.resolve(DRIVE, 'borders.geojson'));
-        await fsp.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
-        await fsp.unlink(path.resolve(DRIVE, 'borders.tilebase'));
-
-        // Build Data Fabric
-        const datas = await oa.cmd('data', 'list', {
-            fabric: true
-        });
-
-        const layers = ['addresses', 'buildings', 'parcels'];
-
-        console.error(`ok - fetching ${datas.length} sources`);
-        for (const data of datas) {
-            if (!layers.includes(data.layer)) {
-                console.error(`ok - skipping ${JSON.stringify(data)} due to unsuppoted layer type`);
-                continue; // Ignore unsupported sources
-            }
-
-            await get_source(layers[data.layer], data);
-        }
-        console.error('ok - completed fetch');
-
-        for (const l of layers) {
-            console.error(`ok - generating ${l} tiles`);
+            console.error('ok - generating border tiles');
             await tippecanoe.tile(
-                fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
-                path.resolve(DRIVE, `${l}.mbtiles`),
+                fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
+                path.resolve(DRIVE, 'borders.mbtiles'),
                 {
-                    layer: l,
+                    layer: 'data',
                     std: true,
                     force: true,
-                    name: `OpenAddresses ${l} fabric`,
+                    name: 'OpenAddresses Borders',
                     attribution: 'OpenAddresses',
-                    description: `OpenAddresses ${l} fabric`,
+                    description: 'OpenAddresses Borders',
                     limit: {
                         features: false,
                         size: false
                     },
                     zoom: {
-                        max: 15,
-                        min: zooms[l]
+                        max: 6,
+                        min: 0
                     }
                 }
             );
+
+            await TileBase.to_tb(
+                path.resolve(DRIVE, 'borders.mbtiles'),
+                path.resolve(DRIVE, 'borders.tilebase')
+            );
+
+            await s3.putObject({
+                ContentType: 'application/octet-stream',
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/borders.tilebase`,
+                Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
+            }).promise();
+
+            await fsp.unlink(path.resolve(DRIVE, 'borders.geojson'));
+            await fsp.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
+            await fsp.unlink(path.resolve(DRIVE, 'borders.tilebase'));
         }
 
-        await tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), layers.map((l) => {
-            return path.resolve(DRIVE, `${l}.mbtiles`);
-        }), {
-            std: true,
-            force: true,
-            limit: {
-                features: false,
-                size: false
+        if (args.fabric || (!args.border && !args.fabric)) {
+            // Build Data Fabric
+            const datas = await oa.cmd('data', 'list', {
+                fabric: true
+            });
+
+            const layers = ['addresses', 'buildings', 'parcels'];
+
+            console.error(`ok - tw
+            tching ${datas.length} sources`);
+            for (const data of datas) {
+                if (!layers.includes(data.layer)) {
+                    console.error(`ok - skipping ${JSON.stringify(data)} due to unsuppoted layer type`);
+                    continue; // Ignore unsupported sources
+                }
+
+                await get_source(layers[data.layer], data);
             }
-        });
+            console.error('ok - completed fetch');
 
-        await TileBase.to_tb(
-            path.resolve(DRIVE, 'fabric.mbtiles'),
-            path.resolve(DRIVE, 'fabric.tilebase')
-        );
+            for (const l of layers) {
+                console.error(`ok - generating ${l} tiles`);
+                await tippecanoe.tile(
+                    fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
+                    path.resolve(DRIVE, `${l}.mbtiles`),
+                    {
+                        layer: l,
+                        std: true,
+                        force: true,
+                        name: `OpenAddresses ${l} fabric`,
+                        attribution: 'OpenAddresses',
+                        description: `OpenAddresses ${l} fabric`,
+                        limit: {
+                            features: false,
+                            size: false
+                        },
+                        zoom: {
+                            max: 15,
+                            min: zooms[l]
+                        }
+                    }
+                );
+            }
 
-        await s3.putObject({
-            ContentType: 'application/octet-stream',
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/fabric.tilebase`,
-            Body: fs.createReadStream(path.resolve(DRIVE, 'fabric.tilebase'))
-        }).promise();
+            await tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), layers.map((l) => {
+                return path.resolve(DRIVE, `${l}.mbtiles`);
+            }), {
+                std: true,
+                force: true,
+                limit: {
+                    features: false,
+                    size: false
+                }
+            });
 
+            await TileBase.to_tb(
+                path.resolve(DRIVE, 'fabric.mbtiles'),
+                path.resolve(DRIVE, 'fabric.tilebase')
+            );
+
+            await s3.putObject({
+                ContentType: 'application/octet-stream',
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/fabric.tilebase`,
+                Body: fs.createReadStream(path.resolve(DRIVE, 'fabric.tilebase'))
+            }).promise();
+        }
     } catch (err) {
         await meta.protection(false);
         console.error(err);

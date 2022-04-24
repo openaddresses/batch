@@ -69,6 +69,8 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Return a single job error if one exists or 404 if not
      *
+     * @apiParam {Number} :job Job
+     *
      * @apiSchema {jsonschema=../schema/res.ErrorSingle.json} apiSuccess
      */
     await schema.get('/job/error/:job', {
@@ -91,9 +93,6 @@ export default async function router(schema, config) {
      *
      * @apiDescription
      *     Create a new Job Error in response to a live job that Failed or Warned
-     *
-     * @apiParam {Number} job Job ID of the given error
-     * @apiParam {String} message Text representation of the error
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.ErrorCreate.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ErrorCreate.json} apiSuccess
@@ -122,7 +121,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Mark a job error as resolved
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      * @apiSchema (Body) {jsonschema=../schema/res.ErrorModerate.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ErrorModerate.json} apiSuccess

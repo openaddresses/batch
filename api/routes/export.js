@@ -55,7 +55,7 @@ export default async function router(schema, config) {
      *   Note: These are stored in AWS CloudWatch and *do* expire
      *   The presence of a loglink on a export does not guarantee log retention
      *
-     * @apiParam {Number} :exportid Export ID
+     * @apiParam {Number} :exportid Export
      *
      * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
      */
@@ -102,7 +102,7 @@ export default async function router(schema, config) {
     });
 
     /**
-     * @api {get} /api/export/:export Get Export
+     * @api {get} /api/export/:exportid Get Export
      * @apiVersion 1.0.0
      * @apiName GetExport
      * @apiGroup Exports
@@ -110,6 +110,8 @@ export default async function router(schema, config) {
      *
      * @apiDescription
      *   Get a single export
+     *
+     * @apiParam {Number} :exportid Export
      *
      * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
      */
@@ -128,6 +130,42 @@ export default async function router(schema, config) {
     });
 
     /**
+     * @api {put} /api/export/:exportid ReRun Export
+     * @apiVersion 1.0.0
+     * @apiName ReRunExport
+     * @apiGroup Exports
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *   Rerun an export
+     *
+     * @apiParam {Number} :exportid Export
+     *
+     * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
+     */
+    await schema.put('/export/:exportid', {
+        ':exportid': 'integer',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await user.is_admin(req);
+
+            const exp = await Exporter.from(config.pool, req.params.exportid);
+
+            exp.status = 'Pending';
+            exp.loglink = null;
+            exp.size = null;
+            await exp.commit(config.pool);
+
+            await exp.batch();
+
+            res.json(exp);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/export/:exportid/output/export.zip Get Export Data
      * @apiVersion 1.0.0
      * @apiName DataExport
@@ -136,6 +174,8 @@ export default async function router(schema, config) {
      *
      * @apiDescription
      *   Download the data created in an export
+     *
+     * @apiParam {Number} :exportid Export
      *
      * @apiParam {Number} :exportid Export ID
      */
@@ -152,7 +192,7 @@ export default async function router(schema, config) {
     });
 
     /**
-     * @api {patch} /api/export/:export Patch Export
+     * @api {patch} /api/export/:exportid Patch Export
      * @apiVersion 1.0.0
      * @apiName PatchExport
      * @apiGroup Exports
@@ -160,6 +200,8 @@ export default async function router(schema, config) {
      *
      * @apiDescription
      *   Update a single export
+     *
+     * @apiParam {Number} :exportid Export
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchExport.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess

@@ -38,6 +38,8 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Flush the Memcached Cache
      *
+     * @apiParam {String} :cache_key Cache Key
+     *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     schema.delete('/cache/:cache_key', {

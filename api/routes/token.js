@@ -66,6 +66,8 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Delete a user's API Token
      *
+     * @apiParam {Number} :id Token ID
+     *
      * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/token/:id', {

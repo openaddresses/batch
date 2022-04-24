@@ -8,7 +8,6 @@ const path = require('path');
 const { pipeline } = require('stream/promises');
 const csv = require('csv-parse');
 const AWS = require('aws-sdk');
-const OASchema = require('oa');
 const transform = require('parallel-transform');
 const Stats = require('./stats');
 
@@ -84,6 +83,7 @@ class Job {
             throw new Error('Source missing schema: 2');
         }
 
+        const OASchema = await import('oa');
         const validate = await OASchema.compile(true);
         const valid = validate(source);
 

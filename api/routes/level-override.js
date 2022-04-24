@@ -69,6 +69,8 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Patch a level override
      *
+     * @apiParam {Number} :levelid Level
+     *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchLevelOverride.json} apiParam
      * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
@@ -100,6 +102,8 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Get a level override
      *
+     * @apiParam {Number} :levelid Level
+     *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchLevelOverride.json} apiParam
      * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
      */
@@ -126,6 +130,8 @@ export default async function router(schema, config) {
      *
      * @apiDescription
      *   Delete a level override
+     *
+     * @apiParam {Number} :levelid Level
      *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */

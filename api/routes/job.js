@@ -53,7 +53,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given job
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
      */
@@ -86,7 +86,7 @@ export default async function router(schema, config) {
      *     Return the raw source from github - this API is not stable nor
      *     will it always return a consistent result
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      */
     await schema.get('/job/:job/raw', {
         ':job': 'integer'
@@ -110,7 +110,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Submit a job for reprocessing - often useful for network errors
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
      */
@@ -148,7 +148,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Compare the stats of the given job against the current live data job
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      * @apiSchema {jsonschema=../schema/res.SingleDelta.json} apiSuccess
      */
@@ -207,7 +207,7 @@ export default async function router(schema, config) {
      *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
      *    Please consider donating if you are able https://opencollective.com/openaddresses
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      */
     await schema.get('/job/:job/output/validated.geojson.gz', {
         ':job': 'integer'
@@ -239,7 +239,7 @@ export default async function router(schema, config) {
      *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
      *    Please consider donating if you are able https://opencollective.com/openaddresses
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      */
     await schema.get('/job/:job/output/source.geojson.gz', {
         ':job': 'integer'
@@ -263,7 +263,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Return an Array containing a sample of the properties
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      */
     await schema.get('/job/:job/output/sample', {
         ':job': 'integer'
@@ -292,7 +292,7 @@ export default async function router(schema, config) {
      *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
      *    Please consider donating if you are able https://opencollective.com/openaddresses
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      */
     await schema.get('/job/:job/output/cache.zip', {
@@ -319,7 +319,7 @@ export default async function router(schema, config) {
      *   Note: These are stored in AWS CloudWatch and *do* expire
      *   The presence of a loglink on a job, does not guarentree log retention
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      * @apiSchema (Query) {jsonschema=../schema/req.query.SingleLog.json} apiParam
      * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
@@ -359,7 +359,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Update a job
      *
-     * @apiParam {Number} :job Job ID
+     * @apiParam {Number} :job Job
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchJob.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess

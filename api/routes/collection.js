@@ -57,7 +57,7 @@ export default async function router(schema, config) {
      *    OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
      *    Please consider donating if you are able https://opencollective.com/openaddresses
      *
-     * @apiParam {Number} :collection Collection ID
+     * @apiParam {Number} :collection Collection
      */
     await schema.get('/collections/:collection/data', {
         ':collection': 'integer'
@@ -143,7 +143,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Update a collection
      *
-     * @apiParam {Number} :collection Collection ID
+     * @apiParam {Number} :collection Collection
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchCollection.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess

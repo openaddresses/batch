@@ -67,7 +67,7 @@ export default async function router(schema, config) {
      * @apiGroup Run
      * @apiPermission public
      *
-     * @apiParam {Number} :run Run ID
+     * @apiParam {Number} :run Run
      *
      * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
      */
@@ -93,7 +93,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Return statistics about jobs within a given run
      *
-     * @apiParam {Number} :run Run ID
+     * @apiParam {Number} :run Run
      *
      * @apiSchema {jsonschema=../schema/res.RunStats.json} apiSuccess
      */
@@ -118,7 +118,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *   Update an existing run
      *
-     * @apiParam {Number} :run Run ID
+     * @apiParam {Number} :run Run
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchRun.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
@@ -160,7 +160,7 @@ export default async function router(schema, config) {
      *     Note: once jobs are attached to a run, the run is "closed" and subsequent
      *     jobs cannot be attached to it
      *
-     * @apiParam {Number} :run Run ID
+     * @apiParam {Number} :run Run
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.SingleJobsCreate.json} apiParam
      * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
@@ -189,7 +189,7 @@ export default async function router(schema, config) {
      * @apiDescription
      *     Return all jobs for a given run
      *
-     * @apiParam {Number} :run Run ID
+     * @apiParam {Number} :run Run
      *
      * @apiSchema {jsonschema=../schema/res.SingleJobs.json} apiSuccess
      */

@@ -83,7 +83,7 @@ class Job {
             throw new Error('Source missing schema: 2');
         }
 
-        const OASchema = await import('oa');
+        const OASchema = (await import('oa')).default;
         const validate = await OASchema.compile(true);
         const valid = validate(source);
 

@@ -154,7 +154,6 @@ export default class User {
                     SET
                         password = ${userhash},
                         validated = True
-
                     WHERE
                         id = ${uid}
             `);
@@ -284,7 +283,8 @@ export default class User {
                 UPDATE users
                     SET
                         flags = ${JSON.stringify(user.flags)},
-                        access = ${user.access}
+                        access = ${user.access},
+                        validated = ${user.validated}
                     WHERE
                         id = ${uid}
                     RETURNING *
@@ -301,6 +301,7 @@ export default class User {
             id: row.id,
             level:  row.level,
             username: row.username,
+            validated: row.validated,
             email: row.email,
             access: row.access,
             flags: row.flags

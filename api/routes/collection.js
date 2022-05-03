@@ -1,11 +1,9 @@
 import { Err } from '@openaddresses/batch-schema';
 import Collection from '../lib/collections.js';
 import Cacher from '../lib/cacher.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
-
     /**
      * @api {get} /api/collections List Collections
      * @apiVersion 1.0.0
@@ -63,7 +61,7 @@ export default async function router(schema, config) {
         ':collection': 'integer'
     }, async (req, res) => {
         try {
-            await user.is_auth(req, true);
+            await Auth.is_auth(req, true);
 
             Collection.data(config.pool, req.params.collection, res);
         } catch (err) {
@@ -90,7 +88,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             await Collection.delete(config.pool, req.params.collection);
 
@@ -121,7 +119,7 @@ export default async function router(schema, config) {
         res: 'res.Collection.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const collection = new Collection(req.body.name, req.body.sources);
             await collection.generate(config.pool);
@@ -154,7 +152,7 @@ export default async function router(schema, config) {
         res: 'res.Collection.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const collection = await Collection.from(config.pool, req.params.collection);
 

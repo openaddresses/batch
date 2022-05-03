@@ -1,10 +1,8 @@
 import { Err } from '@openaddresses/batch-schema';
 import LevelOverride from '../lib/level-override.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
-
     /**
      * @api {get} /api/level List Override
      * @apiVersion 1.0.0
@@ -23,7 +21,7 @@ export default async function router(schema, config) {
         res: 'res.ListLevelOverride.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             return res.json(await LevelOverride.list(config.pool, req.query));
         } catch (err) {
@@ -49,7 +47,7 @@ export default async function router(schema, config) {
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const level = await LevelOverride.generate(config.pool, req.body);
 
@@ -80,7 +78,7 @@ export default async function router(schema, config) {
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             level.patch(req.body);
@@ -112,7 +110,7 @@ export default async function router(schema, config) {
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             return res.json(level.serialize());
@@ -140,7 +138,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const level = await LevelOverride.from(config.pool, req.params.levelid);
             await level.delete(config.pool);

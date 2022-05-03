@@ -1,6 +1,7 @@
 import { Err } from '@openaddresses/batch-schema';
 import Email from '../lib/email.js';
 import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 import Level from '../lib/level.js';
 
 export default async function router(schema, config) {
@@ -25,7 +26,7 @@ export default async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             res.json(await user.list(req.query));
         } catch (err) {
@@ -91,7 +92,7 @@ export default async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             if (req.query.level) {
                 const usr = await user.user(req.params.id);
@@ -125,7 +126,7 @@ export default async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             res.json(await user.patch(req.params.id, req.body));
         } catch (err) {

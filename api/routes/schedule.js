@@ -1,10 +1,8 @@
 import { Err } from '@openaddresses/batch-schema';
 import Schedule from '../lib/schedule.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
-
     /**
      * @api {post} /api/schedule Scheduled Event
      * @apiVersion 1.0.0
@@ -23,7 +21,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             await Schedule.event(config.pool, req.body);
 

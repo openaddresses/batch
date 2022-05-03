@@ -1,11 +1,9 @@
 import { Err } from '@openaddresses/batch-schema';
 import Busboy from 'busboy';
 import Upload from '../lib/upload.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
-export default async function router(schema, config) {
-    const user = new User(config.pool);
-
+export default async function router(schema) {
     /**
      * @api {post} /api/upload Create Upload
      * @apiVersion 1.0.0
@@ -26,7 +24,7 @@ export default async function router(schema, config) {
     },
     async (req, res) => {
         try {
-            await user.is_flag(req, 'upload');
+            await Auth.is_flag(req, 'upload');
         } catch (err) {
             return Err.respond(err, res);
         }

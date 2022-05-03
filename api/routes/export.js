@@ -1,10 +1,9 @@
 import { Err } from '@openaddresses/batch-schema';
 import Job from '../lib/job.js';
 import Exporter from '../lib/exporter.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
 
     /**
      * @api {post} /api/export Create Export
@@ -24,7 +23,7 @@ export default async function router(schema, config) {
         res: 'res.Export.json'
     }, async (req, res) => {
         try {
-            await user.is_level(req, 'backer');
+            await Auth.is_level(req, 'backer');
 
             if (req.auth.access !== 'admin' && await Exporter.count(config.pool, req.auth.uid) >= config.limits.exports) {
                 throw new Err(400, null, 'Reached Monthly Export Limit');
@@ -148,7 +147,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const exp = await Exporter.from(config.pool, req.params.exportid);
 
@@ -183,7 +182,7 @@ export default async function router(schema, config) {
         ':exportid': 'integer'
     }, async (req, res) => {
         try {
-            await user.is_auth(req, true);
+            await Auth.is_auth(req, true);
 
             await Exporter.data(config.pool, req.auth, req.params.exportid, res);
         } catch (err) {
@@ -212,7 +211,7 @@ export default async function router(schema, config) {
         res: 'res.Export.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const exp = await Exporter.from(config.pool, req.params.exportid);
             exp.patch(req.body);

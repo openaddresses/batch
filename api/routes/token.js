@@ -1,9 +1,8 @@
 import { Err } from '@openaddresses/batch-schema';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 import Token from '../lib/token.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
     const token = new Token(config.pool);
 
     /**
@@ -22,7 +21,7 @@ export default async function router(schema, config) {
         res: 'res.ListTokens.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await Auth.is_auth(req);
 
             return res.json(await token.list(req.auth));
         } catch (err) {
@@ -48,7 +47,7 @@ export default async function router(schema, config) {
         res: 'res.CreateToken.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await Auth.is_auth(req);
 
             return res.json(await token.generate(req.auth, req.body.name));
         } catch (err) {
@@ -75,7 +74,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await Auth.is_auth(req);
 
             return res.json(await token.delete(req.auth, req.params.id));
         } catch (err) {

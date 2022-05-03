@@ -1,11 +1,10 @@
 import { Err } from '@openaddresses/batch-schema';
 import Run from '../lib/run.js';
 import Job from '../lib/job.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
     const ci = new CI(config);
 
     /**
@@ -119,7 +118,7 @@ export default async function router(schema, config) {
         res: 'res.SingleJobsCreate.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const job = await Job.from(config.pool, req.params.job);
             const run = await Run.from(config.pool, job.run);
@@ -213,8 +212,7 @@ export default async function router(schema, config) {
         ':job': 'integer'
     }, async (req, res) => {
         try {
-            await user.is_auth(req, true);
-            await user.is_level(req, 'sponsor');
+            await Auth.is_level(req, 'sponsor');
 
             await Job.validated(config.pool, req.params.job, res);
         } catch (err) {
@@ -245,7 +243,7 @@ export default async function router(schema, config) {
         ':job': 'integer'
     }, async (req, res) => {
         try {
-            await user.is_auth(req, true);
+            await Auth.is_auth(req, true);
 
             await Job.data(config.pool, req.params.job, res);
         } catch (err) {
@@ -299,7 +297,7 @@ export default async function router(schema, config) {
         ':job': 'integer'
     }, async (req, res) => {
         try {
-            await user.is_auth(req, true);
+            await Auth.is_auth(req, true);
 
             Job.cache(req.params.job, res);
         } catch (err) {
@@ -370,7 +368,7 @@ export default async function router(schema, config) {
         res: 'res.Job.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const job = await Job.from(config.pool, req.params.job);
             job.patch(req.body);

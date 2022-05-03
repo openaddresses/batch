@@ -1,11 +1,9 @@
 import { Err } from '@openaddresses/batch-schema';
 import Data from '../lib/data.js';
 import Cacher from '../lib/cacher.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
-
     /**
      * @api {get} /api/data List Data
      * @apiVersion 1.0.0
@@ -63,7 +61,7 @@ export default async function router(schema, config) {
         res: 'res.Data.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             req.body.id = req.params.data;
 

@@ -1,10 +1,8 @@
 import { Err } from '@openaddresses/batch-schema';
 import Run from '../lib/run.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
-
     /**
      * @api {get} /api/run List Runs
      * @apiVersion 1.0.0
@@ -50,7 +48,7 @@ export default async function router(schema, config) {
         res: 'res.Run.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const run = await Run.generate(config.pool, req.body);
 
@@ -130,7 +128,7 @@ export default async function router(schema, config) {
         res: 'res.Run.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const run = await Run.from(config.pool, req.params.run);
 
@@ -171,7 +169,7 @@ export default async function router(schema, config) {
         res: 'res.SingleJobsCreate.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             return res.json(await Run.populate(config.pool, req.params.run, req.body.jobs));
         } catch (err) {

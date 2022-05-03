@@ -1,10 +1,9 @@
 import { Err } from '@openaddresses/batch-schema';
 import JobError from '../lib/joberror.js';
-import User from '../lib/user.js';
+import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 
 export default async function router(schema, config) {
-    const user = new User(config.pool);
     const ci = new CI(config);
 
     /**
@@ -102,7 +101,7 @@ export default async function router(schema, config) {
         res: 'res.ErrorCreate.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await Auth.is_admin(req);
 
             const joberror = new JobError(req.body.job, req.body.message);
             return res.json(await joberror.generate(config.pool));
@@ -132,7 +131,7 @@ export default async function router(schema, config) {
         res: 'res.ErrorModerate.json'
     }, async (req, res) => {
         try {
-            await user.is_flag(req, 'moderator');
+            await Auth.is_flag(req, 'moderator');
 
             res.json(await JobError.moderate(config.pool, ci, req.params.job, req.body));
         } catch (err) {

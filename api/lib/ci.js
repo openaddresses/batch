@@ -218,7 +218,7 @@ export default class CI {
         return res.body.files.map((file) => {
             return {
                 filename: file.filename,
-                raw: file.raw_url
+                raw: decodeURIComponent(file.raw_url)
             };
         });
     }

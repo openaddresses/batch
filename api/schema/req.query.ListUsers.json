@@ -24,6 +24,10 @@
         "level": {
             "$ref": "./util/level.json"
         },
+        "validated": {
+            "type": "boolean",
+            "description": "Only show validated or unvalidated users"
+        },
         "before": {
             "type": "string",
             "description": "Query users that were created before the given ISO Date"

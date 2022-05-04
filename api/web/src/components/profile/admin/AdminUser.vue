@@ -24,11 +24,11 @@
             <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
                 <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
-                <div class='col col--6 px6'>
+                <div class='col col--12 px6 mb6'>
                     <label>Username/Email Filter</label>
                     <input v-model='filter.name' class='input' placeholder='john-doe' />
                 </div>
-                <div class='col col--3 px6'>
+                <div class='col col--4 px6'>
                     <label>Access</label>
                     <div class='w-full select-container'>
                         <select v-model='filter.access' class='select select--stroke'>
@@ -40,7 +40,7 @@
                         <div class='select-arrow'></div>
                     </div>
                 </div>
-                <div class='col col--3 px6'>
+                <div class='col col--4 px6'>
                     <label>Level</label>
                     <div class='w-full select-container'>
                         <select v-model='filter.level' class='select select--stroke'>
@@ -52,9 +52,35 @@
                         <div class='select-arrow'></div>
                     </div>
                 </div>
+                <div class='col col--4 px6'>
+                    <label>Validated</label>
+                    <div class='w-full select-container'>
+                        <select v-model='filter.validated' class='select select--stroke'>
+                            <option>all</option>
+                            <option>validated</option>
+                            <option>unvalidated</option>
+                        </select>
+                        <div class='select-arrow'></div>
+                    </div>
+                </div>
+                <div class='col col--6 px6 mt6'>
+                    <label class='switch-container mr6'>
+                        <input type='checkbox' v-model='filter.switches.before'/>
+                        <div class='switch switch--gray'></div>
+                    </label>
+                    <label>Before</label>
+                    <input class='input' type='date' v-model='filter.before'/>
+                </div>
+                <div class='col col--6 px6 mt6'>
+                    <label class='switch-container mr6'>
+                        <input type='checkbox' v-model='filter.switches.after'/>
+                        <div class='switch switch--gray'></div>
+                    </label>
+                    <label>After</label>
+                    <input class='input' type='date' v-model='filter.after'/>
+                </div>
             </div>
         </template>
-
 
         <template v-if='loading'>
             <div class='flex flex--center-main w-full py24'>
@@ -161,7 +187,14 @@ export default {
             filter: {
                 name: '',
                 level: 'all',
-                access: 'all'
+                access: 'all',
+                validated: 'all',
+                before: '',
+                after: '',
+                switches: {
+                    before: false,
+                    after: false
+                }
             },
             showFilter: false,
             page: 0,
@@ -177,11 +210,33 @@ export default {
         page: function() {
             this.getUsers();
         },
+        'filter.switches.after': function() {
+            this.page = 0;
+            this.getUsers();
+        },
+        'filter.switches.before': function() {
+            this.page = 0;
+            this.getUsers();
+        },
+        'filter.after': function() {
+            this.filter.switches.after = true;
+            this.page = 0;
+            this.getUsers();
+        },
+        'filter.before': function() {
+            this.filter.switches.before = true;
+            this.page = 0;
+            this.getUsers();
+        },
         'filter.name': function() {
             this.page = 0;
             this.getUsers();
         },
         'filter.level': function() {
+            this.page = 0;
+            this.getUsers();
+        },
+        'filter.validated': function() {
             this.page = 0;
             this.getUsers();
         },
@@ -213,12 +268,18 @@ export default {
         getUsers: async function() {
             try {
                 const url = new URL(`${window.location.origin}/api/user`);
-                url.searchParams.append('limit', this.perpage)
-                url.searchParams.append('page', this.page)
-                url.searchParams.append('filter', this.filter.name)
+                url.searchParams.append('limit', this.perpage);
+                url.searchParams.append('page', this.page);
+                url.searchParams.append('filter', this.filter.name);
 
-                if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
-                if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access)
+                if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level);
+                if (this.filter.access !== 'all') url.searchParams.append('access', this.filter.access);
+
+                if (this.filter.validated === 'unvalidated') url.searchParams.append('validated', 'false');
+                if (this.filter.validated === 'validated') url.searchParams.append('validated', 'true');
+
+                if (this.filter.switches.after && this.filter.after) url.searchParams.set('after', this.filter.after);
+                if (this.filter.switches.before && this.filter.before) url.searchParams.set('before', this.filter.before);
 
                 const res = await window.std(url);
                 this.total = res.total;

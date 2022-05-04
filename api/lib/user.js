@@ -264,6 +264,7 @@ export default class User {
      * @param {String} [query.filter=] - Username or Email fragment to filter by
      * @param {String} [query.level=] - Donor level to filter by
      * @param {String} [query.access=] - User Access to filter by
+     * @param {String} [query.validated=] - User Validated status to filter by
      * @param {String} [query.before=undefined] - Only show users before the given date
      * @param {String} [query.after=undefined] - Only show users after the given date
      */
@@ -275,6 +276,8 @@ export default class User {
 
         if (!query.access) query.access = null;
         if (!query.level) query.level = null;
+
+        if (!query.validated) query.validated = null;
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
@@ -314,6 +317,7 @@ export default class User {
                     (username ~* ${query.filter} OR email ~* ${query.filter})
                     AND (${query.access}::TEXT IS NULL OR access = ${query.access})
                     AND (${query.level}::TEXT IS NULL OR level = ${query.level})
+                    AND (${query.validated}::BOOLEAN IS NULL OR validated = ${query.validated})
                     AND (${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP IS NULL OR created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
                     AND (${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP IS NULL OR created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                 ORDER BY

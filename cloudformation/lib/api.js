@@ -294,7 +294,11 @@ const stack = {
         APIELB: {
             Description: 'API URL',
             Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')])
-        }
+        },
+        SharedSecret: {
+            Description: 'SharedSecret',
+            Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}')
+        },
     }
 };
 

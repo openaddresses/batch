@@ -306,7 +306,8 @@ export default class User {
                     level,
                     access,
                     email,
-                    flags
+                    flags,
+                    validated
                 FROM
                     users
                 WHERE
@@ -336,7 +337,8 @@ export default class User {
                     username: row.username,
                     email: row.email,
                     access: row.access,
-                    flags: row.flags
+                    flags: row.flags,
+                    validated: row.validated
                 };
             })
         };

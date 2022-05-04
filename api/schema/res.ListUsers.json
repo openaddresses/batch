@@ -20,7 +20,8 @@
                     "email",
                     "access",
                     "level",
-                    "flags"
+                    "flags",
+                    "validated"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -44,6 +45,9 @@
                     },
                     "flags": {
                         "type": "object"
+                    },
+                    "validated": {
+                        "type": "boolean"
                     }
                 }
             }

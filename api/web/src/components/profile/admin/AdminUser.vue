@@ -83,6 +83,8 @@
                         <span v-else class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
 
                         <span v-if='user.level !== "basic"' class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='user.level'></span>
+
+                        <span v-if='!user.validated' class='mx3 fr bg-purple-faint color-gray round inline-block px6 py3 txt-xs txt-bold'>Unvalidated</span>
                     </div>
                 </div>
 
@@ -95,9 +97,16 @@
                     <template v-else>
                         <div class='col col--12'>
                             <h3 class='pb6 fl'>User Access</h3>
+
                             <button @click='getUser(user)' class='btn btn--stroke round color-gray color-blue-on-hover fr'>
                                 <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
                             </button>
+
+                            <label class='fr switch-container mr6'>
+                                Validated
+                                <input @change='patchUser(user)' v-model='user.validated' type='checkbox'/>
+                                <div class='switch ml3'></div>
+                            </label>
                         </div>
 
                         <div class='col col--12'>
@@ -228,7 +237,8 @@ export default {
                     method: 'PATCH',
                     body: {
                         access: user.access,
-                        flags: user.flags
+                        flags: user.flags,
+                        validated: user.validated
                     }
                 });
 

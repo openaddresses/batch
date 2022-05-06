@@ -1,5 +1,5 @@
 import { Err } from '@openaddresses/batch-schema';
-import Busboy from 'busboy';
+import busboy from 'busboy';
 import Upload from '../lib/upload.js';
 import Auth from '../lib/auth.js';
 
@@ -21,25 +21,25 @@ export default async function router(schema) {
      */
     await schema.post('/upload', {
         res: 'res.Standard.json'
-    },
-    async (req, res) => {
+    }, async (req, res) => {
         try {
             await Auth.is_flag(req, 'upload');
         } catch (err) {
             return Err.respond(err, res);
         }
 
-        const busboy = new Busboy({
+        const bb = busboy({
             headers: req.headers
         });
+        console.error(bb);
 
         const files = [];
 
-        busboy.on('file', (fieldname, file, filename) => {
+        bb.on('file', (fieldname, file, filename) => {
             files.push(Upload.put(req.auth.uid, filename, file));
         });
 
-        busboy.on('finish', async () => {
+        bb.on('close', async () => {
             try {
                 await Promise.all(files);
 
@@ -52,6 +52,6 @@ export default async function router(schema) {
             }
         });
 
-        return req.pipe(busboy);
+        return req.pipe(bb);
     });
 }

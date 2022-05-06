@@ -31,7 +31,7 @@
         "aws-sdk": "^2.901.0",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
-        "busboy": "^0.3.1",
+        "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "csv-stringify": "^5.6.5",
         "d3-queue": "^3.0.7",

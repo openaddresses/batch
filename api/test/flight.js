@@ -92,7 +92,7 @@ export default class Flight {
         url = new URL(url, this.base);
 
         if (!req.headers) req.headers = {};
-        if (typeof req.body === 'object') {
+        if (req.body && req.body.constructor === Object) {
             req.headers['Content-Type'] = 'application/json';
             req.body = JSON.stringify(req.body);
         }

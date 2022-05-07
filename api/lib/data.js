@@ -1,12 +1,18 @@
 import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
 import Map from './map.js';
+import fs from 'fs';
 import moment from 'moment';
 import { sql } from 'slonik';
 
 /**
  * @class
  */
-export default class Data {
+export default class Data extends Generic {
+    static _table = 'results';
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Data.json', import.meta.url)));
+    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchData.json', import.meta.url)));
+
     /**
      * Return the last sucessful state for all data runs
      *
@@ -93,15 +99,12 @@ export default class Data {
                     results.name
             `);
 
-            return pgres.rows.map((res) => {
-                res.id = parseInt(res.id);
-                res.job = parseInt(res.job);
-                res.size = parseInt(res.size);
-                res.map = parseInt(res.map);
-                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
 
+
+            return Data.deserialize(pgres.rows.map((res) => {
+                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
                 return res;
-            });
+            }));
         } catch (err) {
             throw new Err(500, err, 'Failed to load data');
         }
@@ -149,10 +152,6 @@ export default class Data {
             return {
                 id: parseInt(data_id),
                 jobs: pgres.rows.map((res) => {
-                    res.id = parseInt(res.id);
-                    res.count = parseInt(res.count);
-                    res.run = parseInt(res.run);
-                    res.map = parseInt(res.map);
                     res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;
                 })
@@ -182,9 +181,6 @@ export default class Data {
         }
 
         return pgres.rows.map((res) => {
-            res.id = parseInt(res.id);
-            res.job = parseInt(res.job);
-            res.size = parseInt(res.size);
             res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
             return res;
         })[0];
@@ -216,14 +212,9 @@ export default class Data {
                 throw new Err(404, null, 'No data by that id');
             }
 
-            return pgres.rows.map((res) => {
-                res.id = parseInt(res.id);
-                res.job = parseInt(res.job);
-                res.size = parseInt(res.size);
-                res.map = parseInt(res.map);
-                res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
-                return res;
-            })[0];
+            const data = Data.deserialize(pgres.rows[0]);
+            data.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`;
+            return data;
         } catch (err) {
             throw new Err(500, err, 'Failed to load data');
         }

@@ -27,13 +27,13 @@ export default async function router(schema, config) {
             });
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
-                for (const d of data) {
+                for (const d of data.results) {
                     delete d.s3;
                     delete d.s3_validated;
                 }
             }
 
-            return res.json(data);
+            return res.json(data.results);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -68,6 +68,37 @@ export default async function router(schema, config) {
             await config.cacher.del('data');
 
             return res.json(await Data.commit(config.pool, req.body));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {delete} /api/data/:data Delete Data
+     * @apiVersion 1.0.0
+     * @apiName DeleteData
+     * @apiGroup Data
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Remove a given data entry
+     *
+     * @apiParam {Number} :data Data
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+     */
+    await schema.delete('/data/:data', {
+        ':data': 'integer',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await Auth.is_admin(req);
+
+            const data = await Data.from(config.pool, req.params.data);
+            await data.delete(config.pool);
+            await config.cacher.del('data');
+
+            return res.json(data);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -32,10 +32,15 @@ test('POST: api/upload', async () => {
         const res = await flight.fetch('/api/upload', {
             method: 'POST',
             headers: {
-                'shared-secret': '123',
+                'shared-secret': '123'
             },
             body: form
         }, false);
+
+        assert.deepEqual(res.body, {
+            message: 'Upload Success',
+            status: 200
+        });
 
         AWS.S3.restore();
     } catch (err) {

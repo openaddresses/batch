@@ -29,7 +29,7 @@ export default async function router(schema) {
         }
 
         if (req.headers['content-type']) {
-            req.headers['content-type'] = req.headers['content-type'].split(',')[0]
+            req.headers['content-type'] = req.headers['content-type'].split(',')[0];
         }
 
         let bb;

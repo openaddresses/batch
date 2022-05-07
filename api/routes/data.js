@@ -27,13 +27,13 @@ export default async function router(schema, config) {
             });
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
-                for (const d of data) {
+                for (const d of data.results) {
                     delete d.s3;
                     delete d.s3_validated;
                 }
             }
 
-            return res.json(data);
+            return res.json(data.results);
         } catch (err) {
             return Err.respond(err, res);
         }

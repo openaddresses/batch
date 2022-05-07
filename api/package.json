@@ -56,16 +56,17 @@
         "wkx": "^0.5.0"
     },
     "devDependencies": {
+        "@mapbox/mock-aws-sdk-js": "^1.0.0",
         "apidoc": "^0.51.0",
         "apidoc-plugin-schema2": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^8.1.0",
         "eslint-plugin-node": "^11.0.0",
-        "tap-merge": "^0.3.1",
         "glob": "^8.0.1",
         "nock": "^13.0.8",
         "nodemon": "^2.0.7",
-        "nyc": "^15.1.0"
+        "nyc": "^15.1.0",
+        "tap-merge": "^0.3.1"
     },
     "apidoc": {
         "name": "OpenAddresses API",

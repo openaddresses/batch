@@ -170,12 +170,32 @@
                                     <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
                                         <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-settings" /></svg>
 
-                                        <div class='round dropdown-content'>
-                                            <label class='switch-container'>
-                                                <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
-                                                <div class='switch switch--blue mx6'></div>
-                                                Fabric
-                                            </label>
+                                        <div class='round dropdown-content' style='width: 180px;'>
+                                            <template v-if='!job._confirm'>
+                                                <label class='switch-container w-full'>
+                                                    <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
+                                                    <div class='switch switch--blue mx6'></div>
+                                                    Fabric
+                                                </label>
+
+                                                <button @click='job._confirm = true' class='btn btn--s btn--stroke color-gray color-red-on-hover w-full round'>Delete</button>
+                                            </template>
+                                            <template v-else>
+                                                <div class='col col--12 grid'>
+                                                    <div class='col col--12 flex flex--center-main'>
+                                                        <div class='py12'>
+                                                            <svg class='icon h60 w60 color-gray'><use href='#icon-alert'/></svg>
+                                                        </div>
+                                                    </div>
+                                                    <div class='col col--12'><div class='align-center'>Are you sure?</div></div>
+                                                    <div class='col col--6 pr3'>
+                                                        <button @click='job._confirm = false' class='btn btn--s btn--stroke color-gray color-black-on-hover w-full round'>Cancel</button>
+                                                    </div>
+                                                    <div class='col col--6 pl3'>
+                                                        <button @click='deleteData(job)' class='btn btn--s btn--stroke color-red-light color-red-on-hover w-full round'>Delete</button>
+                                                    </div>
+                                                </div>
+                                            </template>
                                         </div>
                                     </span>
                                 </template>
@@ -308,6 +328,17 @@ export default {
                 this.$emit('err', err);
             }
         },
+        deleteData: async function(job) {
+            try {
+                await window.std(`/api/data/${job.id}`, {
+                    method: 'DELETE',
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
+
+            this.refresh();
+        },
         updateData: async function(job) {
             try {
                 await window.std(`/api/data/${job.id}`, {
@@ -361,6 +392,7 @@ export default {
                     for (const source of dataname[sourcename]) {
                         d.has[source.layer] = true;
                         d.sources.push(source);
+                        source._confirm = false;
                         if (source.map) d.map = source.map;
                     }
 

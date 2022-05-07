@@ -74,6 +74,37 @@ export default async function router(schema, config) {
     });
 
     /**
+     * @api {delete} /api/data/:data Delete Data
+     * @apiVersion 1.0.0
+     * @apiName DeleteData
+     * @apiGroup Data
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Remove a given data entry
+     *
+     * @apiParam {Number} :data Data
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+     */
+    await schema.delete('/data/:data', {
+        ':data': 'integer',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await Auth.is_admin(req);
+
+            const data = await Data.from(config.pool, req.params.data);
+            await data.delete(config.pool);
+            await config.cacher.del('data');
+
+            return res.json(data);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/data/:data Get Data
      * @apiVersion 1.0.0
      * @apiName SingleData

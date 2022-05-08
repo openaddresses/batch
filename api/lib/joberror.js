@@ -1,105 +1,17 @@
 import { Err } from '@openaddresses/batch-schema';
 import Job from './job.js';
 import Run from './run.js';
+import fs from 'fs';
 import { sql } from 'slonik';
 import { Status } from './util.js';
+import Generic from '@openaddresses/batch-generic';
 
 /**
  * @class
  */
-export default class JobError {
-    constructor(job, message) {
-        if (typeof job !== 'number') throw new Error('JobError.job must be numeric');
-        if (typeof message !== 'string') throw new Error('JobError.message must be a string');
-
-        this.job = job;
-        this.message = message;
-    }
-
-    async generate(pool) {
-        if (!this.job) throw new Err(400, null, 'Cannot generate a job error without a job');
-        if (!this.message) throw new Err(400, null, 'Cannot generate a job error without a message');
-
-        try {
-            await pool.query(sql`
-                INSERT INTO job_errors (
-                    job,
-                    message
-                ) VALUES (
-                    ${this.job},
-                    ${this.message}
-                ) RETURNING *
-            `);
-
-            return  {
-                job: this.job,
-                message: this.message
-            };
-        } catch (err) {
-            throw new Err(500, err, 'failed to generate job error');
-        }
-    }
-
-    static async clear(pool) {
-        try {
-            await pool.query(sql`
-                DELETE FROM
-                    job_errors
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to clear job_errors');
-        }
-
-        return true;
-    }
-
-    static async delete(pool, job_id) {
-        try {
-            await pool.query(sql`
-                DELETE FROM
-                    job_errors
-                WHERE
-                    job = ${job_id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to remove job from job_errors');
-        }
-
-        return {
-            job: job_id
-        };
-    }
-
-    static async moderate(pool, ci, job_id, params) {
-        if (!params.moderate) throw new Err(400, null, 'moderate key must be provided');
-        if (!['confirm', 'reject'].includes(params.moderate)) throw new Err(400, null, 'moderate key must be "confirm" or "reject"');
-
-        const job = await Job.from(pool, job_id);
-
-        if (job.status === 'Fail' && params.moderate === 'confirm') {
-            // Jobs that fail are added to the list solely to notify a mod that they failed
-            // They can not be forcibly marked as a pass as this would break the data page
-            throw new Err(400, null, 'Failed jobs can only be suppressed');
-        }
-
-        if (params.moderate === 'confirm') {
-            job.status = 'Success';
-            await job.commit(pool);
-        } else if (params.moderate === 'reject') {
-            if (job.status !== 'Fail') {
-                job.status = 'Fail';
-                await job.commit(pool);
-            }
-        }
-
-        await JobError.delete(pool, job_id);
-        Run.ping(pool, ci, job);
-
-        return {
-            job: job_id,
-            moderate: params.moderate
-        };
-    }
+export default class JobError extends Generic {
+    static _table = 'job_errors';
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.JobError.json', import.meta.url)));
 
     static async list(pool, query) {
         if (!query) query = {};
@@ -116,7 +28,7 @@ export default class JobError {
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    job.id,
+                    job.id AS job,
                     job.status,
                     JSON_AGG(job_errors.message) AS messages,
                     job.source_name,
@@ -142,19 +54,68 @@ export default class JobError {
             throw new Err(404, null, 'No job errors found');
         }
 
-        return pgres.rows.map((row) => {
-            row.id = parseInt(row.id);
-
-            return row;
-        });
+        return JobError.deserialize(pgres.rows).job_errors;
     }
 
-    static async get(pool, job_id) {
+    static async generate(pool, joberror) {
+        try {
+            const pgres = await pool.query(sql`
+                INSERT INTO job_errors (
+                    job,
+                    message
+                ) VALUES (
+                    ${joberror.job},
+                    ${joberror.message}
+                ) RETURNING *
+            `);
+
+            pgres.rows[0].messages = [pgres.rows[0].message];
+            return JobError.deserialize(pgres.rows[0]);
+        } catch (err) {
+            throw new Err(500, err, 'failed to generate job error');
+        }
+    }
+
+    static async moderate(pool, ci, job_id, params) {
+        if (!params.moderate) throw new Err(400, null, 'moderate key must be provided');
+        if (!['confirm', 'reject'].includes(params.moderate)) throw new Err(400, null, 'moderate key must be "confirm" or "reject"');
+
+        const job = await Job.from(pool, job_id);
+
+        if (job.status === 'Fail' && params.moderate === 'confirm') {
+            // Jobs that fail are added to the list solely to notify a mod that they failed
+            // They can not be forcibly marked as a pass as this would break the data page
+            throw new Err(400, null, 'Failed jobs can only be suppressed');
+        }
+
+        if (params.moderate === 'confirm') {
+            job.status = 'Success';
+            await job.commit(pool);
+        } else if (params.moderate === 'reject') {
+            if (job.status !== 'Fail') {
+                job.status = 'Fail';
+                await job.commit(pool);
+            }
+        }
+
+        await JobError.delete(pool, job.id, {
+            column: 'job'
+        });
+
+        Run.ping(pool, ci, job);
+
+        return {
+            job: job_id,
+            moderate: params.moderate
+        };
+    }
+
+    static async from(pool, job_id) {
         let pgres;
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    job.id,
+                    job.id AS job,
                     job.status,
                     JSON_AGG(job_errors.message) AS messages,
                     job.source_name,
@@ -176,15 +137,7 @@ export default class JobError {
             throw new Err(404, null, 'No job errors found');
         }
 
-        const row = pgres.rows[0];
-        return {
-            id: parseInt(row.id),
-            status: row.status,
-            messages: row.messages,
-            source_name: row.source_name,
-            layer: row.layer,
-            name: row.name
-        };
+        return JobError.deserialize(pgres.rows[0]);
     }
 
     static async count(pool) {
@@ -201,7 +154,7 @@ export default class JobError {
         }
 
         return {
-            count: parseInt(pgres.rows[0].count)
+            count: pgres.rows[0].count
         };
     }
 }

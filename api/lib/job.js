@@ -10,7 +10,7 @@ import Data from './data.js';
 import S3 from './s3.js';
 import { Status } from './util.js';
 import { sql } from 'slonik';
-import stringify from 'csv-stringify/lib/sync.js';
+import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 import { trigger } from './batch.js';
 

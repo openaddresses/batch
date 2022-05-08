@@ -101,7 +101,7 @@ test('POST: api/job/error', async () => {
 
         assert.deepEqual(res.body, {
             job: 1,
-            message: 'Something went wrong!'
+            messages: ['Something went wrong!']
         });
     } catch (err) {
         assert.ifError(err, 'no error');
@@ -115,7 +115,7 @@ test('GET: api/job/error', async () => {
         }, true);
 
         assert.deepEqual(res.body, [{
-            id: 1,
+            job: 1,
             status: 'Fail',
             messages: ['Something went wrong!'],
             source_name: 'us/dc/statewide',
@@ -134,7 +134,7 @@ test('GET: api/job/error/1', async () => {
         }, true);
 
         assert.deepEqual(res.body, {
-            id: 1,
+            job: 1,
             status: 'Fail',
             messages: ['Something went wrong!'],
             source_name: 'us/dc/statewide',
@@ -161,7 +161,7 @@ test('POST: api/job/error', async () => {
 
         assert.deepEqual(res.body, {
             job: 1,
-            message: 'Another Something went wrong!'
+            messages: ['Another Something went wrong!']
         });
     } catch (err) {
         assert.ifError(err, 'no error');
@@ -175,7 +175,7 @@ test('GET: api/job/error', async () => {
         }, true);
 
         assert.deepEqual(res.body, [{
-            id: 1,
+            job: 1,
             status: 'Fail',
             messages: ['Something went wrong!', 'Another Something went wrong!'],
             source_name: 'us/dc/statewide',
@@ -195,7 +195,7 @@ test('GET: api/job/error/1', async () => {
         }, true);
 
         assert.deepEqual(res.body, {
-            id: 1,
+            job: 1,
             status: 'Fail',
             messages: ['Something went wrong!', 'Another Something went wrong!'],
             source_name: 'us/dc/statewide',

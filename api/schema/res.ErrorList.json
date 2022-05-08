@@ -3,7 +3,7 @@
     "items": {
         "type": "object",
         "required": [
-            "id",
+            "job",
             "status",
             "messages",
             "source_name",
@@ -12,7 +12,7 @@
         ],
         "additionalProperties": false,
         "properties": {
-            "id": {
+            "job": {
                 "type": "integer"
             },
             "status": {

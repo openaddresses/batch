@@ -1,92 +1,50 @@
 import fs from 'fs';
 import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
 import { sql } from 'slonik';
 
 /**
  * @class
  */
-export default class Collection {
-    constructor(name, sources) {
-        if (typeof name !== 'string') throw new Err(400, null, 'Collection.name must be a string');
-        if (name.length === 0) throw new Err(400, null, 'Collection.name cannot be empty');
-        if (!/^[a-z0-9-]+$/.test(name)) throw new Err(400, null, 'Collection.name may only contain a-z 0-9 and -');
+export default class Collection extends Generic {
+    static _table = 'collections';
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Collection.json', import.meta.url)));
+    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchCollection.json', import.meta.url)));
 
-        if (!Array.isArray(sources)) throw new Err(400, null, 'Collection.sources must be an array');
-        for (const source of sources) {
-            if (typeof source !== 'string') {
-                throw new Err(400, null, 'Collection.sources array must contain strings');
-            }
+    static async list(pool) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                SELECT
+                    id,
+                    name,
+                    created,
+                    sources,
+                    size
+                FROM
+                    collections
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to list collections');
         }
 
-        this.id = false;
-        this.name = name;
-        this.sources = sources;
-        this.created = false;
-        this.size = 0;
-        this.s3 = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchCollection.json', import.meta.url))).properties);
-    }
-
-    json() {
-        return {
-            id: parseInt(this.id),
-            s3: this.s3,
-            size: parseInt(this.size),
-            name: this.name,
-            sources: this.sources,
-            created: this.created
-        };
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'No collections found');
         }
+
+        return pgres.rows.map((res) => {
+            res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}.zip`;
+            return res;
+        });
     }
 
     static async data(pool, collection_id, res) {
         const collection = await Collection.from(pool, collection_id);
-
         return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
     }
 
-    static async from(pool, id) {
-        try {
-            const pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    name,
-                    sources,
-                    created,
-                    size
-                FROM
-                    collections
-                WHERE
-                    id = ${id}
-            `);
-
-            if (pgres.rows.length === 0) throw new Err(404, null, 'collection not found');
-
-            pgres.rows[0].id = parseInt(pgres.rows[0].id);
-            pgres.rows[0].size = parseInt(pgres.rows[0].size);
-
-            const collection = new Collection(pgres.rows[0].name, pgres.rows[0].sources);
-
-            for (const key of Object.keys(pgres.rows[0])) {
-                collection[key] = pgres.rows[0][key];
-            }
-
-            collection.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${collection.name}.zip`;
-
-            return collection;
-        } catch (err) {
-            if (err instanceof Err) throw err;
-            throw new Err(500, err, 'failed to get collection');
-        }
+    _s3() {
+        this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${this.name}.zip`;
     }
 
     async commit(pool) {
@@ -111,7 +69,7 @@ export default class Collection {
         }
     }
 
-    async generate(pool) {
+    static async generate(pool, collection) {
         try {
             const pgres = await pool.query(sql`
                 INSERT INTO collections (
@@ -120,23 +78,14 @@ export default class Collection {
                     created,
                     size
                 ) VALUES (
-                    ${this.name},
-                    ${JSON.stringify(this.sources)}::JSONB,
+                    ${collection.name},
+                    ${JSON.stringify(collection.sources)}::JSONB,
                     NOW(),
-                    ${this.size || 0}
+                    ${collection.size || 0}
                 ) RETURNING *
             `);
 
-            pgres.rows[0].id = parseInt(pgres.rows[0].id);
-            pgres.rows[0].size = parseInt(pgres.rows[0].size);
-
-            for (const key of Object.keys(pgres.rows[0])) {
-                this[key] = pgres.rows[0][key];
-            }
-
-            this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${pgres.rows[0].name}.zip`;
-
-            return this;
+            return Collection.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'duplicate collections not allowed');
@@ -146,46 +95,4 @@ export default class Collection {
         }
     }
 
-    static async list(pool) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    name,
-                    created,
-                    sources,
-                    size
-                FROM
-                    collections
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to list collections');
-        }
-
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'No collections found');
-        }
-
-        return pgres.rows.map((res) => {
-            res.id = parseInt(res.id);
-            res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}.zip`;
-            res.size = parseInt(res.size);
-            return res;
-        });
-    }
-
-    static async delete(pool, id) {
-        try {
-            await pool.query(sql`
-                DELETE FROM
-                    collections
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to delete collection');
-        }
-
-    }
 }

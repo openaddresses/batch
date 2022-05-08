@@ -140,8 +140,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const level = await LevelOverride.from(config.pool, req.params.levelid);
-            await level.delete(config.pool);
+            await LevelOverride.delete(config.pool, req.params.levelid);
 
             return res.json({
                 status: 200,

@@ -61,8 +61,8 @@ export default async function router(schema, config) {
     /**
      * @api {get} /api/job/error/:job Get Job Error
      * @apiVersion 1.0.0
-     * @apiName ErrorList
-     * @apiGroup ErrorSingle
+     * @apiName GetError
+     * @apiGroup JobError
      * @apiPermission public
      *
      * @apiDescription
@@ -70,14 +70,15 @@ export default async function router(schema, config) {
      *
      * @apiParam {Number} :job Job
      *
-     * @apiSchema {jsonschema=../schema/res.ErrorSingle.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.JobError.json} apiSuccess
      */
     await schema.get('/job/error/:job', {
         ':job': 'integer',
-        res: 'res.ErrorSingle.json'
+        res: 'res.JobError.json'
     }, async (req, res) => {
         try {
-            return res.json(await JobError.get(config.pool, req.params.job));
+            const joberror = await JobError.from(config.pool, req.params.job);
+            return res.json(joberror.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -94,17 +95,18 @@ export default async function router(schema, config) {
      *     Create a new Job Error in response to a live job that Failed or Warned
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.ErrorCreate.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ErrorCreate.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.JobError.json} apiSuccess
      */
     await schema.post('/job/error', {
         body: 'req.body.ErrorCreate.json',
-        res: 'res.ErrorCreate.json'
+        res: 'res.JobError.json'
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
 
-            const joberror = new JobError(req.body.job, req.body.message);
-            return res.json(await joberror.generate(config.pool));
+            const joberror = await JobError.generate(config.pool, req.body);
+
+            return res.json(joberror.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -1,16 +1,12 @@
 {
     "type": "object",
     "required": [
-        "id",
-        "status",
-        "messages",
-        "source_name",
-        "layer",
-        "name"
+        "job",
+        "messages"
     ],
     "additionalProperties": false,
     "properties": {
-        "id": {
+        "job": {
             "type": "integer"
         },
         "status": {

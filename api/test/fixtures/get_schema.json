@@ -27,7 +27,7 @@
     "GET /collections/:collection": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /collections/:collection": {
         "body": false,

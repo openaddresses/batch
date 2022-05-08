@@ -238,9 +238,9 @@ export default class Data extends Generic {
             throw new Err(500, err, 'Failed to match coverage');
         }
 
-        if (data.length > 1) {
+        if (data.total > 1) {
             throw new Err(500, null, 'More than 1 source matches job');
-        } else if (data.length === 0) {
+        } else if (data.total === 0) {
             try {
                 await pool.query(sql`
                     INSERT INTO results (

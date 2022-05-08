@@ -24,6 +24,11 @@
         "query": false,
         "res": false
     },
+    "GET /collections/:collection": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "DELETE /collections/:collection": {
         "body": false,
         "query": false,
@@ -46,6 +51,11 @@
     },
     "PATCH /data/:data": {
         "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /data/:data": {
+        "body": false,
         "query": false,
         "res": true
     },
@@ -100,6 +110,11 @@
         "res": true
     },
     "GET /export/:exportid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PUT /export/:exportid": {
         "body": false,
         "query": false,
         "res": true

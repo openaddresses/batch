@@ -70,6 +70,35 @@ export default async function router(schema, config) {
     });
 
     /**
+     * @api {get} /api/collections/:collection Get Collection
+     * @apiVersion 1.0.0
+     * @apiName GetCollection
+     * @apiGroup Collections
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Get a given collection
+     *
+     * @apiParam {Number} :collection Collection
+     *
+     * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
+     */
+    await schema.get('/collections/:collection', {
+        ':collection': 'integer',
+        'res': 'res.Collection.json'
+    }, async (req, res) => {
+        try {
+            await Auth.is_auth(req, true);
+
+            const collection = await Collection.from(config.pool, req.params.collection);
+
+            return res.json(collection.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {delete} /api/collections/:collection Delete Collection
      * @apiVersion 1.0.0
      * @apiName DeleteCollection
@@ -121,11 +150,15 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const collection = new Collection(req.body.name, req.body.sources);
-            await collection.generate(config.pool);
+            const collection = await Collection.generate(config.pool, req.body);
 
             await config.cacher.del('collection');
-            return res.json(collection.json());
+
+            if (req.auth && req.auth.level && req.auth.level === 'sponsor') {
+                collection._s3();
+            }
+
+            return res.json(collection.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -161,7 +194,9 @@ export default async function router(schema, config) {
             await collection.commit(config.pool);
             await config.cacher.del('collection');
 
-            return res.json(collection.json());
+            collection._s3();
+
+            return res.json(collection.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

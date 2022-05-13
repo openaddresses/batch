@@ -49,7 +49,6 @@
         "parallel-transform": "^1.2.0",
         "path-to-regexp": "^6.2.0",
         "pg": "^8.6.0",
-        "request": "^2.88.2",
         "slonik": "^28.0.0",
         "split": "^1.0.1",
         "tilebase": "^3.0.0",

@@ -1,10 +1,10 @@
 import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
 import moment from 'moment';
 import {
     difference,
     area
 } from '@turf/turf';
-import request from 'request';
 import AWS from 'aws-sdk';
 import Data from './data.js';
 import S3 from './s3.js';
@@ -20,196 +20,10 @@ const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.u
 /**
  * @class
  */
-export default class Job {
-    constructor(run, source, layer, name) {
-        if (typeof run !== 'number') throw new Error('Job.run must be numeric');
-        if (typeof source !== 'string') throw new Error('Job.source must be a string');
-        if (typeof layer !== 'string') throw new Error('Job.layer must be a string');
-        if (typeof name !== 'string') throw new Error('Job.name must be a string');
-
-        this.id = false,
-        this.run = run;
-        this.map = null;
-        this.created = false;
-        this.source = source;
-        this.source_name = this.fullname();
-        this.layer = layer;
-        this.name = name;
-        this.license = false;
-        this.output = {
-            cache: false,
-            output: false,
-            preview: false,
-            validated: false
-        };
-        this.loglink = false;
-        this.status = 'Pending';
-        this.version = pkg.version,
-        this.stats = {};
-        this.count = 0;
-        this.size = 0;
-        this.bounds = false;
-        this.s3 = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchJob.json', import.meta.url))).properties);
-
-        this.raw = false;
-    }
-
-    get_raw() {
-        return new Promise((resolve, reject) => {
-            if (!this.raw) {
-                request({
-                    url: this.source,
-                    method: 'GET',
-                    json: true
-                }, (err, res) => {
-                    if (err) return reject(err);
-
-                    this.raw = res.body;
-
-                    return resolve(this.raw);
-                });
-            } else {
-                return resolve(this.raw);
-            }
-        });
-    }
-
-    /**
-     * Return a comparison of a given job id and the current live data job
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     * @param {Number} compare_id - Id of the job to comapre against live job
-     *
-     * @returns {Object} Delta comparison
-     */
-    static async delta(pool, compare_id) {
-        const compare = await Job.from(pool, compare_id);
-        if (compare.status !== 'Success') throw new Err(400, null, 'Job is not in Success state');
-
-        const datas = await Data.list(pool, {
-            source: compare.source_name,
-            layer: compare.layer,
-            name: compare.name
-        });
-
-        let master;
-        if (datas.length > 1) {
-            throw new Err(400, null, 'Job matches multiple live jobs');
-        } else if (datas.length === 0) {
-            throw new Err(400, null, 'Job does not match a live job');
-        } else {
-            master = await Job.from(pool, datas[0].job);
-        }
-
-        const stats = JSON.parse(JSON.stringify(compare.stats));
-        for (const key of Object.keys(compare.stats)) {
-            if (typeof compare.stats[key] === 'object') {
-                for (const key_i of Object.keys(compare.stats[key])) {
-                    if (master.stats[key]) {
-                        stats[key][key_i] = compare.stats[key][key_i] - (master.stats[key][key_i] !== undefined ? master.stats[key][key_i] : 0);
-                    } else {
-                        stats[key][key_i] = compare.stats[key][key_i] - 0;
-                    }
-                }
-            } else {
-                stats[key] = compare.stats[key] - (master.stats[key] !== undefined ? master.stats[key] : 0);
-            }
-        }
-
-        const geom = difference(master.bounds, compare.bounds);
-        return {
-            compare: {
-                id: compare.id,
-                count: compare.count,
-                stats: compare.stats,
-                bounds: {
-                    area: area(compare.bounds),
-                    geom: compare.bounds
-                }
-            },
-            master: {
-                id: master.id,
-                count: master.count,
-                stats: master.stats,
-                bounds: {
-                    area: area(master.bounds),
-                    geom: master.bounds
-                }
-            },
-            delta: {
-                count: master.count - compare.count,
-                stats: stats,
-                bounds: {
-                    area: area(master.bounds) - area(compare.bounds),
-                    diff_area: geom ? geom : 0,
-                    geom: geom
-                }
-            }
-        };
-    }
-
-    /**
-     * Return the source_name of the source given the source url
-     *
-     * @returns {String} source_name
-     */
-    fullname() {
-        return this.source
-            .replace(/.*sources\//, '')
-            .replace(/\.json/, '');
-    }
-
-    /**
-     * Return a JSON representation of the job
-     *
-     * @returns {Object} JSON representation of object
-     */
-    json() {
-        return {
-            id: this.id ? parseInt(this.id) : false,
-            size: parseInt(this.size),
-            s3: this.s3,
-            run: parseInt(this.run),
-            license: this.license,
-            map: this.map ? parseInt(this.map) : null,
-            created: this.created,
-            source_name: this.source_name,
-            source: this.source,
-            layer: this.layer,
-            name: this.name,
-            output: this.output,
-            loglink: this.loglink,
-            status: this.status,
-            version: this.version,
-            count: parseInt(this.count),
-            bounds: this.bounds,
-            stats: this.stats
-        };
-    }
-
-    /**
-     * Create a Job object given a JSON blob
-     *
-     * @param {Object} json JSON Blob
-     * @returns {Job}
-     */
-    static from_json(json) {
-        const job = new Job(
-            json.run,
-            json.source,
-            json.layer,
-            json.name
-        );
-
-        for (const key of Object.keys(json)) {
-            job[key] = json[key];
-        }
-
-        return job;
-    }
+export default class Job extends Generic {
+    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Job.json', import.meta.url)));
+    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchJob.json', import.meta.url)));
+    static _table = 'job';
 
     /**
      * List & Filter Jobs
@@ -311,6 +125,101 @@ export default class Job {
         });
     }
 
+
+    async get_raw() {
+        if (!this.raw) {
+            const res = await fetch(this.source);
+            this.raw = await res.json();
+        }
+
+        return this.raw;
+    }
+
+    /**
+     * Return a comparison of a given job id and the current live data job
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Number} compare_id - Id of the job to comapre against live job
+     *
+     * @returns {Object} Delta comparison
+     */
+    static async delta(pool, compare_id) {
+        const compare = await Job.from(pool, compare_id);
+        if (compare.status !== 'Success') throw new Err(400, null, 'Job is not in Success state');
+
+        const datas = await Data.list(pool, {
+            source: compare.source_name,
+            layer: compare.layer,
+            name: compare.name
+        });
+
+        let master;
+        if (datas.length > 1) {
+            throw new Err(400, null, 'Job matches multiple live jobs');
+        } else if (datas.length === 0) {
+            throw new Err(400, null, 'Job does not match a live job');
+        } else {
+            master = await Job.from(pool, datas[0].job);
+        }
+
+        const stats = JSON.parse(JSON.stringify(compare.stats));
+        for (const key of Object.keys(compare.stats)) {
+            if (typeof compare.stats[key] === 'object') {
+                for (const key_i of Object.keys(compare.stats[key])) {
+                    if (master.stats[key]) {
+                        stats[key][key_i] = compare.stats[key][key_i] - (master.stats[key][key_i] !== undefined ? master.stats[key][key_i] : 0);
+                    } else {
+                        stats[key][key_i] = compare.stats[key][key_i] - 0;
+                    }
+                }
+            } else {
+                stats[key] = compare.stats[key] - (master.stats[key] !== undefined ? master.stats[key] : 0);
+            }
+        }
+
+        const geom = difference(master.bounds, compare.bounds);
+        return {
+            compare: {
+                id: compare.id,
+                count: compare.count,
+                stats: compare.stats,
+                bounds: {
+                    area: area(compare.bounds),
+                    geom: compare.bounds
+                }
+            },
+            master: {
+                id: master.id,
+                count: master.count,
+                stats: master.stats,
+                bounds: {
+                    area: area(master.bounds),
+                    geom: master.bounds
+                }
+            },
+            delta: {
+                count: master.count - compare.count,
+                stats: stats,
+                bounds: {
+                    area: area(master.bounds) - area(compare.bounds),
+                    diff_area: geom ? geom : 0,
+                    geom: geom
+                }
+            }
+        };
+    }
+
+    /**
+     * Return the source_name of the source given the source url
+     *
+     * @returns {String} source_name
+     */
+    fullname() {
+        return this.source
+            .replace(/.*sources\//, '')
+            .replace(/\.json/, '');
+    }
+
     static async from(pool, id) {
         let pgres;
         try {
@@ -367,14 +276,6 @@ export default class Job {
         }
 
         return job;
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
     }
 
     static preview(job_id, res) {
@@ -493,14 +394,10 @@ export default class Job {
         }
     }
 
-    async generate(pool) {
-        if (!this.run) throw new Err(400, null, 'Cannot generate a job without a run');
-        if (!this.source) throw new Err(400, null, 'Cannot generate a job without a source');
-        if (!this.layer) throw new Err(400, null, 'Cannot generate a job without a layer');
-        if (!this.name) throw new Err(400, null, 'Cannot generate a job without a name');
-
+    async generate(pool, job) {
+        let pgres;
         try {
-            const pgres = await pool.query(sql`
+            pgres = await pool.query(sql`
                 INSERT INTO job (
                     run,
                     created,
@@ -515,29 +412,23 @@ export default class Job {
                     size,
                     license
                 ) VALUES (
-                    ${this.run},
+                    ${job.run},
                     NOW(),
                     '{}'::JSONB,
-                    ${this.source_name},
-                    ${this.source},
-                    ${this.layer},
-                    ${this.name},
+                    ${job.source_name},
+                    ${job.source},
+                    ${job.layer},
+                    ${job.name},
                     'Pending',
-                    ${this.version},
-                    ${JSON.stringify(this.output)}::JSONB,
-                    ${this.size},
-                    ${this.license}
+                    ${job.version},
+                    ${JSON.stringify(job.output)}::JSONB,
                 ) RETURNING *
             `);
-
-            for (const key of Object.keys(pgres.rows[0])) {
-                this[key] = pgres.rows[0][key];
-            }
-
-            return this;
         } catch (err) {
             throw new Err(500, err, 'failed to generate job');
         }
+
+        return Job.deserialize(pgres.rows[0]);
     }
 
     /**

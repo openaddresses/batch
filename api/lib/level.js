@@ -1,4 +1,3 @@
-import { promisify } from 'util';
 import moment from 'moment';
 import User from './user.js';
 import Override from './level-override.js';

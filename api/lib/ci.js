@@ -1,12 +1,9 @@
 import assert from 'assert';
 import fs from 'fs';
 import Run from './run.js';
-import { promisify } from 'util';
-import request from 'request';
 import { Err } from '@openaddresses/batch-schema';
 import GH from './gh.js';
 
-const prequest = promisify(request);
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
@@ -206,16 +203,15 @@ export default class CI {
     async filediff(ref) {
         console.error(`ok - FileDiff: ${ref}`);
 
-        const res = await prequest({
-            url: `https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`,
-            json: true,
+        const res = await fetch(`https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`, {
             headers: {
                 'User-Agent': `OpenAddresses v${pkg.version}`
             },
             method: 'GET'
         });
+        const res_body = await res.json();
 
-        return res.body.files.map((file) => {
+        return res_body.files.map((file) => {
             return {
                 filename: file.filename,
                 raw: decodeURIComponent(file.raw_url)
@@ -237,22 +233,23 @@ export default class CI {
             try {
                 const url = new URL(`https://raw.githubusercontent.com/openaddresses/openaddresses/master/${file.filename}`);
 
-                const master_res = await prequest({
-                    url: url,
+                const master_res = await fetch(url, {
                     headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
                     method: 'GET'
                 });
 
-                let master_body = '{}';
-                if (master_res.statusCode === 200) {
-                    master_body = master_res.body;
-                } else {
+                let master_json = {};
+                try {
+                    if (master_res.ok) {
+                        master_json = await master_res.json();
+                    } else {
+                        throw new Err(await master_res.text());
+                    }
+                } catch (err) {
                     // This isn't always an error - if the source is new you can't compare against master as
                     // it won't exist - hence the fallback to an empty object
-                    console.error(`Error: InternalDiff: ${url} HTTP:${master_res.statusCode}: ${master_res.body}`);
+                    console.error(`Error: InternalDiff: ${url} HTTP:${master_res.status}: ${err.message}`);
                 }
-
-                const master_json = JSON.parse(master_body);
 
                 if (master_json.layers) {
                     for (const layertype of Object.keys(master_json.layers)) {
@@ -263,11 +260,12 @@ export default class CI {
                     }
                 }
 
-                const branch_json = JSON.parse((await prequest({
-                    url: file.raw,
+                const branch_res = fetch(file.raw, {
                     headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
                     method: 'GET'
-                })).body);
+                });
+
+                const branch_json = await branch_res.json();
 
                 for (const layertype of Object.keys(branch_json.layers)) {
                     for (const source of branch_json.layers[layertype]) {

@@ -15,7 +15,6 @@ import fs from 'fs';
 import { trigger } from './batch.js';
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class

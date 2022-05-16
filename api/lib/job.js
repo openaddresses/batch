@@ -7,7 +7,6 @@ import {
 } from '@turf/turf';
 import AWS from 'aws-sdk';
 import Data from './data.js';
-import S3 from './s3.js';
 import { Status } from './util.js';
 import { sql } from 'slonik';
 import { stringify } from 'csv-stringify/sync';
@@ -15,6 +14,7 @@ import fs from 'fs';
 import { trigger } from './batch.js';
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
+const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
@@ -211,10 +211,11 @@ export default class Job extends Generic {
     /**
      * Return the source_name of the source given the source url
      *
+     * @param {String} source
      * @returns {String} source_name
      */
-    fullname() {
-        return this.source
+    static fullname(source) {
+        return source
             .replace(/.*sources\//, '')
             .replace(/\.json/, '');
     }
@@ -277,59 +278,6 @@ export default class Job extends Generic {
         return job;
     }
 
-    static preview(job_id, res) {
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${job_id}/source.png`
-        });
-
-        return s3.stream(res);
-    }
-
-    static async sample(pool, job_id) {
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${job_id}/source.geojson.gz`
-        });
-
-        return await s3.sample();
-    }
-
-    static async validated(pool, job_id, res) {
-        const job = await Job.from(pool, job_id);
-
-        if (!job.output.validated) throw new Err(400, null, 'Job does not have validated data');
-
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${job_id}/validated.geojson.gz`
-        });
-
-        return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}-validated.geojson.gz`);
-    }
-
-    static async data(pool, job_id, res) {
-        const job = await Job.from(pool, job_id);
-
-        if (!job.output.output) throw new Err(400, null, 'Job does not have output data');
-
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${job_id}/source.geojson.gz`
-        });
-
-        return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}.geojson.gz`);
-    }
-
-    static cache(job_id, res) {
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${job_id}/cache.zip`
-        });
-
-        return s3.stream(res);
-    }
-
     async commit(pool) {
         if (this.id === false) throw new Err(500, null, 'Job.id must be populated');
 
@@ -345,7 +293,8 @@ export default class Job extends Generic {
                         stats = ${this.stats ? JSON.stringify(this.stats) : null}::JSON,
                         bounds = ST_GeomFromGeoJSON(${this.bounds ? JSON.stringify(this.bounds) : null}::JSON),
                         map = ${this.map},
-                        size = ${this.size}
+                        size = ${this.size},
+                        license = ${this.license}
                     WHERE
                         id = ${this.id}
             `);
@@ -393,7 +342,7 @@ export default class Job extends Generic {
         }
     }
 
-    async generate(pool, job) {
+    static async generate(pool, job) {
         let pgres;
         try {
             pgres = await pool.query(sql`
@@ -408,19 +357,19 @@ export default class Job extends Generic {
                     status,
                     version,
                     output,
-                    size,
                     license
                 ) VALUES (
                     ${job.run},
                     NOW(),
                     '{}'::JSONB,
-                    ${job.source_name},
+                    ${Job.fullname(job.source)},
                     ${job.source},
                     ${job.layer},
                     ${job.name},
                     'Pending',
-                    ${job.version},
-                    ${JSON.stringify(job.output)}::JSONB,
+                    ${pkg.version},
+                    '{}'::JSONB,
+                    False
                 ) RETURNING *
             `);
         } catch (err) {

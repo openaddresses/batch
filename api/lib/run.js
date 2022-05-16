@@ -190,14 +190,18 @@ export default class Run extends Generic {
         }
 
         for (let i = 0; i < jobs.length; i++) {
-            jobs[i] = new Job(run_id, jobs[i].source, jobs[i].layer, jobs[i].name);
-
             try {
-                await jobs[i].generate(pool);
+                jobs[i] = await Job.generate(pool, {
+                    run: run_id,
+                    source: jobs[i].source,
+                    layer: jobs[i].layer,
+                    name: jobs[i].name
+                });
+
                 await jobs[i].batch(run.github && run.github.check);
             } catch (err) {
                 // TODO return list of successful ids
-                throw new Err(400, err, 'jobs only partially queued');
+                throw new Err(500, err, 'jobs only partially queued');
             }
         }
 
@@ -210,7 +214,7 @@ export default class Run extends Generic {
         return {
             run: run_id,
             jobs: jobs.map((job) => {
-                return job.json().id;
+                return job.id;
             })
         };
     }

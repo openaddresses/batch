@@ -240,7 +240,8 @@ export default class Job extends Generic {
                     count,
                     ST_AsGeoJSON(bounds)::JSON AS bounds,
                     version,
-                    size
+                    size,
+                    license
                 FROM
                     job
                 WHERE
@@ -254,17 +255,16 @@ export default class Job extends Generic {
             throw new Err(404, null, 'no job by that id');
         }
 
-        pgres.rows[0].count = isNaN(parseInt(pgres.rows[0].count)) ? null : parseInt(pgres.rows[0].count);
+        const job = Job.deserialize(pgres.rows[0]);
 
-        const job = new Job(
-            pgres.rows[0].run,
-            pgres.rows[0].source,
-            pgres.rows[0].layer,
-            pgres.rows[0].name
-        );
-
-        for (const key of Object.keys(pgres.rows[0])) {
-            job[key] = pgres.rows[0][key];
+        if (!job.license) {
+            job.license = false;
+        } else {
+            try {
+                job.license = JSON.parse(job.license);
+            } catch (err) {
+                job.license = true;
+            }
         }
 
         if (job.output && job.output.output) {
@@ -294,7 +294,7 @@ export default class Job extends Generic {
                         bounds = ST_GeomFromGeoJSON(${this.bounds ? JSON.stringify(this.bounds) : null}::JSON),
                         map = ${this.map},
                         size = ${this.size},
-                        license = ${this.license}
+                        license = ${typeof this.license === 'object' ? JSON.stringify(this.license) : this.license}
                     WHERE
                         id = ${this.id}
             `);

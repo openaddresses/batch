@@ -254,13 +254,9 @@ export default class Run extends Generic {
             `);
 
             return pgres.rows.map((job) => {
-                job.id = parseInt(job.id);
-                job.run = parseInt(job.run);
-                job.map = job.map ? parseInt(job.map) : null;
                 job.count = isNaN(parseInt(job.count)) ? null : parseInt(job.count);
-                job.size = parseInt(job.size);
 
-                return Job.from_json(job);
+                return Job.deserialize(job);
             });
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
@@ -278,17 +274,11 @@ export default class Run extends Generic {
                     github->>'sha' = ${sha}
             `);
 
-            const run = new Run();
-
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'no run by that sha');
             }
 
-            for (const key of Object.keys(pgres.rows[0])) {
-                run[key] = pgres.rows[0][key];
-            }
-
-            return run;
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'failed to fetch run from sha');
         }
@@ -390,13 +380,6 @@ export default class Run extends Generic {
             throw new Err(500, err, 'failed to generate run');
         }
 
-        const run = new Run();
-
-        pgres.rows[0].id = parseInt(pgres.rows[0].id);
-        for (const key of Object.keys(pgres.rows[0])) {
-            run[key] = pgres.rows[0][key];
-        }
-
-        return run;
+        return this.deserialize(pgres.rows[0]);
     }
 }

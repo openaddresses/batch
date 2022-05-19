@@ -47,7 +47,6 @@
         "morgan": "^1.10.0",
         "object-hash": "^3.0.0",
         "parallel-transform": "^1.2.0",
-        "path-to-regexp": "^6.2.0",
         "pg": "^8.6.0",
         "slonik": "^28.0.0",
         "split": "^1.0.1",
@@ -65,6 +64,7 @@
         "nock": "^13.0.8",
         "nodemon": "^2.0.7",
         "nyc": "^15.1.0",
+        "path-to-regexp": "^6.2.1",
         "tap-merge": "^0.3.1"
     },
     "apidoc": {

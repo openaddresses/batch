@@ -14,7 +14,7 @@
             <div :key='message' v-for='message in joberror.messages' class='align-center w-full' v-text='message'></div>
 
             <div class='flex flex--center-main'>
-                <ErrorsModerate @moderated='joberror = false' class='py12' :job='job'/>
+                <ErrorsModerate @moderated='joberror = false' class='py12' :error='job'/>
             </div>
         </div>
 

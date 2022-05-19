@@ -6,7 +6,7 @@ const secret = require('./lib/secret');
 const db = require('./lib/db');
 const schedule = require('./lib/schedule');
 const kms = require('./lib/kms');
-const alarms = require('batch-alarms');
+const alarms = require('@openaddresses/batch-alarms');
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',

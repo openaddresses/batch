@@ -131,7 +131,7 @@ test('GET: api/data', async () => {
             layer: 'addresses',
             name: 'dcgis',
             job: 1,
-            size: 0,
+            size: null,
             output: {
                 cache: false,
                 output: false,
@@ -139,7 +139,7 @@ test('GET: api/data', async () => {
                 validated: false
             },
             map: 1
-        }], 'data: { ... }');
+        }], JSON.stringify(res.body));
     } catch (err) {
         assert.ifError(err, 'no error');
     }

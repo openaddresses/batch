@@ -344,6 +344,16 @@ export default class Job extends Generic {
 
     static async generate(pool, job) {
         let pgres;
+
+        if (!job.output) {
+            job.output = {
+                cache: false,
+                output: false,
+                preview: false,
+                validated: false
+            };
+        }
+
         try {
             pgres = await pool.query(sql`
                 INSERT INTO job (
@@ -368,7 +378,7 @@ export default class Job extends Generic {
                     ${job.name},
                     'Pending',
                     ${pkg.version},
-                    '{}'::JSONB,
+                    ${JSON.stringify(job.output)}::JSONB,
                     False
                 ) RETURNING *
             `);

@@ -178,25 +178,24 @@ export default class Exporter extends Generic {
     }
 
     async log() {
-        return new Promise((resolve, reject) => {
-            if (!this.loglink) return reject(new Err(404, null, 'Export has not produced a log'));
+        if (!this.loglink) return reject(new Err(404, null, 'Export has not produced a log'));
 
-            cwl.getLogEvents({
+        try {
+            const res = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink
-            }, (err, res) => {
-                if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
-
-                let line = 0;
-                return resolve(res.events.map((event) => {
-                    return {
-                        id: ++line,
-                        timestamp: event.timestamp,
-                        message: event.message
-                    };
-                }));
             });
-        });
-    }
 
+            let line = 0;
+            return res.events.map((event) => {
+                return {
+                    id: ++line,
+                    timestamp: event.timestamp,
+                    message: event.message
+                };
+            });
+        } catch (err) {
+            throw new Err(500, err, 'Could not retrieve logs');
+        }
+    }
 }

@@ -95,22 +95,4 @@ export default class LevelOverride extends Generic {
             throw new Err(500, err, 'Failed to save Level Override');
         }
     }
-
-    static async generate(pool, prj) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO level_override (
-                    level,
-                    pattern
-                ) VALUES (
-                    ${prj.level},
-                    ${prj.pattern}
-                ) RETURNING *
-            `);
-
-            return LevelOverride.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate Level Override');
-        }
-    }
 }

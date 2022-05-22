@@ -156,36 +156,6 @@ export default class Exporter extends Generic {
     }
 
     /**
-     * Create a new Export
-     *
-     * @param {Pool} pool Postgres Pool Instance
-     * @param {Object} params
-     * @param {Number} params.uid User ID that created the export
-     * @param {Number} params.job_id Job to export
-     * @param {String} params.format Format to export to
-     */
-    static async generate(pool, params = {}) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO exports (
-                    uid,
-                    job_id,
-                    format
-                ) VALUES (
-                    ${params.uid},
-                    ${params.job_id},
-                    ${params.format}
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to generate exports');
-        }
-
-        return this.deserialize(pgres.rows[0]);
-    }
-
-    /**
      * Submit the Export to AWS Batch for processing
      */
     async batch() {

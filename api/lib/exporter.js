@@ -178,13 +178,13 @@ export default class Exporter extends Generic {
     }
 
     async log() {
-        if (!this.loglink) return reject(new Err(404, null, 'Export has not produced a log'));
+        if (!this.loglink) return throw new Err(404, null, 'Export has not produced a log');
 
         try {
             const res = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink
-            });
+            }).promise();
 
             let line = 0;
             return res.events.map((event) => {

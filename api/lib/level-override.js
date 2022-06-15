@@ -63,7 +63,7 @@ export default class LevelOverride extends Generic {
             throw new Err(500, err, 'Internal LevelOverride Error');
         }
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     serialize() {

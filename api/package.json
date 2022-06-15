@@ -24,7 +24,7 @@
         "@octokit/request": "^5.4.15",
         "@octokit/rest": "^18.11.3",
         "@octokit/webhooks": "9.24.0",
-        "@openaddresses/batch-generic": "^4.0.0",
+        "@openaddresses/batch-generic": "^5.0.0",
         "@openaddresses/batch-schema": "^4.0.0",
         "@turf/bbox": "^6.5.0",
         "@turf/turf": "^6.5.0",

@@ -85,7 +85,7 @@ export default class Collection extends Generic {
                 ) RETURNING *
             `);
 
-            return Collection.deserialize(pgres.rows[0]);
+            return Collection.deserialize(pgres);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'duplicate collections not allowed');

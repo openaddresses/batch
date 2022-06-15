@@ -54,7 +54,7 @@ export default class JobError extends Generic {
             throw new Err(404, null, 'No job errors found');
         }
 
-        return JobError.deserialize(pgres.rows).job_errors;
+        return JobError.deserialize_list(pgres).job_errors;
     }
 
     static async generate(pool, joberror) {
@@ -70,7 +70,7 @@ export default class JobError extends Generic {
             `);
 
             pgres.rows[0].messages = [pgres.rows[0].message];
-            return JobError.deserialize(pgres.rows[0]);
+            return JobError.deserialize(pgres);
         } catch (err) {
             throw new Err(500, err, 'failed to generate job error');
         }
@@ -137,7 +137,7 @@ export default class JobError extends Generic {
             throw new Err(404, null, 'No job errors found');
         }
 
-        return JobError.deserialize(pgres.rows[0]);
+        return JobError.deserialize(pgres);
     }
 
     static async count(pool) {

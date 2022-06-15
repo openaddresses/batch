@@ -41,12 +41,12 @@ test('GET: api/schema?method=FAKE', async () => {
             message: 'validation error',
             messages: [{
                 keyword: 'enum',
-                dataPath: '.method',
+                instancePath: '/method',
                 schemaPath: '#/properties/method/enum',
                 params: {
                     allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
                 },
-                message: 'should be equal to one of the allowed values'
+                message: 'must be equal to one of the allowed values'
             }]
         });
     } catch (err) {
@@ -148,19 +148,19 @@ test('POST: api/login', async () => {
             status: 400,
             message: 'validation error',
             messages: [{
-                keyword: 'type',
-                dataPath: '.username',
-                schemaPath: '#/properties/username/type',
-                params: { type: 'string' },
-                message: 'should be string'
-            },{
                 keyword: 'required',
-                dataPath: '',
+                instancePath: '',
                 schemaPath: '#/required',
                 params: {
                     missingProperty: 'password'
                 },
-                message: 'should have required property \'password\''
+                message: 'must have required property \'password\''
+            },{
+                keyword: 'type',
+                instancePath: '/username',
+                schemaPath: '#/properties/username/type',
+                params: { type: 'string' },
+                message: 'must be string'
             }]
         });
     } catch (err) {

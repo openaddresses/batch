@@ -95,7 +95,7 @@ export default class Exporter extends Generic {
             throw new Err(500, err, 'failed to fetch runs');
         }
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     /**
@@ -178,7 +178,7 @@ export default class Exporter extends Generic {
     }
 
     async log() {
-        if (!this.loglink) return throw new Err(404, null, 'Export has not produced a log');
+        if (!this.loglink) throw new Err(404, null, 'Export has not produced a log');
 
         try {
             const res = await cwl.getLogEvents({

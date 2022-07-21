@@ -6,7 +6,7 @@ test('CI#internaldiff - No File On Master', async () => {
     const jobs = await CI.internaldiff([{
         filename: 'sources/us/mt/statewide.json',
         raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json'
-    }], async function(url, opts) {
+    }], async (url) => {
         if (new URL(url).pathname === '/openaddresses/openaddresses/123/sources/us/mt/statewide.json') {
             return new Response(JSON.stringify({
                 schema: 2,
@@ -32,7 +32,7 @@ test('CI#internaldiff - Internal Diff', async () => {
     const jobs = await CI.internaldiff([{
         filename: 'sources/us/mt/statewide.json',
         raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json'
-    }], async function(url, opts) {
+    }], async (url) => {
         if (new URL(url).pathname === '/openaddresses/openaddresses/123/sources/us/mt/statewide.json') {
             return new Response(JSON.stringify({
                 schema: 2,

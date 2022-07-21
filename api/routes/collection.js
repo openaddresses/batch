@@ -157,7 +157,6 @@ export default async function router(schema, config) {
             if (req.auth && req.auth.level && req.auth.level === 'sponsor') {
                 collection._s3();
             }
-            console.error(collection);
 
             return res.json(collection.serialize());
         } catch (err) {

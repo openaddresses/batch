@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const Job = require('../lib/job');
 const test = require('tape');
+const AWS = require('@mapbox/mock-aws-sdk-js');
+const stream = require('stream');
 
 test('Job#compress', async (t) => {
     try {
@@ -93,6 +95,20 @@ test('Job#s3_down', async (t) => {
 
         job.specific = require('./fixtures/us-or-clackamas.json').layers.addresses[0];
 
+        AWS.stub('S3', 'getObject', async function(params) {
+            t.deepEquals(params, {
+                Bucket: 'data.openaddresses.io',
+                Key: 'cache/us-or-clackamas.zip'
+            });
+
+            this.request.createReadStream.returns(new stream.Readable({
+                read: function() {
+                    this.push('123');
+                    this.push(null);
+                }
+            }));
+        });
+
         await job.s3_down();
 
         t.equals(job.specific.protocol, 'file', 'protocol: file');
@@ -100,6 +116,8 @@ test('Job#s3_down', async (t) => {
     } catch (err) {
         t.error(err);
     }
+
+    AWS.S3.restore();
 
     t.end();
 });

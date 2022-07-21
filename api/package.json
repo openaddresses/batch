@@ -55,7 +55,7 @@
     },
     "devDependencies": {
         "@mapbox/mock-aws-sdk-js": "^1.0.0",
-        "apidoc": "^0.51.0",
+        "apidoc": "^0.52.0",
         "apidoc-plugin-schema2": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^8.1.0",

@@ -222,8 +222,9 @@ export default class CI {
     /**
      * Given a list of filediffs, calculate what sources in the JSON file changed
      * @param {Object[]} files
+     * @param {Function} fetch Optional fetch override
      */
-    static async internaldiff(files) {
+    static async internaldiff(files, fetch=fetch) {
         const jobs = [];
 
         for (const file of files) {
@@ -260,7 +261,7 @@ export default class CI {
                     }
                 }
 
-                const branch_res = fetch(file.raw, {
+                const branch_res = await fetch(file.raw, {
                     headers: { 'User-Agent': `OpenAddresses v${pkg.version}` },
                     method: 'GET'
                 });

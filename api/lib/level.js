@@ -82,6 +82,7 @@ export default class Level {
             }
         });
 
+        console.error(await res.text());
         const body = await res.json();
         const usrs = body.data.account.members.nodes.filter((node) => {
             return node.account.email === email;

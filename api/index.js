@@ -142,25 +142,6 @@ async function server(args, config) {
         }
     });
 
-    /**
-     * @api {get} /health Server Healthcheck
-     * @apiVersion 1.0.0
-     * @apiName Health
-     * @apiGroup Server
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     AWS ELB Healthcheck for the server
-     *
-     * @apiSchema {jsonschema=./schema/res.Health.json} apiSuccess
-     */
-    app.get('/health', (req, res) => {
-        return res.json({
-            healthy: true,
-            message: 'I work all day, I work all night to get the open the data!'
-        });
-    });
-
     app.use('/api', schema.router);
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));

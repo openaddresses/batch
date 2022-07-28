@@ -266,17 +266,13 @@ export default class Flight {
      * Shutdown an existing server test instance
      */
     landing() {
-        test('test server landing - api', async () => {
-            if (this.srv) {
-                assert.ok(this.srv, 'server object returned');
-                await this.srv.close();
-            }
-
-            assert.ok(this.config.pool, 'pool object returned');
-            await this.config.pool.end();
-
-            assert.ok(this.config.cacher, 'cacher object returned');
-            await this.config.cacher.cache.quit();
+        test('test server landing - api', (t) => {
+            this.srv.close(async () => {
+                await this.config.pool.end();
+                delete this.config;
+                delete this.srv;
+                t.end();
+            });
         });
     }
 }

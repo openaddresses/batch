@@ -269,6 +269,7 @@ export default class Flight {
         test('test server landing - api', (t) => {
             this.srv.close(async () => {
                 await this.config.pool.end();
+                await this.config.cacher.cache.quit();
                 delete this.config;
                 delete this.srv;
                 t.end();

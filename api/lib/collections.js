@@ -47,28 +47,6 @@ export default class Collection extends Generic {
         this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${this.name}.zip`;
     }
 
-    async commit(pool) {
-        if (this.id === false) throw new Err(400, null, 'Collection.id must be populated');
-
-        try {
-            await pool.query(sql`
-                UPDATE collections
-                    SET
-                        name = COALESCE(${this.name || null}, name),
-                        sources = COALESCE(${this.sources ? JSON.stringify(this.sources) : null}::JSONB, sources),
-                        created = NOW(),
-                        size = COALESCE(${this.size || null}, size)
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            if (err instanceof Err) throw err;
-            throw new Err(500, err, 'failed to save collection');
-        }
-    }
-
     static async generate(pool, collection) {
         try {
             const pgres = await pool.query(sql`

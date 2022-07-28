@@ -43,7 +43,7 @@ async function prompt() {
 
 async function cli() {
     if (!process.env.StackName) process.env.StackName = 'batch-prod';
-    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
+    if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.OA_API) throw new Error('No OA_API env var defined');
 

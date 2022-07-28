@@ -8,8 +8,6 @@ import minify from 'express-minify';
 import bodyparser from 'body-parser';
 import { Schema, Err } from '@openaddresses/batch-schema';
 import { Pool } from '@openaddresses/batch-generic';
-import wkx from 'wkx';
-import bbox from '@turf/bbox';
 import minimist from 'minimist';
 
 import User from './lib/user.js';
@@ -91,7 +89,7 @@ async function server(args, config) {
 
     try {
         if (args.populate) {
-            await Map.populate(pool);
+            await Map.populate(config.pool);
         }
     } catch (err) {
         throw new Error(err);
@@ -253,11 +251,5 @@ async function server(args, config) {
             if (!config.silent) console.log('ok - http://localhost:4999');
             return resolve([srv, config]);
         });
-    });
-}
-
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
     });
 }

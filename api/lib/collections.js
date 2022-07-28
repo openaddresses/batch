@@ -25,7 +25,7 @@ export default class Collection extends Generic {
                     collections
             `);
         } catch (err) {
-            throw new Err(500, err, 'Failed to list collections');
+            throw new Err(500, new Error(err), 'Failed to list collections');
         }
 
         if (!pgres.rows.length) {
@@ -69,8 +69,29 @@ export default class Collection extends Generic {
                 throw new Err(400, null, 'duplicate collections not allowed');
             }
 
-            throw new Err(500, err, 'failed to generate collection');
+            throw new Err(500, new Error(err), 'failed to generate collection');
         }
     }
 
+    async commit(pool) {
+        if (this.id === false) throw new Err(400, null, 'Collection.id must be populated');
+
+        try {
+            await pool.query(sql`
+                UPDATE collections
+                    SET
+                        name = COALESCE(${this.name || null}, name),
+                        sources = COALESCE(${this.sources ? JSON.stringify(this.sources) : null}::JSONB, sources),
+                        created = NOW(),
+                        size = COALESCE(${this.size || null}, size)
+                    WHERE
+                        id = ${this.id}
+            `);
+
+            return this;
+        } catch (err) {
+            console.error(err);
+            throw new Err(500, new Error(err), 'failed to save collection');
+        }
+    }
 }

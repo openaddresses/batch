@@ -85,7 +85,7 @@ async function server(args, config) {
     }
 
     config.cacher = new Cacher(args['no-cache'], config.silent);
-    config.pool = Pool.connect(process.env.POSTGRES || args.postgres || 'postgres://postgres@localhost:5432/openaddresses');
+    config.pool = await Pool.connect(process.env.POSTGRES || args.postgres || 'postgres://postgres@localhost:5432/openaddresses');
 
     try {
         if (args.populate) {

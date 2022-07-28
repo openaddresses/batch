@@ -6,9 +6,9 @@ const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('GET: /health', async () => {
+test('GET: /api/health', async () => {
     try {
-        const res = await flight.fetch('/health', {
+        const res = await flight.fetch('/api/health', {
             method: 'GET'
         }, false);
 

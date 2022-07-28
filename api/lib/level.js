@@ -40,9 +40,10 @@ export default class Level {
             method: 'POST',
             headers: {
                 'Api-Key': this.OpenCollective,
-                'User-Agent': `OpenAddresses v${pkg.version}`
+                'User-Agent': `OpenAddresses v${pkg.version}`,
+                'Content-Type': 'application/json'
             },
-            body: {
+            body: JSON.stringify({
                 query: `
                   query account($slug: String, $email: EmailAddress, $roles: [MemberRole]) {
                     account(slug: $slug) {
@@ -79,10 +80,9 @@ export default class Level {
                     email: email,
                     roles: ['BACKER']
                 }
-            }
+            })
         });
 
-        console.error(await res.text());
         const body = await res.json();
         const usrs = body.data.account.members.nodes.filter((node) => {
             return node.account.email === email;

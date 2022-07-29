@@ -24,9 +24,8 @@
         "@octokit/request": "^5.4.15",
         "@octokit/rest": "^18.11.3",
         "@octokit/webhooks": "9.24.0",
-        "@openaddresses/batch-generic": "^3.2.0",
-        "@openaddresses/batch-schema": "^3.1.2",
-        "@turf/bbox": "^6.5.0",
+        "@openaddresses/batch-generic": "^5.0.0",
+        "@openaddresses/batch-schema": "^4.0.0",
         "@turf/turf": "^6.5.0",
         "aws-sdk": "^2.901.0",
         "bcrypt": "^5.0.0",
@@ -47,17 +46,14 @@
         "morgan": "^1.10.0",
         "object-hash": "^3.0.0",
         "parallel-transform": "^1.2.0",
-        "path-to-regexp": "^6.2.0",
         "pg": "^8.6.0",
-        "request": "^2.88.2",
         "slonik": "^28.0.0",
         "split": "^1.0.1",
-        "tilebase": "^3.0.0",
-        "wkx": "^0.5.0"
+        "tilebase": "^3.0.0"
     },
     "devDependencies": {
         "@mapbox/mock-aws-sdk-js": "^1.0.0",
-        "apidoc": "^0.51.0",
+        "apidoc": "^0.52.0",
         "apidoc-plugin-schema2": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^8.1.0",
@@ -66,6 +62,7 @@
         "nock": "^13.0.8",
         "nodemon": "^2.0.7",
         "nyc": "^15.1.0",
+        "path-to-regexp": "^6.2.1",
         "tap-merge": "^0.3.1"
     },
     "apidoc": {

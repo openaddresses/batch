@@ -7,9 +7,7 @@ import express from 'express';
 import minify from 'express-minify';
 import bodyparser from 'body-parser';
 import { Schema, Err } from '@openaddresses/batch-schema';
-import { sql, createPool, createTypeParserPreset } from 'slonik';
-import wkx from 'wkx';
-import bbox from '@turf/bbox';
+import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';
 
 import User from './lib/user.js';
@@ -86,62 +84,19 @@ async function server(args, config) {
         if (!config.silent) console.log('ok - TileBase Disabled');
     }
 
-    let postgres = process.env.POSTGRES;
-
-    if (args.postgres) {
-        postgres = args.postgres;
-    } else if (!postgres) {
-        postgres = 'postgres://postgres@localhost:5432/openaddresses';
-    }
-
-    let pool = false;
-    let retry = 5;
-    do {
-        try {
-            pool = createPool(postgres, {
-                typeParsers: [
-                    ...createTypeParserPreset(), {
-                        name: 'geometry',
-                        parse: (value) => {
-                            const geom = wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
-
-                            geom.bounds = bbox(geom);
-
-                            return geom;
-                        }
-                    }
-                ]
-            });
-
-            await pool.query(sql`SELECT NOW()`);
-        } catch (err) {
-            pool = false;
-
-            if (retry === 0) {
-                console.error('not ok - terminating due to lack of postgres connection');
-                return process.exit(1);
-            }
-
-            retry--;
-            console.error('not ok - unable to get postgres connection');
-            console.error(`ok - retrying... (${5 - retry}/5)`);
-            await sleep(5000);
-        }
-    } while (!pool);
-
     config.cacher = new Cacher(args['no-cache'], config.silent);
-    config.pool = pool;
+    config.pool = await Pool.connect(process.env.POSTGRES || args.postgres || 'postgres://postgres@localhost:5432/openaddresses');
 
     try {
         if (args.populate) {
-            await Map.populate(pool);
+            await Map.populate(config.pool);
         }
     } catch (err) {
         throw new Error(err);
     }
 
-    const user = new User(pool);
-    const token = new Token(pool);
+    const user = new User(config.pool);
+    const token = new Token(config.pool);
 
     const app = express();
 
@@ -185,25 +140,6 @@ async function server(args, config) {
         } catch (err) {
             Err.respond(res, err);
         }
-    });
-
-    /**
-     * @api {get} /health Server Healthcheck
-     * @apiVersion 1.0.0
-     * @apiName Health
-     * @apiGroup Server
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     AWS ELB Healthcheck for the server
-     *
-     * @apiSchema {jsonschema=./schema/res.Health.json} apiSuccess
-     */
-    app.get('/health', (req, res) => {
-        return res.json({
-            healthy: true,
-            message: 'I work all day, I work all night to get the open the data!'
-        });
     });
 
     app.use('/api', schema.router);
@@ -296,11 +232,5 @@ async function server(args, config) {
             if (!config.silent) console.log('ok - http://localhost:4999');
             return resolve([srv, config]);
         });
-    });
-}
-
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
     });
 }

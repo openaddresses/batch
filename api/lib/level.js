@@ -1,11 +1,8 @@
-import { promisify } from 'util';
-import request from 'request';
 import moment from 'moment';
 import User from './user.js';
 import Override from './level-override.js';
 import fs from 'fs';
 
-const prequest = promisify(request);
 const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
@@ -39,15 +36,14 @@ export default class Level {
             }
         }
 
-        const res = await prequest({
-            url: this.base,
+        const res = await fetch(this.base, {
             method: 'POST',
-            json: true,
             headers: {
                 'Api-Key': this.OpenCollective,
-                'User-Agent': `OpenAddresses v${pkg.version}`
+                'User-Agent': `OpenAddresses v${pkg.version}`,
+                'Content-Type': 'application/json'
             },
-            body: {
+            body: JSON.stringify({
                 query: `
                   query account($slug: String, $email: EmailAddress, $roles: [MemberRole]) {
                     account(slug: $slug) {
@@ -84,10 +80,11 @@ export default class Level {
                     email: email,
                     roles: ['BACKER']
                 }
-            }
+            })
         });
 
-        const usrs = res.body.data.account.members.nodes.filter((node) => {
+        const body = await res.json();
+        const usrs = body.data.account.members.nodes.filter((node) => {
             return node.account.email === email;
         });
 
@@ -108,10 +105,8 @@ export default class Level {
      * Refresh the entire user list
      */
     async all() {
-        const res = await prequest({
-            url: this.base,
+        const res = await fetch(this.base, {
             method: 'POST',
-            json: true,
             headers: {
                 'Api-Key': this.OpenCollective,
                 'User-Agent': `OpenAddresses v${pkg.version}`
@@ -155,7 +150,8 @@ export default class Level {
             }
         });
 
-        const usrs = res.body.data.account.members.nodes;
+        const body = await res.json();
+        const usrs = body.data.account.members.nodes;
         if (!usrs.length) return;
 
         for (const usr of usrs) {

@@ -190,14 +190,18 @@ export default class Run extends Generic {
         }
 
         for (let i = 0; i < jobs.length; i++) {
-            jobs[i] = new Job(run_id, jobs[i].source, jobs[i].layer, jobs[i].name);
-
             try {
-                await jobs[i].generate(pool);
+                jobs[i] = await Job.generate(pool, {
+                    run: run_id,
+                    source: jobs[i].source,
+                    layer: jobs[i].layer,
+                    name: jobs[i].name
+                });
+
                 await jobs[i].batch(run.github && run.github.check);
             } catch (err) {
                 // TODO return list of successful ids
-                throw new Err(400, err, 'jobs only partially queued');
+                throw new Err(500, err, 'jobs only partially queued');
             }
         }
 
@@ -210,7 +214,7 @@ export default class Run extends Generic {
         return {
             run: run_id,
             jobs: jobs.map((job) => {
-                return job.json().id;
+                return job.id;
             })
         };
     }
@@ -250,13 +254,9 @@ export default class Run extends Generic {
             `);
 
             return pgres.rows.map((job) => {
-                job.id = parseInt(job.id);
-                job.run = parseInt(job.run);
-                job.map = job.map ? parseInt(job.map) : null;
                 job.count = isNaN(parseInt(job.count)) ? null : parseInt(job.count);
-                job.size = parseInt(job.size);
 
-                return Job.from_json(job);
+                return Job.deserialize(job);
             });
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
@@ -274,17 +274,11 @@ export default class Run extends Generic {
                     github->>'sha' = ${sha}
             `);
 
-            const run = new Run();
-
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'no run by that sha');
             }
 
-            for (const key of Object.keys(pgres.rows[0])) {
-                run[key] = pgres.rows[0][key];
-            }
-
-            return run;
+            return this.deserialize(pgres);
         } catch (err) {
             throw new Err(500, err, 'failed to fetch run from sha');
         }
@@ -386,13 +380,6 @@ export default class Run extends Generic {
             throw new Err(500, err, 'failed to generate run');
         }
 
-        const run = new Run();
-
-        pgres.rows[0].id = parseInt(pgres.rows[0].id);
-        for (const key of Object.keys(pgres.rows[0])) {
-            run[key] = pgres.rows[0][key];
-        }
-
-        return run;
+        return this.deserialize(pgres);
     }
 }

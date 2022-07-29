@@ -3,6 +3,7 @@ import Run from '../lib/run.js';
 import Job from '../lib/job.js';
 import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
+import S3 from '../lib/s3.js';
 
 export default async function router(schema, config) {
     const ci = new CI(config);
@@ -61,14 +62,14 @@ export default async function router(schema, config) {
         res: 'res.Job.json'
     }, async (req, res) => {
         try {
-            const job = (await Job.from(config.pool, req.params.job)).json();
+            const job = await Job.from(config.pool, req.params.job);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 delete job.s3;
                 delete job.s3_validated;
             }
 
-            return res.json(job);
+            return res.json(job.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -180,7 +181,12 @@ export default async function router(schema, config) {
         ':job': 'integer'
     }, async (req, res) => {
         try {
-            Job.preview(req.params.job, res);
+            const s3 = new S3({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${req.params.job}/source.png`
+            });
+
+            return s3.stream(res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -214,7 +220,16 @@ export default async function router(schema, config) {
         try {
             await Auth.is_level(req, 'sponsor');
 
-            await Job.validated(config.pool, req.params.job, res);
+            const job = await Job.from(config.pool, req.params.job);
+
+            if (!job.output.validated) throw new Err(400, null, 'Job does not have validated data');
+
+            const s3 = new S3({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${req.params.job}/validated.geojson.gz`
+            });
+
+            return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}-validated.geojson.gz`);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -245,7 +260,16 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            await Job.data(config.pool, req.params.job, res);
+            const job = await Job.from(config.pool, req.params.job);
+
+            if (!job.output.output) throw new Err(400, null, 'Job does not have output data');
+
+            const s3 = new S3({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${req.params.job}/source.geojson.gz`
+            });
+
+            return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}.geojson.gz`);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -267,7 +291,12 @@ export default async function router(schema, config) {
         ':job': 'integer'
     }, async (req, res) => {
         try {
-            return res.json(await Job.sample(config.pool, req.params.job));
+            const s3 = new S3({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${req.params.job}/source.geojson.gz`
+            });
+
+            res.json(await s3.sample());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -299,7 +328,12 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            Job.cache(req.params.job, res);
+            const s3 = new S3({
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${req.params.job}/cache.zip`
+            });
+
+            return s3.stream(res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -376,7 +410,7 @@ export default async function router(schema, config) {
 
             await Run.ping(config.pool, ci, job);
 
-            return res.json(job.json());
+            return res.json(job.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

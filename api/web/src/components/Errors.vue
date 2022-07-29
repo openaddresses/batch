@@ -45,23 +45,26 @@
             <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
         </template>
         <template v-else>
-            <div @click='$router.push({ path: `/job/${job.id}` })' :key='job.id' v-for='(job, i) in problems' class='col col--12 grid'>
+            <div @click='$router.push({ path: `/job/${error.job}` })' :key='error.job' v-for='(error, i) in problems' class='col col--12 grid'>
                 <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
                     <div class='col col--1'>
-                        <Status :status='job.status'/>
+                        <Status :status='error.status'/>
                     </div>
                     <div class='col col--1'>
-                        Job <span v-text='job.id'/>
+                        Job <span v-text='error.job'/>
                     </div>
                     <div class='col col--6'>
-                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
+                        <span v-text='`${error.source_name} - ${error.layer} - ${error.name}`'/>
                     </div>
                     <div class='col col--4'>
-                        <ErrorsModerate :job='job' @moderated="problems.splice(i, 1)"/>
+                        <ErrorsModerate
+                            :error='error'
+                            @moderated="problems.splice(i, 1)"
+                        />
                     </div>
 
                     <div class='col col--12 py3'>
-                        <div :key='message' v-for='message in job.messages' class='align-center w-full' v-text='message'></div>
+                        <div :key='message' v-for='message in error.messages' class='align-center w-full' v-text='message'></div>
                     </div>
                 </div>
             </div>

@@ -1,24 +1,25 @@
 import CI from '../lib/ci.js';
 import test from 'node:test';
 import assert from 'assert';
-import nock from 'nock';
 
 test('CI#internaldiff - No File On Master', async () => {
-    nock('https://raw.githubusercontent.com')
-        .get('/openaddresses/openaddresses/123/sources/us/mt/statewide.json')
-        .reply(200, JSON.stringify({
-            schema: 2,
-            layers: {
-                addresses: [{ name: 'state' }]
-            }
-        }))
-        .get('/openaddresses/openaddresses/master/sources/us/mt/statewide.json')
-        .reply(404, 'NOT FOUND');
-
     const jobs = await CI.internaldiff([{
         filename: 'sources/us/mt/statewide.json',
         raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json'
-    }]);
+    }], async (url) => {
+        if (new URL(url).pathname === '/openaddresses/openaddresses/123/sources/us/mt/statewide.json') {
+            return new Response(JSON.stringify({
+                schema: 2,
+                layers: {
+                    addresses: [{ name: 'state' }]
+                }
+            }));
+        } else if (new URL(url).pathname === '/openaddresses/openaddresses/master/sources/us/mt/statewide.json') {
+            return new Response('NOT FOUND', {
+                status: 404
+            });
+        }
+    });
 
     assert.deepEqual(jobs, [{
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json',
@@ -28,27 +29,27 @@ test('CI#internaldiff - No File On Master', async () => {
 });
 
 test('CI#internaldiff - Internal Diff', async () => {
-    nock('https://raw.githubusercontent.com')
-        .get('/openaddresses/openaddresses/123/sources/us/mt/statewide.json')
-        .reply(200, JSON.stringify({
-            schema: 2,
-            layers: {
-                addresses: [{ name: 'state' }, { name: 'state-other' }, { name: 'no-diff' }],
-                parcels: [{ name: 'state' }]
-            }
-        }))
-        .get('/openaddresses/openaddresses/master/sources/us/mt/statewide.json')
-        .reply(200, JSON.stringify({
-            schema: 2,
-            layers: {
-                addresses: [{ name: 'state', diff: true }, { name: 'no-diff' }]
-            }
-        }));
-
     const jobs = await CI.internaldiff([{
         filename: 'sources/us/mt/statewide.json',
         raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json'
-    }]);
+    }], async (url) => {
+        if (new URL(url).pathname === '/openaddresses/openaddresses/123/sources/us/mt/statewide.json') {
+            return new Response(JSON.stringify({
+                schema: 2,
+                layers: {
+                    addresses: [{ name: 'state' }, { name: 'state-other' }, { name: 'no-diff' }],
+                    parcels: [{ name: 'state' }]
+                }
+            }));
+        } else if (new URL(url).pathname === '/openaddresses/openaddresses/master/sources/us/mt/statewide.json') {
+            return new Response(JSON.stringify({
+                schema: 2,
+                layers: {
+                    addresses: [{ name: 'state', diff: true }, { name: 'no-diff' }]
+                }
+            }));
+        }
+    });
 
     assert.deepEqual(jobs, [{
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json',
@@ -63,9 +64,4 @@ test('CI#internaldiff - Internal Diff', async () => {
         layer: 'parcels',
         name: 'state'
     }]);
-});
-
-test('close', () => {
-    nock.cleanAll();
-    nock.enableNetConnect();
 });

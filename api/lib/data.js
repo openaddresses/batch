@@ -99,12 +99,12 @@ export default class Data extends Generic {
                     results.name
             `);
 
-
-
-            return Data.deserialize(pgres.rows.map((res) => {
+            pgres.rows.map((res) => {
                 res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
                 return res;
-            }));
+            });
+
+            return Data.deserialize_list(pgres);
         } catch (err) {
             throw new Err(500, err, 'Failed to load data');
         }
@@ -212,7 +212,7 @@ export default class Data extends Generic {
                 throw new Err(404, null, 'No data by that id');
             }
 
-            const data = Data.deserialize(pgres.rows[0]);
+            const data = Data.deserialize(pgres);
             data.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`;
             return data;
         } catch (err) {

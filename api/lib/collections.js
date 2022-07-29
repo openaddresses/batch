@@ -25,7 +25,7 @@ export default class Collection extends Generic {
                     collections
             `);
         } catch (err) {
-            throw new Err(500, err, 'Failed to list collections');
+            throw new Err(500, new Error(err), 'Failed to list collections');
         }
 
         if (!pgres.rows.length) {
@@ -47,6 +47,32 @@ export default class Collection extends Generic {
         this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${this.name}.zip`;
     }
 
+    static async generate(pool, collection) {
+        try {
+            const pgres = await pool.query(sql`
+                INSERT INTO collections (
+                    name,
+                    sources,
+                    created,
+                    size
+                ) VALUES (
+                    ${collection.name},
+                    ${JSON.stringify(collection.sources)}::JSONB,
+                    NOW(),
+                    ${collection.size || 0}
+                ) RETURNING *
+            `);
+
+            return Collection.deserialize(pgres);
+        } catch (err) {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
+                throw new Err(400, null, 'duplicate collections not allowed');
+            }
+
+            throw new Err(500, new Error(err), 'failed to generate collection');
+        }
+    }
+
     async commit(pool) {
         if (this.id === false) throw new Err(400, null, 'Collection.id must be populated');
 
@@ -64,35 +90,8 @@ export default class Collection extends Generic {
 
             return this;
         } catch (err) {
-            if (err instanceof Err) throw err;
-            throw new Err(500, err, 'failed to save collection');
+            console.error(err);
+            throw new Err(500, new Error(err), 'failed to save collection');
         }
     }
-
-    static async generate(pool, collection) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO collections (
-                    name,
-                    sources,
-                    created,
-                    size
-                ) VALUES (
-                    ${collection.name},
-                    ${JSON.stringify(collection.sources)}::JSONB,
-                    NOW(),
-                    ${collection.size || 0}
-                ) RETURNING *
-            `);
-
-            return Collection.deserialize(pgres.rows[0]);
-        } catch (err) {
-            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
-                throw new Err(400, null, 'duplicate collections not allowed');
-            }
-
-            throw new Err(500, err, 'failed to generate collection');
-        }
-    }
-
 }

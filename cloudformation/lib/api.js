@@ -78,7 +78,7 @@ const stack = {
             Properties: {
                 HealthCheckEnabled: true,
                 HealthCheckIntervalSeconds: 30,
-                HealthCheckPath: '/health',
+                HealthCheckPath: '/api/health',
                 Port: 5000,
                 Protocol: 'HTTP',
                 TargetType: 'ip',

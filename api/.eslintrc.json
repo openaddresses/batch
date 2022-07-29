@@ -9,6 +9,7 @@
         "Promise": true,
         "fetch": true,
         "FormData": true,
+        "Response": true,
         "Blob": true
     },
     "parserOptions": {

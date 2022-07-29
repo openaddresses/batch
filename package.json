@@ -5,7 +5,6 @@
     "description": "AWS Batch based ETL Processing",
     "repository": "git@github.com:openaddresses/batch",
     "author": "ingalls <nick@ingalls.ca>",
-    "license": "MIT",
     "private": false,
     "scripts": {
         "test": "echo 'no tests'",
@@ -13,11 +12,7 @@
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^5.0.1",
-        "aws-sdk": "^2.901.0",
-        "batch-alarms": "^2.1.1",
-        "minimist": "^1.2.2",
-        "prompts": "^2.4.0",
-        "request": "^2.88.2"
+        "@openaddresses/batch-alarms": "^2.1.1"
     },
     "devDependencies": {
         "eslint": "^8.0.1",

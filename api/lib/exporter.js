@@ -95,7 +95,7 @@ export default class Exporter extends Generic {
             throw new Err(500, err, 'failed to fetch runs');
         }
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     /**
@@ -156,36 +156,6 @@ export default class Exporter extends Generic {
     }
 
     /**
-     * Create a new Export
-     *
-     * @param {Pool} pool Postgres Pool Instance
-     * @param {Object} params
-     * @param {Number} params.uid User ID that created the export
-     * @param {Number} params.job_id Job to export
-     * @param {String} params.format Format to export to
-     */
-    static async generate(pool, params = {}) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO exports (
-                    uid,
-                    job_id,
-                    format
-                ) VALUES (
-                    ${params.uid},
-                    ${params.job_id},
-                    ${params.format}
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to generate exports');
-        }
-
-        return this.deserialize(pgres.rows[0]);
-    }
-
-    /**
      * Submit the Export to AWS Batch for processing
      */
     async batch() {
@@ -208,25 +178,24 @@ export default class Exporter extends Generic {
     }
 
     async log() {
-        return new Promise((resolve, reject) => {
-            if (!this.loglink) return reject(new Err(404, null, 'Export has not produced a log'));
+        if (!this.loglink) throw new Err(404, null, 'Export has not produced a log');
 
-            cwl.getLogEvents({
+        try {
+            const res = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink
-            }, (err, res) => {
-                if (err) return reject(new Err(500, err, 'Could not retrieve logs' ));
+            }).promise();
 
-                let line = 0;
-                return resolve(res.events.map((event) => {
-                    return {
-                        id: ++line,
-                        timestamp: event.timestamp,
-                        message: event.message
-                    };
-                }));
+            let line = 0;
+            return res.events.map((event) => {
+                return {
+                    id: ++line,
+                    timestamp: event.timestamp,
+                    message: event.message
+                };
             });
-        });
+        } catch (err) {
+            throw new Err(500, err, 'Could not retrieve logs');
+        }
     }
-
 }

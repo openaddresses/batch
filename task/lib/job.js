@@ -12,9 +12,6 @@ const transform = require('parallel-transform');
 const Stats = require('./stats');
 
 const find = require('find');
-const s3 = new AWS.S3({
-    region: 'us-east-1'
-});
 
 /**
  * @class Job
@@ -129,6 +126,7 @@ class Job {
                 return resolve();
             });
 
+            const s3 = new AWS.S3({ region: 'us-east-1' });
             s3.getObject({
                 Bucket: url.host,
                 Key: url.pathname.replace(/^\//, '')
@@ -218,6 +216,8 @@ class Job {
         if (this.status !== 'processed') {
             return new Error('job state must be "processed" to perform asset upload');
         }
+
+        const s3 = new AWS.S3({ region: 'us-east-1' });
 
         const cache = await Job.find('cache.zip', this.tmp);
         if (cache.length === 1) {

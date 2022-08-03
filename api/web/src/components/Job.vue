@@ -44,15 +44,15 @@
                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
 
                 <span v-if='job.license' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-license" /></svg>
+                    <LicenseIcon width="16" height="16"/>
                 </span>
 
                 <span v-on:click.stop.prevent='$router.push({ path: `/job/${jobid}/raw` })' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-code" /></svg>
+                    <CodeIcon width="16" height="16"/>
                 </span>
 
                 <span v-on:click.stop.prevent='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-notes" /></svg>
+                    <NotesIcon width="16" height="16"/>
                 </span>
             </div>
         </div>
@@ -112,6 +112,11 @@ import Status from './Status.vue';
 import JobSample from './job/JobSample.vue';
 import JobStats from './job/JobStats.vue';
 import JobMap from './job/JobMap.vue';
+import {
+    LicenseIcon,
+    CodeIcon,
+    NotesIcon
+ } from 'vue-tabler-icons';
 
 export default {
     name: 'Job',

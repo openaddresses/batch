@@ -49,43 +49,43 @@
                 "cursor-pointer": profile.level !== "basic",
                 "border border--gray-light": profile.level === "basic",
             }'>
-                <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-user" /></svg>
+                <UserIcon class='w-full align-center' width="36" height="36"/>
 
                 <div class='align-center'>Basic</div>
                 <div class='align-center txt-s'>No Cost</div>
 
                 <div class='col col--12 pt12'>
-                    <svg v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                    <svg v-else-if='hover === "basic"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                    <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                    <CircleCheckIcon v-if='profile.level === "basic"' class='w-full align-center' width="18" height="18"/>
+                    <CircleIcon v-else-if='hover === "basic"' class='w-full align-center' width="18" height="18"/>
+                    <CircleDottedIcon v-else class='w-full align-center' width="18" height="18"/>
                 </div>
             </div>
             <div @click='oc("backer")' class='col col--4 round py12 my12' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
                 "cursor-pointer": profile.level !== "backer",
                 "border border--gray-light": profile.level === "backer",
             }'>
-                <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-coin" /></svg>
+                <CoinIcon class='w-full align-center' width="36" height="36"/>
                 <div class='align-center'>Backer</div>
                 <div class='align-center txt-s'>&gt;= $5</div>
 
                 <div class='col col--12 pt12'>
-                    <svg v-if='profile.level === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                    <svg v-else-if='hover === "backer"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                    <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                    <CircleCheckIcon v-if='profile.level === "backer"' class='w-full align-center' width="18" height="18"/>
+                    <CircleIcon v-else-if='hover === "backer"' class='w-full align-center' width="18" height="18"/>
+                    <CircleDottedIcon v-else class='w-full align-center' width="18" height="18"/>
                 </div>
             </div>
             <div @click='oc("sponsor")' class='col col--4 round py12 my12' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
                 "cursor-pointer": profile.level !== "sponsor",
                 "border border--gray-light": profile.level === "sponsor",
             }'>
-                <svg class='w-full align-center' width="36" height="36"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-trophy" /></svg>
+                <TrophyIcon class='w-full align-center' width="36" height="36"/>
                 <div class='align-center'>Sponsor</div>
                 <div class='align-center txt-s'>&gt;= $100</div>
 
                 <div class='col col--12 pt12'>
-                    <svg v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-check" /></svg>
-                    <svg v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle" /></svg>
-                    <svg v-else class='w-full align-center' width="18" height="18"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-circle-dotted" /></svg>
+                    <CircleCheckIcon v-if='profile.level === "sponsor"' class='w-full align-center' width="18" height="18"/>
+                    <CircleIcon v-else-if='hover === "sponsor"' class='w-full align-center' width="18" height="18"/>
+                    <CircleDottedIcon v-else class='w-full align-center' width="18" height="18"/>
                 </div>
             </div>
 
@@ -128,6 +128,14 @@
 <script>
 import Tokens from './Tokens.vue'
 import Exports from '../Exports.vue'
+import {
+    UserIcon,
+    CircleCheckIcon,
+    CircleIcon,
+    CircleDottedIcon,
+    CoinIcon,
+    TrophyIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'ProfileDefault',
@@ -167,7 +175,13 @@ export default {
     },
     components: {
         Tokens,
-        Exports
+        Exports,
+        UserIcon,
+        CircleCheckIcon,
+        CircleIcon,
+        CircleDottedIcon,
+        CoinIcon,
+        TrophyIcon
     }
 }
 </script>

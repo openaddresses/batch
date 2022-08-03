@@ -1,13 +1,9 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router';
+import { createApp } from 'vue'
+import * as VueRouter from 'vue-router';
 import VTooltip from 'v-tooltip';
 import App from './App.vue'
 import std from '../std.js';
 std();
-
-Vue.config.productionTip = false
-Vue.use(VueRouter);
-Vue.use(VTooltip);
 
 // === Components ===
 
@@ -39,8 +35,8 @@ import ProfileAdmin from '../components/profile/ProfileAdmin.vue';
 
 // === Routes ===
 
-const router = new VueRouter({
-    mode: 'history',
+const router = new VueRouter.createRouter({
+    mode: VueRouter.createWebHistory(),
     routes: [
         { path: '/', redirect: '/data' },
 
@@ -93,7 +89,9 @@ const router = new VueRouter({
     ]
 });
 
-new Vue({
-    router: router,
-    render: h => h(App)
-}).$mount('#app')
+const app = createApp(App);
+
+app.config.devtools = true
+app.use(router);
+app.use(VTooltip);
+app.mount('#app');

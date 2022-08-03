@@ -1,6 +1,6 @@
 <template>
     <span v-on:click.stop.prevent='datapls(job.job)' v-if='job.output.output' class='fr dropdown h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-        <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+        <DownloadIcon width="16" height="16"/>
 
         <div v-on:click.stop class='round dropdown-content cursor-default' style='width: 150px;'>
             <div class='col col--12'>
@@ -15,21 +15,21 @@
                         <span @click='datapls(job.job || job.id)' class='txt-underline-on-hover cursor-pointer'>
                             GeoJSON+LD
                         </span>
-                        <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
                     </div>
 
                     <div class='col col--12'>
                         <span @click='datapls(job.job || job.id, "shapefile")' class='txt-underline-on-hover cursor-pointer'>
                             ShapeFile
                         </span>
-                        <svg @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
                     </div>
 
                     <div class='col col--12'>
                         <span @click='datapls(job.job || job.id, "csv")' class='txt-underline-on-hover cursor-pointer'>
                             CSV
                         </span>
-                        <svg @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"/>
                     </div>
                 </div>
                 <div v-else-if='!job.output.validated' class='col col--12'>
@@ -49,7 +49,7 @@
                         <span @click='datapls(job.job || job.id, "geojson", true)' class='txt-underline-on-hover cursor-pointer'>
                             GeoJSON+LD
                         </span>
-                        <svg @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-info-circle" /></svg>
+                        <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
                     </div>
                 </div>
             </div>
@@ -58,6 +58,9 @@
 </template>
 
 <script>
+import {
+    DownloadIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'Download',

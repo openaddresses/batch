@@ -87,7 +87,7 @@
                     </div>
                     <div class='col col--3'>
                         <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                            <DownloadIcon  width="16" height="16"/>
                         </span>
                     </div>
                 </div>
@@ -99,12 +99,16 @@
 <script>
 import LineChart from './LineChart.js';
 import moment from 'moment-timezone';
+import {
+    DownloadIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'History',
     props: ['dataid'],
     components: {
-        LineChart
+        LineChart,
+        DownloadIcon
     },
     data: function() {
         return {

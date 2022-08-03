@@ -34,7 +34,7 @@
 
                         <template v-if='auth && auth.access === "admin"'>
                             <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-settings" /></svg>
+                                <SettingsIcon width='16' height='16'/>
 
                                 <div class='round dropdown-content'>
                                     <label class='switch-container'>
@@ -47,7 +47,7 @@
                         </template>
 
                         <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
+                            <HistoryIcon width='16' height='16'/>
                         </span>
 
                         <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
@@ -66,6 +66,10 @@
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 import moment from 'moment-timezone';
+import {
+    HistoryIcon,
+    SettingsIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'Location',
@@ -84,7 +88,9 @@ export default {
     },
     components: {
         Download,
-        Coverage
+        Coverage,
+        HistoryIcon,
+        SettingsIcon
     },
     methods: {
         fmt: function(date) {

@@ -105,6 +105,9 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        DownloadIcon
     }
 }
 </script>

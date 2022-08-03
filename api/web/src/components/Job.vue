@@ -154,7 +154,10 @@ export default {
         Download,
         JobStats,
         ErrorsModerate,
-        Status
+        Status,
+        LicenseIcon,
+        CodeIcon,
+        NotesIcon
     },
     methods: {
         datapls: function() {

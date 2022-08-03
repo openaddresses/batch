@@ -222,7 +222,7 @@ import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 
 import { 
-    BuidingCommunityIcon,
+    BuildingCommunityIcon,
     MapPinIcon,
     ShapeIcon,
     DownloadIcon,
@@ -231,7 +231,7 @@ import {
 } from 'vue-tabler-icons';
 
 export default {
-    name: 'Data',
+    name: 'OpenAddressesData',
     props: ['auth'],
     data: function() {
         return {
@@ -420,7 +420,7 @@ export default {
         QuerySource,
         QueryLayer,
         Download,
-        BuidingCommunityIcon,
+        BuildingCommunityIcon,
         MapPinIcon,
         ShapeIcon,
         DownloadIcon,

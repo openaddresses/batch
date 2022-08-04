@@ -31,6 +31,7 @@
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
         "busboy": "^1.6.0",
+        "connect-history-api-fallback": "^2.0.0",
         "cors": "^2.8.5",
         "csv-stringify": "^6.0.0",
         "d3-queue": "^3.0.7",

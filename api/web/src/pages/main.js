@@ -85,7 +85,7 @@ const router = new VueRouter.createRouter({
 
         { path: '/upload', component: Upload },
 
-        { path: '*', component: NotFound }
+        { path: '/.*', component: NotFound }
     ]
 });
 

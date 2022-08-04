@@ -1,6 +1,7 @@
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
+import path from 'path';
 import Cacher from './lib/cacher.js';
 import morgan from 'morgan';
 import express from 'express';
@@ -9,6 +10,7 @@ import bodyparser from 'body-parser';
 import { Schema, Err } from '@openaddresses/batch-schema';
 import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';
+import history from 'connect-history-api-fallback';
 
 import User from './lib/user.js';
 import Token from './lib/token.js';
@@ -112,6 +114,25 @@ async function server(args, config) {
     }));
 
     app.use(minify());
+
+    app.use(history({
+        rewrites: [{
+            from: /.*\/js\/.*$/,
+            to: function(context) {
+                return context.parsedUrl.pathname.replace(/.*\/js\//, '/js/');
+            }
+        },{
+            from: /.*$/,
+            to: function(context) {
+                const parse = path.parse(context.parsedUrl.path);
+                if (parse.ext) {
+                    return context.parsedUrl.pathname;
+                } else {
+                    return '/';
+                }
+            }
+        }]
+    }));
 
     app.use(express.static('web/dist'));
 

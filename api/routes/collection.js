@@ -1,4 +1,5 @@
 import { Err } from '@openaddresses/batch-schema';
+import { sql } from 'slonik';
 import Collection from '../lib/collections.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
@@ -150,7 +151,10 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const collection = await Collection.generate(config.pool, req.body);
+            const collection = await Collection.generate(config.pool, {
+                created: sql`NOW()`,
+                ...req.body
+            });
 
             await config.cacher.del('collection');
 
@@ -188,10 +192,11 @@ export default async function router(schema, config) {
             await Auth.is_admin(req);
 
             const collection = await Collection.from(config.pool, req.params.collection);
+            await collection.commit(config.pool, null, {
+                created: sql`NOW()`,
+                ...req.body
+            });
 
-            collection.patch(req.body);
-
-            await collection.commit(config.pool);
             await config.cacher.del('collection');
 
             collection._s3();

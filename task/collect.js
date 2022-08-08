@@ -70,7 +70,7 @@ async function cli() {
     try {
         const collections = await oa.cmd('collection', 'list');
         console.error('ok - got collections list');
-        const datas = await oa.cmd('data', 'list');
+        let datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
         await sources(oa, tmp, datas);
@@ -95,6 +95,10 @@ async function collect(tmp, collection, oa) {
             cwd: path.resolve(tmp, 'sources')
         }));
     }
+
+    collection_data = collection_data.filter((d) => {
+        return path.parse(d).ext === '.geojson';
+    });
 
     const zip = await zip_datas(tmp, collection_data, collection.name);
 
@@ -136,7 +140,7 @@ async function get_source(oa, tmp, data, stats) {
         ':job': data.job
     });
 
-    fs.writeFileSync(source_meta, JSON.stringify(job, null, 4));
+    fs.writeFileSync(path.resolve(tmp, 'sources', dir, source_meta), JSON.stringify(job, null, 4));
 
     console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
 

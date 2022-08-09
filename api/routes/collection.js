@@ -192,7 +192,9 @@ export default async function router(schema, config) {
             await Auth.is_admin(req);
 
             const collection = await Collection.from(config.pool, req.params.collection);
-            await collection.commit(config.pool, null, {
+            await collection.commit(config.pool, {
+                override: ['created']
+            }, {
                 created: sql`NOW()`,
                 ...req.body
             });

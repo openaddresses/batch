@@ -75,6 +75,21 @@ test('GET: /api/collection/1', async () => {
 });
 
 test('PATCH: /api/collection/1', async () => {
+    let date;
+    try {
+        const res = await flight.fetch('/api/collections/1', {
+            headers: {
+                'shared-secret': '123'
+            }
+        }, true);
+
+        assert.equal(res.body.id, 1);
+        assert.equal(res.body.name, 'global');
+        date = res.body.created;
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
+
     try {
         const res = await flight.fetch('/api/collections/1', {
             method: 'PATCH',
@@ -89,6 +104,8 @@ test('PATCH: /api/collection/1', async () => {
         assert.equal(res.body.id, 1);
         assert.equal(res.body.name, 'global');
         assert.equal(res.body.size, 123);
+
+        assert.notEqual(date, res.body.created)
     } catch (err) {
         assert.ifError(err, 'no error');
     }

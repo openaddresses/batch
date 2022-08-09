@@ -105,7 +105,7 @@ test('PATCH: /api/collection/1', async () => {
         assert.equal(res.body.name, 'global');
         assert.equal(res.body.size, 123);
 
-        assert.notEqual(date, res.body.created)
+        assert.notEqual(date, res.body.created);
     } catch (err) {
         assert.ifError(err, 'no error');
     }

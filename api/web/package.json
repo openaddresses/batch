@@ -16,7 +16,7 @@
         "chart.js": "2.9.4",
         "core-js": "^3.12.0",
         "mapbox-gl": "^2.7.0",
-        "moment-timezone": "^0.5.33",
+        "moment-timezone": "^0.5.35",
         "sass": "^1.32.12",
         "sass-loader": "10.1.1",
         "v-tooltip": "^2.1.3",

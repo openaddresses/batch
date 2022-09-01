@@ -1,8 +1,6 @@
-'use strict';
+import cf from '@mapbox/cloudfriend';
 
-const cf = require('@mapbox/cloudfriend');
-
-const stack = {
+export default {
     AWSTemplateFormatVersion: '2010-09-09',
     Description: 'OpenAddresses Batch T3 Compute Environment',
     Resources: {
@@ -172,5 +170,3 @@ const stack = {
         }
     }
 };
-
-module.exports = stack;

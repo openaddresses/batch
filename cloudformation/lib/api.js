@@ -1,7 +1,6 @@
-'use strict';
-const cf = require('@mapbox/cloudfriend');
+import cf from '@mapbox/cloudfriend';
 
-const stack = {
+export default {
     Parameters: {
         OpenCollective: {
             Type: 'String',
@@ -301,5 +300,3 @@ const stack = {
         },
     }
 };
-
-module.exports = stack;

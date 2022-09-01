@@ -1,12 +1,11 @@
-'use strict';
-const cf = require('@mapbox/cloudfriend');
-const api = require('./lib/api');
-const batch = require('./lib/batch');
-const secret = require('./lib/secret');
-const db = require('./lib/db');
-const schedule = require('./lib/schedule');
-const kms = require('./lib/kms');
-const alarms = require('@openaddresses/batch-alarms');
+import cf from '@mapbox/cloudfriend';
+import api from './lib/api';
+import batch from './lib/batch';
+import secret from './lib/secret';
+import db from './lib/db';
+import schedule from './lib/schedule';
+import kms from './lib/kms';
+import alarms from '@openaddresses/batch-alarms';
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -36,7 +35,7 @@ const stack = {
     }
 };
 
-module.exports = cf.merge(
+export default cf.merge(
     stack,
     db,
     api,

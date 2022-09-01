@@ -9,7 +9,7 @@
     "private": false,
     "scripts": {
         "test": "echo 'no tests'",
-        "lint": "eslint cloudformation/**.js"
+        "lint": "eslint cloudformation/*.js cloudformation/**/*.js"
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^5.0.1",

@@ -297,6 +297,6 @@ export default {
         SharedSecret: {
             Description: 'SharedSecret',
             Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}')
-        },
+        }
     }
 };

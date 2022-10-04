@@ -1,28 +1,22 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router';
-import VTooltip from 'v-tooltip';
+import { createApp } from 'vue';
+import * as VueRouter from 'vue-router';
+import FloatingVue from 'floating-vue';
+
 import App from './App.vue'
 import std from '../../std.js';
 std();
 
-Vue.config.productionTip = false
-Vue.use(VueRouter);
-Vue.use(VTooltip);
-
-// === Components ===
-
-//import Register from './components/Register.vue';
-
-// === Routes ===
-
-const router = new VueRouter({
-    mode: 'history',
+const router = new VueRouter.createRouter({
+    mode: VueRouter.createWebHistory(),
     routes: [
         { path: '/' },
     ]
 });
 
-new Vue({
-    router: router,
-    render: h => h(App)
-}).$mount('#app')
+const app = createApp(App);
+app.config.devtools = true
+app.use(router);
+app.use(FloatingVue);
+
+app.mount('#app');
+

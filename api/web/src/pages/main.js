@@ -1,6 +1,7 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router';
-import VTooltip from 'v-tooltip';
+import { createApp } from 'vue';
+import * as VueRouter from 'vue-router';
+import FloatingVue from 'floating-vue';
+
 import App from './App.vue'
 import std from '../std.js';
 std();
@@ -9,91 +10,64 @@ Vue.config.productionTip = false
 Vue.use(VueRouter);
 Vue.use(VTooltip);
 
-// === Components ===
-
-import Register from '../components/Register.vue';
-import Export from '../components/Export.vue';
-import Exports from '../components/Exports.vue';
-import Upload from '../components/Upload.vue';
-import Errors from '../components/Errors.vue';
-import Login from '../components/Login.vue';
-import Forgot from '../components/Forgot.vue';
-import Verify from '../components/Verify.vue';
-import Reset from '../components/Reset.vue';
-import History from '../components/History.vue';
-import Data from '../components/Data.vue';
-import Runs from '../components/Runs.vue';
-import Jobs from '../components/Jobs.vue';
-import Job from '../components/Job.vue';
-import Run from '../components/Run.vue';
-import JobLog from '../components/JobLog.vue';
-import JobRaw from '../components/JobRaw.vue';
-import Location from '../components/Location.vue';
-
-import NotFound from '../components/NotFound.vue';
-
-import Profile from '../components/Profile.vue';
-import ProfileDefault from '../components/profile/ProfileDefault.vue';
-import ProfileAnalytics from '../components/profile/ProfileAnalytics.vue';
-import ProfileAdmin from '../components/profile/ProfileAdmin.vue';
-
 // === Routes ===
 
-const router = new VueRouter({
-    mode: 'history',
+const router = new VueRouter.createRouter({
+    mode: Vuerouter.createWebHistory(),
     routes: [
         { path: '/', redirect: '/data' },
 
-        { path: '/errors', component: Errors },
+        { path: '/errors', component: () => import('../components/Errors.vue') },
 
-        { path: '/run', component: Runs },
-        { path: '/run/:runid', component: Run, props: true },
+        { path: '/run', component: () => import('../components/Runs.vue') },
+        { path: '/run/:runid', component: () => import('../components/Run.vue'), props: true },
 
-        { path: '/export/', component: Exports, props: true },
-        { path: '/export/:exportid', component: Export, props: true },
+        { path: '/export/', component: () => import('../components/Exports.vue'), props: true },
+        { path: '/export/:exportid', component: () => import('../components/Export.vue'), props: true },
 
-        { path: '/job', component: Jobs },
-        { path: '/job/:jobid', component: Job, props: true },
-        { path: '/job/:jobid/log', component: JobLog, props: true },
-        { path: '/job/:jobid/raw', component: JobRaw, props: true },
+        { path: '/job', component: () => import('../components/Jobs.vue') },
+        { path: '/job/:jobid', component: () => import('../components/Job.vue'), props: true },
+        { path: '/job/:jobid/log', component: () => import('../components/JobLog.vue'), props: true },
+        { path: '/job/:jobid/raw', component: () => import('../components/JobRaw.vue'), props: true },
 
-        { path: '/location/:locid', component: Location, props: true },
+        { path: '/location/:locid', component: () => import('../components/Location.vue'), props: true },
 
-        { path: '/data', component: Data },
-        { path: '/data/:dataid/history', component: History, props: true },
+        { path: '/data', component: () => import('../components/Data.vue') },
+        { path: '/data/:dataid/history', component: () => import('../components/History.vue'), props: true },
 
-        { path: '/login', component: Login },
-        { path: '/login/verify', component: Verify },
-        { path: '/login/forgot', component: Forgot },
-        { path: '/login/reset', component: Reset },
+        { path: '/login', component: () => import('../components/Login.vue') },
+        { path: '/login/verify', component: () => import('../components/Verify.vue') },
+        { path: '/login/forgot', component: () => import('../components/Forgot.vue') },
+        { path: '/login/reset', component: () => import('../components/Reset.vue') },
 
         {
             path: '/profile',
-            component: Profile,
+            component: () => import('../components/Profile.vue'),
             children: [{
                 path: '',
                 name: 'ProfileDefault',
-                component: ProfileDefault
+                component: () => import('../components/profile/ProfileDefault.vue')
             },{
                 path: 'analytics',
                 name: 'ProfileAnalytics',
-                component: ProfileAnalytics
+                component: () => import('../components/profile/ProfileAnalytics.vue')
             },{
                 path: 'admin',
                 name: 'ProfileAdmin',
-                component: ProfileAdmin
+                component: () => import('../components/profile/ProfileAdmin.vue')
             }]
         },
 
-        { path: '/register', component: Register },
+        { path: '/register', component: () => import('../components/Register.vue') },
 
-        { path: '/upload', component: Upload },
+        { path: '/upload', component: () => import('../components/Upload.vue') },
 
-        { path: '*', component: NotFound }
+        { path: '*', component: () => import('../components/NotFound.vue') }
     ]
 });
 
-new Vue({
-    router: router,
-    render: h => h(App)
-}).$mount('#app')
+const app = createApp(App);
+app.config.devtools = true
+app.use(router);
+app.use(FloatingVue);
+app.mount('#app');

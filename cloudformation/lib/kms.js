@@ -1,8 +1,6 @@
-'use strict';
+import cf from '@mapbox/cloudfriend';
 
-const cf = require('@mapbox/cloudfriend');
-
-const stack = {
+export default {
     Resources: {
         OAKMS: {
             Type : 'AWS::KMS::Key',
@@ -25,5 +23,3 @@ const stack = {
         }
     }
 };
-
-module.exports = stack;

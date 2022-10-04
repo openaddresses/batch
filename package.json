@@ -1,6 +1,7 @@
 {
     "name": "batch",
     "root": true,
+    "type": "module",
     "version": "1.0.0",
     "description": "AWS Batch based ETL Processing",
     "repository": "git@github.com:openaddresses/batch",
@@ -8,7 +9,7 @@
     "private": false,
     "scripts": {
         "test": "echo 'no tests'",
-        "lint": "eslint cloudformation/**.js"
+        "lint": "eslint cloudformation/*.js cloudformation/**/*.js"
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^5.0.1",

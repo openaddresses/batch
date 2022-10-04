@@ -1,8 +1,6 @@
-'use strict';
+import cf from '@mapbox/cloudfriend';
 
-const cf = require('@mapbox/cloudfriend');
-
-const stack = {
+export default {
     Resources: {
         APISigningSecret: {
             Type: 'AWS::SecretsManager::Secret',
@@ -18,5 +16,3 @@ const stack = {
 
     }
 };
-
-module.exports = stack;

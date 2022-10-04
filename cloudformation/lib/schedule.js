@@ -1,8 +1,6 @@
-'use strict';
+import cf from '@mapbox/cloudfriend';
 
-const cf = require('@mapbox/cloudfriend');
-
-function schedule(type, cron, desc) {
+export default function schedule(type, cron, desc) {
     const stack =  {
         Resources: { }
     };
@@ -108,5 +106,3 @@ function toTitleCase(str) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 }
-
-module.exports = schedule;

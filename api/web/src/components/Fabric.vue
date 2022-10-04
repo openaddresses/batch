@@ -157,7 +157,7 @@ export default {
     },
     components: {
         ShapeIcon,
-        MapPinIon,
+        MapPinIcon,
         BuildingCommunityIcon
     }
 }

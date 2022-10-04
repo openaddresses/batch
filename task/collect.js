@@ -70,7 +70,7 @@ async function cli() {
     try {
         const collections = await oa.cmd('collection', 'list');
         console.error('ok - got collections list');
-        let datas = await oa.cmd('data', 'list');
+        const datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
         await sources(oa, tmp, datas);

@@ -58,7 +58,7 @@ const router = new VueRouter.createRouter({
 
         { path: '/upload', component: () => import('../components/Upload.vue') },
 
-        { path: '*', component: () => import('../components/NotFound.vue') }
+        { path: '/.*', component: () => import('../components/NotFound.vue') }
     ]
 });
 

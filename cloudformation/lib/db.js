@@ -24,7 +24,7 @@ export default {
                 DBName: 'openaddresses',
                 DBInstanceIdentifier: cf.stackName,
                 KmsKeyId: cf.ref('OAKMS'),
-                EngineVersion: '14.2',
+                EngineVersion: '14.3',
                 MasterUsername: 'openaddresses',
                 MasterUserPassword: cf.ref('DatabasePassword'),
                 AllocatedStorage: 10,

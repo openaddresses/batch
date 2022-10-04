@@ -1,11 +1,12 @@
 import cf from '@mapbox/cloudfriend';
-import api from './lib/api';
-import batch from './lib/batch';
-import secret from './lib/secret';
-import db from './lib/db';
-import schedule from './lib/schedule';
-import kms from './lib/kms';
 import alarms from '@openaddresses/batch-alarms';
+
+import schedule from './lib/schedule.js';
+import secret from './lib/secret.js';
+import batch from './lib/batch.js';
+import api from './lib/api.js';
+import kms from './lib/kms.js';
+import db from './lib/db.js';
 
 const stack = {
     AWSTemplateFormatVersion: '2010-09-09',

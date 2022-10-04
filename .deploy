@@ -1,5 +1,12 @@
 {
     "profile": "oa",
+    "tags": [
+        {
+            "Key": "Project",
+            "Value": "batch"
+        },
+        "Owner"
+    ],
     "artifacts": {
         "docker": [
             "{{project}}:task-{{gitsha}}",

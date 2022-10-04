@@ -6,14 +6,10 @@ import App from './App.vue'
 import std from '../std.js';
 std();
 
-Vue.config.productionTip = false
-Vue.use(VueRouter);
-Vue.use(VTooltip);
-
 // === Routes ===
 
 const router = new VueRouter.createRouter({
-    mode: Vuerouter.createWebHistory(),
+    mode: VueRouter.createWebHistory(),
     routes: [
         { path: '/', redirect: '/data' },
 

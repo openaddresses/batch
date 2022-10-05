@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Cacher from '../lib/cacher.js';
 
 export default async function router(schema, config) {

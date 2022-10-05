@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { promisify } from 'util';

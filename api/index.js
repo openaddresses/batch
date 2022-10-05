@@ -2,11 +2,10 @@ import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import Cacher from './lib/cacher.js';
-import morgan from 'morgan';
 import express from 'express';
 import minify from 'express-minify';
-import bodyparser from 'body-parser';
-import { Schema, Err } from '@openaddresses/batch-schema';
+import Schema from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';
 
@@ -101,7 +100,7 @@ async function server(args, config) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: String(new URL('./schema', import.meta.url)).replace('file://', '')
+        schemas: new URL('./schema', import.meta.url)
     });
 
     app.disable('x-powered-by');
@@ -145,12 +144,6 @@ async function server(args, config) {
     app.use('/api', schema.router);
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
-
-    schema.router.use(bodyparser.urlencoded({ extended: true }));
-    schema.router.use(morgan('combined'));
-    schema.router.use(bodyparser.json({
-        limit: '50mb'
-    }));
 
     // Unified Auth
     schema.router.use(async (req, res, next) => {
@@ -216,14 +209,18 @@ async function server(args, config) {
 
 
     await schema.api();
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(String(new URL('./routes/', import.meta.url)).replace('file://', ''))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await (await import('./routes/' + r)).default(schema, config);
-    }
+    await schema.load(
+        new URL('./routes/', import.meta.url),
+        config,
+        {
+            silent: !!config.silent
+        }
+    );
 
     schema.not_found();
     schema.error();
+
+    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {

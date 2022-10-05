@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import Map from './map.js';
 import fs from 'fs';

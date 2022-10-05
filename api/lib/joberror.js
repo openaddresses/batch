@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Job from './job.js';
 import Run from './run.js';
 import fs from 'fs';

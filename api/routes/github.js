@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import { Webhooks } from '@octokit/webhooks';
 import CI from '../lib/ci.js';
 

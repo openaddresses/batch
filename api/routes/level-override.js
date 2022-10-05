@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import LevelOverride from '../lib/level-override.js';
 import Auth from '../lib/auth.js';
 

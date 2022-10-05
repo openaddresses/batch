@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Email from '../lib/email.js';
 import jwt from 'jsonwebtoken';
 import User from '../lib/user.js';

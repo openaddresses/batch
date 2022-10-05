@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import Err from '@openaddresses/batch-error';
 import readline from 'readline';
 import zlib from 'zlib';
 

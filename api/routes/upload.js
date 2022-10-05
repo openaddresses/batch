@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import busboy from 'busboy';
 import Upload from '../lib/upload.js';
 import Auth from '../lib/auth.js';

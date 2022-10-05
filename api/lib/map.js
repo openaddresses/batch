@@ -7,7 +7,7 @@ import { pipeline } from 'stream/promises';
 import transform from 'parallel-transform';
 import AWS from 'aws-sdk';
 import Generic from '@openaddresses/batch-generic';
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import { Transform } from 'stream';
 
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });

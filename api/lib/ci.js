@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs';
 import Run from './run.js';
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import GH from './gh.js';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));

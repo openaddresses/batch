@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Run from '../lib/run.js';
 import Job from '../lib/job.js';
 import Auth from '../lib/auth.js';

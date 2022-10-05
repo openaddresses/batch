@@ -33,7 +33,7 @@ import {
     ShapeIcon,
     MapPinIcon,
     BuildingCommunityIcon
-} from 'vue-tabler-icons';
+} from '@openaddresses/vue-tabler-icons';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 

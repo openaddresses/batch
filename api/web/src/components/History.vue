@@ -23,21 +23,21 @@
                 </div>
             </template>
             <template v-else>
-                <LineChart class='w-full mb24' style='height: 200px' :chartData='chart' options='{
+                <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
                     "maintainAspectRatio": false,
                     "scales": {
-                        "xAxes": [{
+                        "xAxis": {
                             "type": "time",
                             "time": {
                                 "unit": "day"
                             },
                             "distribution": "linear"
-                        }],
-                        "yAxes": [{
+                        },
+                        "yAxis": {
                             "ticks": {
                                 "beginAtZero": true
                             }
-                        }]
+                        }
                     }
                 }'/>
             </template>
@@ -99,9 +99,14 @@
 <script>
 import {
     DownloadIcon
-} from 'vue-tabler-icons';
-import LineChart from './LineChart.js';
+} from '@openaddresses/vue-tabler-icons';
+import { Line as LineChart } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement } from 'chart.js'
 import moment from 'moment-timezone';
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement)
+
+import 'chartjs-adapter-date-fns';
 
 export default {
     name: 'History',

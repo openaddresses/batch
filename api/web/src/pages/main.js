@@ -44,10 +44,6 @@ const router = new VueRouter.createRouter({
                 name: 'ProfileDefault',
                 component: () => import('../components/profile/ProfileDefault.vue')
             },{
-                path: 'analytics',
-                name: 'ProfileAnalytics',
-                component: () => import('../components/profile/ProfileAnalytics.vue')
-            },{
                 path: 'admin',
                 name: 'ProfileAdmin',
                 component: () => import('../components/profile/ProfileAdmin.vue')

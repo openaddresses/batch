@@ -131,7 +131,7 @@ import {
     CircleCheckIcon,
     CircleDottedIcon,
     CircleIcon
-} from 'vue-tabler-icons';
+} from '@openaddresses/vue-tabler-icons';
 import Tokens from './Tokens.vue'
 import Exports from '../Exports.vue'
 

@@ -109,7 +109,7 @@ import {
     LicenseIcon,
     CodeIcon,
     NotesIcon
-} from 'vue-tabler-icons'
+} from '@openaddresses/vue-tabler-icons'
 import ErrorsModerate from './ErrorsModerate.vue';
 import Download from './Download.vue';
 import Status from './Status.vue';

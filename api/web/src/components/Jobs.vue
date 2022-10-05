@@ -61,7 +61,7 @@
 import {
     BrandGithubIcon,
     NotesIcon
-} from 'vue-tabler-icons'
+} from '@openaddresses/vue-tabler-icons'
 import Status from './Status.vue';
 import Download from './Download.vue';
 

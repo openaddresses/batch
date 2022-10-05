@@ -222,7 +222,7 @@ import {
     BuildingCommunityIcon,
     MapPinIcon,
     ShapeIcon
-} from 'vue-tabler-icons';
+} from '@openaddresses/vue-tabler-icons';
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 import QuerySource from './query/Source.vue';

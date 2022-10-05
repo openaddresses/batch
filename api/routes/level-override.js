@@ -3,20 +3,11 @@ import LevelOverride from '../lib/types/level-override.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {get} /api/level List Override
-     * @apiVersion 1.0.0
-     * @apiName ListLevelOverride
-     * @apiGroup LevelOverride
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   List level overrides
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListLevelOverride.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListLevelOverride.json} apiSuccess
-     */
     await schema.get('/level', {
+        name: 'List Override',
+        group: 'LevelOverride',
+        auth: 'admin',
+        description: 'List level overrides',
         query: 'req.query.ListLevelOverride.json',
         res: 'res.ListLevelOverride.json'
     }, async (req, res) => {
@@ -29,20 +20,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/level Create Override
-     * @apiVersion 1.0.0
-     * @apiName CreateLevelOverride
-     * @apiGroup LevelOverride
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Create a new level override
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateLevelOverride.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
-     */
     await schema.post('/level', {
+        name: 'Create Override',
+        group: 'LevelOverride',
+        auth: 'admin',
+        description: 'Create a new level override',
         body: 'req.body.CreateLevelOverride.json',
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
@@ -57,22 +39,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/level/:levelid Patch Override
-     * @apiVersion 1.0.0
-     * @apiName PatchLevelOverride
-     * @apiGroup LevelOverride
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Patch a level override
-     *
-     * @apiParam {Number} :levelid Level
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchLevelOverride.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
-     */
     await schema.patch('/level/:levelid', {
+        name: 'Patch Override',
+        group: 'LevelOverride',
+        auth: 'admin',
+        description: 'Patch a level override',
         ':levelid': 'integer',
         body: 'req.body.PatchLevelOverride.json',
         res: 'res.LevelOverride.json'
@@ -80,7 +51,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            await LevelOverride.commit(config.pool, req.params.levelid, req.body);
+            const level = await LevelOverride.commit(config.pool, req.params.levelid, req.body);
 
             return res.json(level.serialize());
         } catch (err) {
@@ -88,22 +59,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/level/:levelid Get Override
-     * @apiVersion 1.0.0
-     * @apiName GetLevelOverride
-     * @apiGroup LevelOverride
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Get a level override
-     *
-     * @apiParam {Number} :levelid Level
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchLevelOverride.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.LevelOverride.json} apiSuccess
-     */
     await schema.get('/level/:levelid', {
+        name: 'Get Override',
+        group: 'LevelOverride',
+        auth: 'admin',
+        description: 'Get a level override',
         ':levelid': 'integer',
         res: 'res.LevelOverride.json'
     }, async (req, res) => {
@@ -117,21 +77,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/level/:levelid Delete Override
-     * @apiVersion 1.0.0
-     * @apiName DeleteLevelOverride
-     * @apiGroup LevelOverride
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Delete a level override
-     *
-     * @apiParam {Number} :levelid Level
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/level/:levelid', {
+        name: 'Delete Override',
+        group: 'LevelOverride',
+        auth: 'admin',
+        description: 'Delete a level override',
         ':levelid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {

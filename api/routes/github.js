@@ -3,17 +3,12 @@ import { Webhooks } from '@octokit/webhooks';
 import CI from '../lib/ci.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {post} /api/github/event Github Webhook
-     * @apiVersion 1.0.0
-     * @apiName Github
-     * @apiGroup Webhooks
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Callback endpoint for GitHub Webhooks. Should not be called by user functions
-     */
-    await schema.post('/github/event', null, async (req, res) => {
+    await schema.post('/github/event', {
+        name: 'Github Webhook',
+        group: 'Github',
+        auth: 'admin',
+        description: 'Callback endpoint for GitHub Webhooks. Should not be called by user functions'
+    }, async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
         const ci = new CI(config);

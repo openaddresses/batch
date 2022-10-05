@@ -10,7 +10,7 @@
         "node": ">= 18"
     },
     "scripts": {
-        "doc": "apidoc -i ./ -f index.js -f ./routes/ -e node_modules -e web --private",
+        "doc": "apidoc -i ./doc/",
         "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
         "test": "./test/test | tap-merge",
         "start": "node index.js --email",

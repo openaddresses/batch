@@ -4,20 +4,11 @@ import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {get} /api/data List Data
-     * @apiVersion 1.0.0
-     * @apiName ListData
-     * @apiGroup Data
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Get the latest successful run of a given geographic area
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListData.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListData.json} apiSuccess
-     */
     await schema.get('/data', {
+        name: 'List Data',
+        group: 'Data',
+        auth: 'public',
+        description: 'Get the latest successful run of a given geographic area',
         query: 'req.query.ListData.json',
         res: 'res.ListData.json'
     }, async (req, res) => {
@@ -39,23 +30,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/data/:data Update Data
-     * @apiVersion 1.0.0
-     * @apiName Update
-     * @apiGroup Data
-     * @apiPermission data
-     *
-     * @apiDescription
-     *   Update an existing data object
-     *
-     * @apiParam {Number} :data Data
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchData.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
-     *
-     */
     await schema.patch('/data/:data', {
+        name: 'Update Data',
+        group: 'Data',
+        auth: 'admin',
+        description: 'Update an existing data object',
         ':data': 'integer',
         body: 'req.body.PatchData.json',
         res: 'res.Data.json'
@@ -73,21 +52,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/data/:data Delete Data
-     * @apiVersion 1.0.0
-     * @apiName DeleteData
-     * @apiGroup Data
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Remove a given data entry
-     *
-     * @apiParam {Number} :data Data
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/data/:data', {
+        name: 'Delete Data',
+        group: 'Data',
+        auth: 'admin',
+        description: 'Remove a given data entry',
         ':data': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
@@ -104,21 +73,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/data/:data Get Data
-     * @apiVersion 1.0.0
-     * @apiName SingleData
-     * @apiGroup Data
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return all information about a specific data segment
-     *
-     * @apiParam {Number} :data Data
-     *
-     * @apiSchema {jsonschema=../schema/res.Data.json} apiSuccess
-     */
     await schema.get('/data/:data', {
+        name: 'Get Data',
+        group: 'Data',
+        auth: 'public',
+        description: 'Return all information about a specific data segment',
         ':data': 'integer',
         res: 'res.Data.json'
     }, async (req, res) => {
@@ -136,21 +95,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/data/:data/history Return Data History
-     * @apiVersion 1.0.0
-     * @apiName SingleHistoryData
-     * @apiGroup Data
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return the job history for a given data component
-     *
-     * @apiParam {Number} :data Data
-     *
-     * @apiSchema {jsonschema=../schema/res.DataHistory.json} apiSuccess
-     */
     await schema.get('/data/:data/history', {
+        name: 'Return Data History',
+        group: 'Data',
+        auth: 'public',
+        description: 'Return the job history for a given data component',
         ':data': 'integer',
         res: 'res.DataHistory.json'
     }, async (req, res) => {

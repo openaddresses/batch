@@ -4,22 +4,16 @@ import Upload from '../lib/upload.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema) {
-    /**
-     * @api {post} /api/upload Create Upload
-     * @apiVersion 1.0.0
-     * @apiName upload
-     * @apiGroup Upload
-     * @apiPermission upload
-     *
-     * @apiDescription
-     *     Statically cache source data
-     *
-     *     If a source is unable to be pulled from directly, authenticated users can cache
-     *     data resources to the OpenAddresses S3 cache to be pulled from
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.post('/upload', {
+        name: 'Create Upload',
+        group: 'Upload',
+        auth: 'upload',
+        description: `
+            Statically cache source data
+
+            If a source is unable to be pulled from directly, authenticated users can cache
+            data resources to the OpenAddresses S3 cache to be pulled from
+        `,
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {

@@ -9,20 +9,11 @@ export default async function router(schema, config) {
     const user = new User(config.pool);
     const level = new Level(config.pool);
 
-    /**
-     * @api {get} /api/user List Users
-     * @apiVersion 1.0.0
-     * @apiName ListUsers
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Return a list of users that have registered with the service
-     *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.ListUsers.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.ListUsers.json} apiSuccess
-     */
     await schema.get('/user', {
+        name: 'List Users',
+        group: 'User',
+        auth: 'admin',
+        description: 'Return a list of users that have registered with the service',
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
@@ -34,20 +25,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/user Create User
-     * @apiVersion 1.0.0
-     * @apiName CreateUser
-     * @apiGroup User
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Create a new user
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateUser.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
-     */
     await schema.post('/user', {
+        name: 'Create User',
+        group: 'User',
+        auth: 'public',
+        description: 'Create a new user',
         body: 'req.body.CreateUser.json',
         res: 'res.User.json'
     }, async (req, res) => {
@@ -71,22 +53,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/user/:id Single User
-     * @apiVersion 1.0.0
-     * @apiName SingleUser
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Get all info about a single user
-     *
-     * @apiParam {Number} :id User ID
-     *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.SingleUser.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
-     */
     await schema.get('/user/:id', {
+        name: 'Single User',
+        group: 'User',
+        auth: 'admin',
+        description: 'Get all info about a given user',
         ':id': 'integer',
         query: 'req.query.SingleUser.json',
         res: 'res.User.json'
@@ -105,22 +76,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/user/:id Update User
-     * @apiVersion 1.0.0
-     * @apiName PatchUser
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Update information about a given user
-     *
-     * @apiParam {Number} :id User ID
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.PatchUser.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.User.json} apiSuccess
-     */
     await schema.patch('/user/:id', {
+        name: 'Update User',
+        group: 'User',
+        auth: 'admin',
+        description: 'Update a user',
         ':id': 'integer',
         body: 'req.body.PatchUser.json',
         res: 'res.User.json'

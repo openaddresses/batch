@@ -9,19 +9,11 @@ export default async function router(schema, config) {
     const user = new User(config.pool);
     const level = new Level(config.pool);
 
-    /**
-     * @api {post} /api/login/verify Verify User
-     * @apiVersion 1.0.0
-     * @apiName VerifyLogin
-     * @apiGroup Login
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Email Verification of new user
-     *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
     await schema.get('/login/verify', {
+        name: 'Verify User',
+        group: 'Login',
+        auth: 'public',
+        description: 'Email Verification of new user',
         query: 'req.query.VerifyLogin.json',
         res: 'res.Standard.json'
     }, async (req, res) => {
@@ -32,21 +24,11 @@ export default async function router(schema, config) {
         }
     });
 
-
-    /**
-     * @api {get} /api/login Session Info
-     * @apiVersion 1.0.0
-     * @apiName GetLogin
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return information about the currently logged in user
-     *
-     * @apiSchema (Query) {jsonawait schema=./schema/req.query.GetLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
-     */
     await schema.get('/login', {
+        name: 'Session Info',
+        group: 'Login',
+        auth: 'user',
+        description: 'Return information about the currently logged in user',
         query: 'req.query.GetLogin.json',
         res: 'res.Login.json'
     }, async (req, res) => {
@@ -65,20 +47,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/login Create Session
-     * @apiVersion 1.0.0
-     * @apiName CreateLogin
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Log a user into the service and create an authenticated cookie
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Login.json} apiSuccess
-     */
     await schema.post('/login', {
+        name: 'Create Session',
+        group: 'Login',
+        auth: 'user',
+        description: 'Log a user into the service and create an authenticated cookie',
         body: 'req.body.CreateLogin.json',
         res: 'res.Login.json'
     }, async (req, res) => {
@@ -106,20 +79,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/login/forgot Forgot Login
-     * @apiVersion 1.0.0
-     * @apiName ForgotLogin
-     * @apiGroup Login
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     If a user has forgotten their password, send them a password reset link to their email
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ForgotLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
     await schema.post('/login/forgot', {
+        name: 'Forgot Login',
+        group: 'Login',
+        auth: 'public',
+        description: 'If a user has forgotten their password, send them a password reset link to their email',
         body: 'req.body.ForgotLogin.json',
         res: 'res.Standard.json'
     }, async (req, res) => {
@@ -135,21 +99,14 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/login/reset Reset Login
-     * @apiVersion 1.0.0
-     * @apiName ResetLogin
-     * @apiGroup Login
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Once a user has obtained a password reset by email via the Forgot Login API,
-     *     use the token to reset the password
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.ResetLogin.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
     await schema.post('/login/reset', {
+        name: 'Reset Login',
+        group: 'Login',
+        auth: 'public',
+        description: `
+            Once a user has obtained a password reset by email via the Forgot Login API,
+            use the token to reset the password
+        `,
         body: 'req.body.ResetLogin.json',
         res: 'res.Standard.json'
     }, async (req, res) => {

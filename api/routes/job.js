@@ -8,20 +8,11 @@ import S3 from '../lib/s3.js';
 export default async function router(schema, config) {
     const ci = new CI(config);
 
-    /**
-     * @api {get} /api/job List Jobs
-     * @apiVersion 1.0.0
-     * @apiName ListJobs
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return information about a given subset of jobs
-     *
-     * @apiSchema (query) {jsonschema=../schema/req.query.ListJobs.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListJobs.json} apiSuccess
-     */
     await schema.get('/job', {
+        name: 'List Jobs',
+        group: 'Job',
+        auth: 'public',
+        description: 'Return information about a given subset of jobs',
         query: 'req.query.ListJobs.json',
         res: 'res.ListJobs.json'
     }, async (req, res) => {
@@ -43,21 +34,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job Get Job
-     * @apiVersion 1.0.0
-     * @apiName Single
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return all information about a given job
-     *
-     * @apiParam {Number} :job Job
-     *
-     * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
-     */
     await schema.get('/job/:job', {
+        name: 'Get Job',
+        group: 'Job',
+        auth: 'public',
+        description: 'Return all information about a given job',
         ':job': 'integer',
         res: 'res.Job.json'
     }, async (req, res) => {
@@ -75,20 +56,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/raw Raw Source
-     * @apiVersion 1.0.0
-     * @apiName RawSingle
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return the raw source from github - this API is not stable nor
-     *     will it always return a consistent result
-     *
-     * @apiParam {Number} :job Job
-     */
     await schema.get('/job/:job/raw', {
+        name: 'Raw Source',
+        group: 'Job',
+        auth: 'public',
+        description: 'Return the raw source from github - this API is not stable nor will it always return a consistent result',
         ':job': 'integer'
     }, async (req, res) => {
         try {
@@ -100,21 +72,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/job/:job Rerun Job
-     * @apiVersion 1.0.0
-     * @apiName JobRerun
-     * @apiGroup Job
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Submit a job for reprocessing - often useful for network errors
-     *
-     * @apiParam {Number} :job Job
-     *
-     * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
-     */
     await schema.post('/job/:job/rerun', {
+        name: 'Rerun Job',
+        group: 'Job',
+        auth: 'admin',
+        description: 'Submit a job for reprocessing - often useful for network errors',
         ':job': 'integer',
         res: 'res.SingleJobsCreate.json'
     }, async (req, res) => {
@@ -138,21 +100,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/delta Job Stats Comparison
-     * @apiVersion 1.0.0
-     * @apiName SingleDelta
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Compare the stats of the given job against the current live data job
-     *
-     * @apiParam {Number} :job Job
-     *
-     * @apiSchema {jsonschema=../schema/res.SingleDelta.json} apiSuccess
-     */
     await schema.get('/job/:job/delta', {
+        name: 'Job Stats Comparison',
+        group: 'Job',
+        auth: 'public',
+        description: 'Compare the stats of the given job against the current live data job',
         ':job': 'integer',
         res: 'res.SingleDelta.json'
     }, async (req, res) => {
@@ -165,19 +117,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/output/source.png Get Job Preview
-     * @apiVersion 1.0.0
-     * @apiName SingleOutputPreview
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return the preview image for a given job
-     *
-     * @apiParam {Number} :job Job ID
-     */
     await schema.get('/job/:job/output/source.png', {
+        name: 'Get Job Preview',
+        group: 'Job',
+        auth: 'public',
+        description: 'Return a preview image for the job',
         ':job': 'integer'
     }, async (req, res) => {
         try {
@@ -192,29 +136,23 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/output/validated.geojson.gz Validated Data
-     * @apiVersion 1.0.0
-     * @apiName JobValidatedData
-     * @apiGroup Job
-     * @apiPermission user
-     *
-     * @apiDescription
-     *    Sponsors of our project recieve access to validated data as a way of saying thanks for
-     *    keeping our project alive.
-     *
-     *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
-     *
-     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
-     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
-     *
-     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
-     *    Please consider donating if you are able https://opencollective.com/openaddresses
-     *
-     * @apiParam {Number} :job Job
-     */
     await schema.get('/job/:job/output/validated.geojson.gz', {
+        name: 'Validated Data',
+        group: 'Job',
+        auth: 'user',
+        description: `
+            Sponsors of our project recieve access to validated data as a way of saying thanks for
+            keeping our project alive.
+
+            Note: the user must be authenticated to perform a download. One of our largest costs is
+            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+
+            Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+            to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+            OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+            Please consider donating if you are able https://opencollective.com/openaddresses
+        `,
         ':job': 'integer'
     }, async (req, res) => {
         try {
@@ -235,26 +173,20 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/output/source.geojson.gz Get Job Data
-     * @apiVersion 1.0.0
-     * @apiName SingleOutputData
-     * @apiGroup Job
-     * @apiPermission user
-     *
-     * @apiDescription
-     *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
-     *
-     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
-     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
-     *
-     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
-     *    Please consider donating if you are able https://opencollective.com/openaddresses
-     *
-     * @apiParam {Number} :job Job
-     */
     await schema.get('/job/:job/output/source.geojson.gz', {
+        name: 'Get Job Data',
+        group: 'Job',
+        auth: 'user',
+        description: `
+            Note: the user must be authenticated to perform a download. One of our largest costs is
+            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+
+            Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+            to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+            OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+            Please consider donating if you are able https://opencollective.com/openaddresses
+        `,
         ':job': 'integer'
     }, async (req, res) => {
         try {
@@ -275,19 +207,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/output/sample Small Sample
-     * @apiVersion 1.0.0
-     * @apiName SampleData
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return an Array containing a sample of the properties
-     *
-     * @apiParam {Number} :job Job
-     */
     await schema.get('/job/:job/output/sample', {
+        name: 'Small Sample',
+        group: 'Job',
+        auth: 'public',
+        description: 'Return an Array containing a sample of the properties',
         ':job': 'integer'
     }, async (req, res) => {
         try {
@@ -302,27 +226,20 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/output/cache.zip Get Job Cache
-     * @apiVersion 1.0.0
-     * @apiName SingleOutputCache
-     * @apiGroup Job
-     * @apiPermission user
-     *
-     *  @apiDescription
-     *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
-     *
-     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
-     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
-     *
-     *    OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
-     *    Please consider donating if you are able https://opencollective.com/openaddresses
-     *
-     * @apiParam {Number} :job Job
-     *
-     */
     await schema.get('/job/:job/output/cache.zip', {
+        name: 'Get Job Cache',
+        group: 'Job',
+        auth: 'user',
+        description: `
+            Note: the user must be authenticated to perform a download. One of our largest costs is
+            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+
+            Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+            to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+            OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+            Please consider donating if you are able https://opencollective.com/openaddresses
+        `,
         ':job': 'integer'
     }, async (req, res) => {
         try {
@@ -339,24 +256,15 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/job/:job/log Get Job Log
-     * @apiVersion 1.0.0
-     * @apiName SingleLog
-     * @apiGroup Job
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return the batch-machine processing log for a given job
-     *   Note: These are stored in AWS CloudWatch and *do* expire
-     *   The presence of a loglink on a job, does not guarentree log retention
-     *
-     * @apiParam {Number} :job Job
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.SingleLog.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
-     */
     await schema.get('/job/:job/log', {
+        name: 'Get Job Log',
+        group: 'Job',
+        auth: 'public',
+        description: `
+            Return the batch-machine processing log for a given job
+            Note: These are stored in AWS CloudWatch and *do* expire
+            The presence of a loglink on a job, does not guarentree log retention
+        `,
         ':job': 'integer',
         query: 'req.query.SingleLog.json',
         res: 'res.SingleLog.json'
@@ -381,22 +289,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/job/:job Update Job
-     * @apiVersion 1.0.0
-     * @apiName JobPatch
-     * @apiGroup Job
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Update a job
-     *
-     * @apiParam {Number} :job Job
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchJob.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Job.json} apiSuccess
-     */
     await schema.patch('/job/:job', {
+        name: 'Update Job',
+        group: 'Job',
+        auth: 'admin',
+        description: 'Update a job',
         ':job': 'integer',
         body: 'req.body.PatchJob.json',
         res: 'res.Job.json'

@@ -1,17 +1,12 @@
 import Err from '@openaddresses/batch-error';
 
 export default async function router(schema) {
-    /**
-     * @api {post} /api/opencollective/event OpenCollective
-     * @apiVersion 1.0.0
-     * @apiName OpenCollective
-     * @apiGroup Webhooks
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Callback endpoint for OpenCollective. Should not be called by user functions
-     */
-    await schema.post('/opencollective/event', null, async (req, res) => {
+    await schema.post('/opencollective/event', {
+        name: 'OpenCollective',
+        group: 'Webhooks',
+        auth: 'admin',
+        description: 'Callback endpoint for OpenCollective. Should not be called by user functions'
+    }, async (req, res) => {
         try {
             console.error(req.headers);
             console.error(req.body);

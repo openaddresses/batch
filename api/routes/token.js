@@ -5,19 +5,11 @@ import Token from '../lib/token.js';
 export default async function router(schema, config) {
     const token = new Token(config.pool);
 
-    /**
-     * @api {get} /api/token List Tokens
-     * @apiVersion 1.0.0
-     * @apiName ListTokens
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     List all tokens associated with the requester's account
-     *
-     * @apiSchema {jsonawait schema=./schema/res.ListTokens.json} apiSuccess
-     */
     await schema.get('/token', {
+        name: 'List Tokens',
+        group: 'Token',
+        auth: 'user',
+        description: 'List all tokens associated with the requester\'s account',
         res: 'res.ListTokens.json'
     }, async (req, res) => {
         try {
@@ -29,20 +21,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/token Create Token
-     * @apiVersion 1.0.0
-     * @apiName CreateToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new API token for programatic access
-     *
-     * @apiSchema (Body) {jsonawait schema=./schema/req.body.CreateToken.json} apiParam
-     * @apiSchema {jsonawait schema=./schema/res.CreateToken.json} apiSuccess
-     */
     await schema.post('/token', {
+        name: 'Create Tokens',
+        group: 'Token',
+        auth: 'user',
+        description: 'Create a new API token for programatic access',
         body: 'req.body.CreateToken.json',
         res: 'res.CreateToken.json'
     }, async (req, res) => {
@@ -55,21 +38,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/token/:id Delete Token
-     * @apiVersion 1.0.0
-     * @apiName DeleteToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete a user's API Token
-     *
-     * @apiParam {Number} id Token ID
-     *
-     * @apiSchema {jsonawait schema=./schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/token/:id', {
+        name: 'Delete Tokens',
+        group: 'Token',
+        auth: 'user',
+        description: 'Delete a user\'s API Token',
         ':id': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {

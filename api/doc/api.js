@@ -18,14 +18,14 @@
 
 
 /**
-* @api {delete} /cache DELETE /cache
+* @api {delete} /cache Flush Cache
 * @apiVersion 1.0.0
 * @apiName DELETE-/cache
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Cache
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Flush the Memcached Cache
 *
 
 *
@@ -36,14 +36,14 @@
 
 
 /**
-* @api {delete} /cache/:cache_key DELETE /cache/:cache_key
+* @api {delete} /cache/:cache_key Delete Key
 * @apiVersion 1.0.0
 * @apiName DELETE-/cache/:cache_key
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Cache
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Flush the Memcached Cache
 *
 * @apiParam {string} cache_key param
 *
@@ -54,14 +54,14 @@
 
 
 /**
-* @api {get} /collections GET /collections
+* @api {get} /collections List Collections
 * @apiVersion 1.0.0
 * @apiName GET-/collections
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Collections
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a list of all collections and their glob rules
 *
 
 *
@@ -72,14 +72,25 @@
 
 
 /**
-* @api {get} /collections/:collection/data GET /collections/:collection/data
+* @api {get} /collections/:collection/data Collection Data
 * @apiVersion 1.0.0
 * @apiName GET-/collections/:collection/data
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Collections
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Download a given collection file
+
+Note: the user must be authenticated to perform a download. One of our largest costs is
+S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
+
+Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
+Please consider donating if you are able https://opencollective.com/openaddresses
+
 *
 * @apiParam {integer} collection param
 *
@@ -90,14 +101,14 @@
 
 
 /**
-* @api {get} /collections/:collection GET /collections/:collection
+* @api {get} /collections/:collection Get Collection
 * @apiVersion 1.0.0
 * @apiName GET-/collections/:collection
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Collections
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Get a given collection
 *
 * @apiParam {integer} collection param
 *
@@ -108,14 +119,14 @@
 
 
 /**
-* @api {delete} /collections/:collection DELETE /collections/:collection
+* @api {delete} /collections/:collection Delete Collection
 * @apiVersion 1.0.0
 * @apiName DELETE-/collections/:collection
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Collections
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Delete a collection (This should not be done lightly)
 *
 * @apiParam {integer} collection param
 *
@@ -126,14 +137,14 @@
 
 
 /**
-* @api {post} /collections POST /collections
+* @api {post} /collections Create Collection
 * @apiVersion 1.0.0
 * @apiName POST-/collections
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Collections
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Create a new collection
 *
 
 *
@@ -144,14 +155,14 @@
 
 
 /**
-* @api {patch} /collections/:collection PATCH /collections/:collection
+* @api {patch} /collections/:collection Update Collection
 * @apiVersion 1.0.0
 * @apiName PATCH-/collections/:collection
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Collections
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update a collection
 *
 * @apiParam {integer} collection param
 *
@@ -162,14 +173,14 @@
 
 
 /**
-* @api {get} /data GET /data
+* @api {get} /data List Data
 * @apiVersion 1.0.0
 * @apiName GET-/data
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Data
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Get the latest successful run of a given geographic area
 *
 
 *
@@ -180,14 +191,14 @@
 
 
 /**
-* @api {patch} /data/:data PATCH /data/:data
+* @api {patch} /data/:data Update Data
 * @apiVersion 1.0.0
 * @apiName PATCH-/data/:data
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Data
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update an existing data object
 *
 * @apiParam {integer} data param
 *
@@ -198,14 +209,14 @@
 
 
 /**
-* @api {delete} /data/:data DELETE /data/:data
+* @api {delete} /data/:data Delete Data
 * @apiVersion 1.0.0
 * @apiName DELETE-/data/:data
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Data
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Remove a given data entry
 *
 * @apiParam {integer} data param
 *
@@ -216,14 +227,14 @@
 
 
 /**
-* @api {get} /data/:data GET /data/:data
+* @api {get} /data/:data Get Data
 * @apiVersion 1.0.0
 * @apiName GET-/data/:data
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Data
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return all information about a specific data segment
 *
 * @apiParam {integer} data param
 *
@@ -234,14 +245,14 @@
 
 
 /**
-* @api {get} /data/:data/history GET /data/:data/history
+* @api {get} /data/:data/history Return Data History
 * @apiVersion 1.0.0
 * @apiName GET-/data/:data/history
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Data
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return the job history for a given data component
 *
 * @apiParam {integer} data param
 *
@@ -252,14 +263,18 @@
 
 
 /**
-* @api {get} /job/error GET /job/error
+* @api {get} /job/error Get Job Errors
 * @apiVersion 1.0.0
 * @apiName GET-/job/error
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup JobErrors
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*
+All jobs that fail as part of a live run are entered into the JobError API
+This API powers a page that allows for human review of failing jobs
+Note: Job Errors are cleared with every subsequent full cache
+
 *
 
 *
@@ -270,14 +285,14 @@
 
 
 /**
-* @api {get} /job/error/count GET /job/error/count
+* @api {get} /job/error/count Job Error Count
 * @apiVersion 1.0.0
 * @apiName GET-/job/error/count
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup JobErrors
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a simple count of the current number of job errors
 *
 
 *
@@ -288,14 +303,14 @@
 
 
 /**
-* @api {get} /job/error/:job GET /job/error/:job
+* @api {get} /job/error/:job Get Job Error
 * @apiVersion 1.0.0
 * @apiName GET-/job/error/:job
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup JobErrors
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a single job error if one exists
 *
 * @apiParam {integer} job param
 *
@@ -306,14 +321,14 @@
 
 
 /**
-* @api {post} /job/error POST /job/error
+* @api {post} /job/error Create Job Error
 * @apiVersion 1.0.0
 * @apiName POST-/job/error
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup JobErrors
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Create a new Job Error in response to a live job that Failed or Warned
 *
 
 *
@@ -324,14 +339,14 @@
 
 
 /**
-* @api {post} /job/error/:job POST /job/error/:job
+* @api {post} /job/error/:job Resolve Job Error
 * @apiVersion 1.0.0
 * @apiName POST-/job/error/:job
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup JobErrors
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Mark a job error as resolved
 *
 * @apiParam {integer} job param
 *
@@ -342,14 +357,14 @@
 
 
 /**
-* @api {post} /export POST /export
+* @api {post} /export Create Export
 * @apiVersion 1.0.0
 * @apiName POST-/export
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Create a new export task
 *
 
 *
@@ -360,14 +375,18 @@
 
 
 /**
-* @api {get} /export/:exportid/log GET /export/:exportid/log
+* @api {get} /export/:exportid/log Get Export Log
 * @apiVersion 1.0.0
 * @apiName GET-/export/:exportid/log
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Return the batch-machine processing log for a given export
+Note: These are stored in AWS CloudWatch and *do* expire
+The presence of a loglink on a export does not guarantee log retention
+
 *
 * @apiParam {integer} exportid param
 *
@@ -378,14 +397,14 @@
 
 
 /**
-* @api {get} /export GET /export
+* @api {get} /export List Export
 * @apiVersion 1.0.0
 * @apiName GET-/export
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   List existing exports
 *
 
 *
@@ -396,14 +415,14 @@
 
 
 /**
-* @api {get} /export/:exportid GET /export/:exportid
+* @api {get} /export/:exportid Get Export
 * @apiVersion 1.0.0
 * @apiName GET-/export/:exportid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Get a single export
 *
 * @apiParam {integer} exportid param
 *
@@ -414,14 +433,14 @@
 
 
 /**
-* @api {put} /export/:exportid PUT /export/:exportid
+* @api {put} /export/:exportid Re-run Export
 * @apiVersion 1.0.0
 * @apiName PUT-/export/:exportid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Re-run an export
 *
 * @apiParam {integer} exportid param
 *
@@ -432,14 +451,14 @@
 
 
 /**
-* @api {get} /export/:exportid/output/export.zip GET /export/:exportid/output/export.zip
+* @api {get} /export/:exportid/output/export.zip Get Export Data
 * @apiVersion 1.0.0
 * @apiName GET-/export/:exportid/output/export.zip
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Download the data created during an export
 *
 * @apiParam {integer} exportid param
 *
@@ -450,14 +469,14 @@
 
 
 /**
-* @api {patch} /export/:exportid PATCH /export/:exportid
+* @api {patch} /export/:exportid Patch Export
 * @apiVersion 1.0.0
 * @apiName PATCH-/export/:exportid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Exports
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update an export
 *
 * @apiParam {integer} exportid param
 *
@@ -468,14 +487,14 @@
 
 
 /**
-* @api {get} /fabric GET /fabric
+* @api {get} /fabric Fabric TileJSON
 * @apiVersion 1.0.0
 * @apiName GET-/fabric
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Map
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a TileJSON for the current fabric
 *
 
 *
@@ -486,14 +505,14 @@
 
 
 /**
-* @api {get} /fabric/:z/:x/:y.mvt GET /fabric/:z/:x/:y.mvt
+* @api {get} /fabric/:z/:x/:y.mvt Fabric MVT
 * @apiVersion 1.0.0
 * @apiName GET-/fabric/:z/:x/:y.mvt
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Map
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Retreive fabric Mapbox Vector Tiles
 *
 * @apiParam {integer} z param
 * @apiParam {integer} x param
@@ -506,14 +525,14 @@
 
 
 /**
-* @api {post} /github/event POST /github/event
+* @api {post} /github/event Github Webhook
 * @apiVersion 1.0.0
 * @apiName POST-/github/event
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Github
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Callback endpoint for GitHub Webhooks. Should not be called by user functions
 *
 
 *
@@ -524,14 +543,14 @@
 
 
 /**
-* @api {get} /health GET /health
+* @api {get} /health Server Healthcheck
 * @apiVersion 1.0.0
 * @apiName GET-/health
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Health
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   AWS ELB Healthcheck
 *
 
 *
@@ -542,14 +561,14 @@
 
 
 /**
-* @api {get} /job GET /job
+* @api {get} /job List Jobs
 * @apiVersion 1.0.0
 * @apiName GET-/job
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return information about a given subset of jobs
 *
 
 *
@@ -560,14 +579,14 @@
 
 
 /**
-* @api {get} /job/:job GET /job/:job
+* @api {get} /job/:job Get Job
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return all information about a given job
 *
 * @apiParam {integer} job param
 *
@@ -578,14 +597,14 @@
 
 
 /**
-* @api {get} /job/:job/raw GET /job/:job/raw
+* @api {get} /job/:job/raw Raw Source
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/raw
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return the raw source from github - this API is not stable nor will it always return a consistent result
 *
 * @apiParam {integer} job param
 *
@@ -596,14 +615,14 @@
 
 
 /**
-* @api {post} /job/:job/rerun POST /job/:job/rerun
+* @api {post} /job/:job/rerun Rerun Job
 * @apiVersion 1.0.0
 * @apiName POST-/job/:job/rerun
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Submit a job for reprocessing - often useful for network errors
 *
 * @apiParam {integer} job param
 *
@@ -614,14 +633,14 @@
 
 
 /**
-* @api {get} /job/:job/delta GET /job/:job/delta
+* @api {get} /job/:job/delta Job Stats Comparison
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/delta
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Compare the stats of the given job against the current live data job
 *
 * @apiParam {integer} job param
 *
@@ -632,14 +651,14 @@
 
 
 /**
-* @api {get} /job/:job/output/source.png GET /job/:job/output/source.png
+* @api {get} /job/:job/output/source.png Get Job Preview
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/output/source.png
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a preview image for the job
 *
 * @apiParam {integer} job param
 *
@@ -650,14 +669,26 @@
 
 
 /**
-* @api {get} /job/:job/output/validated.geojson.gz GET /job/:job/output/validated.geojson.gz
+* @api {get} /job/:job/output/validated.geojson.gz Validated Data
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/output/validated.geojson.gz
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Sponsors of our project recieve access to validated data as a way of saying thanks for
+keeping our project alive.
+
+Note: the user must be authenticated to perform a download. One of our largest costs is
+S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+
+Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+Please consider donating if you are able https://opencollective.com/openaddresses
+
 *
 * @apiParam {integer} job param
 *
@@ -668,14 +699,23 @@
 
 
 /**
-* @api {get} /job/:job/output/source.geojson.gz GET /job/:job/output/source.geojson.gz
+* @api {get} /job/:job/output/source.geojson.gz Get Job Data
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/output/source.geojson.gz
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Note: the user must be authenticated to perform a download. One of our largest costs is
+S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+
+Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+Please consider donating if you are able https://opencollective.com/openaddresses
+
 *
 * @apiParam {integer} job param
 *
@@ -686,14 +726,14 @@
 
 
 /**
-* @api {get} /job/:job/output/sample GET /job/:job/output/sample
+* @api {get} /job/:job/output/sample Small Sample
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/output/sample
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return an Array containing a sample of the properties
 *
 * @apiParam {integer} job param
 *
@@ -704,14 +744,23 @@
 
 
 /**
-* @api {get} /job/:job/output/cache.zip GET /job/:job/output/cache.zip
+* @api {get} /job/:job/output/cache.zip Get Job Cache
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/output/cache.zip
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Note: the user must be authenticated to perform a download. One of our largest costs is
+S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+
+Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
+Please consider donating if you are able https://opencollective.com/openaddresses
+
 *
 * @apiParam {integer} job param
 *
@@ -722,14 +771,18 @@
 
 
 /**
-* @api {get} /job/:job/log GET /job/:job/log
+* @api {get} /job/:job/log Get Job Log
 * @apiVersion 1.0.0
 * @apiName GET-/job/:job/log
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*
+Return the batch-machine processing log for a given job
+Note: These are stored in AWS CloudWatch and *do* expire
+The presence of a loglink on a job, does not guarentree log retention
+
 *
 * @apiParam {integer} job param
 *
@@ -740,14 +793,14 @@
 
 
 /**
-* @api {patch} /job/:job PATCH /job/:job
+* @api {patch} /job/:job Update Job
 * @apiVersion 1.0.0
 * @apiName PATCH-/job/:job
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Job
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update a job
 *
 * @apiParam {integer} job param
 *
@@ -758,14 +811,14 @@
 
 
 /**
-* @api {get} /level GET /level
+* @api {get} /level List Override
 * @apiVersion 1.0.0
 * @apiName GET-/level
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup LevelOverride
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   List level overrides
 *
 
 *
@@ -776,14 +829,14 @@
 
 
 /**
-* @api {post} /level POST /level
+* @api {post} /level Create Override
 * @apiVersion 1.0.0
 * @apiName POST-/level
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup LevelOverride
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Create a new level override
 *
 
 *
@@ -794,14 +847,14 @@
 
 
 /**
-* @api {patch} /level/:levelid PATCH /level/:levelid
+* @api {patch} /level/:levelid Patch Override
 * @apiVersion 1.0.0
 * @apiName PATCH-/level/:levelid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup LevelOverride
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Patch a level override
 *
 * @apiParam {integer} levelid param
 *
@@ -812,14 +865,14 @@
 
 
 /**
-* @api {get} /level/:levelid GET /level/:levelid
+* @api {get} /level/:levelid Get Override
 * @apiVersion 1.0.0
 * @apiName GET-/level/:levelid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup LevelOverride
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Get a level override
 *
 * @apiParam {integer} levelid param
 *
@@ -830,14 +883,14 @@
 
 
 /**
-* @api {delete} /level/:levelid DELETE /level/:levelid
+* @api {delete} /level/:levelid Delete Override
 * @apiVersion 1.0.0
 * @apiName DELETE-/level/:levelid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup LevelOverride
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Delete a level override
 *
 * @apiParam {integer} levelid param
 *
@@ -848,14 +901,14 @@
 
 
 /**
-* @api {get} /login/verify GET /login/verify
+* @api {get} /login/verify Verify User
 * @apiVersion 1.0.0
 * @apiName GET-/login/verify
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Login
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Email Verification of new user
 *
 
 *
@@ -866,14 +919,14 @@
 
 
 /**
-* @api {get} /login GET /login
+* @api {get} /login Session Info
 * @apiVersion 1.0.0
 * @apiName GET-/login
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Login
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return information about the currently logged in user
 *
 
 *
@@ -884,14 +937,14 @@
 
 
 /**
-* @api {post} /login POST /login
+* @api {post} /login Create Session
 * @apiVersion 1.0.0
 * @apiName POST-/login
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Login
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Log a user into the service and create an authenticated cookie
 *
 
 *
@@ -902,14 +955,14 @@
 
 
 /**
-* @api {post} /login/forgot POST /login/forgot
+* @api {post} /login/forgot Forgot Login
 * @apiVersion 1.0.0
 * @apiName POST-/login/forgot
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Login
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   If a user has forgotten their password, send them a password reset link to their email
 *
 
 *
@@ -920,14 +973,17 @@
 
 
 /**
-* @api {post} /login/reset POST /login/reset
+* @api {post} /login/reset Reset Login
 * @apiVersion 1.0.0
 * @apiName POST-/login/reset
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Login
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*
+Once a user has obtained a password reset by email via the Forgot Login API,
+use the token to reset the password
+
 *
 
 *
@@ -938,14 +994,14 @@
 
 
 /**
-* @api {get} /map GET /map
+* @api {get} /map Coverage TileJSON
 * @apiVersion 1.0.0
 * @apiName GET-/map
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Map
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Data required for map initialization
 *
 
 *
@@ -956,14 +1012,14 @@
 
 
 /**
-* @api {get} /map/features GET /map/features
+* @api {get} /map/features All Features
 * @apiVersion 1.0.0
 * @apiName GET-/map/features
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Map
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return all map objects in Line Delimited GeoJSON
 *
 
 *
@@ -974,14 +1030,14 @@
 
 
 /**
-* @api {get} /map/:mapid GET /map/:mapid
+* @api {get} /map/:mapid Map Feature
 * @apiVersion 1.0.0
 * @apiName GET-/map/:mapid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Map
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Get a single Map Object
 *
 * @apiParam {integer} mapid param
 *
@@ -992,14 +1048,14 @@
 
 
 /**
-* @api {get} /map/:z/:x/:y.mvt GET /map/:z/:x/:y.mvt
+* @api {get} /map/:z/:x/:y.mvt Coverage MVT
 * @apiVersion 1.0.0
 * @apiName GET-/map/:z/:x/:y.mvt
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Map
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Retreive coverage MVT
 *
 * @apiParam {integer} z param
 * @apiParam {integer} x param
@@ -1012,14 +1068,14 @@
 
 
 /**
-* @api {post} /opencollective/event POST /opencollective/event
+* @api {post} /opencollective/event OpenCollective
 * @apiVersion 1.0.0
 * @apiName POST-/opencollective/event
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Webhooks
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Callback endpoint for OpenCollective. Should not be called by user functions
 *
 
 *
@@ -1030,14 +1086,14 @@
 
 
 /**
-* @api {get} /run GET /run
+* @api {get} /run List Runs
 * @apiVersion 1.0.0
 * @apiName GET-/run
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Runs are container objects that contain jobs that were started at the same time or by the same process
 *
 
 *
@@ -1048,14 +1104,14 @@
 
 
 /**
-* @api {post} /run POST /run
+* @api {post} /run Create Runs
 * @apiVersion 1.0.0
 * @apiName POST-/run
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Create a new run to hold a batch of jobs
 *
 
 *
@@ -1066,14 +1122,14 @@
 
 
 /**
-* @api {get} /run/:run GET /run/:run
+* @api {get} /run/:run Get Runs
 * @apiVersion 1.0.0
 * @apiName GET-/run/:run
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Get a single run
 *
 * @apiParam {integer} run param
 *
@@ -1084,14 +1140,14 @@
 
 
 /**
-* @api {get} /run/:run/count GET /run/:run/count
+* @api {get} /run/:run/count Run Stats
 * @apiVersion 1.0.0
 * @apiName GET-/run/:run/count
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return statistics about jobs within a given run
 *
 * @apiParam {integer} run param
 *
@@ -1102,14 +1158,14 @@
 
 
 /**
-* @api {patch} /run/:run PATCH /run/:run
+* @api {patch} /run/:run Update Run
 * @apiVersion 1.0.0
 * @apiName PATCH-/run/:run
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Update a run
 *
 * @apiParam {integer} run param
 *
@@ -1120,14 +1176,20 @@
 
 
 /**
-* @api {post} /run/:run/jobs POST /run/:run/jobs
+* @api {post} /run/:run/jobs Populate Run Jobs
 * @apiVersion 1.0.0
 * @apiName POST-/run/:run/jobs
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*
+Given an array sources, explode it into multiple jobs and submit to batch
+or pass in a predefined list of sources/layer/names
+
+Note: once jobs are attached to a run, the run is "closed" and subsequent
+jobs cannot be attached to it
+
 *
 * @apiParam {integer} run param
 *
@@ -1138,14 +1200,14 @@
 
 
 /**
-* @api {get} /run/:run/jobs GET /run/:run/jobs
+* @api {get} /run/:run/jobs List Run Jobs
 * @apiVersion 1.0.0
 * @apiName GET-/run/:run/jobs
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Run
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   return all jobs for a given run
 *
 * @apiParam {integer} run param
 *
@@ -1156,14 +1218,14 @@
 
 
 /**
-* @api {post} /schedule POST /schedule
+* @api {post} /schedule Scheduled Event
 * @apiVersion 1.0.0
 * @apiName POST-/schedule
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Schedule
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Internal function to allow scheduled lambdas to kick off events
 *
 
 *
@@ -1174,14 +1236,14 @@
 
 
 /**
-* @api {get} /token GET /token
+* @api {get} /token List Tokens
 * @apiVersion 1.0.0
 * @apiName GET-/token
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Token
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   List all tokens associated with the requester's account
 *
 
 *
@@ -1192,14 +1254,14 @@
 
 
 /**
-* @api {post} /token POST /token
+* @api {post} /token Create Tokens
 * @apiVersion 1.0.0
 * @apiName POST-/token
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Token
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Create a new API token for programatic access
 *
 
 *
@@ -1210,14 +1272,14 @@
 
 
 /**
-* @api {delete} /token/:id DELETE /token/:id
+* @api {delete} /token/:id Delete Tokens
 * @apiVersion 1.0.0
 * @apiName DELETE-/token/:id
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Token
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Delete a user's API Token
 *
 * @apiParam {integer} id param
 *
@@ -1228,14 +1290,19 @@
 
 
 /**
-* @api {post} /upload POST /upload
+* @api {post} /upload Create Upload
 * @apiVersion 1.0.0
 * @apiName POST-/upload
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Upload
+* @apiPermission upload
 *
 * @apidescription
-*   No Description
+*
+Statically cache source data
+
+If a source is unable to be pulled from directly, authenticated users can cache
+data resources to the OpenAddresses S3 cache to be pulled from
+
 *
 
 *
@@ -1246,14 +1313,14 @@
 
 
 /**
-* @api {get} /user GET /user
+* @api {get} /user List Users
 * @apiVersion 1.0.0
 * @apiName GET-/user
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Return a list of users that have registered with the service
 *
 
 *
@@ -1264,14 +1331,14 @@
 
 
 /**
-* @api {post} /user POST /user
+* @api {post} /user Create User
 * @apiVersion 1.0.0
 * @apiName POST-/user
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Create a new user
 *
 
 *
@@ -1282,14 +1349,14 @@
 
 
 /**
-* @api {get} /user/:id GET /user/:id
+* @api {get} /user/:id Single User
 * @apiVersion 1.0.0
 * @apiName GET-/user/:id
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Get all info about a given user
 *
 * @apiParam {integer} id param
 *
@@ -1300,14 +1367,14 @@
 
 
 /**
-* @api {patch} /user/:id PATCH /user/:id
+* @api {patch} /user/:id Update User
 * @apiVersion 1.0.0
 * @apiName PATCH-/user/:id
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update a user
 *
 * @apiParam {integer} id param
 *

@@ -3,20 +3,11 @@ import Schedule from '../lib/schedule.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {post} /api/schedule Scheduled Event
-     * @apiVersion 1.0.0
-     * @apiName Schedule
-     * @apiGroup Schedule
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Internal function to allow scheduled lambdas to kick off events
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.Schedule.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.post('/schedule', {
+        name: 'Scheduled Event',
+        group: 'Schedule',
+        auth: 'admin',
+        description: 'Internal function to allow scheduled lambdas to kick off events',
         body: 'req.body.Schedule.json',
         res: 'res.Standard.json'
     }, async (req, res) => {

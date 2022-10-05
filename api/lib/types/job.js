@@ -7,21 +7,19 @@ import {
 } from '@turf/turf';
 import AWS from 'aws-sdk';
 import Data from './data.js';
-import { Status } from './util.js';
+import { Status } from '../util.js';
 import { sql } from 'slonik';
 import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
-import { trigger } from './batch.js';
+import { trigger } from '../batch.js';
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
+const pkg  = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
 
 /**
  * @class
  */
 export default class Job extends Generic {
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Job.json', import.meta.url)));
-    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchJob.json', import.meta.url)));
     static _table = 'job';
 
     /**

@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Data from '../lib/data.js';
+import Data from '../lib/types/data.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
 

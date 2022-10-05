@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import LevelOverride from '../lib/level-override.js';
+import LevelOverride from '../lib/types/level-override.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

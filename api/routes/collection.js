@@ -1,6 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import { sql } from 'slonik';
-import Collection from '../lib/collections.js';
+import Collection from '../lib/types/collections.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
 

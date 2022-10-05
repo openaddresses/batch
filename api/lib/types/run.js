@@ -4,8 +4,7 @@ import Generic from '@openaddresses/batch-generic';
 import moment from 'moment';
 import Job from './job.js';
 import Data from './data.js';
-import { explode } from './util.js';
-import { Status } from './util.js';
+import { explode, Status } from '../util.js';
 import { sql } from 'slonik';
 
 /**
@@ -15,8 +14,6 @@ import { sql } from 'slonik';
  */
 export default class Run extends Generic {
     static _table = 'runs';
-    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchRun.json', import.meta.url)));
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Run.json', import.meta.url)));
 
     /**
      * Anytime a job is completed, a ping is sent to the run module

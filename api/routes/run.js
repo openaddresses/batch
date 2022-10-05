@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Run from '../lib/run.js';
+import Run from '../lib/types/run.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

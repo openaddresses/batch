@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Map from '../lib/map.js';
+import Map from '../lib/types/map.js';
 import Cacher from '../lib/cacher.js';
 
 export default async function router(schema, config) {

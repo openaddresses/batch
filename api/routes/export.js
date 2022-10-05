@@ -1,6 +1,6 @@
 import Err from '@openaddresses/batch-error';
-import Job from '../lib/job.js';
-import Exporter from '../lib/exporter.js';
+import Job from '../lib/types/job.js';
+import Exporter from '../lib/types/exporter.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

@@ -3,7 +3,7 @@ import Job from './job.js';
 import Run from './run.js';
 import fs from 'fs';
 import { sql } from 'slonik';
-import { Status } from './util.js';
+import { Status } from '../util.js';
 import Generic from '@openaddresses/batch-generic';
 
 /**
@@ -11,7 +11,6 @@ import Generic from '@openaddresses/batch-generic';
  */
 export default class JobError extends Generic {
     static _table = 'job_errors';
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.JobError.json', import.meta.url)));
 
     static async list(pool, query) {
         if (!query) query = {};

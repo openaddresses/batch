@@ -1,11 +1,11 @@
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
-import { Status } from './util.js';
-import { trigger } from './batch.js';
+import { Status } from '../util.js';
+import { trigger } from '../batch.js';
 import moment from 'moment';
 import AWS from 'aws-sdk';
-import S3 from './s3.js';
+import S3 from '../s3.js';
 import { sql } from 'slonik';
 
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import fs from 'fs';
-import Run from './run.js';
+import Run from './types/run.js';
 import Err from '@openaddresses/batch-error';
 import GH from './gh.js';
 

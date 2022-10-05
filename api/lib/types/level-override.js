@@ -8,8 +8,6 @@ import { sql } from 'slonik';
  */
 export default class LevelOverride extends Generic {
     static _table = 'level_override';
-    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchLevelOverride.json', import.meta.url)));
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.LevelOverride.json', import.meta.url)));
 
     /**
      * Return a list of level overrides

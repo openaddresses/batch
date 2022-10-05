@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import JobError from '../lib/joberror.js';
+import JobError from '../lib/types/joberror.js';
 import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 

@@ -1,6 +1,6 @@
 import moment from 'moment';
 import User from './user.js';
-import Override from './level-override.js';
+import Override from './types/level-override.js';
 import fs from 'fs';
 
 const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));

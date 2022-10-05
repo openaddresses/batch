@@ -27,7 +27,6 @@ const sm = new SM({
  */
 export default class Map extends Generic {
     static _table = 'map';
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Map.json', import.meta.url)));
 
     static map() {
         return {

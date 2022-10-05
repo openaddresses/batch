@@ -203,7 +203,9 @@ export default class Run extends Generic {
         }
 
         try {
-            await Run.close(pool, run_id);
+            await Run.commit(pool, run_id, {
+                closed: true
+            });
         } catch (err) {
             throw new Err(500, err, 'failed to close run');
         }
@@ -317,66 +319,5 @@ export default class Run extends Generic {
         } catch (err) {
             throw new Err(500, err, 'failed to fetch run');
         }
-    }
-
-    static async close(pool, id) {
-        try {
-            await pool.query(sql`
-                UPDATE
-                    runs
-                SET
-                    closed = true
-                WHERE
-                    id = ${id}
-            `);
-
-            return true;
-        } catch (err) {
-            throw new Err(500, err, 'failed to close run');
-        }
-    }
-
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE runs
-                    SET
-                        github = ${this.github ? JSON.stringify(this.github) : null},
-                        closed = ${this.closed},
-                        live = ${this.live}
-                    WHERE
-                        id = ${this.id}
-           `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to save run');
-        }
-
-        return this;
-    }
-
-    static async generate(pool, params = {}) {
-        if (params.live !== true) params.live = false;
-        if (!params.github) params.github = {};
-
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO runs (
-                    created,
-                    live,
-                    github,
-                    closed
-                ) VALUES (
-                    NOW(),
-                    ${params.live},
-                    ${JSON.stringify(params.github)}::JSONB,
-                    false
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to generate run');
-        }
-
-        return this.deserialize(pool, pgres);
     }
 }

@@ -159,31 +159,6 @@ export default class Data extends Generic {
         }
     }
 
-    static async commit(pool, data) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                UPDATE results
-                    SET
-                        fabric = COALESCE(${data.fabric}, fabric, False)
-                    WHERE
-                        id = ${data.id}
-                    RETURNING
-                        *
-            `, [
-                data.id,
-                data.fabric
-            ]);
-        } catch (err) {
-            throw new Err(500, err, 'failed to save result');
-        }
-
-        return pgres.rows.map((res) => {
-            res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.job}/source.geojson.gz`;
-            return res;
-        })[0];
-    }
-
     static async from(pool, data_id) {
         try {
             const pgres = await pool.query(sql`

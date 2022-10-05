@@ -56,25 +56,6 @@ export default class JobError extends Generic {
         return JobError.deserialize_list(pgres).job_errors;
     }
 
-    static async generate(pool, joberror) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO job_errors (
-                    job,
-                    message
-                ) VALUES (
-                    ${joberror.job},
-                    ${joberror.message}
-                ) RETURNING *
-            `);
-
-            pgres.rows[0].messages = [pgres.rows[0].message];
-            return this.deserialize(pool, pgres);
-        } catch (err) {
-            throw new Err(500, err, 'failed to generate job error');
-        }
-    }
-
     static async moderate(pool, ci, job_id, params) {
         if (!params.moderate) throw new Err(400, null, 'moderate key must be provided');
         if (!['confirm', 'reject'].includes(params.moderate)) throw new Err(400, null, 'moderate key must be "confirm" or "reject"');

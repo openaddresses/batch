@@ -135,24 +135,6 @@ export default class Exporter extends Generic {
         return s3.stream(res, `export-${export_id}.zip`);
     }
 
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE exports
-                    SET
-                        size = ${this.size},
-                        status = ${this.status},
-                        loglink = ${this.loglink}
-                    WHERE
-                        id = ${this.id}
-           `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to save export');
-        }
-
-        return this;
-    }
-
     /**
      * Submit the Export to AWS Batch for processing
      */

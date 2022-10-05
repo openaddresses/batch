@@ -63,34 +63,4 @@ export default class LevelOverride extends Generic {
 
         return this.deserialize_list(pgres);
     }
-
-    serialize() {
-        return {
-            id: this.id,
-            created: this.created,
-            updated: this.updated,
-            level: this.level,
-            pattern: this.pattern
-        };
-    }
-
-    async commit(pool) {
-        if (this.id === false) throw new Err(500, null, 'Project.id must be populated');
-
-        try {
-            await pool.query(sql`
-                UPDATE level_override
-                    SET
-                        pattern     = ${this.pattern},
-                        level       = ${this.level},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Level Override');
-        }
-    }
 }

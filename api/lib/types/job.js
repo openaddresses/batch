@@ -276,33 +276,6 @@ export default class Job extends Generic {
         return job;
     }
 
-    async commit(pool) {
-        if (this.id === false) throw new Err(500, null, 'Job.id must be populated');
-
-        try {
-            await pool.query(sql`
-                UPDATE job
-                    SET
-                        output = ${this.output ? JSON.stringify(this.output) : null}::JSON,
-                        loglink = ${this.loglink},
-                        status = ${this.status},
-                        version = ${this.version},
-                        count = ${this.count},
-                        stats = ${this.stats ? JSON.stringify(this.stats) : null}::JSON,
-                        bounds = ST_GeomFromGeoJSON(${this.bounds ? JSON.stringify(this.bounds) : null}::JSON),
-                        map = ${this.map},
-                        size = ${this.size},
-                        license = ${typeof this.license === 'object' ? JSON.stringify(this.license) : this.license}
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'failed to save job');
-        }
-    }
-
     async log(format = 'json') {
         if (!this.loglink) throw new Err(404, null, 'Job has not produced a log');
 

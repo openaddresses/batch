@@ -7,7 +7,7 @@ import std from '../../std.js';
 std();
 
 const router = new VueRouter.createRouter({
-    mode: VueRouter.createWebHistory(),
+    history: VueRouter.createWebHistory(),
     routes: [
         { path: '/' },
     ]

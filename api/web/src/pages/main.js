@@ -9,7 +9,7 @@ std();
 // === Routes ===
 
 const router = new VueRouter.createRouter({
-    mode: VueRouter.createWebHistory(),
+    history: VueRouter.createWebHistory(),
     routes: [
         { path: '/', redirect: '/data' },
 

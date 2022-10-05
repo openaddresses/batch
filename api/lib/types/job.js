@@ -253,7 +253,7 @@ export default class Job extends Generic {
             throw new Err(404, null, 'no job by that id');
         }
 
-        const job = Job.deserialize(pgres);
+        const job = this.deserialize(pool, pgres);
 
         if (!job.license) {
             job.license = false;

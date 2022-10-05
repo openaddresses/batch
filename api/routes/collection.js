@@ -193,8 +193,6 @@ export default async function router(schema, config) {
 
             const collection = await Collection.from(config.pool, req.params.collection);
             await collection.commit(config.pool, {
-                override: ['created']
-            }, {
                 created: sql`NOW()`,
                 ...req.body
             });

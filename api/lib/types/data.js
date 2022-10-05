@@ -210,7 +210,7 @@ export default class Data extends Generic {
                 throw new Err(404, null, 'No data by that id');
             }
 
-            const data = Data.deserialize(pgres);
+            const data = this.deserialize(pool, pgres);
             data.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`;
             return data;
         } catch (err) {

@@ -253,7 +253,7 @@ export default class Run extends Generic {
             return pgres.rows.map((job) => {
                 job.count = isNaN(parseInt(job.count)) ? null : parseInt(job.count);
 
-                return Job.deserialize(job);
+                return Job.deserialize(pool, job);
             });
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
@@ -275,7 +275,7 @@ export default class Run extends Generic {
                 throw new Err(404, null, 'no run by that sha');
             }
 
-            return this.deserialize(pgres);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             throw new Err(500, err, 'failed to fetch run from sha');
         }
@@ -377,6 +377,6 @@ export default class Run extends Generic {
             throw new Err(500, err, 'failed to generate run');
         }
 
-        return this.deserialize(pgres);
+        return this.deserialize(pool, pgres);
     }
 }

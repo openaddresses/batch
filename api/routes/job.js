@@ -404,9 +404,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const job = await Job.from(config.pool, req.params.job);
-            job.patch(req.body);
-            await job.commit(config.pool);
+            const job = await Job.commit(config.pool, req.params.job, req.body);
 
             await Run.ping(config.pool, ci, job);
 

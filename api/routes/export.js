@@ -149,12 +149,11 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const exp = await Exporter.from(config.pool, req.params.exportid);
-
-            exp.status = 'Pending';
-            exp.loglink = null;
-            exp.size = null;
-            await exp.commit(config.pool);
+            await Exporter.commit(config.pool, req.params.exportid, {
+                status: 'Pending',
+                loglink: null,
+                size: null
+            });
 
             await exp.batch();
 
@@ -213,9 +212,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const exp = await Exporter.from(config.pool, req.params.exportid);
-            exp.patch(req.body);
-            await exp.commit(config.pool);
+            const exp = await Exporter.commit(config.pool, req.params.exportid, req.body);
 
             return res.json(exp.serialize());
         } catch (err) {

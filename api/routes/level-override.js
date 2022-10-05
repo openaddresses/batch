@@ -80,9 +80,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const level = await LevelOverride.from(config.pool, req.params.levelid);
-            level.patch(req.body);
-            await level.commit(config.pool);
+            await LevelOverride.commit(config.pool, req.params.levelid, req.body);
 
             return res.json(level.serialize());
         } catch (err) {

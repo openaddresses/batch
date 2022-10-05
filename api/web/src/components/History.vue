@@ -23,21 +23,21 @@
                 </div>
             </template>
             <template v-else>
-                <LineChart class='w-full mb24' style='height: 200px' :chartData='chart' options='{
+                <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
                     "maintainAspectRatio": false,
                     "scales": {
-                        "xAxes": [{
+                        "xAxis": {
                             "type": "time",
                             "time": {
                                 "unit": "day"
                             },
                             "distribution": "linear"
-                        }],
-                        "yAxes": [{
+                        },
+                        "yAxis": {
                             "ticks": {
                                 "beginAtZero": true
                             }
-                        }]
+                        }
                     }
                 }'/>
             </template>
@@ -87,7 +87,7 @@
                     </div>
                     <div class='col col--3'>
                         <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                            <DownloadIcon width="16" height="16"/>
                         </span>
                     </div>
                 </div>
@@ -97,15 +97,20 @@
 </template>
 
 <script>
-import LineChart from './LineChart.js';
+import {
+    DownloadIcon
+} from '@openaddresses/vue-tabler-icons';
+import { Line as LineChart } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement } from 'chart.js'
 import moment from 'moment-timezone';
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement)
+
+import 'chartjs-adapter-date-fns';
 
 export default {
     name: 'History',
     props: ['dataid'],
-    components: {
-        LineChart
-    },
     data: function() {
         return {
             tz: moment.tz.guess(),
@@ -212,6 +217,10 @@ export default {
                 this.$emit('err', err);
             }
         }
-    }
+    },
+    components: {
+        LineChart,
+        DownloadIcon
+    },
 }
 </script>

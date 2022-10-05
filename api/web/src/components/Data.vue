@@ -6,15 +6,15 @@
 
             <div class='grid'>
                 <div class='col col--4 flex flex--center-main'>
-                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg>
+                    <BuildingCommunityIcon width="24" height="24"/>
                     Buildings
                 </div>
                 <div class='col col--4 flex flex--center-main'>
-                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg>
+                    <MapPinIcon width="24" height="24"/>
                     Addresses
                 </div>
                 <div class='col col--4 flex flex--center-main'>
-                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg>
+                    <ShapeIcon width="24" height="24"/>
                     Parcels
                 </div>
                 <div class='col col--12'>
@@ -49,7 +49,7 @@
                     </div>
                     <div class='col col--5'>
                         <span class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-download" /></svg>
+                            <DownloadIcon width="16" height="16"/>
                         </span>
 
                         <span class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(c.size)'></span>
@@ -148,9 +148,9 @@
                         </span>
                     </div>
                     <div class='col col--3 color-gray'>
-                        <span v-if='d.has.buildings' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg></span>
-                        <span v-if='d.has.addresses' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg></span>
-                        <span v-if='d.has.parcels' class='fr mx12'><svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg></span>
+                        <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
+                        <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
+                        <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
                     </div>
                 </div>
                 <template v-if='d._open'>
@@ -168,7 +168,7 @@
 
                                 <template v-if='auth && auth.access === "admin"'>
                                     <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                        <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-settings" /></svg>
+                                        <SettingsIcon width="16" height="16"/>
 
                                         <div class='round dropdown-content' style='width: 180px;'>
                                             <template v-if='!job._confirm'>
@@ -201,7 +201,7 @@
                                 </template>
 
                                 <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-history" /></svg>
+                                    <HistoryIcon width="16" height="16"/>
                                 </span>
 
                                 <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
@@ -215,7 +215,14 @@
 </template>
 
 <script>
-
+import {
+    SettingsIcon,
+    DownloadIcon,
+    HistoryIcon,
+    BuildingCommunityIcon,
+    MapPinIcon,
+    ShapeIcon
+} from '@openaddresses/vue-tabler-icons';
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 import QuerySource from './query/Source.vue';
@@ -223,7 +230,7 @@ import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 
 export default {
-    name: 'Data',
+    name: 'OAData',
     props: ['auth'],
     data: function() {
         return {
@@ -411,7 +418,13 @@ export default {
         Coverage,
         QuerySource,
         QueryLayer,
-        Download
+        Download,
+        SettingsIcon,
+        DownloadIcon,
+        HistoryIcon,
+        BuildingCommunityIcon,
+        MapPinIcon,
+        ShapeIcon
     }
 }
 </script>

@@ -44,11 +44,11 @@
                         <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
 
                         <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                            <BrandGithubIcon width="16" height="16"/>
                         </span>
 
                         <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                            <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-notes" /></svg>
+                            <NotesIcon width="16" height="16"/>
                         </span>
                     </div>
                 </div>
@@ -58,6 +58,10 @@
 </template>
 
 <script>
+import {
+    BrandGithubIcon,
+    NotesIcon
+} from '@openaddresses/vue-tabler-icons'
 import Status from './Status.vue';
 import Download from './Download.vue';
 
@@ -72,10 +76,6 @@ export default {
             jobs: [],
             loading: false
         };
-    },
-    components: {
-        Download,
-        Status
     },
     methods: {
         external: function(url) {
@@ -99,6 +99,12 @@ export default {
                 this.$emit('err', err);
             }
         }
-    }
+    },
+    components: {
+        Download,
+        Status,
+        BrandGithubIcon,
+        NotesIcon
+    },
 }
 </script>

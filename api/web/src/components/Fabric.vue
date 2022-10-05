@@ -8,19 +8,19 @@
                     "color-gray": !filter.layers.buildings,
                     "color-blue": filter.layers.buildings
                 }'>
-                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-building-community" /></svg>
+                    <BuildingCommunityIcon width="24" height="24"/>
                 </button>
                 <button @click='filter.layers.addresses = !filter.layers.addresses' class='btn btn--stroke btn--s mx3 round' :class='{
                     "color-gray": !filter.layers.addresses,
                     "color-blue": filter.layers.addresses
                 }'>
-                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-map-pin" /></svg>
+                    <MapPinIcon width="24" height="24"/>
                 </button>
                 <button @click='filter.layers.parcels = !filter.layers.parcels' class='btn btn--stroke btn--s mx3 round' :class='{
                     "color-gray": !filter.layers.parcels,
                     "color-blue": filter.layers.parcels
                 }'>
-                    <svg width="24" height="24"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-shape" /></svg>
+                    <ShapeIcon width="24" height="24"/>
                 </button>
             </div>
 
@@ -29,6 +29,11 @@
 </template>
 
 <script>
+import {
+    ShapeIcon,
+    MapPinIcon,
+    BuildingCommunityIcon
+} from '@openaddresses/vue-tabler-icons';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -149,6 +154,11 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        ShapeIcon,
+        MapPinIcon,
+        BuildingCommunityIcon
     }
 }
 </script>

@@ -13,11 +13,11 @@
                 </button>
 
                 <span v-if='raw.data' v-on:click.stop.prevent='external(job.sourcej)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-brand-github" /></svg>
+                    <BrandGithubIcon width="16" height="16"/>
                 </span>
 
                 <span v-if='job.source' v-on:click.stop.prevent='external(raw.data)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <svg width="16" height="16"><use xlink:href="@tabler/icons/tabler-sprite.svg#tabler-link" /></svg>
+                    <LinkIcon width="16" height="16"/>
                 </span>
 
             </div>
@@ -36,6 +36,10 @@
 </template>
 
 <script>
+import {
+    BrandGithubIcon,
+    LinkIcon
+} from '@openaddresses/vue-tabler-icons';
 
 export default {
     name: 'JobRaw',
@@ -90,6 +94,10 @@ export default {
                 this.$emit('err', err);
             }
         },
+    },
+    components: {
+        BrandGithubIcon,
+        LinkIcon
     }
 }
 </script>

@@ -15,8 +15,6 @@ const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
  */
 export default class Exporter extends Generic {
     static _table = 'exports';
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Export.json', import.meta.url)));
-    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchExport.json', import.meta.url)));
 
     /**
      * List & Filter Exports

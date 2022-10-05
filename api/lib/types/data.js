@@ -10,8 +10,6 @@ import { sql } from 'slonik';
  */
 export default class Data extends Generic {
     static _table = 'results';
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Data.json', import.meta.url)));
-    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchData.json', import.meta.url)));
 
     /**
      * Return the last sucessful state for all data runs

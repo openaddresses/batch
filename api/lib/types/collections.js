@@ -8,8 +8,6 @@ import { sql } from 'slonik';
  */
 export default class Collection extends Generic {
     static _table = 'collections';
-    static _res = JSON.parse(fs.readFileSync(new URL('../schema/res.Collection.json', import.meta.url)));
-    static _patch = JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchCollection.json', import.meta.url)));
 
     static async list(pool) {
         let pgres;

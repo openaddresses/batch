@@ -99,7 +99,7 @@
 <script>
 import {
     DownloadIcon
-} from '@openaddresses/vue-tabler-icons';
+} from 'vue-tabler-icons';
 import { Line as LineChart } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement } from 'chart.js'
 import moment from 'moment-timezone';

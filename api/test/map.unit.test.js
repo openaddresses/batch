@@ -1,5 +1,5 @@
-import Map from '../lib/map.js';
-import Job from '../lib/job.js';
+import Map from '../lib/types/map.js';
+import Job from '../lib/types/job.js';
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';

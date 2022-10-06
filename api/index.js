@@ -30,9 +30,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     configure(args);
 }
 
-export default async function configure(args, cb) {
+async function configure(args) {
     try {
-        return server(args, await Config.env(args), cb);
+        return server(await Config.env(args));
     } catch (err) {
         console.error(err);
         process.exit(1);
@@ -56,10 +56,10 @@ export default async function configure(args, cb) {
  *   This API endpoint does not require authentication
  */
 
-async function server(args, config) {
+export default async function server(config) {
     const TileBase = (await import('tilebase')).default;
 
-    if (!args['no-tilebase']) {
+    if (!config.args['no-tilebase']) {
         try {
             if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
             config.tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
@@ -83,11 +83,11 @@ async function server(args, config) {
         if (!config.silent) console.log('ok - TileBase Disabled');
     }
 
-    config.cacher = new Cacher(args['no-cache'], config.silent);
-    config.pool = await Pool.connect(process.env.POSTGRES || args.postgres || 'postgres://postgres@localhost:5432/openaddresses');
+    config.cacher = new Cacher(config.args['no-cache'], config.silent);
+    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses');
 
     try {
-        if (args.populate) {
+        if (config.args.populate) {
             await Map.populate(config.pool);
         }
     } catch (err) {

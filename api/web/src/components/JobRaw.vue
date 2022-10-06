@@ -39,7 +39,7 @@
 import {
     BrandGithubIcon,
     LinkIcon
-} from '@openaddresses/vue-tabler-icons';
+} from 'vue-tabler-icons';
 
 export default {
     name: 'JobRaw',

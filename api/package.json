@@ -15,8 +15,8 @@
         "test": "./test/test | tap-merge",
         "start": "node index.js --email",
         "dev": "nodemon -i ./web index.js",
-        "cov-html": "nyc node 'test/**/*.js' && nyc report --reporter=html",
-        "cov": "nyc node 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
+        "cov-html": "nyc tape 'test/*.test.js' && nyc report --reporter=html",
+        "cov": "nyc tape 'test/*.test.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },
     "dependencies": {
         "@mapbox/sphericalmercator": "^1.1.0",
@@ -48,6 +48,7 @@
         "pg": "^8.6.0",
         "slonik": "^31.0.0",
         "split": "^1.0.1",
+        "tape": "^5.6.1",
         "tilebase": "^3.0.0"
     },
     "devDependencies": {

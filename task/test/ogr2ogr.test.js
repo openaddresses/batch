@@ -1,6 +1,5 @@
-
-const test = require('tape');
-const CP = require('child_process');
+import test from 'tape';
+import CP from 'child_process';
 
 test('ogr2ogr installed', (t) => {
 

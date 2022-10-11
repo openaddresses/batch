@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import split from 'split';
-import turf from '@turf/turf';
+import { bbox } from '@turf/turf';
 import { pipeline } from 'stream/promises';
 import transform from 'parallel-transform';
-import Validator from './validator';
+import Validator from './validator.js';
 
 export default class Stats {
     constructor(file, layer) {
-        if (!file || typeof file !== 'string') throw new Error('Stats.file must be a string');
+        if (!file instanceof URL) throw new Error('Stats.file must be a URL');
         if (!layer || typeof layer !== 'string') throw new Error('Stats.layer must be a string');
 
         this.file = file;
@@ -96,7 +96,7 @@ export default class Stats {
     }
 
     bounds(feat) {
-        const bounds = turf.bbox(feat);
+        const bounds = bbox(feat);
 
         if (!this.stats.bounds.length) {
             this.stats.bounds = bounds;

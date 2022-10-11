@@ -1,5 +1,7 @@
 import wkt from 'wellknown';
-import turf from '@turf/turf';
+import {
+    bboxPolygon
+} from '@turf/turf';
 import { createGzip } from 'zlib';
 import os from 'os';
 import fs from 'fs';
@@ -141,7 +143,7 @@ export default class Job {
         this.validated = stats.validated_path;
         console.error(`ok - validated: ${this.validated}`);
 
-        this.bounds = turf.bboxPolygon(stats.stats.bounds).geometry;
+        this.bounds = bboxPolygon(stats.stats.bounds).geometry;
         this.count = stats.stats.count;
         this.stats = stats.stats[stats.layer];
     }

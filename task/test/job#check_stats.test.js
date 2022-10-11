@@ -1,7 +1,5 @@
-
-
-const test = require('tape');
-const Job = require('../lib/job');
+import test from 'tape';
+import Job from '../lib/job.js';
 
 test('Count: 10% Reduction', async (t) => {
     const job = new Job(true, 1);

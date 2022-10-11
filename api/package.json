@@ -14,7 +14,7 @@
         "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
         "test": "./test/test | tap-merge",
         "start": "node index.js --email",
-        "dev": "nodemon -i ./web index.js",
+        "dev": "nodemon -i ./web -e ./schema index.js",
         "cov-html": "nyc tape 'test/*.test.js' && nyc report --reporter=html",
         "cov": "nyc tape 'test/*.test.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },

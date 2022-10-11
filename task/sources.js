@@ -1,19 +1,21 @@
 #!/usr/bin/env node
-'use strict';
 
-const { interactive } = require('./lib/pre');
 
-const Meta = require('./lib/meta');
-const os = require('os');
-const pkg = require('./package.json');
-const fs = require('fs');
-const glob = require('glob');
-const path = require('path');
-const request = require('request');
-const { pipeline } = require('stream/promises');
-const unzipper = require('unzipper');
+import { interactive } from './lib/pre.js';
 
-const args = require('minimist')(process.argv, {
+import Meta from './lib/meta.js';
+import os from 'os';
+import fs from 'fs';
+import glob from 'glob';
+import path from 'path';
+import { pipeline } from 'stream/promises';
+import unzipper from 'unzipper';
+import request from 'request';
+import minimist from 'minimist';
+
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
+
+const args = minimist(process.argv, {
     boolean: ['interactive'],
     alias: {
         interactive: 'i'
@@ -21,8 +23,11 @@ const args = require('minimist')(process.argv, {
 });
 
 if (require.main === module) {
-    if (args.interactive) return prompt();
-    return cli();
+    if (args.interactive) {
+        prompt();
+    } else {
+        cli();
+    }
 }
 
 async function prompt() {
@@ -134,19 +139,14 @@ function list(tmp, sha) {
 }
 
 async function get_sha() {
-    return new Promise((resolve, reject) => {
-        request({
-            json: true,
-            url: 'https://api.github.com/repos/openaddresses/openaddresses/commits/master',
-            method: 'GET',
-            headers: {
-                'User-Agent': `OpenAddresses Task v${pkg.version}`
-            }
-        }, (err, res) => {
-            if (err) return reject(err);
-            if (res.statusCode !== 200 && res.body.message) return reject(new Error(res.body.message));
-            if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: Failed to populate run`));
-            return resolve(res.body.sha);
-        });
+    const res = await fetch('https://api.github.com/repos/openaddresses/openaddresses/commits/master', {
+        method: 'GET',
+        headers: {
+            'User-Agent': `OpenAddresses Task v${pkg.version}`
+        }
     });
+
+    if (res.status !== 200) throw new Error(await res.text());
+
+    return (await res.json()).sha;
 }

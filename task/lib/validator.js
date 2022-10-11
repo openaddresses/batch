@@ -1,11 +1,10 @@
-'use strict';
 /**
  * @class
  *
  * @param {string} layer OpenAddresses layer type - addresses/parcels/etc
  * @param {Stream} stream Optional Stream to output validated features to
  */
-class Validator {
+export default class Validator {
     constructor(layer, stream = false) {
         this.layer = layer;
         this.stream = stream;
@@ -128,6 +127,3 @@ class Validator {
         return feat;
     }
 }
-
-
-module.exports = Validator;

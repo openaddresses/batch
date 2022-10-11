@@ -1,14 +1,12 @@
-'use strict';
+import fs from 'fs';
+import path from 'path';
+import split from 'split';
+import turf from '@turf/turf';
+import { pipeline } from 'stream/promises';
+import transform from 'parallel-transform';
+import Validator from './validator';
 
-const fs = require('fs');
-const path = require('path');
-const split = require('split');
-const turf = require('@turf/turf');
-const { pipeline } = require('stream/promises');
-const transform = require('parallel-transform');
-const Validator = require('./validator');
-
-class Stats {
+export default class Stats {
     constructor(file, layer) {
         if (!file || typeof file !== 'string') throw new Error('Stats.file must be a string');
         if (!layer || typeof layer !== 'string') throw new Error('Stats.layer must be a string');
@@ -122,5 +120,3 @@ class Stats {
         }
     }
 }
-
-module.exports = Stats;

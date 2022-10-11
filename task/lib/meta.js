@@ -1,6 +1,4 @@
-'use strict';
-
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
 
 const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
 const ecs = new AWS.ECS({ region: process.env.AWS_DEFAULT_REGION });
@@ -16,7 +14,7 @@ const asg = new AWS.AutoScaling({ region: process.env.AWS_DEFAULT_REGION });
  * @prop {String} instance - ID of EC2 Instance
  * @prop {String} loglink - CloudWatch Log ID
  */
-class Meta {
+export default class Meta {
     /**
      * @constructor
      */
@@ -101,5 +99,3 @@ class Meta {
         });
     }
 }
-
-module.exports = Meta;

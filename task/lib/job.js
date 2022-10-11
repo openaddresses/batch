@@ -1,22 +1,20 @@
-'use strict';
-const wkt = require('wellknown');
-const turf = require('@turf/turf');
-const gzip = require('zlib').createGzip;
-const os = require('os');
-const fs = require('fs');
-const path = require('path');
-const { pipeline } = require('stream/promises');
-const csv = require('csv-parse');
-const AWS = require('aws-sdk');
-const transform = require('parallel-transform');
-const Stats = require('./stats');
-
-const find = require('find');
+import wkt from 'wellknown';
+import turf from '@turf/turf';
+import { createGzip } from 'zlib';
+import os from 'os';
+import fs from 'fs';
+import path from 'path';
+import { pipeline } from 'stream/promises';
+import csv from 'csv-parse';
+import AWS from 'aws-sdk';
+import transform from 'parallel-transform';
+import Stats from './stats.js';
+import find from 'find';
 
 /**
  * @class Job
  */
-class Job {
+export default class Job {
     constructor(oa, job) {
         if (!oa) throw new Error('OA Instance required');
         if (!job) throw new Error('job param required');
@@ -205,7 +203,7 @@ class Job {
 
         await pipeline(
             fs.createReadStream(input),
-            gzip(),
+            createGzip(),
             fs.createWriteStream(compressed)
         );
 
@@ -394,5 +392,3 @@ class Job {
         return true;
     }
 }
-
-module.exports = Job;

@@ -1,21 +1,21 @@
 #!/usr/bin/env node
-'use strict';
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue
-const { interactive } = require('./lib/pre');
+import { interactive } from './lib/pre.js';
 
-const glob = require('glob');
-const os = require('os');
-const { Unzip } = require('zlib');
-const split = require('split');
-const transform = require('parallel-transform');
-const { pipeline } = require('stream/promises');
-const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp').sync;
-const AWS = require('aws-sdk');
-const archiver = require('archiver');
+import glob from 'glob';
+import os from 'os';
+import { Unzip } from 'zlib';
+import split from 'split';
+import transform from 'parallel-transform';
+import { pipeline } from 'stream/promises';
+import fs from 'fs';
+import path from 'path';
+import { sync as mkdirp } from 'mkdirp';
+import AWS from 'aws-sdk';
+import archiver from 'archiver';
+import minimist from 'minimist';
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -23,7 +23,7 @@ const s3 = new AWS.S3({
 
 const DRIVE = '/tmp';
 
-const args = require('minimist')(process.argv, {
+const args = minimist(process.argv, {
     boolean: ['interactive'],
     alias: {
         interactive: 'i'
@@ -31,13 +31,16 @@ const args = require('minimist')(process.argv, {
 });
 
 if (require.main === module) {
-    if (args.interactive) return prompt();
-    return cli();
+    if (args.interactive) {
+        prompt();
+    } else {
+        cli();
+    }
 }
 
 async function prompt() {
     await interactive();
-    return cli();
+    cli();
 
 }
 

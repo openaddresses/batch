@@ -19,7 +19,7 @@
         "mapbox-gl": "^2.7.0",
         "moment-timezone": "^0.5.33",
         "sass": "^1.32.12",
-        "sass-loader": "13.0.0",
+        "sass-loader": "^13.1.0",
         "vue": "^3.2.31",
         "vue-chartjs": "^4.1.1",
         "vue-router": "^4.0.14"

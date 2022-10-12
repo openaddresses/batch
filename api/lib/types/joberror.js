@@ -69,12 +69,14 @@ export default class JobError extends Generic {
         }
 
         if (params.moderate === 'confirm') {
-            job.status = 'Success';
-            await job.commit(pool);
+            await job.commit({
+                status: 'Success'
+            });
         } else if (params.moderate === 'reject') {
             if (job.status !== 'Fail') {
-                job.status = 'Fail';
-                await job.commit(pool);
+                await job.commit({
+                    status: 'Fail'
+                });
             }
         }
 

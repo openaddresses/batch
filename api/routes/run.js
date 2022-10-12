@@ -88,7 +88,7 @@ export default async function router(schema, config) {
             // The CI is making a CI run "live" and updating the /data list
             if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
-            await run.commit(config.pool, req.body);
+            await run.commit(req.body);
 
             return res.json(run.serialize());
         } catch (err) {

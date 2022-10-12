@@ -356,8 +356,11 @@ export default class CI {
             const sha = event.pull_request.head.sha;
 
             const run = await Run.from_sha(pool, sha);
-            run.live = true;
-            await run.commit(pool);
+
+            await run.commit({
+                live: true
+            });
+
             const jobs = await Run.jobs(pool, run.id);
 
             for (const job of jobs) {

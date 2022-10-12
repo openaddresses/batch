@@ -218,46 +218,10 @@ export default class Job extends Generic {
             .replace(/\.json/, '');
     }
 
-    static async from(pool, id) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    run,
-                    map,
-                    created,
-                    source,
-                    source_name,
-                    layer,
-                    name,
-                    output,
-                    loglink,
-                    status,
-                    stats,
-                    count,
-                    ST_AsGeoJSON(bounds)::JSON AS bounds,
-                    version,
-                    size,
-                    license
-                FROM
-                    job
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to load job');
-        }
+    serialize() {
+        const job = super.serialize();
 
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'no job by that id');
-        }
-
-        const job = this.deserialize(pool, pgres);
-
-        if (!job.license) {
-            job.license = false;
-        } else {
+        if (job.license) {
             try {
                 job.license = JSON.parse(job.license);
             } catch (err) {

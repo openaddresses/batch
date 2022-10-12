@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./exports/id.json"
+        },
+        "uid": {
+            "$ref": "./exports/uid.json"
+        },
+        "job_id": {
+            "$ref": "./exports/job_id.json"
+        },
+        "format": {
+            "$ref": "./exports/format.json"
+        },
+        "created": {
+            "$ref": "./exports/created.json"
+        },
+        "expiry": {
+            "$ref": "./exports/expiry.json"
+        },
+        "size": {
+            "$ref": "./exports/size.json"
+        },
+        "status": {
+            "$ref": "./exports/status.json"
+        },
+        "loglink": {
+            "$ref": "./exports/loglink.json"
+        }
+    },
+    "required": [
+        "id",
+        "uid",
+        "job_id",
+        "format",
+        "created",
+        "expiry",
+        "size",
+        "status",
+        "loglink"
+    ]
+}

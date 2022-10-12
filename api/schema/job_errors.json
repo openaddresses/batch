@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "job": {
+            "$ref": "./job_errors/job.json"
+        },
+        "message": {
+            "$ref": "./job_errors/message.json"
+        }
+    },
+    "required": [
+        "job",
+        "message"
+    ]
+}

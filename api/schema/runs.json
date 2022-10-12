@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./runs/id.json"
+        },
+        "live": {
+            "$ref": "./runs/live.json"
+        },
+        "created": {
+            "$ref": "./runs/created.json"
+        },
+        "github": {
+            "$ref": "./runs/github.json"
+        },
+        "closed": {
+            "$ref": "./runs/closed.json"
+        }
+    },
+    "required": [
+        "id",
+        "live",
+        "created",
+        "github",
+        "closed"
+    ]
+}

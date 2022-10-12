@@ -84,7 +84,14 @@ export default async function server(config) {
     }
 
     config.cacher = new Cacher(config.args['no-cache'], config.silent);
-    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses');
+    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses', {
+        schemas: {
+            dir: new URL('./schema/', import.meta.url)
+        },
+        parsing: {
+            geometry: true
+        }
+    });
 
     try {
         if (config.args.populate) {

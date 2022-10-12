@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "sid": {
+            "$ref": "./session/sid.json"
+        },
+        "sess": {
+            "$ref": "./session/sess.json"
+        },
+        "expire": {
+            "$ref": "./session/expire.json"
+        }
+    },
+    "required": [
+        "sid",
+        "sess",
+        "expire"
+    ]
+}

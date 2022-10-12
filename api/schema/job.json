@@ -1,0 +1,76 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./job/id.json"
+        },
+        "run": {
+            "$ref": "./job/run.json"
+        },
+        "map": {
+            "$ref": "./job/map.json"
+        },
+        "created": {
+            "$ref": "./job/created.json"
+        },
+        "source": {
+            "$ref": "./job/source.json"
+        },
+        "source_name": {
+            "$ref": "./job/source_name.json"
+        },
+        "layer": {
+            "$ref": "./job/layer.json"
+        },
+        "name": {
+            "$ref": "./job/name.json"
+        },
+        "output": {
+            "$ref": "./job/output.json"
+        },
+        "loglink": {
+            "$ref": "./job/loglink.json"
+        },
+        "status": {
+            "$ref": "./job/status.json"
+        },
+        "stats": {
+            "$ref": "./job/stats.json"
+        },
+        "count": {
+            "$ref": "./job/count.json"
+        },
+        "bounds": {
+            "$ref": "./job/bounds.json"
+        },
+        "version": {
+            "$ref": "./job/version.json"
+        },
+        "size": {
+            "$ref": "./job/size.json"
+        },
+        "license": {
+            "$ref": "./job/license.json"
+        }
+    },
+    "required": [
+        "id",
+        "run",
+        "map",
+        "created",
+        "source",
+        "source_name",
+        "layer",
+        "name",
+        "output",
+        "loglink",
+        "status",
+        "stats",
+        "count",
+        "bounds",
+        "version",
+        "size",
+        "license"
+    ]
+}

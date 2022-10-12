@@ -18,24 +18,6 @@
 
 
 /**
-* @api {delete} /cache Flush Cache
-* @apiVersion 1.0.0
-* @apiName DELETE-/cache
-* @apiGroup Cache
-* @apiPermission admin
-*
-* @apidescription
-*   Flush the Memcached Cache
-*
-
-*
-*
-*
-* @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-*/
-
-
-/**
 * @api {delete} /cache/:cache_key Delete Key
 * @apiVersion 1.0.0
 * @apiName DELETE-/cache/:cache_key
@@ -46,6 +28,24 @@
 *   Flush the Memcached Cache
 *
 * @apiParam {string} cache_key param
+*
+*
+*
+* @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+*/
+
+
+/**
+* @api {delete} /cache Flush Cache
+* @apiVersion 1.0.0
+* @apiName DELETE-/cache
+* @apiGroup Cache
+* @apiPermission admin
+*
+* @apidescription
+*   Flush the Memcached Cache
+*
+
 *
 *
 *

@@ -56,6 +56,23 @@ export default class JobError extends Generic {
         return JobError.deserialize_list(pgres).job_errors;
     }
 
+    serialize() {
+        const json = super.serialize();
+
+        if (this.message && !json.messages) {
+            json.messages = [ this.message ];
+            delete json.message;
+        } else if (this.messages) {
+            json.messages = this.messages;
+        }
+
+        for (const key of ['status', 'source_name', 'layer', 'name']) {
+            if (this[key]) json[key] = this[key];
+        }
+
+        return json;
+    }
+
     static async moderate(pool, ci, job_id, params) {
         if (!params.moderate) throw new Err(400, null, 'moderate key must be provided');
         if (!['confirm', 'reject'].includes(params.moderate)) throw new Err(400, null, 'moderate key must be "confirm" or "reject"');

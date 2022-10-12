@@ -302,8 +302,9 @@ export default class Map extends Generic {
             return false;
         }
 
-        job.map = bin_id;
-        await job.commit(pool);
+        await job.commit({
+            map: bin_id
+        });
 
         return true;
     }

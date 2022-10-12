@@ -302,7 +302,6 @@ export default async function router(schema, config) {
             await Auth.is_admin(req);
 
             const job = await Job.commit(config.pool, req.params.job, req.body);
-
             await Run.ping(config.pool, ci, job);
 
             return res.json(job.serialize());

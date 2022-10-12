@@ -357,7 +357,7 @@ export default class Job extends Generic {
             throw new Err(500, err, 'failed to generate job');
         }
 
-        return Job.deserialize(pgres);
+        return Job.deserialize(pool, pgres);
     }
 
     /**

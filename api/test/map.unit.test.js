@@ -71,15 +71,12 @@ test('Map#get_feature - country', async () => {
         `);
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
-                'addresses',
-                'fed'
-            );
-            await job.generate(flight.config.pool);
-            job.map = 1;
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
+                layer: 'addresses',
+                source_name: 'fed',
+                map: 1
+            });
 
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
@@ -91,15 +88,12 @@ test('Map#get_feature - country', async () => {
         }
 
         {
-            const job = new Job(
-                1,
-                'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
-                'addresses',
-                'fed'
-            );
-            await job.generate(flight.config.pool);
-            job.map = 1;
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
+                layer: 'addresses',
+                source_name: 'fed',
+                map: 1
+            });
 
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
@@ -111,15 +105,12 @@ test('Map#get_feature - country', async () => {
         }
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
-                'buildings',
-                'fed'
-            );
-            await job.generate(flight.config.pool);
-            job.map = 1;
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
+                layer: 'buildings',
+                source_name: 'fed',
+                map: 1
+            });
 
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
@@ -158,14 +149,11 @@ test('Map#match - county', async () => {
     }, 'no addresses layer');
 
     {
-        const job = new Job(
-            1,
-            'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
-            'addresses',
-            'city'
-        );
-        await job.generate(flight.config.pool);
-        await job.commit(flight.config.pool);
+        const job = await Job.generate(flight.config.pool, {
+            source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            layer: 'addresses',
+            source_name: 'city'
+        });
 
         await Map.match(flight.config.pool, job);
         assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
@@ -178,14 +166,11 @@ test('Map#match - county', async () => {
     }
 
     {
-        const job = new Job(
-            1,
-            'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
-            'buildings',
-            'city'
-        );
-        await job.generate(flight.config.pool);
-        await job.commit(flight.config.pool);
+        const job = await Job.generate(flight.config.pool, {
+            source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            layer: 'buildings',
+            source_name: 'city'
+        });
 
         await Map.match(flight.config.pool, job);
         assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
@@ -219,14 +204,11 @@ test('Map#match - country', async () => {
         }, 'no addresses layer');
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
-                'addresses',
-                'countrywide'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
+                layer: 'addresses',
+                source_name: 'countrywide'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
@@ -239,14 +221,11 @@ test('Map#match - country', async () => {
         }
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
-                'buildings',
-                'city'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
+                layer: 'buildings',
+                source_name: 'city'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
@@ -265,14 +244,11 @@ test('Map#match - country', async () => {
 test('Map#match - geom', async () => {
     try {
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
-                'addresses',
-                'city'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
+                layer: 'addresses',
+                source_name: 'city'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
@@ -285,14 +261,11 @@ test('Map#match - geom', async () => {
         }
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
-                'buildings',
-                'city'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
+                layer: 'buildings',
+                source_name: 'city'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {

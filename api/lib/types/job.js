@@ -289,39 +289,10 @@ export default class Job extends Generic {
             };
         }
 
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO job (
-                    run,
-                    created,
-                    stats,
-                    source_name,
-                    source,
-                    layer,
-                    name,
-                    status,
-                    version,
-                    output,
-                    license
-                ) VALUES (
-                    ${job.run},
-                    NOW(),
-                    '{}'::JSONB,
-                    ${Job.fullname(job.source)},
-                    ${job.source},
-                    ${job.layer},
-                    ${job.name},
-                    'Pending',
-                    ${pkg.version},
-                    ${JSON.stringify(job.output)}::JSONB,
-                    False
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to generate job');
-        }
+        job.source_name = Job.fullname(job.source);
+        job.version = pkg.version;
 
-        return Job.deserialize(pool, pgres);
+        return await super.generate(pool, job);
     }
 
     /**

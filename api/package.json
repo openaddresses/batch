@@ -23,7 +23,7 @@
         "@octokit/auth-app": "^4.0.6",
         "@octokit/request": "^6.2.1",
         "@octokit/rest": "^19.0.4",
-        "@octokit/webhooks": "10.3.0",
+        "@octokit/webhooks": "10.3.1",
         "@openaddresses/batch-error": "^1.1.0",
         "@openaddresses/batch-generic": "^12.0.0",
         "@openaddresses/batch-schema": "^7.2.0",

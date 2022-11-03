@@ -253,8 +253,6 @@ export default class Run extends Generic {
             `);
 
             return pgres.rows.map((job) => {
-                job.count = isNaN(parseInt(job.count)) ? null : parseInt(job.count);
-
                 return Job.deserialize(pool, job);
             });
         } catch (err) {

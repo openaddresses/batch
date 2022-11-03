@@ -267,7 +267,7 @@ export default class Flight {
      * Shutdown an existing server test instance
      */
     landing() {
-        test('test server landing - api', (t) => {
+        test('test server landing - api', () => {
             this.srv.close(async () => {
                 await this.config.pool.end();
                 await this.config.cacher.cache.quit();

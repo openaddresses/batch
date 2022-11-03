@@ -71,7 +71,7 @@ test('Map#get_feature - country', async () => {
         `);
 
         {
-            const job = await Job.generate(flight.config.pool, {
+            await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'addresses',
                 name: 'fed',
@@ -88,7 +88,7 @@ test('Map#get_feature - country', async () => {
         }
 
         {
-            const job = await Job.generate(flight.config.pool, {
+            await Job.generate(flight.config.pool, {
                 source: 'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'addresses',
                 name: 'fed',
@@ -105,7 +105,7 @@ test('Map#get_feature - country', async () => {
         }
 
         {
-            const job = await Job.generate(flight.config.pool, {
+            await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'buildings',
                 name: 'fed',

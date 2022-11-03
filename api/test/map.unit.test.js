@@ -74,7 +74,7 @@ test('Map#get_feature - country', async () => {
             const job = await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'addresses',
-                source_name: 'fed',
+                name: 'fed',
                 map: 1
             });
 
@@ -84,14 +84,14 @@ test('Map#get_feature - country', async () => {
                 code: 'us',
                 geom: null,
                 layers: ['addresses']
-            }, 'addresses layer added');
+            });
         }
 
         {
             const job = await Job.generate(flight.config.pool, {
                 source: 'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'addresses',
-                source_name: 'fed',
+                name: 'fed',
                 map: 1
             });
 
@@ -101,14 +101,14 @@ test('Map#get_feature - country', async () => {
                 code: 'us',
                 geom: null,
                 layers: ['addresses']
-            }, 'addresses layer not duplicated');
+            });
         }
 
         {
             const job = await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'buildings',
-                source_name: 'fed',
+                name: 'fed',
                 map: 1
             });
 
@@ -118,7 +118,7 @@ test('Map#get_feature - country', async () => {
                 code: 'us',
                 geom: null,
                 layers: ['addresses', 'buildings']
-            }, 'additions retain array');
+            });
         }
     } catch (err) {
         assert.ifError(err);
@@ -146,13 +146,13 @@ test('Map#match - county', async () => {
         code: 'us-42017',
         geom: null,
         layers: []
-    }, 'no addresses layer');
+    });
 
     {
         const job = await Job.generate(flight.config.pool, {
             source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'addresses',
-            source_name: 'city'
+            name: 'city'
         });
 
         await Map.match(flight.config.pool, job);
@@ -162,14 +162,14 @@ test('Map#match - county', async () => {
             code: 'us-42017',
             geom: null,
             layers: ['addresses']
-        }, 'addresses layer added');
+        });
     }
 
     {
         const job = await Job.generate(flight.config.pool, {
             source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'buildings',
-            source_name: 'city'
+            name: 'city'
         });
 
         await Map.match(flight.config.pool, job);
@@ -179,7 +179,7 @@ test('Map#match - county', async () => {
             code: 'us-42017',
             geom: null,
             layers: ['addresses', 'buildings']
-        }, 'buildings layer added');
+        });
     }
 });
 
@@ -201,13 +201,13 @@ test('Map#match - country', async () => {
             code: 'ca',
             geom: null,
             layers: []
-        }, 'no addresses layer');
+        });
 
         {
             const job = await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
                 layer: 'addresses',
-                source_name: 'countrywide'
+                name: 'countrywide'
             });
 
             await Map.match(flight.config.pool, job);
@@ -217,14 +217,14 @@ test('Map#match - country', async () => {
                 code: 'ca',
                 geom: null,
                 layers: ['addresses']
-            }, 'addresses layer added');
+            });
         }
 
         {
             const job = await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
                 layer: 'buildings',
-                source_name: 'city'
+                name: 'city'
             });
 
             await Map.match(flight.config.pool, job);
@@ -234,7 +234,7 @@ test('Map#match - country', async () => {
                 code: 'ca',
                 geom: null,
                 layers: ['addresses', 'buildings']
-            }, 'buildings layer added');
+            });
         }
     } catch (err) {
         assert.ifError(err);
@@ -247,7 +247,7 @@ test('Map#match - geom', async () => {
             const job = await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
                 layer: 'addresses',
-                source_name: 'city'
+                name: 'city'
             });
 
             await Map.match(flight.config.pool, job);
@@ -257,14 +257,14 @@ test('Map#match - geom', async () => {
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
                 geom: '0101000020E610000000000000D0E260C048F84A7D6C5E4E40',
                 layers: ['addresses']
-            }, 'addresses layer added');
+            });
         }
 
         {
             const job = await Job.generate(flight.config.pool, {
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
                 layer: 'buildings',
-                source_name: 'city'
+                name: 'city'
             });
 
             await Map.match(flight.config.pool, job);
@@ -274,7 +274,7 @@ test('Map#match - geom', async () => {
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
                 geom: '0101000020E610000000000000D0E260C048F84A7D6C5E4E40',
                 layers: ['addresses', 'buildings']
-            }, 'buildings layer added');
+            });
         }
     } catch (err) {
         assert.ifError(err);

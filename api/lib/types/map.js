@@ -246,6 +246,7 @@ export default class Map extends Generic {
     static async match(pool, job) {
         const raw = await job.get_raw();
 
+        console.error(raw);
         if (!raw.coverage) return true;
 
         const keys = Object.keys(raw.coverage).filter((key) => {

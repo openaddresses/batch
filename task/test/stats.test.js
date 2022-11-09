@@ -1,4 +1,3 @@
-import path from 'path';
 import Stats from '../lib/stats.js';
 import test from 'tape';
 

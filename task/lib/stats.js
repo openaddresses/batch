@@ -8,7 +8,7 @@ import Validator from './validator.js';
 
 export default class Stats {
     constructor(file, layer) {
-        if (!file instanceof URL) throw new Error('Stats.file must be a URL');
+        if (!(file instanceof URL)) throw new Error('Stats.file must be a URL');
         if (!layer || typeof layer !== 'string') throw new Error('Stats.layer must be a string');
 
         this.file = file;

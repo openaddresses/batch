@@ -25,7 +25,7 @@
         "@octokit/rest": "^19.0.4",
         "@octokit/webhooks": "10.3.1",
         "@openaddresses/batch-error": "^1.1.0",
-        "@openaddresses/batch-generic": "^12.0.0",
+        "@openaddresses/batch-generic": "^13.0.1",
         "@openaddresses/batch-schema": "^7.2.0",
         "@turf/turf": "^6.5.0",
         "aws-sdk": "^2.901.0",

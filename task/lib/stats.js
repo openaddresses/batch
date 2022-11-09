@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import split from 'split';
 import { bbox } from '@turf/turf';
 import { pipeline } from 'stream/promises';
@@ -21,7 +20,8 @@ export default class Stats {
 
         this.validated_path = false;
         if (this.layer === 'addresses') {
-            this.validated_path = file + '.validated';
+
+            this.validated_path = new URL(file.href + '.validated');
             this.validator = new Validator(this.layer, fs.createWriteStream(this.validated_path));
         } else {
             this.validator = new Validator(this.layer);
@@ -60,7 +60,7 @@ export default class Stats {
 
     async calc() {
         await pipeline(
-            fs.createReadStream(path.resolve(this.file)),
+            fs.createReadStream(this.file),
             split(),
             transform(100, (data, cb) => {
                 if (!data.trim().length) return cb(null, '');

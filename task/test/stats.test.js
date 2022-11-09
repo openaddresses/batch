@@ -2,13 +2,19 @@ import Stats from '../lib/stats.js';
 import test from 'tape';
 
 test('Stats()', (t) => {
-    t.throws(() => {
+    try {
         new Stats();
-    }, /Stats.file must be a string/, 'Stats.file must be a string');
+        t.fail();
+    } catch (err) {
+        t.equals(err.message, 'Stats.file must be a URL');
+    }
 
-    t.throws(() => {
+    try {
         new Stats('fake');
-    }, /Stats.layer must be a string/, 'Stats.layer must be a string');
+        t.fail();
+    } catch (err) {
+        t.equals(err.message, 'Stats.file must be a URL');
+    }
 
     const stats = new Stats(new URL('./fixtures/addresses.geojson', import.meta.url), 'addresses');
 

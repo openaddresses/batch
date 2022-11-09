@@ -137,7 +137,7 @@ export default class Job {
     }
 
     async validate() {
-        const stats = new Stats(path.resolve(this.tmp, 'out.geojson'), this.layer);
+        const stats = new Stats(new URL('./out.geojson', `file://${this.tmp}`), this.layer);
         await stats.calc();
 
         this.validated = stats.validated_path;

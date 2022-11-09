@@ -131,9 +131,6 @@ export default class Run extends Generic {
             `);
 
             return pgres.rows.map((run) => {
-                run.id = parseInt(run.id);
-                run.jobs = parseInt(run.jobs);
-
                 if (run.status.includes('Fail')) {
                     run.status = 'Fail';
                 } else if (run.status.includes('Pending')) {
@@ -252,9 +249,7 @@ export default class Run extends Generic {
                     job.run = ${run_id}
             `);
 
-            return pgres.rows.map((job) => {
-                return Job.deserialize(pool, job);
-            });
+            return pgres.rows;
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
         }
@@ -308,10 +303,6 @@ export default class Run extends Generic {
                     Fail: 0
                 }
             };
-
-            for (const row of pgres.rows) {
-                res.status[row.status] = parseInt(row.count);
-            }
 
             return res;
         } catch (err) {

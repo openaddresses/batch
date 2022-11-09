@@ -148,7 +148,7 @@ export default class Data extends Generic {
             }
 
             return {
-                id: parseInt(data_id),
+                id: data_id,
                 jobs: pgres.rows.map((res) => {
                     res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${res.id}/source.geojson.gz`;
                     return res;

@@ -1,9 +1,9 @@
 import fs from 'fs';
-import split from 'split';
+import split from 'split2';
 import { bbox } from '@turf/turf';
 import { pipeline } from 'stream/promises';
-import transform from 'parallel-transform';
 import Validator from './validator.js';
+import { Transform } from 'stream';
 
 export default class Stats {
     constructor(file, layer) {
@@ -62,22 +62,25 @@ export default class Stats {
         await pipeline(
             fs.createReadStream(this.file),
             split(),
-            transform(100, (data, cb) => {
-                if (!data.trim().length) return cb(null, '');
+            new Transform({
+                objectMode: true,
+                transform: (data, _, cb) => {
+                    if (!data.trim().length) return cb(null, '');
 
-                const feat = JSON.parse(data);
+                    const feat = JSON.parse(data);
 
-                this.stats.count++;
+                    this.stats.count++;
 
-                this.bounds(feat);
+                    this.bounds(feat);
 
-                this.validator.test(feat);
+                    this.validator.test(feat);
 
-                if (this.layer === 'addresses') {
-                    this.addresses(feat);
+                    if (this.layer === 'addresses') {
+                        this.addresses(feat);
+                    }
+
+                    return cb(null, '');
                 }
-
-                return cb(null, '');
             }),
             fs.createWriteStream('/dev/null')
         );

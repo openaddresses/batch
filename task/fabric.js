@@ -33,7 +33,7 @@ const args = minimist(process.argv, {
     }
 });
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     if (args.interactive) {
         prompt();
     } else {

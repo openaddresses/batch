@@ -6,7 +6,8 @@ import ogr2ogr from 'ogr2ogr';
 import { pipeline } from 'stream/promises';
 import fs from 'fs';
 import path from 'path';
-import { sync as mkdirp } from 'mkdirp';
+import pkg from 'mkdirp';
+const { sync: mkdirp } = pkg;
 import AWS from 'aws-sdk';
 import { Unzip } from 'zlib';
 import archiver from 'archiver';
@@ -25,7 +26,7 @@ const args = minimist(process.argv, {
     }
 });
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     if (args.interactive) {
         prompt();
     } else {

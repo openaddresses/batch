@@ -7,15 +7,16 @@ import { interactive } from './lib/pre.js';
 import glob from 'glob';
 import os from 'os';
 import { Unzip } from 'zlib';
-import split from 'split';
-import transform from 'parallel-transform';
+import split from 'split2';
 import { pipeline } from 'stream/promises';
 import fs from 'fs';
 import path from 'path';
-import { sync as mkdirp } from 'mkdirp';
+import pkg from 'mkdirp';
+const { sync: mkdirp } = pkg;
 import AWS from 'aws-sdk';
 import archiver from 'archiver';
 import minimist from 'minimist';
+import { Transform } from 'stream';
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -30,7 +31,7 @@ const args = minimist(process.argv, {
     }
 });
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     if (args.interactive) {
         prompt();
     } else {
@@ -155,10 +156,12 @@ async function get_source(oa, tmp, data, stats) {
             }).createReadStream(),
             Unzip(),
             split(),
-            transform(100, (line, cb) => {
-                if (!line || !line.trim()) return cb(null, '');
-
-                stats.count++; return cb(null, line + '\n');
+            new Transform({
+                objectMode: true,
+                transform: (line, _, cb) => {
+                    if (!line || !line.trim()) return cb(null, '');
+                    stats.count++; return cb(null, line + '\n');
+                }
             }),
             fs.createWriteStream(path.resolve(tmp, 'sources', dir, source))
         );

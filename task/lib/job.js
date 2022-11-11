@@ -6,12 +6,12 @@ import { createGzip } from 'zlib';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
-import { pipeline } from 'stream/promises';
-import csv from 'csv-parse';
+import { pipeline } from 'node:stream/promises';
+import { parse as csv } from 'csv-parse';
 import AWS from 'aws-sdk';
-import transform from 'parallel-transform';
 import Stats from './stats.js';
 import find from 'find';
+import { Transform } from 'stream';
 
 /**
  * @class Job
@@ -137,7 +137,8 @@ export default class Job {
     }
 
     async validate() {
-        const stats = new Stats(new URL('./out.geojson', `file://${this.tmp}`), this.layer);
+        const stats = new Stats(new URL(path.resolve(this.tmp, './out.geojson'), 'file:///'), this.layer);
+
         await stats.calc();
 
         this.validated = stats.validated_path;
@@ -163,21 +164,25 @@ export default class Job {
             fs.createReadStream(output[0]),
             csv({
                 columns: true,
+                skip_empty_lines: true,
                 delimiter: ','
             }),
-            transform(100, (data, cb) => {
-                const geom = wkt.parse(data.GEOM);
-                delete data.GEOM;
-                const props = {};
-                for (const prop of Object.keys(data)) {
-                    props[prop.toLowerCase()] = data[prop];
-                }
+            new Transform({
+                objectMode: true,
+                transform: (data, _, cb) => {
+                    const geom = wkt.parse(data.GEOM);
+                    delete data.GEOM;
+                    const props = {};
+                    for (const prop of Object.keys(data)) {
+                        props[prop.toLowerCase()] = data[prop];
+                    }
 
-                return cb(null, JSON.stringify({
-                    type: 'Feature',
-                    properties: props,
-                    geometry: geom
-                }) + '\n');
+                    return cb(null, JSON.stringify({
+                        type: 'Feature',
+                        properties: props,
+                        geometry: geom
+                    }) + '\n');
+                }
             }),
             fs.createWriteStream(path.resolve(this.tmp, 'out.geojson'))
         );

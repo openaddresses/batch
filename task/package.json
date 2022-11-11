@@ -15,7 +15,7 @@
         "@turf/turf": "^6.3.0",
         "archiver": "^5.0.0",
         "aws-sdk": "^2.903.0",
-        "csv-parse": "^4.15.4",
+        "csv-parse": "^5.0.0",
         "find": "^0.3.0",
         "glob": "^8.0.0",
         "inquirer": "^9.0.0",

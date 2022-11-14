@@ -1,10 +1,9 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const Job = require('../lib/job');
-const test = require('tape');
-const AWS = require('@mapbox/mock-aws-sdk-js');
-const stream = require('stream');
+import fs from 'fs';
+import path from 'path';
+import Job from '../lib/job.js';
+import test from 'tape';
+import AWS from '@mapbox/mock-aws-sdk-js';
+import stream from 'stream';
 
 test('Job#compress', async (t) => {
     try {
@@ -29,7 +28,7 @@ test('Job#convert', async (t) => {
 
         fs.writeFileSync(
             path.resolve(job.tmp, 'out.csv'),
-            fs.readFileSync(path.resolve(__dirname, './fixtures/input.csv'))
+            fs.readFileSync(new URL('./fixtures/input.csv', import.meta.url))
         );
 
         const out = await job.convert();
@@ -93,7 +92,7 @@ test('Job#s3_down', async (t) => {
         job.layer = 'addresses';
         job.name = 'county';
 
-        job.specific = require('./fixtures/us-or-clackamas.json').layers.addresses[0];
+        job.specific = JSON.parse(fs.readFileSync(new URL('./fixtures/us-or-clackamas.json', import.meta.url))).layers.addresses[0];
 
         AWS.stub('S3', 'getObject', async function(params) {
             t.deepEquals(params, {

@@ -1,19 +1,22 @@
-'use strict';
-
-const path = require('path');
-const Stats = require('../lib/stats');
-const test = require('tape');
+import Stats from '../lib/stats.js';
+import test from 'tape';
 
 test('Stats()', (t) => {
-    t.throws(() => {
+    try {
         new Stats();
-    }, /Stats.file must be a string/, 'Stats.file must be a string');
+        t.fail();
+    } catch (err) {
+        t.equals(err.message, 'Stats.file must be a URL');
+    }
 
-    t.throws(() => {
+    try {
         new Stats('fake');
-    }, /Stats.layer must be a string/, 'Stats.layer must be a string');
+        t.fail();
+    } catch (err) {
+        t.equals(err.message, 'Stats.file must be a URL');
+    }
 
-    const stats = new Stats(path.resolve(__dirname, './fixtures/addresses.geojson'), 'addresses');
+    const stats = new Stats(new URL('./fixtures/addresses.geojson', import.meta.url), 'addresses');
 
     t.ok(/\/fixtures\/addresses.geojson/.test(stats.file), 'stats.file: <geojson>');
     t.deepEquals(stats.stats, {
@@ -44,7 +47,7 @@ test('Stats()', (t) => {
 });
 
 test('Stats#calc', async (t) => {
-    const stats = new Stats(path.resolve(__dirname, './fixtures/addresses.geojson'), 'addresses');
+    const stats = new Stats(new URL('./fixtures/addresses.geojson', import.meta.url), 'addresses');
 
     try {
         await stats.calc();

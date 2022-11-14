@@ -6,6 +6,7 @@ import { sql } from 'slonik';
 import fs from 'fs';
 import Knex from 'knex';
 import KnexConfig from '../knexfile.js';
+import Config from '../lib/config.js';
 import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
 import Ajv from 'ajv';
@@ -171,13 +172,13 @@ export default class Flight {
      */
     takeoff(custom = {}) {
         test('test server takeoff', async () => {
-            const srv = await api(Object.assign({
+            const srv = await api(await Config.env(Object.assign({
                 postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
                 'no-cache': true,
                 'no-tilebase': true,
                 silent: true,
                 test: true
-            }, custom));
+            }, custom)));
 
             assert.equal(srv.length, 2);
 
@@ -266,13 +267,12 @@ export default class Flight {
      * Shutdown an existing server test instance
      */
     landing() {
-        test('test server landing - api', (t) => {
+        test('test server landing - api', () => {
             this.srv.close(async () => {
                 await this.config.pool.end();
                 await this.config.cacher.cache.quit();
                 delete this.config;
                 delete this.srv;
-                t.end();
             });
         });
     }

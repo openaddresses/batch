@@ -1,20 +1,20 @@
 #!/usr/bin/env node
-'use strict';
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue
-const { interactive } = require('./lib/pre');
+import { interactive } from './lib/pre.js';
 
 const DRIVE = '/tmp';
 
-const fs = require('fs');
-const fsp = require('fs/promises');
-const { pipeline } = require('stream/promises');
-const path = require('path');
-const Tippecanoe = require('./lib/tippecanoe');
-const AWS = require('aws-sdk');
-const Meta = require('./lib/meta');
-const { Unzip } = require('zlib');
+import fs from 'fs';
+import fsp from 'fs/promises';
+import { pipeline } from 'stream/promises';
+import path from 'path';
+import Tippecanoe from './lib/tippecanoe.js';
+import AWS from 'aws-sdk';
+import Meta from './lib/meta.js';
+import { Unzip } from 'zlib';
+import minimist from 'minimist';
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -26,16 +26,19 @@ const zooms = {
     buildings: 15
 };
 
-const args = require('minimist')(process.argv, {
+const args = minimist(process.argv, {
     boolean: ['interactive', 'fabric', 'border'],
     alias: {
         interactive: 'i'
     }
 });
 
-if (require.main === module) {
-    if (args.interactive) return prompt();
-    return cli();
+if (import.meta.url === `file://${process.argv[1]}`) {
+    if (args.interactive) {
+        prompt();
+    } else {
+        cli();
+    }
 }
 
 async function prompt() {

@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "o_table_catalog": {
+            "$ref": "./raster_overviews/o_table_catalog.json"
+        },
+        "o_table_schema": {
+            "$ref": "./raster_overviews/o_table_schema.json"
+        },
+        "o_table_name": {
+            "$ref": "./raster_overviews/o_table_name.json"
+        },
+        "o_raster_column": {
+            "$ref": "./raster_overviews/o_raster_column.json"
+        },
+        "r_table_catalog": {
+            "$ref": "./raster_overviews/r_table_catalog.json"
+        },
+        "r_table_schema": {
+            "$ref": "./raster_overviews/r_table_schema.json"
+        },
+        "r_table_name": {
+            "$ref": "./raster_overviews/r_table_name.json"
+        },
+        "r_raster_column": {
+            "$ref": "./raster_overviews/r_raster_column.json"
+        },
+        "overview_factor": {
+            "$ref": "./raster_overviews/overview_factor.json"
+        }
+    },
+    "required": [
+        "o_table_catalog",
+        "o_table_schema",
+        "o_table_name",
+        "o_raster_column",
+        "r_table_catalog",
+        "r_table_schema",
+        "r_table_name",
+        "r_raster_column",
+        "overview_factor"
+    ]
+}

@@ -144,6 +144,11 @@
         "query": false,
         "res": false
     },
+    "GET /health": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /job": {
         "body": false,
         "query": true,

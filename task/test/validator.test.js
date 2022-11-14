@@ -1,7 +1,5 @@
-'use strict';
-
-const test = require('tape');
-const Validator = require('../lib/validator');
+import test from 'tape';
+import Validator from '../lib/validator.js';
 
 test('Valid Feature', (t) => {
     const validator = new Validator('addresses');

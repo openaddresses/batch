@@ -61,7 +61,7 @@
 import {
     InfoCircleIcon,
     DownloadIcon
-} from '@openaddresses/vue-tabler-icons';
+} from 'vue-tabler-icons';
 
 export default {
     name: 'Download',

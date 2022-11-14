@@ -1,4 +1,4 @@
-import Run from '../lib/run.js';
+import Run from '../lib/types/run.js';
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';

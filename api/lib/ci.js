@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs';
-import Run from './run.js';
-import { Err } from '@openaddresses/batch-schema';
+import Run from './types/run.js';
+import Err from '@openaddresses/batch-error';
 import GH from './gh.js';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
@@ -356,8 +356,11 @@ export default class CI {
             const sha = event.pull_request.head.sha;
 
             const run = await Run.from_sha(pool, sha);
-            run.live = true;
-            await run.commit(pool);
+
+            await run.commit({
+                live: true
+            });
+
             const jobs = await Run.jobs(pool, run.id);
 
             for (const job of jobs) {

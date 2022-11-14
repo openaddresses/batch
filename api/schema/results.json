@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./results/id.json"
+        },
+        "fabric": {
+            "$ref": "./results/fabric.json"
+        },
+        "source": {
+            "$ref": "./results/source.json"
+        },
+        "updated": {
+            "$ref": "./results/updated.json"
+        },
+        "layer": {
+            "$ref": "./results/layer.json"
+        },
+        "name": {
+            "$ref": "./results/name.json"
+        },
+        "job": {
+            "$ref": "./results/job.json"
+        }
+    },
+    "required": [
+        "id",
+        "fabric",
+        "source",
+        "updated",
+        "layer",
+        "name",
+        "job"
+    ]
+}

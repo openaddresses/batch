@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 

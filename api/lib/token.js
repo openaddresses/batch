@@ -1,4 +1,4 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import crypto from 'crypto';
 import { promisify } from 'util';
 import { sql } from 'slonik';

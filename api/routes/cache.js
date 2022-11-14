@@ -1,22 +1,17 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
+import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {delete} /api/cache Flush Cache
-     * @apiVersion 1.0.0
-     * @apiName FlushCache
-     * @apiGroup Cache
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Flush the Memcached Cache
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     schema.delete('/cache', {
+        name: 'Flush Cache',
+        group: 'Cache',
+        auth: 'admin',
+        description: 'Flush the Memcached Cache',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
+            await Auth.is_admin(req);
+
             await config.cacher.flush();
 
             res.json({
@@ -28,25 +23,17 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/cache/:cache_key Delete Key
-     * @apiVersion 1.0.0
-     * @apiName FlushCache
-     * @apiGroup Cache
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Flush the Memcached Cache
-     *
-     * @apiParam {String} :cache_key Cache Key
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     schema.delete('/cache/:cache_key', {
+        name: 'Delete Key',
+        group: 'Cache',
+        auth: 'admin',
+        description: 'Flush the Memcached Cache',
         ':cache_key': 'string',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
+            await Auth.is_admin(req);
+
             await config.cacher.del(req.params.cache_key);
 
             res.json({

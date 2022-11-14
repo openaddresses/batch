@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./map/id.json"
+        },
+        "name": {
+            "$ref": "./map/name.json"
+        },
+        "code": {
+            "$ref": "./map/code.json"
+        },
+        "geom": {
+            "$ref": "./map/geom.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "code",
+        "geom"
+    ]
+}

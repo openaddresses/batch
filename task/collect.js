@@ -1,21 +1,22 @@
 #!/usr/bin/env node
-'use strict';
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue
-const { interactive } = require('./lib/pre');
+import { interactive } from './lib/pre.js';
 
-const glob = require('glob');
-const os = require('os');
-const { Unzip } = require('zlib');
-const split = require('split');
-const transform = require('parallel-transform');
-const { pipeline } = require('stream/promises');
-const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp').sync;
-const AWS = require('aws-sdk');
-const archiver = require('archiver');
+import glob from 'glob';
+import os from 'os';
+import { Unzip } from 'zlib';
+import split from 'split2';
+import { pipeline } from 'stream/promises';
+import fs from 'fs';
+import path from 'path';
+import pkg from 'mkdirp';
+const { sync: mkdirp } = pkg;
+import AWS from 'aws-sdk';
+import archiver from 'archiver';
+import minimist from 'minimist';
+import { Transform } from 'stream';
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -23,21 +24,24 @@ const s3 = new AWS.S3({
 
 const DRIVE = '/tmp';
 
-const args = require('minimist')(process.argv, {
+const args = minimist(process.argv, {
     boolean: ['interactive'],
     alias: {
         interactive: 'i'
     }
 });
 
-if (require.main === module) {
-    if (args.interactive) return prompt();
-    return cli();
+if (import.meta.url === `file://${process.argv[1]}`) {
+    if (args.interactive) {
+        prompt();
+    } else {
+        cli();
+    }
 }
 
 async function prompt() {
     await interactive();
-    return cli();
+    cli();
 
 }
 
@@ -152,10 +156,12 @@ async function get_source(oa, tmp, data, stats) {
             }).createReadStream(),
             Unzip(),
             split(),
-            transform(100, (line, cb) => {
-                if (!line || !line.trim()) return cb(null, '');
-
-                stats.count++; return cb(null, line + '\n');
+            new Transform({
+                objectMode: true,
+                transform: (line, _, cb) => {
+                    if (!line || !line.trim()) return cb(null, '');
+                    stats.count++; return cb(null, line + '\n');
+                }
             }),
             fs.createWriteStream(path.resolve(tmp, 'sources', dir, source))
         );

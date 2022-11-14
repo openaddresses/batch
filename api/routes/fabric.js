@@ -1,20 +1,12 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Cacher from '../lib/cacher.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {get} /api/fabric Fabric TileJSON
-     * @apiVersion 1.0.0
-     * @apiName FabricVectorTile
-     * @apiGroup Map
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return a TileJSON for the current fabric
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
     await schema.get('/fabric', {
+        name: 'Fabric TileJSON',
+        group: 'Map',
+        auth: 'public',
+        description: 'Return a TileJSON for the current fabric',
         res: 'res.TileJSON.json'
     }, async (req, res) => {
         try {
@@ -24,21 +16,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/fabric/:z/:x/:y.mvt Fabric MVT
-     * @apiVersion 1.0.0
-     * @apiName FabricVectorTile
-     * @apiGroup Map
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Retrive fabric Mapbox Vector Tiles
-     *
-     * @apiParam {Number} z Z coordinate
-     * @apiParam {Number} x X coordinate
-     * @apiParam {Number} y Y coordinate
-     */
     await schema.get('/fabric/:z/:x/:y.mvt', {
+        name: 'Fabric MVT',
+        group: 'Map',
+        auth: 'public',
+        description: 'Retreive fabric Mapbox Vector Tiles',
         ':z': 'integer',
         ':x': 'integer',
         ':y': 'integer'

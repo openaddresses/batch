@@ -1,0 +1,11 @@
+{
+    "type": "array",
+    "items": {
+        "type": [
+            "boolean",
+            "null"
+        ],
+        "description": ""
+    },
+    "$comment": "bool[]"
+}

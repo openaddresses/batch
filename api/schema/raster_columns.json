@@ -1,0 +1,76 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "r_table_catalog": {
+            "$ref": "./raster_columns/r_table_catalog.json"
+        },
+        "r_table_schema": {
+            "$ref": "./raster_columns/r_table_schema.json"
+        },
+        "r_table_name": {
+            "$ref": "./raster_columns/r_table_name.json"
+        },
+        "r_raster_column": {
+            "$ref": "./raster_columns/r_raster_column.json"
+        },
+        "srid": {
+            "$ref": "./raster_columns/srid.json"
+        },
+        "scale_x": {
+            "$ref": "./raster_columns/scale_x.json"
+        },
+        "scale_y": {
+            "$ref": "./raster_columns/scale_y.json"
+        },
+        "blocksize_x": {
+            "$ref": "./raster_columns/blocksize_x.json"
+        },
+        "blocksize_y": {
+            "$ref": "./raster_columns/blocksize_y.json"
+        },
+        "same_alignment": {
+            "$ref": "./raster_columns/same_alignment.json"
+        },
+        "regular_blocking": {
+            "$ref": "./raster_columns/regular_blocking.json"
+        },
+        "num_bands": {
+            "$ref": "./raster_columns/num_bands.json"
+        },
+        "pixel_types": {
+            "$ref": "./raster_columns/pixel_types.json"
+        },
+        "nodata_values": {
+            "$ref": "./raster_columns/nodata_values.json"
+        },
+        "out_db": {
+            "$ref": "./raster_columns/out_db.json"
+        },
+        "extent": {
+            "$ref": "./raster_columns/extent.json"
+        },
+        "spatial_index": {
+            "$ref": "./raster_columns/spatial_index.json"
+        }
+    },
+    "required": [
+        "r_table_catalog",
+        "r_table_schema",
+        "r_table_name",
+        "r_raster_column",
+        "srid",
+        "scale_x",
+        "scale_y",
+        "blocksize_x",
+        "blocksize_y",
+        "same_alignment",
+        "regular_blocking",
+        "num_bands",
+        "pixel_types",
+        "nodata_values",
+        "out_db",
+        "extent",
+        "spatial_index"
+    ]
+}

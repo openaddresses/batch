@@ -1,5 +1,5 @@
-import { Err } from '@openaddresses/batch-schema';
-import JobError from './joberror.js';
+import Err from '@openaddresses/batch-error';
+import JobError from './types/joberror.js';
 import {
     scale_in,
     trigger

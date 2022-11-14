@@ -1,22 +1,13 @@
-import { Err } from '@openaddresses/batch-schema';
-import Run from '../lib/run.js';
+import Err from '@openaddresses/batch-error';
+import Run from '../lib/types/run.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {get} /api/run List Runs
-     * @apiVersion 1.0.0
-     * @apiName ListRuns
-     * @apiGroup Run
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Runs are container objects that contain jobs that were started at the same time or by the same process
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListRuns.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListRuns.json} apiSuccess
-     */
     await schema.get('/run', {
+        name: 'List Runs',
+        group: 'Run',
+        auth: 'public',
+        description: 'Runs are container objects that contain jobs that were started at the same time or by the same process',
         query: 'req.query.ListRuns.json',
         res: 'res.ListRuns.json'
     }, async (req, res) => {
@@ -30,20 +21,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/run Create Run
-     * @apiVersion 1.0.0
-     * @apiName CreateRun
-     * @apiGroup Run
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Create a new run to hold a batch of jobs
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateRun.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
-     */
     await schema.post('/run', {
+        name: 'Create Runs',
+        group: 'Run',
+        auth: 'admin',
+        description: 'Create a new run to hold a batch of jobs',
         body: 'req.body.CreateRun.json',
         res: 'res.Run.json'
     }, async (req, res) => {
@@ -58,18 +40,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/run/:run Get Run
-     * @apiVersion 1.0.0
-     * @apiName Single
-     * @apiGroup Run
-     * @apiPermission public
-     *
-     * @apiParam {Number} :run Run
-     *
-     * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
-     */
     await schema.get('/run/:run', {
+        name: 'Get Runs',
+        group: 'Run',
+        auth: 'public',
+        description: 'Get a single run',
         ':run': 'integer',
         res: 'res.Run.json'
     }, async (req, res) => {
@@ -81,21 +56,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/run/:run/count Run Stats
-     * @apiVersion 1.0.0
-     * @apiName RunStats
-     * @apiGroup Run
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return statistics about jobs within a given run
-     *
-     * @apiParam {Number} :run Run
-     *
-     * @apiSchema {jsonschema=../schema/res.RunStats.json} apiSuccess
-     */
     await schema.get('/run/:run/count', {
+        name: 'Run Stats',
+        group: 'Run',
+        auth: 'public',
+        description: 'Return statistics about jobs within a given run',
         ':run': 'integer',
         res: 'res.RunStats.json'
     }, async (req, res) => {
@@ -106,23 +71,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/run/:run Update Run
-     * @apiVersion 1.0.0
-     * @apiName Update
-     * @apiGroup Run
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Update an existing run
-     *
-     * @apiParam {Number} :run Run
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchRun.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Run.json} apiSuccess
-     *
-     */
     await schema.patch('/run/:run', {
+        name: 'Update Run',
+        group: 'Run',
+        auth: 'public',
+        description: 'Update a run',
         ':run': 'integer',
         body: 'req.body.PatchRun.json',
         res: 'res.Run.json'
@@ -135,8 +88,7 @@ export default async function router(schema, config) {
             // The CI is making a CI run "live" and updating the /data list
             if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
-            run.patch(req.body);
-            await run.commit(config.pool);
+            await run.commit(req.body);
 
             return res.json(run.serialize());
         } catch (err) {
@@ -144,26 +96,17 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/run/:run/jobs Populate Run Jobs
-     * @apiVersion 1.0.0
-     * @apiName SingleJobsCreate
-     * @apiGroup Run
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Given an array sources, explode it into multiple jobs and submit to batch
-     *     or pass in a predefined list of sources/layer/names
-     *
-     *     Note: once jobs are attached to a run, the run is "closed" and subsequent
-     *     jobs cannot be attached to it
-     *
-     * @apiParam {Number} :run Run
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.SingleJobsCreate.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.SingleJobsCreate.json} apiSuccess
-     */
     await schema.post('/run/:run/jobs', {
+        name: 'Populate Run Jobs',
+        group: 'Run',
+        auth: 'admin',
+        description: `
+            Given an array sources, explode it into multiple jobs and submit to batch
+            or pass in a predefined list of sources/layer/names
+
+            Note: once jobs are attached to a run, the run is "closed" and subsequent
+            jobs cannot be attached to it
+        `,
         ':run': 'integer',
         body: 'req.body.SingleJobsCreate.json',
         res: 'res.SingleJobsCreate.json'
@@ -177,21 +120,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/run/:run/jobs List Run Jobs
-     * @apiVersion 1.0.0
-     * @apiName SingleJobs
-     * @apiGroup Run
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return all jobs for a given run
-     *
-     * @apiParam {Number} :run Run
-     *
-     * @apiSchema {jsonschema=../schema/res.SingleJobs.json} apiSuccess
-     */
     await schema.get('/run/:run/jobs', {
+        name: 'List Run Jobs',
+        group: 'Run',
+        auth: 'public',
+        description: 'return all jobs for a given run',
         ':run': 'integer',
         res: 'res.SingleJobs.json'
     }, async (req, res) => {

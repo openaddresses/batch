@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-'use strict';
+import { interactive } from './lib/pre.js';
 
-const { interactive } = require('./lib/pre');
-
-const Meta = require('./lib/meta');
-const ogr2ogr = require('ogr2ogr');
-const { pipeline } = require('stream/promises');
-const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp').sync;
-const AWS = require('aws-sdk');
-const { Unzip } = require('zlib');
-const archiver = require('archiver');
+import Meta from './lib/meta.js';
+import ogr2ogr from 'ogr2ogr';
+import { pipeline } from 'stream/promises';
+import fs from 'fs';
+import path from 'path';
+import pkg from 'mkdirp';
+const { sync: mkdirp } = pkg;
+import AWS from 'aws-sdk';
+import { Unzip } from 'zlib';
+import archiver from 'archiver';
+import minimist from 'minimist';
 
 const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
@@ -19,16 +19,19 @@ const s3 = new AWS.S3({
 
 const DRIVE = '/tmp';
 
-const args = require('minimist')(process.argv, {
+const args = minimist(process.argv, {
     boolean: ['interactive'],
     alias: {
         interactive: 'i'
     }
 });
 
-if (require.main === module) {
-    if (args.interactive) return prompt();
-    return cli();
+if (import.meta.url === `file://${process.argv[1]}`) {
+    if (args.interactive) {
+        prompt();
+    } else {
+        cli();
+    }
 }
 
 async function prompt() {

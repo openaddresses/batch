@@ -66,7 +66,7 @@
 import {
     HistoryIcon,
     SettingsIcon
-} from '@openaddresses/vue-tabler-icons';
+} from 'vue-tabler-icons';
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 import moment from 'moment-timezone';

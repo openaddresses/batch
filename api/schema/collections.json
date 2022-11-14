@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./collections/id.json"
+        },
+        "size": {
+            "$ref": "./collections/size.json"
+        },
+        "name": {
+            "$ref": "./collections/name.json"
+        },
+        "sources": {
+            "$ref": "./collections/sources.json"
+        },
+        "created": {
+            "$ref": "./collections/created.json"
+        }
+    },
+    "required": [
+        "id",
+        "size",
+        "name",
+        "sources",
+        "created"
+    ]
+}

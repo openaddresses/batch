@@ -1,12 +1,10 @@
-'use strict';
-
-const inquirer = require('inquirer');
+import inquirer from 'inquirer';
 
 if (!process.env.AWS_DEFAULT_REGION) {
     process.env.AWS_DEFAULT_REGION = 'us-east-1';
 }
 
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
 
 async function secret(secretName) {
     const client = new AWS.SecretsManager({
@@ -44,7 +42,7 @@ async function interactive(additional = []) {
     Object.assign(process.env, p);
 }
 
-module.exports = {
+export {
     interactive,
     secret
 };

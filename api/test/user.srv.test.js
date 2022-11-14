@@ -170,35 +170,40 @@ test('GET: api/user', async () => {
                 username: 'sponsor',
                 email: 'sponsor@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 4,
                 level: 'backer',
                 username: 'backer',
                 email: 'backer@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 3,
                 level: 'basic',
                 username: 'basic',
                 email: 'basic@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 2,
                 level: 'basic',
                 username: 'admin',
                 email: 'admin@openaddresses.io',
                 access: 'admin',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 1,
                 level: 'basic',
                 username: 'ingalls',
                 email: 'ingalls@example.com',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }]
         });
     } catch (err) {
@@ -223,7 +228,8 @@ test('GET: api/user?level=backer', async () => {
                 username: 'backer',
                 email: 'backer@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }]
         });
     } catch (err) {
@@ -248,7 +254,8 @@ test('GET: api/user?level=sponsor', async () => {
                 username: 'sponsor',
                 email: 'sponsor@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }]
         });
     } catch (err) {
@@ -273,7 +280,8 @@ test('GET: api/user?filter=ADMIN', async () => {
                 username: 'admin',
                 email: 'admin@openaddresses.io',
                 access: 'admin',
-                flags: {}
+                flags: {},
+                validated: true
             }]
         });
     } catch (err) {
@@ -298,7 +306,8 @@ test('GET: api/user?access=admin', async () => {
                 username: 'admin',
                 email: 'admin@openaddresses.io',
                 access: 'admin',
-                flags: {}
+                flags: {},
+                validated: true
             }]
         });
     } catch (err) {
@@ -323,35 +332,40 @@ test('GET: api/user?before=<NOW>', async () => {
                 username: 'sponsor',
                 email: 'sponsor@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 4,
                 level: 'backer',
                 username: 'backer',
                 email: 'backer@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 3,
                 level: 'basic',
                 username: 'basic',
                 email: 'basic@openaddresses.io',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 2,
                 level: 'basic',
                 username: 'admin',
                 email: 'admin@openaddresses.io',
                 access: 'admin',
-                flags: {}
+                flags: {},
+                validated: true
             }, {
                 id: 1,
                 level: 'basic',
                 username: 'ingalls',
                 email: 'ingalls@example.com',
                 access: 'user',
-                flags: {}
+                flags: {},
+                validated: true
             }]
         });
     } catch (err) {

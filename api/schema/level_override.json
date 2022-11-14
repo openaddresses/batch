@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./level_override/id.json"
+        },
+        "created": {
+            "$ref": "./level_override/created.json"
+        },
+        "updated": {
+            "$ref": "./level_override/updated.json"
+        },
+        "level": {
+            "$ref": "./level_override/level.json"
+        },
+        "pattern": {
+            "$ref": "./level_override/pattern.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "level",
+        "pattern"
+    ]
+}

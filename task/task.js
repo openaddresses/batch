@@ -1,25 +1,28 @@
 #!/usr/bin/env node
-'use strict';
+import { interactive } from './lib/pre.js';
 
-const { interactive } = require('./lib/pre');
+import Job from './lib/job.js';
+import path from 'path';
+import CP from 'child_process';
+import fs from 'fs';
+import Meta from './lib/meta.js';
+import minimist from 'minimist';
 
-const config = require('./package.json');
-const Job = require('./lib/job');
-const path = require('path');
-const CP = require('child_process');
-const fs = require('fs');
-const Meta = require('./lib/meta');
+const config = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
 
-const args = require('minimist')(process.argv, {
+const args = minimist(process.argv, {
     boolean: ['interactive'],
     alias: {
         interactive: 'i'
     }
 });
 
-if (require.main === module) {
-    if (args.interactive) return prompt();
-    return cli();
+if (import.meta.url === `file://${process.argv[1]}`) {
+    if (args.interactive) {
+        prompt();
+    } else {
+        cli();
+    }
 }
 
 async function prompt() {
@@ -162,7 +165,7 @@ function process_job(job) {
     });
 }
 
-module.exports = {
+export {
     Job,
     flow
 };

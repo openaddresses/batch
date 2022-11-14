@@ -1,23 +1,15 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import { sql } from 'slonik';
-import Collection from '../lib/collections.js';
+import Collection from '../lib/types/collections.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {get} /api/collections List Collections
-     * @apiVersion 1.0.0
-     * @apiName ListCollections
-     * @apiGroup Collections
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return a list of all collections and their glob rules
-     *
-     * @apiSchema {jsonschema=../schema/res.ListCollections.json} apiSuccess
-     */
     await schema.get('/collections', {
+        name: 'List Collections',
+        group: 'Collections',
+        auth: 'public',
+        description: 'Return a list of all collections and their glob rules',
         res: 'res.ListCollections.json'
     }, async (req, res) => {
         try {
@@ -37,28 +29,22 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/collections/:collection/data Get Collection Data
-     * @apiVersion 1.0.0
-     * @apiName DataCollection
-     * @apiGroup Collections
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Download a given collection file
-     *
-     *    Note: the user must be authenticated to perform a download. One of our largest costs is
-     *    S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
-     *
-     *    Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an `s3` property which links
-     *    to a requester pays object on S3. For those that are able, this is the best way to download data.
-     *
-     *    OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
-     *    Please consider donating if you are able https://opencollective.com/openaddresses
-     *
-     * @apiParam {Number} :collection Collection
-     */
     await schema.get('/collections/:collection/data', {
+        name: 'Collection Data',
+        group: 'Collections',
+        auth: 'user',
+        description: `
+            Download a given collection file
+     
+            Note: the user must be authenticated to perform a download. One of our largest costs is
+            S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
+     
+            Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
+            to a requester pays object on S3. For those that are able, this is the best way to download data.
+     
+            OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
+            Please consider donating if you are able https://opencollective.com/openaddresses
+        `,
         ':collection': 'integer'
     }, async (req, res) => {
         try {
@@ -70,21 +56,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/collections/:collection Get Collection
-     * @apiVersion 1.0.0
-     * @apiName GetCollection
-     * @apiGroup Collections
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Get a given collection
-     *
-     * @apiParam {Number} :collection Collection
-     *
-     * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
-     */
     await schema.get('/collections/:collection', {
+        name: 'Get Collection',
+        group: 'Collections',
+        auth: 'public',
+        description: 'Get a given collection',
         ':collection': 'integer',
         'res': 'res.Collection.json'
     }, async (req, res) => {
@@ -99,21 +75,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/collections/:collection Delete Collection
-     * @apiVersion 1.0.0
-     * @apiName DeleteCollection
-     * @apiGroup Collections
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Delete a collection (This should not be done lightly)
-     *
-     * @apiParam {Number} :collection Collection ID
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/collections/:collection', {
+        name: 'Delete Collection',
+        group: 'Collections',
+        auth: 'admin',
+        description: 'Delete a collection (This should not be done lightly)',
         ':collection': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
@@ -131,20 +97,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/collections Create Collection
-     * @apiVersion 1.0.0
-     * @apiName CreateCollection
-     * @apiGroup Collections
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Create a new collection
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateCollection.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
-     */
     await schema.post('/collections', {
+        name: 'Create Collection',
+        group: 'Collections',
+        auth: 'admin',
+        description: 'Create a new collection',
         body: 'req.body.CreateCollection.json',
         res: 'res.Collection.json'
     }, async (req, res) => {
@@ -168,22 +125,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/collections/:collection Patch Collection
-     * @apiVersion 1.0.0
-     * @apiName PatchCollection
-     * @apiGroup Collections
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Update a collection
-     *
-     * @apiParam {Number} :collection Collection
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchCollection.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Collection.json} apiSuccess
-     */
     await schema.patch('/collections/:collection', {
+        name: 'Update Collection',
+        group: 'Collections',
+        auth: 'admin',
+        description: 'Update a collection',
         ':collection': 'integer',
         body: 'req.body.PatchCollection.json',
         res: 'res.Collection.json'
@@ -191,10 +137,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const collection = await Collection.from(config.pool, req.params.collection);
-            await collection.commit(config.pool, {
-                override: ['created']
-            }, {
+            const collection = await Collection.commit(config.pool, req.params.collection, {
                 created: sql`NOW()`,
                 ...req.body
             });

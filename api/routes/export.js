@@ -1,24 +1,14 @@
-import { Err } from '@openaddresses/batch-schema';
-import Job from '../lib/job.js';
-import Exporter from '../lib/exporter.js';
+import Err from '@openaddresses/batch-error';
+import Job from '../lib/types/job.js';
+import Exporter from '../lib/types/exporter.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {
-
-    /**
-     * @api {post} /api/export Create Export
-     * @apiVersion 1.0.0
-     * @apiName CreateExport
-     * @apiGroup Exports
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Create a new export task
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateExport.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
-     */
     await schema.post('/export', {
+        name: 'Create Export',
+        group: 'Exports',
+        auth: 'user',
+        description: 'Create a new export task',
         body: 'req.body.CreateExport.json',
         res: 'res.Export.json'
     }, async (req, res) => {
@@ -42,23 +32,15 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/export/:exportid/log Get Export Log
-     * @apiVersion 1.0.0
-     * @apiName ExportSingleLog
-     * @apiGroup Export
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Return the batch-machine processing log for a given export
-     *   Note: These are stored in AWS CloudWatch and *do* expire
-     *   The presence of a loglink on a export does not guarantee log retention
-     *
-     * @apiParam {Number} :exportid Export
-     *
-     * @apiSchema {jsonschema=../schema/res.SingleLog.json} apiSuccess
-     */
     await schema.get('/export/:exportid/log', {
+        name: 'Get Export Log',
+        group: 'Exports',
+        auth: 'user',
+        description: `
+            Return the batch-machine processing log for a given export
+            Note: These are stored in AWS CloudWatch and *do* expire
+            The presence of a loglink on a export does not guarantee log retention
+        `,
         ':exportid': 'integer',
         res: 'res.SingleLog.json'
     }, async (req, res) => {
@@ -72,20 +54,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/export List Export
-     * @apiVersion 1.0.0
-     * @apiName ListExport
-     * @apiGroup Exports
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   List existing exports
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListExport.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListExport.json} apiSuccess
-     */
     await schema.get('/export', {
+        name: 'List Export',
+        group: 'Exports',
+        auth: 'user',
+        description: 'List existing exports',
         query: 'req.query.ListExport.json',
         res: 'res.ListExport.json'
     }, async (req, res) => {
@@ -100,21 +73,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/export/:exportid Get Export
-     * @apiVersion 1.0.0
-     * @apiName GetExport
-     * @apiGroup Exports
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Get a single export
-     *
-     * @apiParam {Number} :exportid Export
-     *
-     * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
-     */
     await schema.get('/export/:exportid', {
+        name: 'Get Export',
+        group: 'Exports',
+        auth: 'user',
+        description: 'Get a single export',
         ':exportid': 'integer',
         res: 'res.Export.json'
     }, async (req, res) => {
@@ -128,33 +91,22 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {put} /api/export/:exportid ReRun Export
-     * @apiVersion 1.0.0
-     * @apiName ReRunExport
-     * @apiGroup Exports
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Rerun an export
-     *
-     * @apiParam {Number} :exportid Export
-     *
-     * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
-     */
     await schema.put('/export/:exportid', {
+        name: 'Re-run Export',
+        group: 'Exports',
+        auth: 'admin',
+        description: 'Re-run an export',
         ':exportid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
 
-            const exp = await Exporter.from(config.pool, req.params.exportid);
-
-            exp.status = 'Pending';
-            exp.loglink = null;
-            exp.size = null;
-            await exp.commit(config.pool);
+            const exp = await Exporter.commit(config.pool, req.params.exportid, {
+                status: 'Pending',
+                loglink: null,
+                size: null
+            });
 
             await exp.batch();
 
@@ -164,21 +116,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/export/:exportid/output/export.zip Get Export Data
-     * @apiVersion 1.0.0
-     * @apiName DataExport
-     * @apiGroup Exports
-     * @apiPermission user
-     *
-     * @apiDescription
-     *   Download the data created in an export
-     *
-     * @apiParam {Number} :exportid Export
-     *
-     * @apiParam {Number} :exportid Export ID
-     */
     await schema.get('/export/:exportid/output/export.zip', {
+        name: 'Get Export Data',
+        group: 'Exports',
+        auth: 'user',
+        description: 'Download the data created during an export',
         ':exportid': 'integer'
     }, async (req, res) => {
         try {
@@ -190,22 +132,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/export/:exportid Patch Export
-     * @apiVersion 1.0.0
-     * @apiName PatchExport
-     * @apiGroup Exports
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *   Update a single export
-     *
-     * @apiParam {Number} :exportid Export
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchExport.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Export.json} apiSuccess
-     */
     await schema.patch('/export/:exportid', {
+        name: 'Patch Export',
+        group: 'Exports',
+        auth: 'admin',
+        description: 'Update an export',
         ':exportid': 'integer',
         body: 'req.body.PatchExport.json',
         res: 'res.Export.json'
@@ -213,9 +144,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const exp = await Exporter.from(config.pool, req.params.exportid);
-            exp.patch(req.body);
-            await exp.commit(config.pool);
+            const exp = await Exporter.commit(config.pool, req.params.exportid, req.body);
 
             return res.json(exp.serialize());
         } catch (err) {

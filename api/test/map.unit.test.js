@@ -1,5 +1,5 @@
-import Map from '../lib/map.js';
-import Job from '../lib/job.js';
+import Map from '../lib/types/map.js';
+import Job from '../lib/types/job.js';
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';
@@ -71,15 +71,12 @@ test('Map#get_feature - country', async () => {
         `);
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
-                'addresses',
-                'fed'
-            );
-            await job.generate(flight.config.pool);
-            job.map = 1;
-            await job.commit(flight.config.pool);
+            await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
+                layer: 'addresses',
+                name: 'fed',
+                map: 1
+            });
 
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
@@ -87,19 +84,16 @@ test('Map#get_feature - country', async () => {
                 code: 'us',
                 geom: null,
                 layers: ['addresses']
-            }, 'addresses layer added');
+            });
         }
 
         {
-            const job = new Job(
-                1,
-                'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
-                'addresses',
-                'fed'
-            );
-            await job.generate(flight.config.pool);
-            job.map = 1;
-            await job.commit(flight.config.pool);
+            await Job.generate(flight.config.pool, {
+                source: 'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
+                layer: 'addresses',
+                name: 'fed',
+                map: 1
+            });
 
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
@@ -107,19 +101,16 @@ test('Map#get_feature - country', async () => {
                 code: 'us',
                 geom: null,
                 layers: ['addresses']
-            }, 'addresses layer not duplicated');
+            });
         }
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
-                'buildings',
-                'fed'
-            );
-            await job.generate(flight.config.pool);
-            job.map = 1;
-            await job.commit(flight.config.pool);
+            await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
+                layer: 'buildings',
+                name: 'fed',
+                map: 1
+            });
 
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
                 id: 1,
@@ -127,7 +118,7 @@ test('Map#get_feature - country', async () => {
                 code: 'us',
                 geom: null,
                 layers: ['addresses', 'buildings']
-            }, 'additions retain array');
+            });
         }
     } catch (err) {
         assert.ifError(err);
@@ -155,17 +146,14 @@ test('Map#match - county', async () => {
         code: 'us-42017',
         geom: null,
         layers: []
-    }, 'no addresses layer');
+    });
 
     {
-        const job = new Job(
-            1,
-            'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
-            'addresses',
-            'city'
-        );
-        await job.generate(flight.config.pool);
-        await job.commit(flight.config.pool);
+        const job = await Job.generate(flight.config.pool, {
+            source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            layer: 'addresses',
+            name: 'city'
+        });
 
         await Map.match(flight.config.pool, job);
         assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
@@ -174,18 +162,15 @@ test('Map#match - county', async () => {
             code: 'us-42017',
             geom: null,
             layers: ['addresses']
-        }, 'addresses layer added');
+        });
     }
 
     {
-        const job = new Job(
-            1,
-            'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
-            'buildings',
-            'city'
-        );
-        await job.generate(flight.config.pool);
-        await job.commit(flight.config.pool);
+        const job = await Job.generate(flight.config.pool, {
+            source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
+            layer: 'buildings',
+            name: 'city'
+        });
 
         await Map.match(flight.config.pool, job);
         assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
@@ -194,7 +179,7 @@ test('Map#match - county', async () => {
             code: 'us-42017',
             geom: null,
             layers: ['addresses', 'buildings']
-        }, 'buildings layer added');
+        });
     }
 });
 
@@ -216,17 +201,14 @@ test('Map#match - country', async () => {
             code: 'ca',
             geom: null,
             layers: []
-        }, 'no addresses layer');
+        });
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
-                'addresses',
-                'countrywide'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
+                layer: 'addresses',
+                name: 'countrywide'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
@@ -235,18 +217,15 @@ test('Map#match - country', async () => {
                 code: 'ca',
                 geom: null,
                 layers: ['addresses']
-            }, 'addresses layer added');
+            });
         }
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
-                'buildings',
-                'city'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
+                layer: 'buildings',
+                name: 'city'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
@@ -255,7 +234,7 @@ test('Map#match - country', async () => {
                 code: 'ca',
                 geom: null,
                 layers: ['addresses', 'buildings']
-            }, 'buildings layer added');
+            });
         }
     } catch (err) {
         assert.ifError(err);
@@ -265,14 +244,11 @@ test('Map#match - country', async () => {
 test('Map#match - geom', async () => {
     try {
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
-                'addresses',
-                'city'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
+                layer: 'addresses',
+                name: 'city'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
@@ -281,18 +257,15 @@ test('Map#match - geom', async () => {
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
                 geom: '0101000020E610000000000000D0E260C048F84A7D6C5E4E40',
                 layers: ['addresses']
-            }, 'addresses layer added');
+            });
         }
 
         {
-            const job = new Job(
-                1,
-                'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
-                'buildings',
-                'city'
-            );
-            await job.generate(flight.config.pool);
-            await job.commit(flight.config.pool);
+            const job = await Job.generate(flight.config.pool, {
+                source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
+                layer: 'buildings',
+                name: 'city'
+            });
 
             await Map.match(flight.config.pool, job);
             assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
@@ -301,7 +274,7 @@ test('Map#match - geom', async () => {
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
                 geom: '0101000020E610000000000000D0E260C048F84A7D6C5E4E40',
                 layers: ['addresses', 'buildings']
-            }, 'buildings layer added');
+            });
         }
     } catch (err) {
         assert.ifError(err);

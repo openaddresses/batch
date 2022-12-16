@@ -199,10 +199,9 @@ export default class CI {
      * Calculate the individual filenames & patches that changed in a PR
      *
      * @param {String} ref Github Ref
-     * @param {Function} fetch Optional fetch override
      */
     // eslint-disable-next-line no-use-before-define
-    async filediff(ref, fetch = fetch) {
+    async filediff(ref) {
         console.error(`ok - FileDiff: ${ref}`);
 
         const res = await fetch(`https://api.github.com/repos/openaddresses/openaddresses/compare/master...${ref}`, {
@@ -224,10 +223,9 @@ export default class CI {
     /**
      * Given a list of filediffs, calculate what sources in the JSON file changed
      * @param {Object[]} files
-     * @param {Function} fetch Optional fetch override
      */
     // eslint-disable-next-line no-use-before-define
-    static async internaldiff(files, fetch = fetch) {
+    static async internaldiff(files) {
         const jobs = [];
 
         for (const file of files) {

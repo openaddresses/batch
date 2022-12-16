@@ -6,7 +6,7 @@ import { MockAgent, setGlobalDispatcher } from 'undici';
 test('CI#internaldiff - No File On Master', async () => {
     const mockAgent = new MockAgent();
     const mockPool = mockAgent.get('https://raw.githubusercontent.com');
-    setGlobalDispatcher(mockAgent)
+    setGlobalDispatcher(mockAgent);
 
     mockPool.intercept({
         path: '/openaddresses/openaddresses/123/sources/us/mt/statewide.json'
@@ -16,7 +16,7 @@ test('CI#internaldiff - No File On Master', async () => {
             addresses: [{ name: 'state' }]
         }
     }, {
-         headers: { 'content-type': 'application/json' }
+        headers: { 'content-type': 'application/json' }
     });
 
     mockPool.intercept({
@@ -24,7 +24,7 @@ test('CI#internaldiff - No File On Master', async () => {
     }).reply(404, {
         status: 404
     }, {
-         headers: { 'content-type': 'application/json' }
+        headers: { 'content-type': 'application/json' }
     });
 
     const jobs = await CI.internaldiff([{
@@ -42,7 +42,7 @@ test('CI#internaldiff - No File On Master', async () => {
 test('CI#internaldiff - Internal Diff', async () => {
     const mockAgent = new MockAgent();
     const mockPool = mockAgent.get('https://raw.githubusercontent.com');
-    setGlobalDispatcher(mockAgent)
+    setGlobalDispatcher(mockAgent);
 
     mockPool.intercept({
         path: '/openaddresses/openaddresses/123/sources/us/mt/statewide.json'
@@ -53,7 +53,7 @@ test('CI#internaldiff - Internal Diff', async () => {
             parcels: [{ name: 'state' }]
         }
     }, {
-         headers: { 'content-type': 'application/json' }
+        headers: { 'content-type': 'application/json' }
     });
 
     mockPool.intercept({
@@ -64,7 +64,7 @@ test('CI#internaldiff - Internal Diff', async () => {
             addresses: [{ name: 'state', diff: true }, { name: 'no-diff' }]
         }
     }, {
-         headers: { 'content-type': 'application/json' }
+        headers: { 'content-type': 'application/json' }
     });
 
     const jobs = await CI.internaldiff([{

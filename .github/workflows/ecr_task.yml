@@ -1,6 +1,9 @@
 name: AWS ECR Task
 
 on:
+    push:
+        branches:
+            - master
     pull_request:
         types:
             - opened
@@ -22,7 +25,7 @@ jobs:
 
             - uses: actions/checkout@v2
               with:
-                  ref: ${{ github.event.pull_request.head.sha }}
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Docker Layer Caching
               uses: satackey/action-docker-layer-caching@v0.0.11
@@ -36,10 +39,10 @@ jobs:
               run: docker build -t task task/
 
             - name: Docker Tag Task
-              run: docker tag task ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{github.event.pull_request.head.sha}}
+              run: docker tag task ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Docker Push Task
-              run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{github.event.pull_request.head.sha}}
+              run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Docker Task Lint
               run: docker run task npm run lint

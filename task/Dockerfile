@@ -7,8 +7,6 @@ COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
-RUN apk add git jq
-
 WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch
 

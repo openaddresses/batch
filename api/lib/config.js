@@ -37,7 +37,6 @@ export default class Config {
                 this.GithubWebhookSecret = secrets.GithubWebhookSecret;
                 this.CookieSecret = secrets.CookieSecret;
                 this.SharedSecret = process.env.SharedSecret;
-                this.MailGun = secrets.MailGun;
                 this.StackName = process.env.StackName;
 
                 let github = secrets.GitHubKey

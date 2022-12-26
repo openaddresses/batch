@@ -35,13 +35,13 @@ export default async function router(schema, config) {
         auth: 'user',
         description: `
             Download a given collection file
-     
+
             Note: the user must be authenticated to perform a download. One of our largest costs is
             S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
-     
+
             Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
             to a requester pays object on S3. For those that are able, this is the best way to download data.
-     
+
             OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
@@ -50,7 +50,8 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            Collection.data(config.pool, req.params.collection, res);
+            const collection = await Collection.from(config.pool, req.params.collection);
+            return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
         } catch (err) {
             return Err.respond(err, res);
         }

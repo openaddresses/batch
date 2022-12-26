@@ -202,11 +202,13 @@ export default class Job {
             throw new Error('out.geojson not found');
         }
 
-        return await Job.gz(data[0]);
+        return await Job.gz(new URL(data[0], 'file://'));
     }
 
     static async gz(input) {
-        const compressed = input + '.gz';
+        if (!(input instanceof URL)) throw new Error('input arg must be URL');
+
+        const compressed = new URL(input.pathname + '.gz', 'file://');
 
         await pipeline(
             fs.createReadStream(input),

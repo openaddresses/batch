@@ -6,10 +6,6 @@ export default {
             Type: 'String',
             Description: 'OpenCollective API Token'
         },
-        MailGun: {
-            Type: 'String',
-            Description: 'MailGun API Token to send user emails'
-        },
         GithubSecret: {
             Type: 'String',
             Description: 'Github CI Integration Secret'
@@ -223,7 +219,6 @@ export default {
                         { Name: 'MEGA_QUEUE', Value: cf.importValue('mega-queue') },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
-                        { Name: 'MAILGUN_API_KEY', Value: cf.ref('MailGun') },
                         { Name: 'OPENCOLLECTIVE_API_KEY', Value: cf.ref('OpenCollective') },
                         { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstanceVPC', 'Endpoint.Address'), ':5432/openaddresses']) },
                         { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },

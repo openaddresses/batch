@@ -36,11 +36,6 @@ export default class Collection extends Generic {
         });
     }
 
-    static async data(pool, collection_id, res) {
-        const collection = await Collection.from(pool, collection_id);
-        return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
-    }
-
     _s3() {
         this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${this.name}.zip`;
     }

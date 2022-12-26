@@ -162,12 +162,7 @@ export default async function router(schema, config) {
 
             if (!job.output.validated) throw new Err(400, null, 'Job does not have validated data');
 
-            const s3 = new S3({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${req.params.job}/validated.geojson.gz`
-            });
-
-            return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}-validated.geojson.gz`);
+            return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/job/${req.params.job}/validated.geojson.gz`);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -196,12 +191,7 @@ export default async function router(schema, config) {
 
             if (!job.output.output) throw new Err(400, null, 'Job does not have output data');
 
-            const s3 = new S3({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${req.params.job}/source.geojson.gz`
-            });
-
-            return s3.stream(res, `${job.source_name}-${job.layer}-${job.name}.geojson.gz`);
+            return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/job/${req.params.job}/source.geojson.gz`);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -245,12 +235,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            const s3 = new S3({
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${req.params.job}/cache.zip`
-            });
-
-            return s3.stream(res);
+            return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/job/${req.params.job}/cache.zip`);
         } catch (err) {
             return Err.respond(err, res);
         }

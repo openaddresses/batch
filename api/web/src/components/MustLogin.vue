@@ -16,7 +16,7 @@
                 <div class='txt-m align-center px12'>
                     <p class='my6'>
                         Only logged in users can perform downloads. One of our largest costs is
-                        S3 egress, authenticatd downloads allow us to prevent abuse and keep the project
+                        S3 egress, authenticated downloads allow us to prevent abuse and keep the project
                         running and the data free!
                     </p>
                     <p class='my6'>

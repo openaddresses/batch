@@ -226,6 +226,14 @@ export default class Job {
 
         const s3 = new AWS.S3({ region: 'us-east-1' });
 
+        const r2 = new AWS.S3({
+            credentials: {
+                accessKeyId: process.env.R2_ACCESS_KEY_ID,
+                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+            },
+            endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        });
+
         const cache = await Job.find('cache.zip', this.tmp);
         if (cache.length === 1) {
             console.error('ok - found cache', cache[0]);
@@ -234,6 +242,13 @@ export default class Job {
                 ContentType: 'application/zip',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
+                Body: fs.createReadStream(cache[0])
+            }).promise();
+
+            await r2.putObject({
+                ContentType: 'application/zip',
+                Bucket: process.env.R2Bucket,
+                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/cache.zip`,
                 Body: fs.createReadStream(cache[0])
             }).promise();
 
@@ -252,6 +267,13 @@ export default class Job {
             Body: fs.createReadStream(data)
         }).promise();
 
+        await r2.putObject({
+            ContentType: 'application/gzip',
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.geojson.gz`,
+            Body: fs.createReadStream(data)
+        }).promise();
+
         console.error('ok - source.geojson.gz uploaded');
         this.assets.output = true;
 
@@ -262,6 +284,13 @@ export default class Job {
                 ContentType: 'application/gzip',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
+                Body: fs.createReadStream(this.validated)
+            }).promise();
+
+            await r2.putObject({
+                ContentType: 'application/gzip',
+                Bucket: process.env.R2Bucket,
+                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
                 Body: fs.createReadStream(this.validated)
             }).promise();
 
@@ -279,6 +308,13 @@ export default class Job {
                 ContentType: 'image/png',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/source.png`,
+                Body: fs.createReadStream(preview[0])
+            }).promise();
+
+            await r2.putObject({
+                ContentType: 'image/png',
+                Bucket: process.env.R2Bucket,
+                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.png`,
                 Body: fs.createReadStream(preview[0])
             }).promise();
 

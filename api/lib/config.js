@@ -74,8 +74,28 @@ export default class Config {
                 this.Bucket = process.env.Bucket;
             }
 
+            if (!process.env.R2Bucket) {
+                if (!this.silent) console.error('ok - set env R2Bucket: openaddresses');
+                process.env.R2Bucket = 'openaddresses';
+                this.R2Bucket = 'openaddresses';
+            } else {
+                this.R2Bucket = process.env.R2Bucket;
+            }
+
             if (!process.env.MAPBOX_TOKEN) {
                 throw new Error('not ok - MAPBOX_TOKEN env var required');
+            }
+
+            if (!process.env.CLOUDFLARE_ACCOUNT_ID) {
+                throw new Error('not ok - CLOUDFLARE_ACCOUNT_ID env var required');
+            }
+
+            if (!process.env.R2_ACCESS_KEY_ID) {
+                throw new Error('not ok - R2_ACCESS_KEY_ID env var required');
+            }
+
+            if (!process.env.R2_SECRET_ACCESS_KEY) {
+                throw new Error('not ok - R2_SECRET_ACCESS_KEY env var required');
             }
 
             if (!process.env.GithubSecret) {

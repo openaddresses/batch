@@ -17,6 +17,14 @@ const s3 = new AWS.S3({
     region: process.env.AWS_DEFAULT_REGION
 });
 
+const r2 = new AWS.S3({
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+    },
+    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+});
+
 const DRIVE = '/tmp';
 
 const args = minimist(process.argv, {
@@ -103,6 +111,14 @@ async function cli() {
             Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
         }).promise();
         console.error(`ok - uploaded: s3://${process.env.Bucket}/${process.env.StackName}/export/${exp.id}/export.zip`);
+
+        await r2.putObject({
+            ContentType: 'application/zip',
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/export/${exp.id}/export.zip`,
+            Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
+        }).promise();
+        console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/export/${exp.id}/export.zip`);
 
         await oa.cmd('export', 'update', {
             ':exportid': process.env.OA_EXPORT_ID,

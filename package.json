@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^6.0.0",
-        "@openaddresses/batch-alarms": "^2.1.1"
+        "@openaddresses/batch-alarms": "^3.0.0"
     },
     "devDependencies": {
         "eslint": "^8.0.1",

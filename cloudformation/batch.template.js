@@ -1,4 +1,4 @@
-import cf from '@mapbox/cloudfriend';
+import cf from '@openaddresses/cloudfriend';
 import alarms from '@openaddresses/batch-alarms';
 
 import schedule from './lib/schedule.js';

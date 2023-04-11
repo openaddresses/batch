@@ -10,15 +10,15 @@ export default {
             Type: 'String',
             Description: 'Github CI Integration Secret'
         },
-        CLOUDFLARE_ACCOUNT_ID: {
+        CloudflareAccountID: {
             Type: 'String',
             Description: 'Account Id for CloudFlare'
         },
-        R2_ACCESS_KEY_ID: {
+        R2AccessKeyID: {
             Type: 'String',
             Description: 'Access Key Id for CloudFlare R2'
         },
-        R2_SECRET_ACCESS_KEY: {
+        R2SecretAccessKey: {
             Type: 'String',
             Description: 'Secret Access Key for CloudFlare R2'
         }
@@ -236,9 +236,9 @@ export default {
                         { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
                         { Name: 'Bucket', Value: cf.ref('Bucket') },
                         { Name: 'StackName', Value: cf.stackName },
-                        { Name: 'CLOUDFLARE_ACCOUNT_ID', Value: cf.ref('CLOUDFLARE_ACCOUNT_ID') },
-                        { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2_ACCESS_KEY_ID') },
-                        { Name: 'R2_SECRET_ACCESS_KEY', Value: cf.ref('R2_SECRET_ACCESS_KEY') },
+                        { Name: 'CLOUDFLARE_ACCOUNT_ID', Value: cf.ref('CloudflareAccountID') },
+                        { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2AccessKeyID') },
+                        { Name: 'R2_SECRET_ACCESS_KEY', Value: cf.ref('R2SecretAccessKey') },
                         { Name: 'AWS_DEFAULT_REGION', Value: cf.region }
                     ],
                     LogConfiguration: {

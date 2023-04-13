@@ -49,8 +49,8 @@ export default {
                     Environment: [
                         { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
-                        { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2_ACCESS_KEY_ID') },
-                        { Name: 'R2_SECRET_ACCESS_KEY', Value: cf.ref('R2_SECRET_ACCESS_KEY') },
+                        { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2AccessKeyID') },
+                        { Name: 'R2_SECRET_ACCESS_KEY', Value: cf.ref('R2SecretAccessKey') },
                         { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },
                         { Name: 'OA_BRANCH', Value: cf.ref('Branch') },
                         { Name: 'OA_API' , Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]) },

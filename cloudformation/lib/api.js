@@ -235,6 +235,7 @@ export default {
                         { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },
                         { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
                         { Name: 'Bucket', Value: cf.ref('Bucket') },
+                        { Name: 'R2Bucket', Value: cf.ref('R2Bucket') },
                         { Name: 'StackName', Value: cf.stackName },
                         { Name: 'CLOUDFLARE_ACCOUNT_ID', Value: cf.ref('CloudflareAccountID') },
                         { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2AccessKeyID') },

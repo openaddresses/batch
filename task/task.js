@@ -38,6 +38,7 @@ async function prompt() {
 async function cli() {
     if (!process.env.StackName) process.env.StackName = 'local';
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddreses.io';
+    if (!process.env.R2Bucket) process.env.R2Bucket = 'openaddreses';
 
     if (!process.env.SharedSecret) throw new Error('No SharedSecret env var defined');
     if (!process.env.OA_JOB_ID) throw new Error('No OA_JOB_ID env var defined');

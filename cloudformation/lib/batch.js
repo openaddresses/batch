@@ -53,7 +53,8 @@ export default {
                         { Name: 'OA_BRANCH', Value: cf.ref('Branch') },
                         { Name: 'OA_API' , Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]) },
                         { Name: 'StackName', Value: cf.stackName },
-                        { Name: 'Bucket', Value: cf.ref('Bucket') }
+                        { Name: 'Bucket', Value: cf.ref('Bucket') },
+                        { Name: 'R2Bucket', Value: cf.ref('R2Bucket') }
                     ],
                     Memory: 1900,
                     Privileged: true,

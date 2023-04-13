@@ -51,6 +51,7 @@ export default {
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
                         { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2AccessKeyID') },
                         { Name: 'R2_SECRET_ACCESS_KEY', Value: cf.ref('R2SecretAccessKey') },
+                        { Name: 'CLOUDFLARE_ACCOUNT_ID', Value: cf.ref('CloudflareAccountID') },
                         { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },
                         { Name: 'OA_BRANCH', Value: cf.ref('Branch') },
                         { Name: 'OA_API' , Value: cf.join(['http://', cf.getAtt('APIELB', 'DNSName')]) },

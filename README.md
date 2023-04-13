@@ -8,13 +8,13 @@ Once these are installed, you can create the production stack via:
 (Note: it should already exist!)
 
 ```sh
-deploy create production
+deploy create prod
 ```
 
 Or update to the latest GitSha or CloudFormation template via
 
 ```sh
-deploy update production
+deploy update prod
 ```
 
 ### Parameters

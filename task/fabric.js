@@ -104,7 +104,7 @@ async function cli() {
                 path.resolve(DRIVE, 'borders.tilebase')
             );
 
-            await s3.putObject({
+            await s3.upload({
                 ContentType: 'application/octet-stream',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/borders.tilebase`,
@@ -176,7 +176,7 @@ async function cli() {
                 path.resolve(DRIVE, 'fabric.tilebase')
             );
 
-            await s3.putObject({
+            await s3.upload({
                 ContentType: 'application/octet-stream',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/fabric.tilebase`,

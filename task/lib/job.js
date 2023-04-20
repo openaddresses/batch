@@ -238,14 +238,14 @@ export default class Job {
         if (cache.length === 1) {
             console.error('ok - found cache', cache[0]);
 
-            await s3.putObject({
+            await s3.upload({
                 ContentType: 'application/zip',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
                 Body: fs.createReadStream(cache[0])
             }).promise();
 
-            await r2.putObject({
+            await r2.upload({
                 ContentType: 'application/zip',
                 Bucket: process.env.R2Bucket,
                 Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/cache.zip`,
@@ -260,14 +260,14 @@ export default class Job {
 
         this.size = fs.statSync(data).size;
 
-        await s3.putObject({
+        await s3.upload({
             ContentType: 'application/gzip',
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
             Body: fs.createReadStream(data)
         }).promise();
 
-        await r2.putObject({
+        await r2.upload({
             ContentType: 'application/gzip',
             Bucket: process.env.R2Bucket,
             Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.geojson.gz`,
@@ -280,14 +280,14 @@ export default class Job {
         if (this.validated) {
             this.validated = await Job.gz(this.validated);
 
-            await s3.putObject({
+            await s3.upload({
                 ContentType: 'application/gzip',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
                 Body: fs.createReadStream(this.validated)
             }).promise();
 
-            await r2.putObject({
+            await r2.upload({
                 ContentType: 'application/gzip',
                 Bucket: process.env.R2Bucket,
                 Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
@@ -304,14 +304,14 @@ export default class Job {
         if (preview.length === 1) {
             console.error('ok - found preview', preview[0]);
 
-            await s3.putObject({
+            await s3.upload({
                 ContentType: 'image/png',
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${this.job}/source.png`,
                 Body: fs.createReadStream(preview[0])
             }).promise();
 
-            await r2.putObject({
+            await r2.upload({
                 ContentType: 'image/png',
                 Bucket: process.env.R2Bucket,
                 Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.png`,

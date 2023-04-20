@@ -192,7 +192,7 @@ async function upload_collection(file, name) {
 
     console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
 
-    await r2.putObject({
+    await r2.upload({
         ContentType: 'application/zip',
         Body: fs.createReadStream(file),
         Bucket: process.env.R2Bucket,

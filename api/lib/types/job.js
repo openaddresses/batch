@@ -255,7 +255,8 @@ export default class Job extends Generic {
         try {
             const res = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
-                logStreamName: this.loglink
+                logStreamName: this.loglink,
+                startFromHead: true
             }).promise();
 
             events = res.events;

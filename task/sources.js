@@ -64,7 +64,7 @@ async function cli() {
         await meta.protection(true);
 
         console.error('ok - fetching repo');
-        await fetch(tmp);
+        await fetch_repo(tmp);
         console.error('ok - extracted repo');
 
         console.error('ok - fetching latest sha');
@@ -96,7 +96,7 @@ async function cli() {
     }
 }
 
-async function fetch(tmp) {
+async function fetch_repo(tmp) {
     await pipeline(
         request(`https://github.com/openaddresses/openaddresses/archive/${process.env.OA_BRANCH}.zip`),
         fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip'))

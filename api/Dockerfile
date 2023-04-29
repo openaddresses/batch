@@ -19,8 +19,7 @@ WORKDIR $HOME/api
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
-RUN npm install \
-    && npm run doc
+RUN npm install
 
 RUN cd web \
     && npm install -g yarn \

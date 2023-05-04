@@ -5,6 +5,7 @@ import Cacher from './lib/cacher.js';
 import express from 'express';
 import minify from 'express-minify';
 import Schema from '@openaddresses/batch-schema';
+import SwaggerUI from 'swagger-ui-express';
 import Err from '@openaddresses/batch-error';
 import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';

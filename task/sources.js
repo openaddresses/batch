@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
-
 import { interactive } from './lib/pre.js';
 
 import Meta from './lib/meta.js';
 import os from 'os';
 import fs from 'fs';
-import glob from 'glob';
+import { globSync } from 'glob';
 import path from 'path';
 import { pipeline } from 'stream/promises';
 import unzipper from 'unzipper';
@@ -114,7 +113,7 @@ async function fetch(tmp) {
 
 function list(tmp, sha) {
     const dir = fs.readdirSync(path.resolve(tmp, 'openaddresses'))[0];
-    const globs = glob.sync('**/*.json', {
+    const globs = globSync('**/*.json', {
         nodir: true,
         cwd: path.resolve(tmp, 'openaddresses', dir, 'sources')
     });

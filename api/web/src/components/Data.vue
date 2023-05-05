@@ -1,60 +1,64 @@
 <template>
-    <div class='col col--12 pt12'>
-
-        <div class='round border border--green pb12 mb12'>
-            <h3 class='align-center pb12'>New Features</h3>
-
-            <div class='grid'>
-                <div class='col col--4 flex flex--center-main'>
-                    <BuildingCommunityIcon width="24" height="24"/>
-                    Buildings
-                </div>
-                <div class='col col--4 flex flex--center-main'>
-                    <MapPinIcon width="24" height="24"/>
-                    Addresses
-                </div>
-                <div class='col col--4 flex flex--center-main'>
-                    <ShapeIcon width="24" height="24"/>
-                    Parcels
-                </div>
-                <div class='col col--12'>
-                    <div class='align-center pt12'>
-                        After many months of work, we've expanded the project to include parcels and building polygons.
-                        Look for the symbols above in the data sources to download the new layers
+<div class='page-body'>
+    <div class='container-xl'>
+        <div class='row row-deck row-cards'>
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h3 class='card-title'>New Features</h3>
+                    </div>
+                    <div class='card-body row'>
+                        <div class='col-4 d-flex justify-content-center'>
+                            <BuildingCommunityIcon width="24" height="24"/>
+                            Buildings
+                        </div>
+                        <div class='col-4 d-flex justify-content-center'>
+                            <MapPinIcon width="24" height="24"/>
+                            Addresses
+                        </div>
+                        <div class='col-4 d-flex justify-content-center'>
+                            <ShapeIcon width="24" height="24"/>
+                            Parcels
+                        </div>
+                        <div class='col-12'>
+                            <div class='text-center pt-3'>
+                                <div>After many months of work, we've expanded the project to include parcels and building polygons.</div>
+                                <div>Look for the symbols above in the data sources to download the new layers</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class='col col--12'>
-            <div class='col col--12 grid border-b border--gray-light mb12'>
-                <div class='col col--12'>
-                    <h2 class='txt-h4 pb12 fl'>Data Collections:</h2>
-                    <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                        <svg class='icon'><use href='#icon-refresh'/></svg>
-                    </button>
-                </div>
+            <div class='card'>
+                <div class='card-header d-flex'>
+                    <h2 class='card-title'>Data Collections</h2>
 
-                <div class='col col--5'>Name</div>
-                <div class='col col--2'>Updated</div>
-                <div class='col col--5'><span class='fr'>Attributes</span></div>
-            </div>
-            <div v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='col col--12 grid pb6'>
-                <div class='col col--12 grid cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--5'>
-                        <span class='ml12' v-text='c.name'/>
-                    </div>
-                    <div class='col col--2'>
-                        <span v-text='fmt(c.created)'/>
-                    </div>
-                    <div class='col col--5'>
-                        <span class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <DownloadIcon width="16" height="16"/>
-                        </span>
-
-                        <span class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(c.size)'></span>
+                    <div class='ms-auto btn-list'>
+                        <button @click='refresh' class='btn round btn--stroke fr color-gray'>
+                            <svg class='icon'><use href='#icon-refresh'/></svg>
+                        </button>
                     </div>
                 </div>
+
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Updated</th>
+                            <th>Attributes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='cursor-pointer'>
+                            <td v-text='v.name'></td>
+                            <td v-text='fmt(c.created)'></td>
+                            <td>
+                                <DownloadIcon width="16" height="16"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -212,6 +216,7 @@
             </div>
         </template>
     </div>
+</div>
 </template>
 
 <script>
@@ -228,6 +233,9 @@ import Coverage from './Coverage.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
+import {
+    TablerLoading
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'OAData',
@@ -422,6 +430,7 @@ export default {
         SettingsIcon,
         DownloadIcon,
         HistoryIcon,
+        TablerLoading,
         BuildingCommunityIcon,
         MapPinIcon,
         ShapeIcon

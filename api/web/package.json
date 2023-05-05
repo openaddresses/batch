@@ -3,12 +3,14 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "serve": "vite serve --port 5000",
+        "serve": "vite serve --port 5430",
         "build": "vite build",
         "lint": "vite lint"
     },
     "dependencies": {
         "@mapbox/assembly": "^1.3.0",
+        "@tabler/core": "^1.0.0-beta17",
+        "@tak-ps/vue-tabler": "^2.11.0",
         "chart.js": "^3.7.0",
         "chartjs-adapter-date-fns": "^2.0.0",
         "core-js": "^3.12.0",
@@ -25,10 +27,9 @@
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^4.2.1",
-        "vite": "^4.3.5",
-        "@babel/eslint-parser": "^7.17.0",
         "eslint": "^8.11.0",
-        "eslint-plugin-vue": "^9.0.0"
+        "eslint-plugin-vue": "^9.0.0",
+        "vite": "^4.3.5"
     },
     "eslintConfig": {
         "root": true,
@@ -42,9 +43,6 @@
             "plugin:vue/essential",
             "eslint:recommended"
         ],
-        "parserOptions": {
-            "parser": "@babel/eslint-parser"
-        },
         "rules": {
             "vue/multi-word-component-names": 1
         }

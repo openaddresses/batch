@@ -5,12 +5,6 @@
         "id": {
             "$ref": "./job/id.json"
         },
-        "size": {
-            "$ref": "./job/size.json"
-        },
-        "license": {
-            "$ref": "./job/license.json"
-        },
         "run": {
             "$ref": "./job/run.json"
         },
@@ -52,12 +46,16 @@
         },
         "version": {
             "$ref": "./job/version.json"
+        },
+        "size": {
+            "$ref": "./job/size.json"
+        },
+        "license": {
+            "$ref": "./job/license.json"
         }
     },
     "required": [
         "id",
-        "size",
-        "license",
         "run",
         "map",
         "created",
@@ -71,6 +69,8 @@
         "stats",
         "count",
         "bounds",
-        "version"
+        "version",
+        "size",
+        "license"
     ]
 }

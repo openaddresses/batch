@@ -3,15 +3,18 @@ import path from 'path';
 import test from 'node:test';
 import assert from 'assert';
 
-import glob from 'glob';
+import { globSync } from 'glob';
 import $RefParser from 'json-schema-ref-parser';
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 
 const ajv = new Ajv({
     allErrors: true
 });
 
-for (const source of glob.sync('../schema/**/*.json')) {
+addFormats(ajv);
+
+for (const source of globSync(new URL('../schema/**.json', import.meta.url).pathname)) {
     test(`schema/${path.parse(source).base}`, async () => {
         try {
             const file = fs.readFileSync(source);

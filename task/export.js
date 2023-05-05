@@ -6,8 +6,7 @@ import ogr2ogr from 'ogr2ogr';
 import { pipeline } from 'stream/promises';
 import fs from 'fs';
 import path from 'path';
-import pkg from 'mkdirp';
-const { sync: mkdirp } = pkg;
+import { mkdirp } from 'mkdirp';
 import AWS from 'aws-sdk';
 import { Unzip } from 'zlib';
 import archiver from 'archiver';
@@ -92,8 +91,8 @@ async function cli() {
         await oa.cmd('export', 'update', update);
 
         const tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
-        mkdirp(path.resolve(tmp));
-        mkdirp(path.resolve(tmp, './export'));
+        await mkdirp(path.resolve(tmp));
+        await mkdirp(path.resolve(tmp, './export'));
 
         console.error(`ok - tmp: ${tmp}`);
 

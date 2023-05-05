@@ -10,7 +10,6 @@
         "node": ">= 18"
     },
     "scripts": {
-        "doc": "apidoc -i ./doc/",
         "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
         "test": "./test/test | tap-merge",
         "start": "node index.js --email",
@@ -23,11 +22,12 @@
         "@octokit/auth-app": "^4.0.6",
         "@octokit/request": "^6.2.1",
         "@octokit/rest": "^19.0.4",
-        "@octokit/webhooks": "10.4.0",
+        "@octokit/webhooks": "11.0.0",
         "@openaddresses/batch-error": "^2.1.0",
         "@openaddresses/batch-generic": "^13.0.1",
-        "@openaddresses/batch-schema": "^7.2.0",
+        "@openaddresses/batch-schema": "^8.0.0",
         "@turf/turf": "^6.5.0",
+        "ajv-formats": "^2.1.1",
         "aws-sdk": "^2.901.0",
         "bcrypt": "^5.0.0",
         "busboy": "^1.6.0",
@@ -49,31 +49,21 @@
         "request": "^2.88.2",
         "slonik": "^32.0.0",
         "split": "^1.0.1",
+        "swagger-ui-express": "^4.6.2",
         "tape": "^5.6.1",
         "tilebase": "^4.0.0",
         "undici": "^5.14.0"
     },
     "devDependencies": {
         "@mapbox/mock-aws-sdk-js": "^1.0.0",
-        "apidoc": "^0.53.0",
-        "apidoc-plugin-schema2": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^8.1.0",
         "eslint-plugin-node": "^11.0.0",
-        "glob": "^8.0.1",
+        "glob": "^10.0.1",
         "nock": "^13.0.8",
         "nodemon": "^2.0.7",
         "nyc": "^15.1.0",
         "path-to-regexp": "^6.2.1",
         "tap-merge": "^0.3.1"
-    },
-    "apidoc": {
-        "name": "OpenAddresses API",
-        "title": "OpenAddresses API",
-        "version": "1.0.0",
-        "header": {
-            "title": "Authentication",
-            "filename": "API.md"
-        }
     }
 }

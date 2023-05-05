@@ -4,15 +4,14 @@
 // as protected as it runs on a managed queue
 import { interactive } from './lib/pre.js';
 
-import glob from 'glob';
+import { globSync } from 'glob';
 import os from 'os';
 import { Unzip } from 'zlib';
 import split from 'split2';
 import { pipeline } from 'stream/promises';
 import fs from 'fs';
 import path from 'path';
-import pkg from 'mkdirp';
-const { sync: mkdirp } = pkg;
+import { mkdirp } from 'mkdirp';
 import AWS from 'aws-sdk';
 import archiver from 'archiver';
 import minimist from 'minimist';
@@ -102,7 +101,7 @@ async function collect(tmp, collection, oa) {
     let collection_data = [];
 
     for (const source of collection.sources) {
-        collection_data = collection_data.concat(glob.sync(source, {
+        collection_data = collection_data.concat(globSync(source, {
             nodir: true,
             cwd: path.resolve(tmp, 'sources')
         }));
@@ -146,7 +145,7 @@ async function get_source(oa, tmp, data, stats) {
     const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
     const source_meta = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson.meta`;
 
-    mkdirp(path.resolve(tmp, 'sources', dir));
+    await mkdirp(path.resolve(tmp, 'sources', dir));
 
     const job = await oa.cmd('job', 'get', {
         ':job': data.job

@@ -5,6 +5,7 @@ import Cacher from './lib/cacher.js';
 import express from 'express';
 import minify from 'express-minify';
 import Schema from '@openaddresses/batch-schema';
+import SwaggerUI from 'swagger-ui-express';
 import Err from '@openaddresses/batch-error';
 import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';
@@ -12,8 +13,17 @@ import minimist from 'minimist';
 import User from './lib/user.js';
 import Token from './lib/token.js';
 
+try {
+    const dotfile = new URL('.env', import.meta.url);
 
-const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
+    fs.accessSync(dotfile);
+
+    Object.assign(process.env, JSON.parse(String(fs.readFileSync(dotfile))));
+} catch (err) {
+    console.log('ok - no .env file loaded');
+}
+
+const pkg = JSON.parse(String(fs.readFileSync(new URL('./package.json', import.meta.url))));
 const args = minimist(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase', 'silent'],
     alias: {
@@ -107,7 +117,8 @@ export default async function server(config) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: new URL('./schema', import.meta.url)
+        schemas: new URL('./schema', import.meta.url),
+        openapi: true
     });
 
     app.disable('x-powered-by');
@@ -121,18 +132,6 @@ export default async function server(config) {
 
     app.use(express.static('web/dist'));
 
-    /**
-     * @api {get} /api Get Metadata
-     * @apiVersion 1.0.0
-     * @apiName Meta
-     * @apiGroup Server
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return basic metadata about server configuration
-     *
-     * @apiSchema {jsonschema=./schema/res.Meta.json} apiSuccess
-     */
     app.get('/api', (req, res) => {
         return res.json({
             version: pkg.version
@@ -149,7 +148,7 @@ export default async function server(config) {
     });
 
     app.use('/api', schema.router);
-    app.use('/docs', express.static('./doc'));
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
     app.use('/*', express.static('web/dist'));
 
     // Unified Auth
@@ -226,8 +225,6 @@ export default async function server(config) {
 
     schema.not_found();
     schema.error();
-
-    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {

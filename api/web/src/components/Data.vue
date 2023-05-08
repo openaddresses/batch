@@ -40,7 +40,7 @@
                         </div>
                     </div>
 
-                    <TablerLoading v-if='loading.collections'/>
+                    <TablerLoading v-if='loading.collections' desc='Loading Collections'/>
                     <table v-else class="table table-vcenter card-table">
                         <thead>
                             <tr>
@@ -63,161 +63,77 @@
                     </table>
                 </div>
             </div>
-        </div>
 
-        <div class='col-12'>
-            <div class='card'>
-                <div class='card-header'>
-                    <h2 class='card-title'>Individual Sources:</h2>
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h2 class='card-title'>Individual Sources</h2>
 
-                    <div class='ms-auto btn-list'>
-                        <RefreshIcon @click='refresh' class='cursor-pointer'/>
-                        <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
-                            <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
-                            <svg v-else class='icon'><use href='#icon-close'/></svg>
-                        </button>
-                    </div>
-                </div>
+                        <div class='ms-auto btn-list'>
+                            <SearchIcon @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer'/>
+                            <XIcon  @click='showFilter = !showFilter' v-else class='cursor-pointer'/>
 
-                <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
-                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
-
-                        <div class='col col--9 px6'>
-                            <QuerySource
-                                showValidated=true
-                                @source='filter.source = $event'
-                                @validated='filter.validated = $event'
-                            />
-                        </div>
-                        <div class='col col--3 px6'>
-                            <QueryLayer @layer='filter.layer = $event'/>
-                        </div>
-                        <div class='col col--6 px6'>
-                            <label class='switch-container mr6'>
-                                <input type='checkbox' v-model='filter.switches.before'/>
-                                <div class='switch switch--gray'></div>
-                            </label>
-                            <label>Before</label>
-                            <input class='input' type='date' v-model='filter.before'/>
-                        </div>
-                        <div class='col col--6 px6'>
-                            <label class='switch-container mr6'>
-                                <input type='checkbox' v-model='filter.switches.after'/>
-                                <div class='switch switch--gray'></div>
-                            </label>
-                            <label>After</label>
-                            <input class='input' type='date' v-model='filter.after'/>
+                            <RefreshIcon @click='refresh' class='cursor-pointer'/>
                         </div>
                     </div>
-                </template>
-            </div>
-        </div>
 
-        <div class='col col--12 mb12 my12 clearfix'>
-            <Coverage
-                @err='$emit("err", $event)'
-                v-on:point='filter.point = $event'
-                :layer='filter.layer'
-            />
-        </div>
-
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--9'>
-                Source
-            </div>
-            <div class='col col--3'>
-                <span class='fr'>Data Layers</span>
-            </div>
-        </div>
-
-        <template v-if='loading.sources'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else-if='!datas.length'>
-            <div class='flex flex--center-main'>
-                <div class='py24'>
-                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                </div>
-            </div>
-            <div class='w-full align-center txt-bold'>No Data Found</div>
-            <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
-        </template>
-        <template v-else>
-            <div :key='d.source' v-for='d in datas' class='col col--12 grid'>
-                <div @click='d._open = !d._open' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--9 clearfix'>
-                        <span class='ml12 fl' v-text='d.source'/>
-                        <span v-if='d.map' class='fl ml6'>
-                            <svg @click='$router.push(`/location/${d.map}`)' class='icon color-gray color-black-on-hover' style='height: 20px; width: 20px; padding-top: 5px;'><use href='#icon-map'/></svg>
-                        </span>
-                    </div>
-                    <div class='col col--3 color-gray'>
-                        <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
-                        <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
-                        <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
-                    </div>
-                </div>
-                <template v-if='d._open'>
-                    <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                        <div class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
-                            <div @click='emitjob(job.job)' class='col col--5'>
-                                <span v-text='job.layer'/> - <span v-text='job.name'/>
-
+                    <template v-if='showFilter'>
+                        <div class='row'>
+                            <div class='col col--9 px6'>
+                                <QuerySource
+                                    showValidated=true
+                                    @source='filter.source = $event'
+                                    @validated='filter.validated = $event'
+                                />
                             </div>
-                            <div @click='emitjob(job.job)' class='col col--2'>
-                                <span v-text='fmt(job.updated)'/>
+                            <div class='col col--3 px6'>
+                                <QueryLayer @layer='filter.layer = $event'/>
                             </div>
-                            <div class='col col--5'>
-                                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-
-                                <template v-if='auth && auth.access === "admin"'>
-                                    <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                        <SettingsIcon width="16" height="16"/>
-
-                                        <div class='round dropdown-content' style='width: 180px;'>
-                                            <template v-if='!job._confirm'>
-                                                <label class='switch-container w-full'>
-                                                    <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
-                                                    <div class='switch switch--blue mx6'></div>
-                                                    Fabric
-                                                </label>
-
-                                                <button @click='job._confirm = true' class='btn btn--s btn--stroke color-gray color-red-on-hover w-full round'>Delete</button>
-                                            </template>
-                                            <template v-else>
-                                                <div class='col col--12 grid'>
-                                                    <div class='col col--12 flex flex--center-main'>
-                                                        <div class='py12'>
-                                                            <svg class='icon h60 w60 color-gray'><use href='#icon-alert'/></svg>
-                                                        </div>
-                                                    </div>
-                                                    <div class='col col--12'><div class='align-center'>Are you sure?</div></div>
-                                                    <div class='col col--6 pr3'>
-                                                        <button @click='job._confirm = false' class='btn btn--s btn--stroke color-gray color-black-on-hover w-full round'>Cancel</button>
-                                                    </div>
-                                                    <div class='col col--6 pl3'>
-                                                        <button @click='deleteData(job)' class='btn btn--s btn--stroke color-red-light color-red-on-hover w-full round'>Delete</button>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </span>
-                                </template>
-
-                                <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                    <HistoryIcon width="16" height="16"/>
-                                </span>
-
-                                <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
+                            <div class='col col--6 px6'>
+                                <label class='switch-container mr6'>
+                                    <input type='checkbox' v-model='filter.switches.before'/>
+                                    <div class='switch switch--gray'></div>
+                                </label>
+                                <TablerInput label='After' type='date' v-model='filter.after'/>
+                            </div>
+                            <div class='col col--6 px6'>
+                                <label class='switch-container mr6'>
+                                    <input type='checkbox' v-model='filter.switches.after'/>
+                                    <div class='switch switch--gray'></div>
+                                </label>
+                                <TablerInput label='After' type='date' v-model='filter.after'/>
                             </div>
                         </div>
-                    </div>
-                </template>
+                    </template>
+
+                    <Coverage
+                        @err='$emit("err", $event)'
+                        v-on:point='filter.point = $event'
+                        :layer='filter.layer'
+                    />
+
+                    <TablerLoading v-if='loading.sources' desc='Loading Sources'/>
+                    <table v-else class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Attributes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
+                                <td v-text='d.source'></td>
+                                <td>
+                                    <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
+                                    <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
+                                    <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </template>
+        </div>
     </div>
 </div>
 </template>
@@ -231,6 +147,8 @@ import {
     MapPinIcon,
     ShapeIcon,
     RefreshIcon,
+    SearchIcon,
+    XIcon,
 } from 'vue-tabler-icons';
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
@@ -238,7 +156,8 @@ import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 import {
-    TablerLoading
+    TablerLoading,
+    TablerInput
 } from '@tak-ps/vue-tabler';
 
 export default {
@@ -397,7 +316,6 @@ export default {
 
                 for (const sourcename of Object.keys(dataname)) {
                     const d = {
-                        _open: false,
                         source: sourcename,
                         map: false,
                         has: {
@@ -436,7 +354,10 @@ export default {
         RefreshIcon,
         HistoryIcon,
         TablerLoading,
+        SearchIcon,
+        XIcon,
         BuildingCommunityIcon,
+        TablerInput,
         MapPinIcon,
         ShapeIcon
     }

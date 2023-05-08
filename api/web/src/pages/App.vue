@@ -46,6 +46,9 @@ import {
     UserIcon,
     MapIcon
 } from 'vue-tabler-icons'
+import {
+    TablerError
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'OpenAddresses',
@@ -115,7 +118,8 @@ export default {
         Err,
         UserIcon,
         MapIcon,
-        HelpIcon
+        HelpIcon,
+        TablerError
     }
 }
 </script>

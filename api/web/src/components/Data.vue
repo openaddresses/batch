@@ -30,50 +30,53 @@
                 </div>
             </div>
 
-            <div class='card'>
-                <div class='card-header d-flex'>
-                    <h2 class='card-title'>Data Collections</h2>
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h2 class='card-title'>Data Collections</h2>
 
-                    <div class='ms-auto btn-list'>
-                        <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                            <svg class='icon'><use href='#icon-refresh'/></svg>
-                        </button>
+                        <div class='ms-auto btn-list'>
+                            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                        </div>
                     </div>
-                </div>
 
-                <table class="table table-vcenter card-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Updated</th>
-                            <th>Attributes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='cursor-pointer'>
-                            <td v-text='v.name'></td>
-                            <td v-text='fmt(c.created)'></td>
-                            <td>
-                                <DownloadIcon width="16" height="16"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <TablerLoading v-if='loading.collections'/>
+                    <table v-else class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Updated</th>
+                                <th>Size</th>
+                                <th>Attributes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='cursor-pointer'>
+                                <td v-text='c.name'></td>
+                                <td v-text='fmt(c.created)'></td>
+                                <td v-text='size(c.size)'></td>
+                                <td>
+                                    <DownloadIcon width="16" height="16"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div class='col col--12 grid pt12'>
-            <div class='col col--12'>
-                <div class='col col--12 clearfix pb12'>
-                    <h2 class='txt-h4 fl'>Individual Sources:</h2>
+        <div class='col-12'>
+            <div class='card'>
+                <div class='card-header'>
+                    <h2 class='card-title'>Individual Sources:</h2>
 
-                    <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                        <svg class='icon'><use href='#icon-refresh'/></svg>
-                    </button>
-                    <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
-                        <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
-                        <svg v-else class='icon'><use href='#icon-close'/></svg>
-                    </button>
+                    <div class='ms-auto btn-list'>
+                        <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                        <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
+                            <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
+                            <svg v-else class='icon'><use href='#icon-close'/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <template v-if='showFilter'>
@@ -226,7 +229,8 @@ import {
     HistoryIcon,
     BuildingCommunityIcon,
     MapPinIcon,
-    ShapeIcon
+    ShapeIcon,
+    RefreshIcon,
 } from 'vue-tabler-icons';
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
@@ -429,6 +433,7 @@ export default {
         Download,
         SettingsIcon,
         DownloadIcon,
+        RefreshIcon,
         HistoryIcon,
         TablerLoading,
         BuildingCommunityIcon,

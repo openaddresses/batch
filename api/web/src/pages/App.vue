@@ -3,7 +3,7 @@
     <header class='navbar navbar-expand-md navbar-dark d-print-none'>
         <div class="container-xl">
             <div class="col-auto">
-                <img @click='$router.push("/")' class='cursor-pointer' height='50' width='50' src='/logo.png'>
+                <img @click='$router.push("/")' class='cursor-pointer' height='40' width='40' src='/logo.jpg'>
             </div>
             <div class="col mx-2">
                 <div class="page-pretitle">OpenAddresses</div>

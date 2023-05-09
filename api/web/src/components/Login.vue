@@ -1,35 +1,43 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6'>Login</h3>
-            </div>
-
-            <div class='col col--12 flex flex--center-main'>
-                <div class='w240 col col--12 grid grid--gut12'>
-                    <label class='mt12 w-full'>Username: <span @click='$router.push({ path: "/login/forgot" })' class='fr cursor-pointer txt-underline-on-hover'>Forgot it?</span></label>
-                    <input v-on:keyup.enter='login' :class='{
-                         "input--border-red": attempted && !username
-                    }' v-model='username' type='text' class='input'/>
-
-                    <label class='mt12 w-full'>Password: <span @click='$router.push({ path: "/login/forgot" })' class='fr cursor-pointer txt-underline-on-hover'>Forgot it?</span></label>
-                    <input v-on:keyup.enter='login' :class='{
-                         "input--border-red": attempted && !password
-                   } ' v-model='password' type='password' class='input'/>
-
-                    <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
-
-                    <div @click='$router.push({ path: "/register" })' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>No account? Register!</div>
+<div class="page page-center">
+    <div class="container container-normal py-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg">
+                <div class="container-tight">
+                    <div class="card card-md">
+                        <div class="card-body">
+                            <div class='text-center' style='margin-bottom: 24px;'>
+                                <img src='/logo.jpg' height='150'/>
+                            </div>
+                            <h2 class="h2 text-center mb-4">Login to your account</h2>
+                            <div class="mb-3">
+                                <label class="form-label">Username or Email</label>
+                                <input v-model='username' v-on:keyup.enter='createLogin' type="text" class="form-control" placeholder="your@email.com" autocomplete="off">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">
+                                    Password
+                                    <span class="form-label-description">
+                                        <a @click='$router.push("/login/forgot")' class='cursor-pointer'>Forgot Password</a>
+                                    </span>
+                                </label>
+                                <div class="input-group input-group-flat">
+                                    <input v-model='password' v-on:keyup.enter='createLogin' type="password" class="form-control" placeholder="Your password" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-footer">
+                              <button @click='createLogin' type="submit" class="btn btn-primary w-100">Sign In</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center text-muted mt-3">
+                        Don't have account yet? <a @click='$router.push("/register")' class='cursor-pointer'>Create Account</a>
+                    </div>
                 </div>
             </div>
-
-        </template>
+        </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -45,7 +53,7 @@ export default {
         }
     },
     methods: {
-        login: async function() {
+        createLogin: async function() {
             try {
                 this.attempted = true;
 

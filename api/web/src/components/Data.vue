@@ -47,17 +47,19 @@
                                 <th>Name</th>
                                 <th>Updated</th>
                                 <th>Size</th>
-                                <th>Attributes</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='cursor-pointer'>
+                            <tr :key='c.id' v-for='c in collections'>
                                 <td v-text='c.name'></td>
                                 <td v-text='fmt(c.created)'></td>
-                                <td v-text='size(c.size)'></td>
-                                <td>
-                                    <DownloadIcon width="16" height="16"/>
+                                <td class='d-flex'>
+                                    <span v-text='size(c.size)'/>
+                                    <div class='ms-auto btn-list'>
+                                        <DownloadIcon v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer'/>
+                                    </div>
                                 </td>
+
                             </tr>
                         </tbody>
                     </table>

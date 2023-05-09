@@ -21,8 +21,9 @@
                     <a href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <MapIcon/>
                     </a>
-                    <a href="/profile" class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <UserIcon/>
+                    <a class="btn btn-dark" target="_blank" rel="noreferrer">
+                        <UserIcon @click='$router.push("/profile")' v-if='auth.username'/>
+                        <LoginIcon @click='$router.push("/login")' v-else/>
                     </a>
                 </div>
             </div>
@@ -44,6 +45,7 @@ import Err from '../components/Err.vue'
 import {
     HelpIcon,
     UserIcon,
+    LoginIcon,
     MapIcon
 } from 'vue-tabler-icons'
 import {
@@ -117,6 +119,7 @@ export default {
     components: {
         Err,
         UserIcon,
+        LoginIcon,
         MapIcon,
         HelpIcon,
         TablerError

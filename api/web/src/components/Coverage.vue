@@ -1,12 +1,10 @@
 <template>
-    <div class='col col--12' :class='{ h300: !fullscreen, h600: fullscreen }'>
-        <div class='col col--12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
-            <div class='col col--12 relative'>
+    <div class='card-body' :class='{ "h-300": !fullscreen, "h-600": fullscreen }'>
+        <div class='row'>
+            <div class='col-12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
                 <div class='absolute top right z1'>
-                    <button @click='setFull' class='btn round btn--stroke fr color-gray bg-white my12 mx12'>
-                        <svg v-if='!fullscreen' class='icon'><use href='#icon-fullscreen'/></svg>
-                        <svg v-else class='icon'><use href='#icon-shrink'/></svg>
-                    </button>
+                    <ArrowsMaximizeIcon @click='setFull' v-if='!fullscreen'/>
+                    <ArrowsMinimizeIcon @click='setFull' v-else/>
                 </div>
 
                 <div v-if='point' class='absolute top left z1'>
@@ -24,6 +22,10 @@
 <script>
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import {
+    ArrowsMaximizeIcon,
+    ArrowsMinimizeIcon
+} from 'vue-tabler-icons';
 
 let map = null;
 
@@ -283,6 +285,10 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        ArrowsMaximizeIcon,
+        ArrowsMinimizeIcon
     }
 }
 </script>

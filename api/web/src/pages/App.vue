@@ -75,6 +75,9 @@ export default {
             dataid: false
         };
     },
+    errorCaptured: function(err) {
+        this.err = err;
+    },
     methods: {
         logout: async function() {
             try {

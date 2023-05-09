@@ -47,7 +47,6 @@ export default {
     data: function() {
         return {
             loading: false,
-            attempted: false,
             username: '',
             password: ''
         }
@@ -55,10 +54,6 @@ export default {
     methods: {
         createLogin: async function() {
             try {
-                this.attempted = true;
-
-                if (!this.username.length) return;
-                if (!this.password.length) return;
                 this.loading = true;
 
                 const body = await window.std('/api/login', {
@@ -77,7 +72,7 @@ export default {
                 this.$router.push('/data')
             } catch (err) {
                 this.loading = false;
-                this.$emit('err', err);
+                throw err;
             }
         }
     }

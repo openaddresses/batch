@@ -1,65 +1,70 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-            </button>
-
-            <h1 class='txt-h4 pl12' v-text='location.name'></h1>
-
-            <div class='col col--12 pt12'>
-                <Coverage
-                    @err='$emit("err", $event)'
-                    :filter='locid'
-                    :bbox='location.bbox'
-                />
-            </div>
-
-            <div :key='job.id' v-for='job in jobs' class='pl24 col col--12'>
-                <div class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
-                    <div @click='emitjob(job.job)' class='col col--5'>
-                        <span v-text='job.layer'/> - <span v-text='job.name'/>
-
+<div class='page-body'>
+    <div class='container-xl'>
+        <div class='row row-deck row-cards'>
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h3 class='card-title' v-text='location.name'></h3>
                     </div>
-                    <div @click='emitjob(job.job)' class='col col--2'>
-                        <span v-text='fmt(job.updated)'/>
-                    </div>
-                    <div class='col col--5'>
-                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                    <div class='card-body row'>
+                        <TablerLoading v-if='loading'/>
+                        <template v-else>
+                            <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
+                                <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
+                            </button>
 
-                        <template v-if='auth && auth.access === "admin"'>
-                            <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                <SettingsIcon width='16' height='16'/>
+                            <div class='col-12'>
+                                <Coverage
+                                    @err='$emit("err", $event)'
+                                    :filter='locid'
+                                    :bbox='location.bbox'
+                                />
+                            </div>
 
-                                <div class='round dropdown-content'>
-                                    <label class='switch-container'>
-                                        <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
-                                        <div class='switch switch--blue mx6'></div>
-                                        Fabric
-                                    </label>
+                            <div :key='job.id' v-for='job in jobs' class='col-12 row'>
+                                <div @click='emitjob(job.job)' class='col col--5'>
+                                    <span v-text='job.layer'/> - <span v-text='job.name'/>
+
                                 </div>
-                            </span>
+                                <div @click='emitjob(job.job)' class='col col--2'>
+                                    <span v-text='fmt(job.updated)'/>
+                                </div>
+                                <div class='col col--5'>
+                                    <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+
+                                    <template v-if='auth && auth.access === "admin"'>
+                                        <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                            <SettingsIcon width='16' height='16'/>
+
+                                            <div class='round dropdown-content'>
+                                                <label class='switch-container'>
+                                                    <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
+                                                    <div class='switch switch--blue mx6'></div>
+                                                    Fabric
+                                                </label>
+                                            </div>
+                                        </span>
+                                    </template>
+
+                                    <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                        <HistoryIcon width='16' height='16'/>
+                                    </span>
+
+                                    <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
+                                </div>
+                            </div>
                         </template>
 
-                        <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                            <HistoryIcon width='16' height='16'/>
-                        </span>
-
-                        <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
+                        <div class='col col--12 py24 align-center'>
+                            OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
+                        </div>
                     </div>
                 </div>
             </div>
-        </template>
-
-        <div class='col col--12 py24 align-center'>
-            OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -67,6 +72,9 @@ import {
     HistoryIcon,
     SettingsIcon
 } from 'vue-tabler-icons';
+import {
+    TablerLoading
+} from '@tak-ps/vue-tabler';
 import Download from './Download.vue';
 import Coverage from './Coverage.vue';
 import moment from 'moment-timezone';
@@ -126,6 +134,7 @@ export default {
     components: {
         Download,
         Coverage,
+        TablerLoading,
         HistoryIcon,
         SettingsIcon
     },

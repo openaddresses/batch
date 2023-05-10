@@ -22,41 +22,49 @@
                                 />
                             </div>
 
-                            <div :key='job.id' v-for='job in jobs' class='col-12 row'>
-                                <div @click='emitjob(job.job)' class='col col--5'>
-                                    <span v-text='job.layer'/> - <span v-text='job.name'/>
+                            <table class="table table-vcenter card-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Updated</th>
+                                        <th>Size</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr :key='job.id' v-for='job in jobs'>
+                                        <td @click='emitjob(job.job)'>
+                                            <span v-text='job.layer'/> - <span v-text='job.name'/>
+                                        </td>
+                                        <td v-text='fmt(job.updated)'></td>
+                                        <td class='d-flex'>
+                                            <span v-text='size(job.size)'/>
+                                            <div class='ms-auto btn-list'>
+                                                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                                                <template v-if='auth && auth.access === "admin"'>
+                                                    <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                                        <SettingsIcon class='cursor-pointer'/>
 
-                                </div>
-                                <div @click='emitjob(job.job)' class='col col--2'>
-                                    <span v-text='fmt(job.updated)'/>
-                                </div>
-                                <div class='col col--5'>
-                                    <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                                                        <div class='round dropdown-content'>
+                                                            <label class='switch-container'>
+                                                                <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
+                                                                <div class='switch switch--blue mx6'></div>
+                                                                Fabric
+                                                            </label>
+                                                        </div>
+                                                    </span>
+                                                </template>
 
-                                    <template v-if='auth && auth.access === "admin"'>
-                                        <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                            <SettingsIcon width='16' height='16'/>
-
-                                            <div class='round dropdown-content'>
-                                                <label class='switch-container'>
-                                                    <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
-                                                    <div class='switch switch--blue mx6'></div>
-                                                    Fabric
-                                                </label>
+                                                <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
+                                                    <HistoryIcon width='16' height='16'/>
+                                                </span>
                                             </div>
-                                        </span>
-                                    </template>
-
-                                    <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                        <HistoryIcon width='16' height='16'/>
-                                    </span>
-
-                                    <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
-                                </div>
-                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </template>
 
-                        <div class='col col--12 py24 align-center'>
+                        <div class='col-12 align-center'>
                             OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
                         </div>
                     </div>

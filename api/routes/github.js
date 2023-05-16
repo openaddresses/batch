@@ -23,6 +23,12 @@ export default async function router(schema, config) {
         }
 
         try {
+            req.body = JSON.parse(req.body);
+        } catch (err) {
+            res.status(400).send('Invalid JSON Body');
+        }
+
+        try {
             if (req.headers['x-github-event'] === 'push') {
                 await ci.push(config.pool, req.body);
 

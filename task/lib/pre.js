@@ -4,16 +4,16 @@ if (!process.env.AWS_DEFAULT_REGION) {
     process.env.AWS_DEFAULT_REGION = 'us-east-1';
 }
 
-import AWS from 'aws-sdk';
+import SM from '@aws-sdk/client-secrets-manager';
 
 async function secret(secretName) {
-    const client = new AWS.SecretsManager({
+    const client = new SM.SecretsManagerClient({
         region: process.env.AWS_DEFAULT_REGION
     });
 
-    const data = await client.getSecretValue({
+    const data = await client.send(new SM.GetSecretValueCommand({
         SecretId: secretName
-    }).promise();
+    }));
 
     return data.SecretString;
 }

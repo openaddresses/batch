@@ -8,8 +8,7 @@ import fs from 'fs';
 import { globSync } from 'glob';
 import path from 'path';
 import { pipeline } from 'stream/promises';
-import unzipper from 'unzipper';
-import request from 'request';
+import decompress from 'decompress';
 import minimist from 'minimist';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
@@ -97,18 +96,11 @@ async function cli() {
 
 async function fetch_repo(tmp) {
     await pipeline(
-        request(`https://github.com/openaddresses/openaddresses/archive/${process.env.OA_BRANCH}.zip`),
+        (await fetch(`https://github.com/openaddresses/openaddresses/archive/${process.env.OA_BRANCH}.zip`)).body,
         fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip'))
     );
 
-    await pipeline(
-        fs.createReadStream(path.resolve(tmp, 'openaddresses.zip')),
-        unzipper.Extract({
-            path: path.resolve(tmp, 'openaddresses')
-        })
-    );
-
-    return true;
+    await decompress(path.resolve(tmp, 'openaddresses.zip'), path.resolve(tmp, 'openaddresses'))
 }
 
 function list(tmp, sha) {
@@ -120,17 +112,22 @@ function list(tmp, sha) {
 
     const jobs = [];
     for (const glob of globs) {
-        const source = JSON.parse(fs.readFileSync(path.resolve(tmp, 'openaddresses', dir, 'sources', glob)));
-        if (source.schema !== 2) continue;
+        try {
+            const source = JSON.parse(String(fs.readFileSync(path.resolve(tmp, 'openaddresses', dir, 'sources', glob))));
+            if (source.schema !== 2) continue;
 
-        for (const layer of Object.keys(source.layers)) {
-            for (const name of source.layers[layer]) {
-                jobs.push({
-                    source: `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/sources/${glob}`,
-                    layer: layer,
-                    name: name.name
-                });
+            for (const layer of Object.keys(source.layers)) {
+                for (const name of source.layers[layer]) {
+                    jobs.push({
+                        source: `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/sources/${glob}`,
+                        layer: layer,
+                        name: name.name
+                    });
+                }
             }
+        } catch (err) {
+            console.error(path.resolve(tmp, 'openaddresses', dir, 'sources', glob));
+            console.error(err);
         }
     }
 

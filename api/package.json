@@ -18,6 +18,10 @@
         "cov": "nyc tape 'test/*.test.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },
     "dependencies": {
+        "@aws-sdk/client-auto-scaling": "^3.369.0",
+        "@aws-sdk/client-batch": "^3.369.0",
+        "@aws-sdk/client-s3": "^3.369.0",
+        "@aws-sdk/client-ses": "^3.369.0",
         "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^4.0.6",
         "@octokit/request": "^6.2.1",

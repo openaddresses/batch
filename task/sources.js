@@ -100,7 +100,7 @@ async function fetch_repo(tmp) {
         fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip'))
     );
 
-    await decompress(path.resolve(tmp, 'openaddresses.zip'), path.resolve(tmp, 'openaddresses'))
+    await decompress(path.resolve(tmp, 'openaddresses.zip'), path.resolve(tmp, 'openaddresses'));
 }
 
 function list(tmp, sha) {

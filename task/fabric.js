@@ -11,14 +11,13 @@ import fsp from 'fs/promises';
 import { pipeline } from 'stream/promises';
 import path from 'path';
 import Tippecanoe from './lib/tippecanoe.js';
-import AWS from 'aws-sdk';
 import Meta from './lib/meta.js';
 import { Unzip } from 'zlib';
 import minimist from 'minimist';
+import S3 from '@aws-sdk/client-s3';
+import { Upload } from "@aws-sdk/lib-storage";
 
-const s3 = new AWS.S3({
-    region: process.env.AWS_DEFAULT_REGION
-});
+const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 
 const zooms = {
     addresses: 15,
@@ -53,7 +52,6 @@ async function cli() {
     if (!process.env.Bucket) process.env.Bucket = 'v2.openaddresses.io';
     if (!process.env.OA_API) process.env.OA_API = 'https://batch.openaddresses.io/api';
 
-    const TileBase = (await import('tilebase')).default;
     const OA = (await import('@openaddresses/lib')).default;
 
     const meta = new Meta();
@@ -80,7 +78,7 @@ async function cli() {
             console.error('ok - generating border tiles');
             await tippecanoe.tile(
                 fs.createReadStream(path.resolve(DRIVE, 'borders.geojson')),
-                path.resolve(DRIVE, 'borders.mbtiles'),
+                path.resolve(DRIVE, 'borders.pmtiles'),
                 {
                     layer: 'data',
                     std: true,
@@ -99,21 +97,20 @@ async function cli() {
                 }
             );
 
-            await TileBase.to_tb(
-                path.resolve(DRIVE, 'borders.mbtiles'),
-                path.resolve(DRIVE, 'borders.tilebase')
-            );
+            const upload = new Upload({
+                client: s3,
+                params: {
+                    ContentType: 'application/octet-stream',
+                    Bucket: process.env.Bucket,
+                    Key: `${process.env.StackName}/borders.pmtiles`,
+                    Body: fs.createReadStream(path.resolve(DRIVE, 'borders.pmtiles'))
+                }
+            });
 
-            await s3.upload({
-                ContentType: 'application/octet-stream',
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/borders.tilebase`,
-                Body: fs.createReadStream(path.resolve(DRIVE, 'borders.tilebase'))
-            }).promise();
+            await upload.done();
 
             await fsp.unlink(path.resolve(DRIVE, 'borders.geojson'));
-            await fsp.unlink(path.resolve(DRIVE, 'borders.mbtiles'));
-            await fsp.unlink(path.resolve(DRIVE, 'borders.tilebase'));
+            await fsp.unlink(path.resolve(DRIVE, 'borders.pmtiles'));
         }
 
         if (args.fabric || (!args.border && !args.fabric)) {
@@ -140,7 +137,7 @@ async function cli() {
                 console.error(`ok - generating ${l} tiles`);
                 await tippecanoe.tile(
                     fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
-                    path.resolve(DRIVE, `${l}.mbtiles`),
+                    path.resolve(DRIVE, `${l}.pmtiles`),
                     {
                         layer: l,
                         std: true,
@@ -160,8 +157,8 @@ async function cli() {
                 );
             }
 
-            await tippecanoe.join(path.resolve(DRIVE, 'fabric.mbtiles'), layers.map((l) => {
-                return path.resolve(DRIVE, `${l}.mbtiles`);
+            await tippecanoe.join(path.resolve(DRIVE, 'fabric.pmtiles'), layers.map((l) => {
+                return path.resolve(DRIVE, `${l}.pmtiles`);
             }), {
                 std: true,
                 force: true,
@@ -171,17 +168,17 @@ async function cli() {
                 }
             });
 
-            await TileBase.to_tb(
-                path.resolve(DRIVE, 'fabric.mbtiles'),
-                path.resolve(DRIVE, 'fabric.tilebase')
-            );
+            const upload = new Upload({
+                client: s3,
+                params: {
+                    ContentType: 'application/octet-stream',
+                    Bucket: process.env.Bucket,
+                    Key: `${process.env.StackName}/fabric.pmtiles`,
+                    Body: fs.createReadStream(path.resolve(DRIVE, 'fabric.pmtiles'))
+                }
+            });
 
-            await s3.upload({
-                ContentType: 'application/octet-stream',
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/fabric.tilebase`,
-                Body: fs.createReadStream(path.resolve(DRIVE, 'fabric.tilebase'))
-            }).promise();
+            await upload.done();
         }
     } catch (err) {
         await meta.protection(false);
@@ -194,10 +191,10 @@ async function get_source(out, data) {
     console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
 
     await pipeline(
-        s3.getObject({
+        (await s3.send(new S3.GetObjectCommand({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-        }).createReadStream(),
+        }))).Body,
         Unzip(),
         fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
     );

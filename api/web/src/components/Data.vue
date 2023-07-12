@@ -362,7 +362,7 @@ export default {
             try {
                 this.loading.sources = true;
 
-                const url = new URL(`${window.location.origin}/api/data`);
+                const url = window.stdurl('/api/data');
                 if (this.filter.source) url.searchParams.set('source', this.filter.source);
                 if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
                 if (this.filter.point) url.searchParams.set('point', this.filter.point.join(','));

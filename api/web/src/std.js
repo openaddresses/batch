@@ -1,22 +1,30 @@
 function std() {
-
-    /**
-     * @param {String} url
-     * @param {Object} opts
-     * @param {Object} opts.headers
-     * @Param {Object} opts.body
-     */
-    window.std = async function(url, opts = {}, redirect = true) {
+    window.stdurl = function(url) {
         try {
             url = new URL(url);
         } catch (err) {
             url = new URL(url, window.location.origin);
         }
 
+        // Allow serving through Vue for hotloading
+        if (url.hostname === 'localhost') url.port = '4999'
+
+        return url;
+    }
+
+    /**
+     * Standardize interactions with the backend API
+     *
+     * @param {URL|String} url      - Full URL or API fragment to request
+     * @param {Object} [opts={}]    - Options
+     */
+    window.std = async function(url, opts = {}) {
+        url = window.stdurl(url)
+
         try {
             if (!opts.headers) opts.headers = {};
 
-            if (typeof opts.body === 'object' && !opts.headers['Content-Type']) {
+            if (!(opts.body instanceof FormData) && typeof opts.body === 'object' && !opts.headers['Content-Type']) {
                 opts.body = JSON.stringify(opts.body);
                 opts.headers['Content-Type'] = 'application/json';
             }
@@ -35,9 +43,10 @@ function std() {
                     throw new Error(`Status Code: ${res.status}`);
                 }
 
-                if (bdy.message) throw new Error(bdy.message);
-                else throw new Error(`Status Code: ${res.status}`);
-            } else if (redirect && res.status === 401) {
+                const err = new Error(bdy.message || `Status Code: ${res.status}`);
+                err.body = bdy;
+                throw err;
+            } else if (res.status === 401) {
                 delete localStorage.token;
                 return window.location.reload();
             }

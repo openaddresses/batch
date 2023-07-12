@@ -1,10 +1,7 @@
 import Err from '@openaddresses/batch-error';
-import Generic from '@openaddresses/batch-generic';
+import Generic, { Params } from '@openaddresses/batch-generic';
 import moment from 'moment';
-import {
-    difference,
-    area
-} from '@turf/turf';
+import { difference, area } from '@turf/turf';
 import AWS from 'aws-sdk';
 import Data from './data.js';
 import { Status } from '../util.js';
@@ -38,17 +35,17 @@ export default class Job extends Generic {
      * @param {String} [query.source=Null] - Filter results by source
      * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
      */
-    static async list(pool, query) {
-        if (!query) query = {};
-        if (!query.limit) query.limit = 100;
-        if (!query.source) query.source = '';
+    static async list(pool, query={}) {
+        query.limit = Params.integer(query.limit, { default: 100 });
+        query.source = Params.string(query.source, { default: '' });
+        query.run = Params.integer(query.run);
+
         if (!query.layer || query.layer === 'all') query.layer = '';
+        if (!query.live || query.live === 'all') query.live = null;
         if (!query.status) query.status = Status.list();
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
-        if (!query.live || query.live === 'all') query.live = null;
-        if (!query.run) query.run = null;
 
         Status.verify(query.status);
 
@@ -72,6 +69,7 @@ export default class Job extends Generic {
         }
 
         let pgres;
+
         try {
             pgres = await pool.query(sql`
                 SELECT
@@ -100,7 +98,7 @@ export default class Job extends Generic {
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 ORDER BY
-                    job.created DESC
+                    job.id DESC
                 LIMIT
                     ${query.limit}
             `);

@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
 import * as VueRouter from 'vue-router';
+
+import 'floating-vue/dist/style.css'
 import FloatingVue from 'floating-vue';
 
 import App from './App.vue'

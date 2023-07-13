@@ -36,9 +36,7 @@
         </div>
     </header>
 
-    <router-view
-        :ws='ws'
-    />
+    <router-view/>
 
     <TablerError v-if='err' :err='err' @close='err = null'/>
 </div>

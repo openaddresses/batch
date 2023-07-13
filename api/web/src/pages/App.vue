@@ -15,12 +15,18 @@
                     <a href="/docs" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <HelpIcon/>
                     </a>
-                    <a href="/upload" class="btn btn-dark" target="_blank" rel="noreferrer">
-                        Contribute
-                    </a>
                     <a href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <MapIcon/>
                     </a>
+                    <button class="btn btn-dark dropdown-toggle" type='button' data-bs-toggle="dropdown" aria-expanded="false">
+                        <MenuIcon/>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a @click='$router.push("/run")' class="dropdown-item cursor-pointer">Runs</a>
+                        <a @click='$router.push("/job")' class="dropdown-item cursor-pointer">Jobs</a>
+                        <a @click='$router.push("/error")' class="dropdown-item cursor-pointer">Errors</a>
+                        <a @click='$router.push("/upload")' class="dropdown-item cursor-pointer"> Contribute</a>
+                    </div>
                     <a class="btn btn-dark" target="_blank" rel="noreferrer">
                         <UserIcon @click='$router.push("/profile")' v-if='auth.username'/>
                         <LoginIcon @click='$router.push("/login")' v-else/>
@@ -44,6 +50,7 @@ import '@tabler/core/dist/css/tabler.min.css';
 import Err from '../components/Err.vue'
 import {
     HelpIcon,
+    MenuIcon,
     UserIcon,
     LoginIcon,
     MapIcon
@@ -122,6 +129,7 @@ export default {
     components: {
         Err,
         UserIcon,
+        MenuIcon,
         LoginIcon,
         MapIcon,
         HelpIcon,

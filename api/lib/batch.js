@@ -1,6 +1,8 @@
-import AWS from 'aws-sdk';
-const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
-const asg = new AWS.AutoScaling({ region: process.env.AWS_DEFAULT_REGION });
+import Batch from '@aws-sdk/client-batch';
+import ASG from '@aws-sdk/client-auto-scaling';
+
+const batch = new Batch.BatchClient({ region: process.env.AWS_DEFAULT_REGION });
+const asg = new ASG.AutoScalingClient({ region: process.env.AWS_DEFAULT_REGION });
 
 const jobDefinition = process.env.JOB_DEFINITION;
 const t3_queue = process.env.T3_QUEUE;
@@ -11,9 +13,9 @@ const mega_queue = process.env.MEGA_QUEUE;
  * Scale Batch T3 ASG Cluster up to MaxSize as needed
  */
 export async function scale_out() {
-    const desc = (await asg.describeAutoScalingGroups({
+    const desc = (await asg.send(new ASG.DescribeAutoScalingGroupsCommand({
         AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
-    }).promise()).AutoScalingGroups[0];
+    }))).AutoScalingGroups[0];
 
     if (desc.DesiredCapacity < desc.MaxSize) {
         await scale(desc.DesiredCapacity + 1);
@@ -23,10 +25,10 @@ export async function scale_out() {
 export async function scale(desired) {
     console.log(`ok - scaling to ${desired} instances`);
 
-    await asg.setDesiredCapacity({
+    await asg.send(new ASG.SetDesiredCapacityCommand({
         AutoScalingGroupName: process.env.T3_CLUSTER_ASG,
         DesiredCapacity: desired
-    }).promise();
+    }));
 }
 
 /**
@@ -36,16 +38,16 @@ export async function scale_in() {
     let queued = 0;
 
     // Number of EC2 instances in ASG (1 instance = 1 task currently)
-    const instances = (await asg.describeAutoScalingGroups({
+    const instances = (await asg.send(new ASG.DescribeAutoScalingGroupsCommand({
         AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
-    }).promise()).AutoScalingGroups[0].DesiredCapacity;
+    }))).AutoScalingGroups[0].DesiredCapacity;
 
     for (const queue of [t3_queue, t3_priority_queue]) {
         for (const status of ['SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING']) {
-            const res = await batch.listJobs({
+            const res = await batch.send(new Batch.ListJobsCommand({
                 jobQueue: queue,
                 jobStatus: status
-            }).promise();
+            }));
             console.error(`ok - ${queue}:${status}:${res.jobSummaryList.length} jobs`);
             queued += res.jobSummaryList.length;
         }
@@ -162,7 +164,7 @@ export async function trigger(event) {
         throw new Error('Unknown event type: ' + event.type);
     }
 
-    const res = await batch.submitJob(params).promise();
+    const res = await batch.send(new Batch.SubmitJobCommand(params));
 
     console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
 

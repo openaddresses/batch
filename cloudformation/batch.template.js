@@ -1,5 +1,8 @@
 import cf from '@openaddresses/cloudfriend';
-import alarms from '@openaddresses/batch-alarms';
+import {
+    ELB as ELBAlarms,
+    RDS as RDSAlarms
+} from '@openaddresses/batch-alarms';
 
 import schedule from './lib/schedule.js';
 import secret from './lib/secret.js';
@@ -43,8 +46,8 @@ export default cf.merge(
     kms,
     batch,
     secret,
-    alarms({
-        prefix: 'Batch',
+    ELBAlarms({
+        prefix: 'BatchELBAlarm',
         email: 'nick@ingalls.ca',
         apache: cf.stackName,
         cluster: cf.ref('APIECSCluster'),
@@ -52,6 +55,11 @@ export default cf.merge(
         loadbalancer: cf.getAtt('APIELB', 'LoadBalancerFullName'),
         targetgroup: cf.getAtt('APITargetGroup', 'TargetGroupFullName')
 
+    }),
+    RDSAlarms({
+        prefix: 'BatchRDSAlarm',
+        email: 'nick@ingalls.ca',
+        instance: cf.ref('DBInstanceVPC')
     }),
     // Every Friday
     schedule('scale',   'cron(0/5 * * * ? *)', 'Scale T3 Batch Cluster'),

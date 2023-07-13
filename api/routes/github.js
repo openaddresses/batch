@@ -1,5 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import { Webhooks } from '@octokit/webhooks';
+import bodyparser from 'body-parser';
 import CI from '../lib/ci.js';
 
 export default async function router(schema, config) {
@@ -8,7 +9,7 @@ export default async function router(schema, config) {
         group: 'Github',
         auth: 'admin',
         description: 'Callback endpoint for GitHub Webhooks. Should not be called by user functions'
-    }, async (req, res) => {
+    }, bodyparser.raw({ type: '*/*' }), async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
         const ci = new CI(config);
@@ -19,6 +20,12 @@ export default async function router(schema, config) {
 
         if (!ghverify.verify(req.body, req.headers['x-hub-signature'])) {
             res.status(400).send('Invalid X-Hub-Signature');
+        }
+
+        try {
+            req.body = JSON.parse(req.body);
+        } catch (err) {
+            res.status(400).send('Invalid JSON Body');
         }
 
         try {

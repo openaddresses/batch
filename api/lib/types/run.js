@@ -280,8 +280,8 @@ export default class Run extends Generic {
         try {
             const pgres = await pool.query(sql`
                 SELECT
-                    status,
-                    count(*) AS count
+                    count(*) AS count,
+                    status
                 FROM
                     job
                 WHERE
@@ -303,6 +303,10 @@ export default class Run extends Generic {
                     Fail: 0
                 }
             };
+
+            for (const row of pgres.rows) {
+                res.status[row.status] = row.count;
+            }
 
             return res;
         } catch (err) {

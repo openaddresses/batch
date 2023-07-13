@@ -103,7 +103,7 @@ async function cli() {
         await convert(tmp, loc, exp, job);
         console.error('ok - converted');
 
-        await s3.putObject({
+        await s3.upload({
             ContentType: 'application/zip',
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/export/${exp.id}/export.zip`,
@@ -111,7 +111,7 @@ async function cli() {
         }).promise();
         console.error(`ok - uploaded: s3://${process.env.Bucket}/${process.env.StackName}/export/${exp.id}/export.zip`);
 
-        await r2.putObject({
+        await r2.upload({
             ContentType: 'application/zip',
             Bucket: process.env.R2Bucket,
             Key: `v2.openaddresses.io/${process.env.StackName}/export/${exp.id}/export.zip`,

@@ -288,6 +288,7 @@ export default async function router(schema, config) {
 
             const job = await Job.commit(config.pool, req.params.job, req.body);
             await Run.ping(config.pool, ci, job);
+            await config.cacher.del('data');
 
             return res.json(job.serialize());
         } catch (err) {

@@ -10,12 +10,19 @@
         "lint": "eslint *.js lib/**.js test/**.js"
     },
     "dependencies": {
+        "@aws-sdk/client-auto-scaling": "^3.363.0",
+        "@aws-sdk/client-batch": "^3.365.0",
+        "@aws-sdk/client-ecs": "^3.364.0",
+        "@aws-sdk/client-s3": "^3.369.0",
+        "@aws-sdk/client-secrets-manager": "^3.363.0",
+        "@aws-sdk/lib-storage": "^3.369.0",
         "@mapbox/mock-aws-sdk-js": "^1.0.0",
         "@openaddresses/lib": "^4.4.0",
         "@turf/turf": "^6.3.0",
         "archiver": "^5.0.0",
         "aws-sdk": "^2.903.0",
         "csv-parse": "^5.0.0",
+        "decompress": "^4.2.1",
         "find": "^0.3.0",
         "glob": "^10.0.0",
         "inquirer": "^9.0.0",
@@ -27,7 +34,6 @@
         "request": "^2.88.2",
         "split2": "^4.1.0",
         "tilebase": "^4.0.0",
-        "unzipper": "^0.10.11",
         "wellknown": "^0.5.0"
     },
     "devDependencies": {

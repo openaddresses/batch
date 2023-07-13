@@ -1,8 +1,6 @@
-import AWS from 'aws-sdk';
-
-const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
-const ecs = new AWS.ECS({ region: process.env.AWS_DEFAULT_REGION });
-const asg = new AWS.AutoScaling({ region: process.env.AWS_DEFAULT_REGION });
+import Batch from '@aws-sdk/client-batch';
+import AutoScaling from '@aws-sdk/client-auto-scaling';
+import ECS from '@aws-sdk/client-ecs';
 
 /**
  * @class Meta
@@ -41,12 +39,14 @@ export default class Meta {
         let jobs = false;
         let instances = false;
 
+        const batch = new Batch.BatchClient({ region: process.env.AWS_DEFAULT_REGION });
+
         do {
             if (!first) await this.sleep(5000);
 
-            jobs = await batch.describeJobs({
+            jobs = await batch.send(new Batch.DescribeJobsCommand({
                 jobs: [process.env.AWS_BATCH_JOB_ID]
-            }).promise();
+            }));
 
             first = false;
         } while (!jobs || !jobs.jobs[0] || !jobs.jobs[0].container || !jobs.jobs[0].container.containerInstanceArn || !jobs.jobs[0].container.logStreamName);
@@ -56,13 +56,16 @@ export default class Meta {
         this.loglink = jobs.jobs[0].container.logStreamName;
 
         first = true;
+
+        const ecs = new ECS.ECSClient({ region: process.env.AWS_DEFAULT_REGION });
+
         do {
             if (!first) await this.sleep(5000);
 
-            instances = await ecs.describeContainerInstances({
+            instances = await ecs.send(new ECS.DescribeContainerInstancesCommand({
                 cluster: this.cluster,
                 containerInstances: [this.container]
-            }).promise();
+            }));
 
             first = false;
         } while (!instances || !instances.containerInstances[0] || !instances.containerInstances[0].ec2InstanceId);
@@ -81,11 +84,13 @@ export default class Meta {
             return;
         }
 
-        await asg.setInstanceProtection({
+        const asg = new AutoScaling.AutoScalingClient({ region: process.env.AWS_DEFAULT_REGION });
+
+        await asg.send(new AutoScaling.SetInstanceProtectionCommand({
             AutoScalingGroupName: this.asg,
             InstanceIds: [this.instance],
             ProtectedFromScaleIn: protect
-        }).promise();
+        }));
     }
 
     /**

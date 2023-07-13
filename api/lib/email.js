@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import SES from '@aws-sdk/client-ses';
 import Mailgen from 'mailgen';
 import Err from '@openaddresses/batch-error';
 
@@ -8,9 +8,7 @@ import Err from '@openaddresses/batch-error';
 export default class Email {
     constructor(config) {
         this.config = config;
-        this.ses = new AWS.SES({
-            region: process.env.AWS_DEFAULT_REGION
-        });
+        this.ses = new SES.SESClient({ region: process.env.AWS_DEFAULT_REGION });
 
         this.mailGenerator = new Mailgen({
             theme: 'default',
@@ -86,7 +84,7 @@ export default class Email {
      * @param {string} body HTML body to send
      */
     async send(email, subject, body) {
-        return await this.ses.sendEmail({
+        return await this.ses.send(new SES.SendEmailCommand({
             Destination: {
                 ToAddresses: [email]
             },
@@ -101,7 +99,7 @@ export default class Email {
                     }
                 }
             }
-        }).promise();
+        }));
     }
 
 }

@@ -85,7 +85,7 @@ export default {
                 }
             },
             Properties: {
-                ImageId: 'ami-005425225a11a4777',
+                ImageId: 'ami-0914ebfbccd143a3f',
                 InstanceType: 't3.small',
                 SecurityGroups: [cf.ref('T3ClusterInstanceSecurityGroup')],
                 IamInstanceProfile: cf.ref('T3ClusterInstanceProfile'),

@@ -1,18 +1,45 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                </button>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <Status :status='run.status'/>
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>
+                                <Status v-if='run && run.status' :status='run.status'/>
+                                Run <span v-text='$route.params.runid'/>
+                            </h3>
 
-                <h2 class='txt-h4 ml12 pb12 fl'>Run #<span v-text='runid'/></h2>
+                            <div class='ms-auto btn-list'>
+                                <RefreshIcon @click='fetchRun' class='cursor-pointer'/>
+                            </div>
+                        </div>
 
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
+                        <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
+                        <div v-else class='card-body'>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
 
                 <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
                     <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
@@ -156,10 +183,18 @@
             </template>
         </template>
     </div>
+    -->
 </template>
 
 <script>
 import Status from './Status.vue';
+import {
+    TablerBreadCrumb,
+    TablerLoading
+} from '@tak-ps/vue-tabler';
+import {
+    RefreshIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'Run',
@@ -192,11 +227,8 @@ export default {
             }
         };
     },
-    mounted: function() {
-        this.refresh();
-    },
-    components: {
-        Status
+    mounted: async function() {
+        await this.refresh();
     },
     watch: {
         showFilter: function() {
@@ -204,14 +236,11 @@ export default {
             this.filter.layer = 'all';
             this.filter.status = 'All'
         },
-        'filter.status': function() {
-            this.getJobs();
-        },
-        'filter.layer': function() {
-            this.getJobs();
-        },
-        'filter.source': function() {
-            this.getJobs();
+        filter: {
+            deep: true,
+            handler: async function() {
+                await this.getJobs();
+            }
         }
     },
     methods: {
@@ -224,10 +253,10 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        refresh: function() {
-            this.getRun();
-            this.getCount();
-            this.getJobs();
+        refresh: async function() {
+            await this.fetchRun();
+            await this.fetchCount();
+            await this.fetchJobs();
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });
@@ -235,40 +264,34 @@ export default {
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
         },
-        getRun: async function() {
-            try {
-                this.loading.run = true;
-                this.run = await window.std(`/api/run/${this.runid}`);
-                this.loading.run = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
+        fetchRun: async function() {
+            this.loading.run = true;
+            this.run = await window.std(`/api/run/${this.runid}`);
+            this.loading.run = false;
         },
-        getCount: async function() {
-            try {
-                this.loading.count = true;
-                this.count = await window.std(window.location.origin + `/api/run/${this.runid}/count`);
-                this.loading.count = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
+        fetchCount: async function() {
+            this.loading.count = true;
+            this.count = await window.std(window.location.origin + `/api/run/${this.runid}/count`);
+            this.loading.count = false;
         },
-        getJobs: async function() {
-            try {
-                this.loading.jobs = true;
+        fetchJobs: async function() {
+            this.loading.jobs = true;
 
-                const url = new URL(`${window.location.origin}/api/job`);
-                url.searchParams.set('run', this.runid);
-                if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
-                if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
-                if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
+            const url = new URL(`${window.location.origin}/api/job`);
+            url.searchParams.set('run', this.runid);
+            if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
+            if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
+            if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
 
-                this.jobs = await window.std(url);
-                this.loading.jobs = false;
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            this.jobs = await window.std(url);
+            this.loading.jobs = false;
         }
-    }
+    },
+    components: {
+        TablerBreadCrumb,
+        TablerLoading,
+        RefreshIcon,
+        Status
+    },
 }
 </script>

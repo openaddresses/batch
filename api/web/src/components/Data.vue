@@ -36,7 +36,7 @@
                         <h2 class='card-title'>Data Collections</h2>
 
                         <div class='ms-auto btn-list'>
-                            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                            <RefreshIcon @click='fetchCollections' class='cursor-pointer'/>
                         </div>
                     </div>
 
@@ -75,7 +75,7 @@
                             <SearchIcon @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer'/>
                             <XIcon  @click='showFilter = !showFilter' v-else class='cursor-pointer'/>
 
-                            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                            <RefreshIcon @click='fetchData' class='cursor-pointer'/>
                         </div>
                     </div>
 
@@ -190,38 +190,19 @@ export default {
         };
     },
     mounted: function() {
-        this.refresh();
+        this.fetchCollections();
+        this.fetchData();
     },
     watch: {
         showFilter: function() {
             this.filter.source = '';
             this.filter.layer = 'all';
         },
-        'filter.switches.after': function() {
-            this.refresh();
-        },
-        'filter.switches.before': function() {
-            this.refresh();
-        },
-        'filter.after': function() {
-            this.filter.switches.after = true;
-            this.refresh();
-        },
-        'filter.before': function() {
-            this.filter.switches.before = true;
-            this.refresh();
-        },
-        'filter.point': function() {
-            this.refresh();
-        },
-        'filter.layer': function() {
-            this.refresh();
-        },
-        'filter.source': function() {
-            this.refresh();
-        },
-        'filter.validated': function() {
-            this.refresh();
+        filter: {
+            deep: true,
+            handler: async function() {
+                await this.fetchData();
+            }
         }
     },
     methods: {
@@ -232,10 +213,6 @@ export default {
             if (bytes == 0) { return "0.00 B"; }
             var e = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes/Math.pow(1024, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
-        },
-        refresh: function() {
-            this.getData();
-            this.getCollections();
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` })
@@ -259,7 +236,7 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        getCollections: async function() {
+        fetchCollections: async function() {
             try {
                 this.loading.collections = true;
                 this.collections = await window.std('/api/collections');
@@ -291,7 +268,7 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getData: async function() {
+        fetchData: async function() {
             try {
                 this.loading.sources = true;
 

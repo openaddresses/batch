@@ -41,7 +41,7 @@
                     </div>
 
                     <TablerLoading v-if='loading.collections' desc='Loading Collections'/>
-                    <table v-else class="table table-vcenter card-table">
+                    <table v-else class="table table-hover table-vcenter card-table">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -115,7 +115,7 @@
                     />
 
                     <TablerLoading v-if='loading.sources' desc='Loading Sources'/>
-                    <table v-else class="table table-vcenter card-table">
+                    <table v-else class="table table-hover table-vcenter card-table">
                         <thead>
                             <tr>
                                 <th>Name</th>

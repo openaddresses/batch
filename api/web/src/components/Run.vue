@@ -24,13 +24,44 @@
                             </h3>
 
                             <div class='ms-auto btn-list'>
+                                <span v-if='run.live' class="badge bg-green">Live</span>
+                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue">Github</span>
                                 <RefreshIcon @click='fetchRun' class='cursor-pointer'/>
                             </div>
                         </div>
 
                         <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
                         <div v-else class='card-body'>
-
+                            <div class='border round row'>
+                                <div @click='filterShortcut("Pending")' class='col-3'>
+                                    <div class='align-center' v-text='count.status.Pending'></div>
+                                    <div class='flex flex--center-main w-full'>
+                                        <Status status='Pending' class='fl'/> Pending
+                                    </div>
+                                </div>
+                                <div @click='filterShortcut("Warn")' class='col-3'>
+                                    <div class='align-center' v-text='count.status.Warn'></div>
+                                    <div class='flex flex--center-main w-full'>
+                                        <Status status='Warn' class='fl'/> Warn
+                                    </div>
+                                </div>
+                                <div @click='filterShortcut("Fail")' class='col-3'>
+                                    <div class='align-center' v-text='count.status.Fail'></div>
+                                    <div class='flex flex--center-main w-full'>
+                                        <div>
+                                            <Status status='Fail' class='fl'/> Fail
+                                        </div>
+                                    </div>
+                                </div>
+                                <div @click='filterShortcut("Success")' class='col-3'>
+                                    <div class='align-center' v-text='count.status.Success'></div>
+                                    <div class='flex flex--center-main w-full'>
+                                        <div>
+                                            <Status status='Success' class='fl'/> Success
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,14 +71,6 @@
 </div>
 
 <!--
-
-                <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
-                    <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
-                    <svg v-else class='icon'><use href='#icon-close'/></svg>
-                </button>
-
-                <span v-if='run.live' class='fr mx6 bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Live</span>
-                <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
 
                 <template v-if='showFilter'>
                     <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
@@ -86,57 +109,6 @@
             </div>
         </div>
 
-        <template v-if='loading.run'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div class='col col--12 pt12'>
-                <h2 class='txt-h4 pb12 fl'>Dashboard:</h2>
-
-                <template v-if='loading.count'>
-                    <div class='flex flex--center-main w-full py24'>
-                        <div class='loading'></div>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class='col col--12 grid border round border--gray-light'>
-                        <div @click='filterShortcut("Pending")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Pending'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Pending' class='fl'/> Pending
-                                </div>
-                            </div>
-                        </div>
-                        <div @click='filterShortcut("Warn")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Warn'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Warn' class='fl'/> Warn
-                                </div>
-                            </div>
-                        </div>
-                        <div @click='filterShortcut("Fail")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Fail'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Fail' class='fl'/> Fail
-                                </div>
-                            </div>
-                        </div>
-                        <div @click='filterShortcut("Success")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Success'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Success' class='fl'/> Success
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </div>
 
             <div class='col col--12 pt12'>
                 <h2 class='txt-h4 pb12 fl'>Jobs:</h2>

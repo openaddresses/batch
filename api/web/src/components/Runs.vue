@@ -24,7 +24,7 @@
                             </div>
                         </div>
 
-                        <TablerLoading v-if='loading' :desc='Loading Runs'/>
+                        <TablerLoading v-if='loading' desc='Loading Runs'/>
                         <table v-else class="table table-hover table-vcenter card-table">
                             <thead>
                                 <tr>

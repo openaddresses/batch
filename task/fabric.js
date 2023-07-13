@@ -15,7 +15,7 @@ import Meta from './lib/meta.js';
 import { Unzip } from 'zlib';
 import minimist from 'minimist';
 import S3 from '@aws-sdk/client-s3';
-import { Upload } from "@aws-sdk/lib-storage";
+import { Upload } from '@aws-sdk/lib-storage';
 
 const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 

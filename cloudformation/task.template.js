@@ -20,7 +20,7 @@ export default {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeEnvironmentName: 'mega',
                 ComputeResources: {
-                    ImageId: 'ami-056807e883f197989',
+                    ImageId: 'ami-0914ebfbccd143a3f',
                     MaxvCpus: 16,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
@@ -77,7 +77,7 @@ export default {
                         Ebs: {
                             Encrypted: true,
                             VolumeSize: 250,
-                            VolumeType: 'gp2'
+                            VolumeType: 'gp3'
                         }
                     }]
                 },
@@ -85,10 +85,10 @@ export default {
             }
         },
         BatchSecurityGroup: {
-            'Type': 'AWS::EC2::SecurityGroup',
-            'Properties': {
-                'VpcId': 'vpc-3f2aa15a',
-                'GroupDescription': 'Batch Security Group',
+            Type: 'AWS::EC2::SecurityGroup',
+            Properties: {
+                VpcId: 'vpc-3f2aa15a',
+                GroupDescription: 'Batch Security Group',
                 SecurityGroupIngress: []
             }
         },

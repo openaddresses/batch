@@ -8,7 +8,7 @@
         "jobs": {
             "type": "array",
             "items": {
-                "type": "object",
+                "type": ["string", "object"],
                 "required": [ "source", "layer", "name" ],
                 "additionalProperties": false,
                 "properties": {

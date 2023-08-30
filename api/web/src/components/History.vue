@@ -53,10 +53,13 @@
         <div class='col col--3'>
             Job ID
         </div>
-        <div class='col col--5'>
+        <div class='col col--3'>
             Updated
         </div>
         <div class='col col--3'>
+            Count
+        </div>
+        <div class='col col--2'>
             <span class='fr'>Attributes</span>
         </div>
 
@@ -82,10 +85,13 @@
                     <div class='col col--3'>
                         Job <span v-text='job.id'/>
                     </div>
-                    <div class='col col--5'>
-                        <span v-text='fmt(job.created)'></span>
+                    <div class='col col--3'>
+                        <span v-text='fmtDate(job.created)'></span>
                     </div>
                     <div class='col col--3'>
+                        <span v-text='fmtNumber(job.count)'></span>
+                    </div>
+                    <div class='col col--2'>
                         <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
                             <DownloadIcon width="16" height="16"/>
                         </span>
@@ -135,8 +141,11 @@ export default {
         this.refresh();
     },
     methods: {
-        fmt: function(date) {
+        fmtDate: function(date) {
             return moment(date).tz(this.tz).format('YYYY-MM-DD');
+        },
+        fmtNumber: function(number) {
+            return new Intl.NumberFormat().format(number);
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}`});

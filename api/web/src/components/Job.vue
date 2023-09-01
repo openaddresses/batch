@@ -21,12 +21,12 @@
                     <div v-if='job.status === "Fail"' class="ribbon bg-red">Error</div>
                     <div v-if='job.status === "Warn"' class="ribbon bg-orange">Warning</div>
                     <div class="card-body">
-                        <h2 v-if='job.status === "Fail"' class='txt-h4 align-center'>Active Job Error</h2>
-                        <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
+                        <h2 v-if='job.status === "Fail"' class='text-center'>Active Job Error</h2>
+                        <h2 v-else class='text-center'>Active Job Warning</h2>
 
-                        <div :key='message' v-for='message in joberror.messages' class='align-center w-full' v-text='message'></div>
+                        <div :key='message' v-for='message in joberror.messages' class='text-center' v-text='message'></div>
 
-                        <div class='flex flex--center-main'>
+                        <div class='d-flex justify-content-center pt-3'>
                             <ErrorsModerate @moderated='joberror = false' class='py12' :error='job'/>
                         </div>
                     </div>

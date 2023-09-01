@@ -1,15 +1,15 @@
 <template>
-    <div class='flex-child'>
-        <template v-if='error.status === "Warn"'>
-            <button v-on:click.stop.prevent='mod(error.id, true)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-green-on-hover'>Confirm</button>
-            <button v-on:click.stop.prevent='mod(error.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Reject</button>
-        </template>
-        <template v-else-if='error.status === "Fail"'>
-            <button v-on:click.stop.prevent='mod(error.id, false)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-red-on-hover'>Suppress</button>
-            <button v-on:click.stop.prevent='createRerun(error.id)' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Rerun</button>
-        </template>
-        <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job}/log` })' class='fr mr6 btn btn--s btn--stroke round btn--gray color-blue-on-hover'>Logs</button>
-    </div>
+<div class='btn-list'>
+    <template v-if='error.status === "Warn"'>
+        <button v-on:click.stop.prevent='mod(error.id, true)' class='btn'>Confirm</button>
+        <button v-on:click.stop.prevent='mod(error.id, false)' class='btn'>Reject</button>
+    </template>
+    <template v-else-if='error.status === "Fail"'>
+        <button v-on:click.stop.prevent='mod(error.id, false)' class='btn'>Suppress</button>
+        <button v-on:click.stop.prevent='createRerun(error.id)' class='btn'>Rerun</button>
+    </template>
+    <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job}/log` })' class='btn'>Logs</button>
+</div>
 </template>
 
 <script>
@@ -20,9 +20,6 @@ export default {
         return {};
     },
     methods: {
-        refresh: function() {
-            this.getProblems();
-        },
         mod: async function(job_id, confirm) {
             try {
                 await window.std(`/api/job/error/${job_id}`, {

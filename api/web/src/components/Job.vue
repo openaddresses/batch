@@ -15,7 +15,10 @@
     <div class='page-body'>
         <div class='container-xl'>
             <div class='row row-deck row-cards'>
-                <div class="card">
+                <div class="card bg-danger-lt" :class='{
+                    "bg-danger-lt": job.status === "Fail",
+                    "bg-warning-lt": job.status === "Warn"
+                }'>
                     <div v-if='job.status === "Fail"' class="card-status-top bg-danger"></div>
                     <div v-if='job.status === "Warn"' class="card-status-top bg-warning"></div>
                     <div v-if='job.status === "Fail"' class="ribbon bg-red">Error</div>

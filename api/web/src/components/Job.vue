@@ -15,25 +15,40 @@
     <div class='page-body'>
         <div class='container-xl'>
             <div class='row row-deck row-cards'>
+                <div class="card">
+                    <div v-if='job.status === "Fail"' class="card-status-top bg-danger"></div>
+                    <div v-if='job.status === "Warn"' class="card-status-top bg-warning"></div>
+                    <div v-if='job.status === "Fail"' class="ribbon bg-red">Error</div>
+                    <div v-if='job.status === "Warn"' class="ribbon bg-orange">Warning</div>
+                    <div class="card-body">
+                        <h2 v-if='job.status === "Fail"' class='txt-h4 align-center'>Active Job Error</h2>
+                        <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
+
+                        <div :key='message' v-for='message in joberror.messages' class='align-center w-full' v-text='message'></div>
+
+                        <div class='flex flex--center-main'>
+                            <ErrorsModerate @moderated='joberror = false' class='py12' :error='job'/>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class='col-12'>
                     <div class='card'>
                         <div class='card-header'>
-                            <h3 class='card-title'>
-                                <Status v-if='job && job.status' :status='job.status'/>
-                                Job <span v-text='$route.params.jobid'/>
+                            <h3 class='card-title d-flex'>
+                                <Status v-if='job.status' :status='job.status'/>
+                                <div class='mx-2 align-self-center'>
+                                    Job <span v-text='$route.params.jobid'/>
+                                </div>
                             </h3>
 
                             <div class='ms-auto btn-list'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-
                                 <LicenseIcon v-if='job.license' class='cursor-pointer'/>
-
                                 <CodeIcon @click='$router.push({ path: `/job/${jobid}/raw` })' class='cursor-pointer'/>
-
                                 <NotesIcon @click='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='cursor-pointer'/>
-
                                 <RefreshIcon @click='refresh' class='cursor-pointer'/>
-
                             </div>
                         </div>
 
@@ -51,22 +66,6 @@
 <!--
     <div class='col col--12 grid pt12'>
 
-        <div v-if='joberror' class='border mb24 round col col--12 py3' :class='{
-            "border--red": job.status === "Fail",
-            "bg-red-light": job.status === "Fail",
-            "border--orange": job.status === "Warn",
-            "bg-orange-light": job.status === "Warn"
-
-        }'>
-            <h2 v-if='job.status === "Fail"' class='txt-h4 align-center'>Active Job Error</h2>
-            <h2 v-else class='txt-h4 align-center'>Active Job Warning</h2>
-
-            <div :key='message' v-for='message in joberror.messages' class='align-center w-full' v-text='message'></div>
-
-            <div class='flex flex--center-main'>
-                <ErrorsModerate @moderated='joberror = false' class='py12' :error='job'/>
-            </div>
-        </div>
 
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
@@ -142,7 +141,8 @@
 import {
     LicenseIcon,
     CodeIcon,
-    NotesIcon
+    NotesIcon,
+    RefreshIcon,
 } from 'vue-tabler-icons'
 import {
     TablerBreadCrumb,
@@ -257,7 +257,8 @@ export default {
         Status,
         LicenseIcon,
         CodeIcon,
-        NotesIcon
+        NotesIcon,
+        RefreshIcon,
     },
 }
 </script>

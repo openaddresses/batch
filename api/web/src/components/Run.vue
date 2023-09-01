@@ -20,7 +20,9 @@
                         <div class='card-header'>
                             <h3 class='card-title'>
                                 <Status v-if='run && run.status' :status='run.status'/>
-                                Run <span v-text='$route.params.runid'/>
+                                <div class='mx-2 align-self-center'>
+                                    Run <span v-text='$route.params.runid'/>
+                                </div>
                             </h3>
 
                             <div class='ms-auto btn-list'>

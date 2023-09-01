@@ -63,104 +63,42 @@
                                 </div>
                             </div>
                         </div>
+
+                        <TablerLoading v-if='loading.jobs' desc='Loading Jobs'/>
+                        <TablerNone v-else-if='!jobs.length'/>
+                        <table v-else class="table table-hover table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Job ID</th>
+                                    <th>Created</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in jobs' class='cursor-pointer'>
+                                    <td><Status :status='job.status'/></td>
+                                    <td>Job <span v-text='job.id'/></td>
+                                    <td><span v-text='fmt(job.created)'/></td>
+                                    <td>
+                                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!--
-
-                <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
-                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
-
-                        <div class='col col--3 px6'>
-                            <label>Status</label>
-                            <select v-model='filter.status' class='select'>
-                                <option>All</option>
-                                <option>Pending</option>
-                                <option>Running</option>
-                                <option>Success</option>
-                                <option>Warn</option>
-                                <option>Fail</option>
-                            </select>
-                            <div class='select-arrow'></div>
-                        </div>
-                        <div class='col col--6 px6'>
-                            <label>Source</label>
-                            <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
-                        </div>
-                        <div class='col col--3 px6'>
-                            <label>Layer</label>
-                            <div class='w-full select-container'>
-                                <select v-model='filter.layer' class='select'>
-                                    <option>all</option>
-                                    <option>addresses</option>
-                                    <option>buildings</option>
-                                    <option>parcels</option>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-
-            <div class='col col--12 pt12'>
-                <h2 class='txt-h4 pb12 fl'>Jobs:</h2>
-            </div>
-
-            <template v-if='loading.jobs'>
-                <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
-                </div>
-            </template>
-            <template v-else-if='jobs.length'>
-                <div class='col col--1'>
-                    Status
-                </div>
-                <div class='col col--4'>
-                    Job ID
-                </div>
-                <div class='col col--7'>
-                    Source
-                </div>
-
-                <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
-                    <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                        <div class='col col--1'>
-                            <Status :status='job.status'/>
-                        </div>
-                        <div class='col col--4'>
-                            Job <span v-text='job.id'/>
-                        </div>
-                        <div class='col col--7'>
-                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <template v-else-if='!jobs.length'>
-                <div class='w-full flex flex--center-main'>
-                    <div class='py24'>
-                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                    </div>
-                </div>
-                <div class='w-full align-center txt-bold'>No Jobs Found</div>
-                <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
-            </template>
-        </template>
-    </div>
-    -->
 </template>
 
 <script>
+import moment from 'moment-timezone';
 import Status from './Status.vue';
 import {
+    TablerNone,
     TablerBreadCrumb,
     TablerLoading
 } from '@tak-ps/vue-tabler';
@@ -173,6 +111,7 @@ export default {
     props: ['runid'],
     data: function() {
         return {
+            tz: moment.tz.guess(),
             showFilter: false,
             filter: {
                 source: '',
@@ -216,6 +155,9 @@ export default {
         }
     },
     methods: {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+        },
         filterShortcut: function(filter) {
             this.showFilter = true;
             this.$nextTick(() => {
@@ -229,9 +171,6 @@ export default {
             await this.fetchRun();
             await this.fetchCount();
             await this.fetchJobs();
-        },
-        emitjob: function(jobid) {
-            this.$router.push({ path: `/job/${jobid}` });
         },
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
@@ -262,6 +201,7 @@ export default {
     components: {
         TablerBreadCrumb,
         TablerLoading,
+        TablerNone,
         RefreshIcon,
         Status
     },

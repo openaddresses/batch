@@ -42,8 +42,8 @@
                                     <td>
                                         <div class='d-flex'>
                                             <div class='ms-auto btn-list'>
-                                                <span v-if='run.live' class="badge bg-green">Live</span>
-                                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue">Github</span>
+                                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
+                                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white">Github</span>
                                             </div>
                                         </div>
                                     </td>

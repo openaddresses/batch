@@ -24,42 +24,42 @@
                             </h3>
 
                             <div class='ms-auto btn-list'>
-                                <span v-if='run.live' class="badge bg-green">Live</span>
-                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue">Github</span>
+                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
+                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white">Github</span>
                                 <RefreshIcon @click='fetchRun' class='cursor-pointer'/>
                             </div>
                         </div>
 
                         <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
                         <div v-else class='card-body'>
-                            <div class='border round row'>
+                            <div class='border round row py-3'>
                                 <div @click='filterShortcut("Pending")' class='col-3'>
-                                    <div class='align-center' v-text='count.status.Pending'></div>
-                                    <div class='flex flex--center-main w-full'>
-                                        <Status status='Pending' class='fl'/> Pending
+                                    <div class='text-center' v-text='count.status.Pending + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Pending'/>
                                     </div>
+                                    <div class='text-center'>Pending</div>
                                 </div>
                                 <div @click='filterShortcut("Warn")' class='col-3'>
-                                    <div class='align-center' v-text='count.status.Warn'></div>
-                                    <div class='flex flex--center-main w-full'>
-                                        <Status status='Warn' class='fl'/> Warn
+                                    <div class='text-center' v-text='count.status.Warn + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Warn'/>
                                     </div>
+                                    <div class='text-center'>Warn</div>
                                 </div>
                                 <div @click='filterShortcut("Fail")' class='col-3'>
-                                    <div class='align-center' v-text='count.status.Fail'></div>
-                                    <div class='flex flex--center-main w-full'>
-                                        <div>
-                                            <Status status='Fail' class='fl'/> Fail
-                                        </div>
+                                    <div class='text-center' v-text='count.status.Fail + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                            <Status status='Fail'/>
                                     </div>
+                                    <div class='text-center'>Fail</div>
                                 </div>
                                 <div @click='filterShortcut("Success")' class='col-3'>
-                                    <div class='align-center' v-text='count.status.Success'></div>
-                                    <div class='flex flex--center-main w-full'>
-                                        <div>
-                                            <Status status='Success' class='fl'/> Success
-                                        </div>
+                                    <div class='text-center' v-text='count.status.Success + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Success'/>
                                     </div>
+                                    <div class='text-center'>Success</div>
                                 </div>
                             </div>
                         </div>

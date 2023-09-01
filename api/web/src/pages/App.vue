@@ -18,15 +18,19 @@
                     <a v-if='false' href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <MapIcon/>
                     </a>
-                    <button class="btn btn-dark dropdown-toggle" type='button' data-bs-toggle="dropdown" aria-expanded="false">
-                        <MenuIcon/>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <a @click='$router.push("/run")' class="dropdown-item cursor-pointer">Runs</a>
-                        <a @click='$router.push("/job")' class="dropdown-item cursor-pointer">Jobs</a>
-                        <a @click='$router.push("/error")' class="dropdown-item cursor-pointer">Errors</a>
-                        <a @click='$router.push("/upload")' class="dropdown-item cursor-pointer"> Contribute</a>
+
+                    <div class='dropdown'>
+                        <div type="button" id="userProfileButton" data-bs-toggle="dropdown" aria-expanded="false" class='btn btn-dark'>
+                            <MenuIcon/>
+                        </div>
+                        <ul class="dropdown-menu" aria-labelledby='userProfileButton'>
+                            <a @click='$router.push("/run")' class="dropdown-item cursor-pointer">Runs</a>
+                            <a @click='$router.push("/job")' class="dropdown-item cursor-pointer">Jobs</a>
+                            <a @click='$router.push("/error")' class="dropdown-item cursor-pointer">Errors</a>
+                            <a @click='$router.push("/upload")' class="dropdown-item cursor-pointer"> Contribute</a>
+                        </ul>
                     </div>
+
                     <a class="btn btn-dark" target="_blank" rel="noreferrer">
                         <UserIcon @click='$router.push("/profile")' v-if='auth.username'/>
                         <LoginIcon @click='$router.push("/login")' v-else/>

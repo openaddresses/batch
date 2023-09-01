@@ -1,4 +1,54 @@
 <template>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>
+                                <Status v-if='job && job.status' :status='job.status'/>
+                                Job <span v-text='$route.params.jobid'/>
+                            </h3>
+
+                            <div class='ms-auto btn-list'>
+                                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+
+                                <LicenseIcon v-if='job.license' class='cursor-pointer'/>
+
+                                <CodeIcon @click='$router.push({ path: `/job/${jobid}/raw` })' class='cursor-pointer'/>
+
+                                <NotesIcon @click='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='cursor-pointer'/>
+
+                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+
+                            </div>
+                        </div>
+
+                        <TablerLoading v-if='loading' :desc='`Loading Job ${$route.params.jobid}`'/>
+                        <div v-else class='card-body'>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
     <div class='col col--12 grid pt12'>
 
         <div v-if='joberror' class='border mb24 round col col--12 py3' :class='{
@@ -37,23 +87,6 @@
                     </div>
                 </h2>
 
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-
-                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-
-                <span v-if='job.license' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <LicenseIcon width="16" height="16"/>
-                </span>
-
-                <span v-on:click.stop.prevent='$router.push({ path: `/job/${jobid}/raw` })' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <CodeIcon width="16" height="16"/>
-                </span>
-
-                <span v-on:click.stop.prevent='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <NotesIcon width="16" height="16"/>
-                </span>
             </div>
         </div>
 
@@ -102,6 +135,7 @@
             </template>
         </template>
     </div>
+-->
 </template>
 
 <script>
@@ -110,6 +144,10 @@ import {
     CodeIcon,
     NotesIcon
 } from 'vue-tabler-icons'
+import {
+    TablerBreadCrumb,
+    TablerLoading,
+} from '@tak-ps/vue-tabler';
 import ErrorsModerate from './ErrorsModerate.vue';
 import Download from './Download.vue';
 import Status from './util/Status.vue';
@@ -213,6 +251,8 @@ export default {
         JobSample,
         Download,
         JobStats,
+        TablerBreadCrumb,
+        TablerLoading,
         ErrorsModerate,
         Status,
         LicenseIcon,

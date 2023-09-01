@@ -38,19 +38,21 @@
                             <tbody>
                                 <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in jobs' class='cursor-pointer'>
                                     <td><Status :status='job.status'/></td>
-                                    <td>Run <span v-text='job.id'/></td>
+                                    <td>Job <span v-text='job.id'/></td>
                                     <td><span v-text='fmt(job.created)'/></td>
                                     <td>
                                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                                     </td>
                                     <td>
-                                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-                                        <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                            <BrandGithubIcon width="16" height="16"/>
-                                        </span>
-                                        <span v-on:click.stop.prevent='$router.push(`/job/${job.id}/log`)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                            <NotesIcon width="16" height="16"/>
-                                        </span>
+                                        <div class='btn-list'>
+                                            <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                                            <span v-on:click.stop.prevent='external(job.source)'>
+                                                <BrandGithubIcon class='cursor-pointer'/>
+                                            </span>
+                                            <span v-on:click.stop.prevent='$router.push(`/job/${job.id}/log`)' v-if='job.loglink'>
+                                                <NotesIcon class='cursor-pointer'/>
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

@@ -15,7 +15,7 @@
                     <a href="/docs" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <HelpIcon/>
                     </a>
-                    <a href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
+                    <a v-if='false' href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <MapIcon/>
                     </a>
                     <button class="btn btn-dark dropdown-toggle" type='button' data-bs-toggle="dropdown" aria-expanded="false">

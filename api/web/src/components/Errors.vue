@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import Status from './Status.vue';
+import Status from './util/Status.vue';
 import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';

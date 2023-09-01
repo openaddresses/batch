@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import Status from './Status.vue';
+import Status from './util/Status.vue';
 import moment from 'moment-timezone';
 import {
     RefreshIcon

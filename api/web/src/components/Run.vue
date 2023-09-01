@@ -96,7 +96,7 @@
 
 <script>
 import moment from 'moment-timezone';
-import Status from './Status.vue';
+import Status from './util/Status.vue';
 import {
     TablerNone,
     TablerBreadCrumb,

@@ -43,7 +43,7 @@
 
 <script>
 import Pager from './util/Pager.vue';
-import Status from './Status.vue';
+import Status from './util/Status.vue';
 
 export default {
     name: 'Exports',

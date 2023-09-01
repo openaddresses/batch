@@ -73,7 +73,7 @@
 <script>
 
 import Log from './Log.vue';
-import Status from './Status.vue';
+import Status from './util/Status.vue';
 
 export default {
     name: 'Export',

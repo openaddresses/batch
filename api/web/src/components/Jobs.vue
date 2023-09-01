@@ -74,6 +74,10 @@ import {
 import Status from './util/Status.vue';
 import Download from './Download.vue';
 import moment from 'moment-timezone';
+import {
+    TablerLoading,
+    TablerBreadCrumb
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Jobs',
@@ -110,7 +114,9 @@ export default {
         RefreshIcon,
         Status,
         BrandGithubIcon,
-        NotesIcon
+        NotesIcon,
+        TablerLoading,
+        TablerBreadCrumb
     },
 }
 </script>

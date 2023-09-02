@@ -39,12 +39,15 @@
                 <div class='col-12'>
                     <div class='card'>
                         <div class='card-header'>
-                            <h3 class='card-title d-flex'>
-                                <Status v-if='job.status' :status='job.status'/>
-                                <div class='mx-2 align-self-center'>
-                                    Job <span v-text='$route.params.jobid'/>
+                            <div class='card-title row'>
+                                <div class='d-flex'>
+                                    <Status v-if='job.status' :status='job.status'/>
+                                    <div class='mx-2 align-self-center'>
+                                        Job <span v-text='$route.params.jobid'/>
+                                    </div>
                                 </div>
-                            </h3>
+                                <div style='padding-left: 50px;' class='subheader' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></div>
+                            </div>
 
                             <div class='ms-auto btn-list'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
@@ -65,8 +68,38 @@
                         </div>
 
                         <TablerLoading v-if='loading' :desc='`Loading Job ${$route.params.jobid}`'/>
-                        <div v-else class='card-body'>
+                        <div v-else class="card-body">
+                            <JobSample
+                                @err='$emit("err", $event)'
+                                :job='job'
+                            />
+                        </div>
+                    </div>
+                </div>
 
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <div class='card-title'>Job Statistics</div>
+                        </div>
+                        <JobStats
+                            @err='$emit("err", $event)'
+                            :job='job'
+                            :delta='delta'
+                        />
+                    </div>
+                </div>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <div class='card-title'>Job Map</div>
+                        </div>
+                        <div class='card-body'>
+                            <JobMap
+                                @err='$emit("err", $event)'
+                                :job='job'
+                                :delta='delta'
+                            />
                         </div>
                     </div>
                 </div>
@@ -74,74 +107,6 @@
         </div>
     </div>
 </div>
-
-<!--
-    <div class='col col--12 grid pt12'>
-
-
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-
-                <h2 class='txt-h4 ml12 fl mb6'>
-                    Job #<span v-text='jobid'/>
-                    <div class='cursor-pointer fr dropdown'>
-                        <svg class='icon' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg>
-
-                        <div class='round dropdown-content'>
-                            <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
-                        </div>
-                    </div>
-                </h2>
-
-            </div>
-        </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
-            </div>
-            <div class='col col--12 py12'>
-                <h3 class='fl txt-h4 py6'>
-                    <span v-if='mode === "preview"'>Job Preview:</span>
-                    <span v-if='mode === "numeric"'>Job Stats:</span>
-                    <span v-if='mode === "bounds"'>Job Bounds:</span>
-                </h3>
-
-                <div class='flex-inline fr'>
-                    <button @click='mode = "preview"' :class='{ "btn--stroke": mode !== "preview" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Preview</button>
-                    <button @click='mode = "numeric"' :class='{ "btn--stroke": mode !== "numeric" }' class='btn btn--s btn--pill btn--pill-hc round mx0'>Numeric</button>
-                    <button @click='mode = "bounds"' :class='{ "btn--stroke": mode !== "bounds" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Map</button>
-                </div>
-            </div>
-
-            <template v-if='mode === "preview"'>
-                <JobSample
-                    @err='$emit("err", $event)'
-                    :job='job'
-                />
-            </template>
-            <template v-else-if='mode === "numeric"'>
-                <JobStats
-                    @err='$emit("err", $event)'
-                    :job='job'
-                    :delta='delta'
-                />
-            </template>
-            <template v-else-if='mode === "bounds"'>
-                <JobMap
-                    @err='$emit("err", $event)'
-                    :job='job'
-                    :delta='delta'
-                />
-            </template>
-        </template>
-    </div>
--->
 </template>
 
 <script>

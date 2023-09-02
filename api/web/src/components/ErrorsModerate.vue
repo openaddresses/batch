@@ -8,7 +8,7 @@
         <button v-on:click.stop.prevent='mod(error.id, false)' class='btn'>Suppress</button>
         <button v-on:click.stop.prevent='createRerun(error.id)' class='btn'>Rerun</button>
     </template>
-    <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job}/log` })' class='btn'>Logs</button>
+    <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.id}/log` })' class='btn'>Logs</button>
 </div>
 </template>
 

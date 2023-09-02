@@ -1,21 +1,21 @@
 <template>
-<div class='col col--12 grid pt12'>
+<div class='col-12'>
     <template v-if='job.output.preview'>
         <img class='round w-full' :src='`/api/job/${job.id}/output/source.png`'/>
     </template>
     <template v-else>
-        <div class='col col--12 border border--gray-light round'>
-            <div class='flex flex--center-main pt36'>
-                <svg class='icon w60 h60 color-gray'><use href='#icon-info'/></svg>
+        <div class='border rounded'>
+            <div class='d-flex justify-content-center my-4'>
+                <InfoCircleIcon size='40'/>
             </div>
 
-            <div class='flex flex--center-main pt12 pb36'>
-                <h1 class='txt-h4 cursor-default'>No Preview Image Found</h1>
+            <div class='text-center'>
+                <h3 class=''>No Preview Image Found</h3>
             </div>
         </div>
     </template>
 
-    <div class='col col--12 py6'>
+    <div class='col-12 py-4'>
         <h3 class='fl txt-h4'>Job Sample:</h3>
 
         <div class='flex-inline fr'>
@@ -60,6 +60,9 @@
 </template>
 
 <script>
+import {
+    InfoCircleIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'JobSample',
@@ -94,6 +97,9 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        InfoCircleIcon
     }
 }
 </script>

@@ -50,6 +50,7 @@ export default {
     methods: {
         calcTable() {
             this.flat.count = this.job.count;
+return
 
             function recurse(self, container, stats, pre = '') {
                 for (const key of Object.keys(stats)) {

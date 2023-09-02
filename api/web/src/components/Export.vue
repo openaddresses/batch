@@ -72,7 +72,7 @@
 
 <script>
 
-import Log from './Log.vue';
+import Log from './util/Log.vue';
 import Status from './util/Status.vue';
 
 export default {

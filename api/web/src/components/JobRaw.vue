@@ -2,24 +2,13 @@
     <div class='col col--12'>
         <div class='col col--12 grid border-b border--gray-light bg-white pt12'>
             <div class='col col--12'>
-                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                </button>
+                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='$route.params.jobid'/></h2>
 
-                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='jobid'/></h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-
-                <span v-if='raw.data' v-on:click.stop.prevent='external(job.sourcej)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <BrandGithubIcon width="16" height="16"/>
-                </span>
-
-                <span v-if='job.source' v-on:click.stop.prevent='external(raw.data)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--white border--gray-on-hover'>
-                    <LinkIcon width="16" height="16"/>
-                </span>
-
+                <div class='ms-auto btn-list'>
+                    <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                    <BrandGithubIcon @click='external(job.source)' class='cursor-pointer'/>
+                    <LinkIcon v-if='job.source' @click='external(raw.data)'/>
+                </div>
             </div>
         </div>
 
@@ -37,13 +26,13 @@
 
 <script>
 import {
+    RefreshIcon,
     BrandGithubIcon,
     LinkIcon
 } from 'vue-tabler-icons';
 
 export default {
     name: 'JobRaw',
-    props: ['jobid'],
     data: function () {
         return {
             loading: {
@@ -55,12 +44,12 @@ export default {
             raw: false
         }
     },
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.refresh();
     },
     methods: {
-        refresh() {
-            this.getJob();
+        refresh: async function() {
+            await this.getJob();
         },
         external: function(url) {
             window.open(url, "_blank");
@@ -68,7 +57,7 @@ export default {
         getJob: async function() {
             try {
                 this.loading.job = true;
-                this.job = await window.std(`/api/job/${this.jobid}`);
+                this.job = await window.std(`/api/job/${this.$route.params.jobid}`);
 
                 this.name = this.job.source
                     .replace(/.*sources\//, '')
@@ -96,6 +85,7 @@ export default {
         },
     },
     components: {
+        RefreshIcon,
         BrandGithubIcon,
         LinkIcon
     }

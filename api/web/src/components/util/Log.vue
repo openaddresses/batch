@@ -1,85 +1,56 @@
 <template>
-    <div class='col col--12'>
-        <div class='col col--12 grid border-b border--gray-light bg-white pt12' :class='scrollHeader'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>Task Log</h2>
-
-                <button v-if='collapse' @click='isCollapsed = !isCollapsed' class='color-gray py6 px6'>
-                    <svg v-if='!isCollapsed' class='icon'><use xlink:href='#icon-chevron-down'/></svg>
-                    <svg v-else-if='isCollapsed' class='icon'><use xlink:href='#icon-chevron-right'/></svg>
-                </button>
-
-                <button v-if='!isCollapsed' @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-
-                <button v-if='!isCollapsed' @click='downloadLog' class='mr12 btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-down'/></svg>
-                </button>
-            </div>
-        </div>
-
-        <template v-if='!isCollapsed'>
-            <template v-if='loading'>
-                <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
-                </div>
-            </template>
-            <template v-else>
-                <div class='col col--12 pre'>
-                    <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
-                </div>
-            </template>
-        </template>
-    </div>
+<div>
+    <TablerLoading v-if='loading'/>
+    <TablerNone v-else-if='alert' :create='false' label='Log Yet Produced'/>
+    <pre v-else>
+        <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
+    </pre>
+</div>
 </template>
 
 <script>
+import {
+    TablerLoading,
+    TablerNone,
+} from '@tak-ps/vue-tabler';
+
 export default {
     name: 'Log',
     props: ['logtype', 'id', 'collapse'],
     data: function() {
         return {
-            scrolled: 0,
-            isCollapsed: false,
-            loading: false,
+            loading: true,
+            alert: false,
             lines: []
         };
     },
     mounted: function() {
-        window.onscroll = () => {
-             this.scrolled = window.scrollY;
-        }
-
-        this.refresh();
-    },
-    computed: {
-        scrollHeader: function () {
-            return {
-                fixed: this.scrolled > 50,
-                top: this.scrolled > 50
-            }
-        }
+        this.getLog();
     },
     methods: {
-        refresh: function() {
-            this.getLog();
-        },
         downloadLog: async function() {
             window.open(`${window.location.origin}/api/${this.logtype}/${this.id}/log?dl=true&format=csv`, '_blank');
         },
         getLog: async function() {
+            this.loading = true;
             try {
-                this.loading = true;
                 this.lines = await window.std(`${window.location.origin}/api/${this.logtype}/${this.id}/log`);
-                this.loading = false;
             } catch(err) {
-                this.$emit('err', err);
+                if (err.message.match(/Job has not produced a log/)) {
+                    this.alert = true;
+                } else {
+                    throw err;
+                }
             }
+            this.loading = false;
         },
         linenum: function(line) {
             window.location.hash = `${this.logtype}:${this.id}:log:${line.id}`
         }
+    },
+    components: {
+        TablerNone,
+        TablerLoading
     }
 }
 </script>

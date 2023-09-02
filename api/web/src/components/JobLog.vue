@@ -68,7 +68,7 @@ export default {
         getJob: async function() {
             try {
                 this.loading = true;
-                this.job = await window.std(`/api/job/${this.jobid}`);
+                this.job = await window.std(`/api/job/${this.$route.params.jobid}`);
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
@@ -79,6 +79,7 @@ export default {
         RefreshIcon,
         TablerLoading,
         TablerBreadCrumb,
+        Status,
         Log
     }
 }

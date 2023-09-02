@@ -52,8 +52,8 @@
                             <div class='ms-auto btn-list'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
                                 <LicenseIcon v-if='job.license' class='cursor-pointer'/>
-                                <CodeIcon @click='$router.push({ path: `/job/${jobid}/raw` })' class='cursor-pointer'/>
-                                <NotesIcon @click='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='cursor-pointer'/>
+                                <CodeIcon @click='$router.push({ path: `/job/${$route.params.jobid}/raw` })' class='cursor-pointer'/>
+                                <NotesIcon @click='$router.push({ path: `/job/${$route.params.jobid}/log` })' v-if='job.loglink' class='cursor-pointer'/>
                                 <RefreshIcon @click='refresh' class='cursor-pointer'/>
 
                                 <div class='dropdown'>
@@ -130,7 +130,7 @@ import JobMap from './job/JobMap.vue';
 
 export default {
     name: 'Job',
-    props: ['jobid', 'auth'],
+    props: ['auth'],
     data: function() {
         return {
             mode: 'preview',
@@ -165,9 +165,6 @@ export default {
         },
         external: function(url) {
             window.open(url, "_blank");
-        },
-        emitlog: function(jobid) {
-            this.$router.push({ path: `/job/${jobid}/log` });
         },
         refresh: function() {
             this.getJob();

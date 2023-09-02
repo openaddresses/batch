@@ -52,6 +52,15 @@
                                 <CodeIcon @click='$router.push({ path: `/job/${jobid}/raw` })' class='cursor-pointer'/>
                                 <NotesIcon @click='$router.push({ path: `/job/${jobid}/log` })' v-if='job.loglink' class='cursor-pointer'/>
                                 <RefreshIcon @click='refresh' class='cursor-pointer'/>
+
+                                <div class='dropdown'>
+                                    <div type="button" id="jobAdmin" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <DotsVerticalIcon class='cursor-pointer'/>
+                                    </div>
+                                    <ul class="dropdown-menu" aria-labelledby='jobAdmin'>
+                                        <a @click='createRerun' class="dropdown-item cursor-pointer">Create ReRun</a>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
@@ -141,6 +150,7 @@ import {
     CodeIcon,
     NotesIcon,
     RefreshIcon,
+    DotsVerticalIcon,
 } from 'vue-tabler-icons'
 import {
     TablerBreadCrumb,
@@ -257,6 +267,7 @@ export default {
         CodeIcon,
         NotesIcon,
         RefreshIcon,
+        DotsVerticalIcon,
     },
 }
 </script>

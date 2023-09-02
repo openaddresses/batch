@@ -72,11 +72,6 @@
 
         <div class='col col--12 grid border-b border--gray-light'>
             <div class='col col--12'>
-                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                </button>
-
-                <Status :status='job.status'/>
 
                 <h2 class='txt-h4 ml12 fl mb6'>
                     Job #<span v-text='jobid'/>

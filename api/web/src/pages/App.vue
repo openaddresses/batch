@@ -40,7 +40,9 @@
         </div>
     </header>
 
-    <router-view/>
+    <router-view
+        :auth='auth'
+    />
 
     <TablerError v-if='err' :err='err' @close='err = null'/>
 </div>

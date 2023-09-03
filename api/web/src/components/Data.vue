@@ -108,31 +108,33 @@
                         </div>
                     </template>
 
-                    <Coverage
-                        @err='$emit("err", $event)'
-                        v-on:point='filter.point = $event'
-                        :layer='filter.layer'
-                    />
-
                     <TablerLoading v-if='loading.sources' desc='Loading Sources'/>
-                    <table v-else class="table table-hover table-vcenter card-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Attributes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
-                                <td v-text='d.source'></td>
-                                <td>
-                                    <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
-                                    <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
-                                    <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <template v-else>
+                        <Coverage
+                            @err='$emit("err", $event)'
+                            v-on:point='filter.point = $event'
+                            :layer='filter.layer'
+                        />
+
+                        <table class="table table-hover table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
+                                    <td v-text='d.source'></td>
+                                    <td>
+                                        <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
+                                        <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
+                                        <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </template>
                 </div>
             </div>
         </div>

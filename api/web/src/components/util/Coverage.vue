@@ -17,7 +17,9 @@
                     </button>
                 </div>
 
-                <div ref='map' class='w-100 h-100'></div>
+                <div ref='map' class='w-100' :style='{
+                    "height": (!fullscreen ? 300 : 600) + "px"
+                }'></div>
             </div>
         </div>
     </div>
@@ -81,8 +83,10 @@ export default {
             this.$emit('point', this.point);
         }
     },
-    mounted: function() {
-        this.init();
+    mounted: async function() {
+        this.$nextTick(async () => {
+            await this.init();
+        });
     },
     methods: {
         setFull: function() {
@@ -94,27 +98,50 @@ export default {
         init: async function() {
             try {
                 const res = await window.std('/api/map');
-                mapboxgl.accessToken = res.token;
-
-                const opts = {
-                    style: 'mapbox://styles/mapbox/light-v9'
-                };
 
                 const tmpmap = new mapgl.Map({
                     container: this.$refs.map,
                     hash: "map",
                     zoom: 0,
                     center: [0, 0],
-                    style: this.style
+                    style: {
+                        version: 8,
+                        sources: {
+                            basemap: {
+                                type: 'raster',
+                                tileSize: 256,
+                                tiles: [
+                                    `https://api.mapbox.com/styles/v1/ingalls/ckvh0wwm8g2cw15r05ozt0ybr/tiles/256/{z}/{x}/{y}@2x?access_token=${res.token}`
+                                ]
+                            }
+                        },
+                        layers: [{
+                            id: 'background',
+                            type: 'background',
+                            paint: {
+                                'background-color': 'rgb(4,7,14)'
+                            }
+                        },{
+                            id: 'basemap',
+                            type: 'raster',
+                            source: 'basemap',
+                            minzoom: 0,
+                            maxzoom: 15
+                        }]
+                    }
+
                 });
 
-                if (this.bbox) opts.bounds = this.bbox;
+                tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
 
-                map = new mapboxgl.Map(opts);
+                map.once('load', () => {
+                    map = tmpmap;
 
-                map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+                    map.addSource('basemap', {
+                        type: 'vector',
+                    });
 
-                map.on('load', () => {
+
                     map.addSource('coverage', {
                         type: 'vector',
                         tiles: [

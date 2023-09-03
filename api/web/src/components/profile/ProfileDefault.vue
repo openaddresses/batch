@@ -119,7 +119,9 @@
     </div>
 
     <template v-if='profile.level !== "basic"'>
-        <Exports :profile='profile' @err='$emit("err", $event)'/>
+        <div class='col-12'>
+            <Exports :profile='profile' @err='$emit("err", $event)'/>
+        </div>
     </template>
     <template v-else>
         <div class='col col--12 grid border-b border--gray-light pt24'>
@@ -148,7 +150,7 @@ import {
     CircleIcon
 } from 'vue-tabler-icons';
 import Tokens from './Tokens.vue'
-import Exports from '../Exports.vue'
+import Exports from '../cards/Exports.vue'
 
 export default {
     name: 'ProfileDefault',

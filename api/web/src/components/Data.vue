@@ -152,8 +152,8 @@ import {
     SearchIcon,
     XIcon,
 } from 'vue-tabler-icons';
-import Download from './Download.vue';
-import Coverage from './Coverage.vue';
+import Download from './util/Download.vue';
+import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';

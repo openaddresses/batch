@@ -72,7 +72,7 @@ import {
     NotesIcon
 } from 'vue-tabler-icons'
 import Status from './util/Status.vue';
-import Download from './Download.vue';
+import Download from './util/Download.vue';
 import moment from 'moment-timezone';
 import {
     TablerLoading,

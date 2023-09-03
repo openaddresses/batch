@@ -122,7 +122,7 @@ import {
     TablerLoading,
 } from '@tak-ps/vue-tabler';
 import ErrorsModerate from './ErrorsModerate.vue';
-import Download from './Download.vue';
+import Download from './util/Download.vue';
 import Status from './util/Status.vue';
 import JobSample from './job/JobSample.vue';
 import JobStats from './job/JobStats.vue';

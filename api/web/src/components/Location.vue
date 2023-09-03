@@ -83,8 +83,8 @@ import {
 import {
     TablerLoading
 } from '@tak-ps/vue-tabler';
-import Download from './Download.vue';
-import Coverage from './Coverage.vue';
+import Download from './util/Download.vue';
+import Coverage from './util/Coverage.vue';
 import moment from 'moment-timezone';
 
 export default {

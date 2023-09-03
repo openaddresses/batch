@@ -1,25 +1,14 @@
 <template>
-    <div class='col col--12 grid pt24'>
-        <div class='col col--12 grid border-b border--gray-light pt24'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>API Tokens:</h2>
-
-                <div class='fr'>
-                    <button @click='newToken.show = true' class='btn round btn--stroke color-gray color-green-on-hover mx3'>
-                        <svg class='icon'><use xlink:href='#icon-plus'/></svg>
-                    </button>
-                    <button @click='refresh' class='btn round btn--stroke color-gray mx3'>
-                        <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                    </button>
-                </div>
-            </div>
+<div class='card'>
+    <div class='card-header'>
+        <h3 class='card-title'>API Tokens:</h3>
+        <div class='d-flex ms-auto btn-list'>
+            <PlusIcon @click='newToken.show = true' class='cursor-pointer'/>
+            <RefreshIcon @click='refresh' class='cursor-pointer'/>
         </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
+    </div>
+    <div class='card-body'>
+        <TablerLoading v-if='loading' desc='Loading Tokens'/>
         <template v-else-if='!tokens.length && !newToken.show'>
             <div class='col col--12'>
                 <div class='flex flex--center-main'>
@@ -81,9 +70,18 @@
             </div>
         </template>
     </div>
+</div>
 </template>
 
 <script>
+import {
+    TablerLoading
+} from '@tak-ps/vue-tabler';
+import {
+    PlusIcon,
+    RefreshIcon,
+} from 'vue-tabler-icons';
+
 export default {
     name: 'Tokens',
     props: [ ],
@@ -153,6 +151,11 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        PlusIcon,
+        RefreshIcon,
+        TablerLoading
     }
 }
 </script>

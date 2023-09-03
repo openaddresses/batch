@@ -1,5 +1,5 @@
 <template>
-<div class='page'>
+<div class='page relative'>
     <header class='navbar navbar-expand-md d-print-none sticky-top' data-bs-theme="dark">
         <div class="container-xl">
             <div class="col-auto">
@@ -65,9 +65,9 @@ import {
 
 export default {
     name: 'OpenAddresses',
-    mounted: function() {
-        this.getLogin();
-        this.getCount();
+    mounted: async function() {
+        await this.getLogin();
+        await this.getCount();
     },
     data: function() {
         return {

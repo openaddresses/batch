@@ -1,7 +1,11 @@
 <template>
-    <div class='card-body' :class='{ "h-300": !fullscreen, "h-600": fullscreen }'>
+    <div class='card-body' :style='{
+            "height": (!fullscreen ? 300 : 600) + "px"
+        }'>
         <div class='row'>
-            <div class='col-12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
+            <div class='col-12' :class='{
+                "absolute right left": fullscreen,
+            }'>
                 <div class='absolute top right z1'>
                     <ArrowsMaximizeIcon @click='setFull' v-if='!fullscreen'/>
                     <ArrowsMinimizeIcon @click='setFull' v-else/>
@@ -13,15 +17,15 @@
                     </button>
                 </div>
 
-                <div ref='map' class='w-full' :class='{ "h-300": !fullscreen, "h-600": fullscreen }'></div>
+                <div ref='map' class='w-100 h-100'></div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import mapgl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css';
 import {
     ArrowsMaximizeIcon,
     ArrowsMinimizeIcon
@@ -93,9 +97,16 @@ export default {
                 mapboxgl.accessToken = res.token;
 
                 const opts = {
-                    container: this.$refs.map,
                     style: 'mapbox://styles/mapbox/light-v9'
                 };
+
+                const tmpmap = new mapgl.Map({
+                    container: this.$refs.map,
+                    hash: "map",
+                    zoom: 0,
+                    center: [0, 0],
+                    style: this.style
+                });
 
                 if (this.bbox) opts.bounds = this.bbox;
 

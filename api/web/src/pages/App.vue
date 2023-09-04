@@ -41,6 +41,7 @@
     </header>
 
     <router-view
+        @auth='getLogin'
         :auth='auth'
     />
 

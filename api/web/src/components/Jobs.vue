@@ -20,9 +20,23 @@
                             <h3 class='card-title'>Jobs</h3>
 
                             <div class='ms-auto btn-list'>
+                                <SearchIcon @click='showFilter = !showFilter' class='cursor-pointer'/>
                                 <RefreshIcon @click='fetchJobs' class='cursor-pointer'/>
                             </div>
                         </div>
+                        <template v-if='showFilter'>
+                            <div class='card-body row'>
+                                <div class='col-12 col-md-6'>
+                                    <QuerySource @source='filter.source = $event'/>
+                                </div>
+                                <div class='col-12 col-md-3'>
+                                    <QueryLayer @layer='filter.layer = $event' />
+                                </div>
+                                <div class='col-12 col-md-3'>
+                                    <QueryStatus @status='filter.status = $event'/>
+                                </div>
+                            </div>
+                        </template>
 
                         <TablerLoading v-if='loading' desc='Loading Jobs'/>
                         <table v-else class="table table-hover table-vcenter card-table">
@@ -71,6 +85,7 @@
 
 <script>
 import {
+    SearchIcon,
     BrandGithubIcon,
     RefreshIcon,
     NotesIcon
@@ -80,6 +95,9 @@ import Status from './util/Status.vue';
 import Download from './util/Download.vue';
 import moment from 'moment-timezone';
 import TableFooter from './util/TableFooter.vue';
+import QueryStatus from './query/Status.vue';
+import QuerySource from './query/Source.vue';
+import QueryLayer from './query/Layer.vue';
 import {
     TablerLoading,
     TablerBreadCrumb
@@ -102,6 +120,7 @@ export default {
     data: function() {
         return {
             tz: moment.tz.guess(),
+            showFilter: false,
             paging: {
                 filter: '',
                 sort: 'id',
@@ -142,6 +161,7 @@ export default {
         }
     },
     components: {
+        SearchIcon,
         Download,
         RefreshIcon,
         Status,
@@ -150,7 +170,10 @@ export default {
         TablerLoading,
         TablerBreadCrumb,
         TableFooter,
-        LayerIcon
+        LayerIcon,
+        QueryStatus,
+        QuerySource,
+        QueryLayer
     },
 }
 </script>

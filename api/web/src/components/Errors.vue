@@ -151,9 +151,12 @@ export default {
                 url.searchParams.append('limit', this.paging.limit);
                 url.searchParams.append('page', this.paging.page);
                 url.searchParams.append('order', this.paging.order);
-                if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
-                if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
-                if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
+
+                if (this.showFilter) {
+                    if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
+                    if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
+                    if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
+                }
 
                 this.list = await window.std(url);
 

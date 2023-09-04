@@ -11,24 +11,21 @@
     <TablerNone v-else-if='!tokens.length && !newToken.show' :create='false' label='Tokens'/>
     <template v-else>
         <template v-if='newToken.show && !newToken.token'>
-            <div class='col-12 row'>
-                <div class='col col--12 pb6'>
-                    <h2 class='txt-bold fl'>Create New Token</h2>
-                    <button @click='newToken.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                        <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                    </button>
-                </div>
+            <div class='mx-2 my-2 py-2 px-2'>
+                <div class='col-12 row border rounded'>
+                    <div class='col-12'>
+                        <h2 class='subheader'>Create New Token</h2>
+                        <button @click='newToken.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
+                            <svg class='icon'><use xlink:href='#icon-close'/></svg>
+                        </button>
+                    </div>
 
-                <div class='col col--12'>
-                    <label>Token Name</label>
-                </div>
-                <div class='col col--10'>
-                    <input v-model='newToken.name' type='text' class='input' placeholder='Token Name'/>
-                </div>
-                <div class='col col--2'>
-                    <button @click='setToken' class='fr btn btn--stroke round color-gray color-green-on-hover h-full w-full'>
-                        <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
-                    </button>
+                    <div class='col-10'>
+                        <TablerInput label='Token Name' v-model='newToken.name' type='text' placeholder='Token Name'/>
+                    </div>
+                    <div class='col-2'>
+                        <CheckIcon @click='setToken' class='cursor-pointer'/>
+                    </div>
                 </div>
             </div>
         </template>
@@ -73,12 +70,14 @@
 <script>
 import {
     TablerLoading,
+    TablerInput,
     TablerNone
 } from '@tak-ps/vue-tabler';
 import {
     PlusIcon,
     TrashIcon,
     RefreshIcon,
+    CheckIcon
 } from 'vue-tabler-icons';
 
 export default {
@@ -155,6 +154,8 @@ export default {
         PlusIcon,
         TrashIcon,
         RefreshIcon,
+        TablerInput,
+        CheckIcon,
         TablerNone,
         TablerLoading
     }

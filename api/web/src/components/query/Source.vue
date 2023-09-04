@@ -1,18 +1,19 @@
 <template>
-    <div>
-        <label>Source</label>
+<div class='col-12'>
+    <TablerInput v-model='source' label='Source'/>
 
-        <label v-if='showValidated' class='switch-container fr'>
-            Validated Data
-            <input type='checkbox' v-model='validated'/>
-            <div class='ml6 switch switch--gray'></div>
-        </label>
-
-        <input v-model='source' class='input' placeholder='/ca/nb/provincewide' />
-    </div>
+    <label v-if='showValidated' class='w-full'>
+        <TablerToggle label='Validated Data' v-model='validated'/>
+    </label>
+</div>
 </template>
 
 <script>
+import {
+    TablerInput,
+    TablerToggle
+} from '@tak-ps/vue-tabler';
+
 export default {
     name: 'QuerySource',
     props: {
@@ -34,6 +35,10 @@ export default {
         validated: function() {
             this.$emit('validated', this.validated);
         }
+    },
+    components: {
+        TablerInput,
+        TablerToggle
     }
 }
 </script>

@@ -1,32 +1,51 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>Source Errors:</h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-
-                <button @click='showFilter = !showFilter' class='mr12 btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-search'/></svg>
-                </button>
-
-                <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
-                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
-
-                        <div class='col col--6 px6'>
-                            <QuerySource @source='filter.source = $event'/>
-                        </div>
-                        <div class='col col--3 px6'>
-                            <QueryLayer @layer='filter.layer = $event' />
-                        </div>
-                        <div class='col col--3 px6'>
-                            <QueryStatus @status='filter.status = $event'/>
-                        </div>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
                     </div>
-                </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>Job Errors</h3>
+
+                            <div class='ms-auto btn-list'>
+                                <SearchIcon @click='showFilter = !showFilter' class='cursor-pointer'/>
+                                <RefreshIcon @click='fetchRuns' class='cursor-pointer'/>
+                            </div>
+                        </div>
+                        <template v-if='showFilter'>
+                            <div class='card-body row'>
+                                <div class='col-12 col-md-6'>
+                                    <QuerySource @source='filter.source = $event'/>
+                                </div>
+                                <div class='col-12 col-md-3'>
+                                    <QueryLayer @layer='filter.layer = $event' />
+                                </div>
+                                <div class='col-12 col-md-3'>
+                                    <QueryStatus @status='filter.status = $event'/>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+
             </div>
         </div>
 
@@ -71,14 +90,23 @@
 
         </template>
     </div>
+-->
 </template>
 
 <script>
+import {
+    RefreshIcon,
+    SearchIcon
+} from 'vue-tabler-icons';
 import Status from './util/Status.vue';
 import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import ErrorsModerate from './ErrorsModerate.vue';
+import {
+    TablerLoading,
+    TablerBreadCrumb
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Errors',
@@ -97,13 +125,6 @@ export default {
     },
     mounted: function() {
         this.refresh();
-    },
-    components: {
-        Status,
-        QueryStatus,
-        QuerySource,
-        QueryLayer,
-        ErrorsModerate
     },
     watch: {
         problems: function() {
@@ -140,6 +161,16 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         }
-    }
+    },
+    components: {
+        SearchIcon,
+        RefreshIcon,
+        Status,
+        QueryStatus,
+        QuerySource,
+        QueryLayer,
+        ErrorsModerate,
+        TablerBreadCrumb,
+    },
 }
 </script>

@@ -1,32 +1,36 @@
 <template>
-<div class='col col--12'>
-    <label>Status</label>
-    <div class='w-full select-container'>
-        <select v-model='status' class='select select--stroke'>
-            <option>All</option>
-            <option>Pending</option>
-            <option>Running</option>
-            <option>Warn</option>
-            <option>Success</option>
-            <option>Fail</option>
-        </select>
-        <div class='select-arrow'></div>
-    </div>
+<div class='col-12'>
+    <TablerEnum v-model='status' label='Status' :options='options'/>
 </div>
 </template>
 
 <script>
+import {
+    TablerEnum
+} from '@tak-ps/vue-tabler';
+
 export default {
     name: 'QueryStatus',
     data: function() {
         return {
-            status: 'All'
+            status: 'All',
+            options: [
+                'All',
+                'Pending',
+                'Running',
+                'Warn',
+                'Success',
+                'Fail'
+            ]
         };
     },
     watch: {
         status: function() {
             this.$emit('status', this.status);
         }
+    },
+    components: {
+        TablerEnum
     }
 }
 </script>

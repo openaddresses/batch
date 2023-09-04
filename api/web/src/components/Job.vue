@@ -15,7 +15,7 @@
     <div class='page-body'>
         <div class='container-xl'>
             <div class='row row-deck row-cards'>
-                <div class="card bg-danger-lt" :class='{
+                <div v-if='joberror' class="card bg-danger-lt" :class='{
                     "bg-danger-lt": job.status === "Fail",
                     "bg-warning-lt": job.status === "Warn"
                 }'>

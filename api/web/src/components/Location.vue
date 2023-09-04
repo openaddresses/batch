@@ -62,11 +62,11 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </template>
 
-                        <div class='col-12 align-center'>
-                            OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
-                        </div>
+                            <div class='col-12 align-center'>
+                                OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>

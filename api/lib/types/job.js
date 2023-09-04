@@ -133,7 +133,6 @@ export default class Job extends Generic {
         return list;
     }
 
-
     async get_raw() {
         if (!this.raw) {
             const res = await prequest({

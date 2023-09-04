@@ -35,7 +35,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click='$router.push(`/run/${run.id}`);' :key='run.id' v-for='run in runs' class='cursor-pointer'>
+                                <tr @click='$router.push(`/run/${run.id}`);' :key='run.id' v-for='run in list.runs' class='cursor-pointer'>
                                     <td><Status :status='run.status'/></td>
                                     <td>Run <span v-text='run.id'/></td>
                                     <td><span v-text='fmt(run.created)'/></td>
@@ -50,6 +50,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
                     </div>
                 </div>
             </div>
@@ -61,6 +62,7 @@
 <script>
 import Status from './util/Status.vue';
 import moment from 'moment-timezone';
+import TableFooter from './util/TableFooter.vue';
 import {
     RefreshIcon
 } from 'vue-tabler-icons';
@@ -74,11 +76,29 @@ export default {
     mounted: async function() {
         await this.fetchRuns();
     },
+    watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchRuns();
+            }
+        }
+    },
     data: function() {
         return {
             tz: moment.tz.guess(),
             loading: false,
-            runs: []
+            paging: {
+                filter: '',
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
+            },
+            list: {
+                total: 0,
+                runs: []
+            }
         };
     },
     methods: {
@@ -92,14 +112,23 @@ export default {
             window.open(url, "_blank");
         },
         fetchRuns: async function() {
-            this.loading = true;
-            this.runs = await window.std('/api/run');
-            this.loading = false;
+                this.loading = true;
+
+                const url = window.stdurl('/api/run');
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
+                url.searchParams.append('filter', this.paging.filter);
+                url.searchParams.append('order', this.paging.order);
+
+                this.list = await window.std(url);
+
+                this.loading = false;
         }
     },
     components: {
         Status,
         RefreshIcon,
+        TableFooter,
         TablerLoading,
         TablerBreadCrumb,
     }

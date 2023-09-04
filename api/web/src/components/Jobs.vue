@@ -102,7 +102,7 @@ export default {
                 filter: '',
                 sort: 'id',
                 order: 'desc',
-                limit: 10,
+                limit: 100,
                 page: 0
             },
             list: {

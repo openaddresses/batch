@@ -71,8 +71,11 @@ export default class Run extends Generic {
      */
     static async list(pool, query) {
         if (!query) query = {};
-        if (!query.limit) query.limit = 100;
         if (!query.status) query.status = Status.list();
+
+        query.limit = Params.integer(query.limit, { default: 100 });
+        query.sort = Params.string(query.sort, { default: 'id' });
+        query.order = Params.order(query.order);
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
@@ -102,6 +105,7 @@ export default class Run extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
+                    count(*) OVER() AS count,
                     runs.id,
                     runs.live,
                     runs.created,
@@ -125,12 +129,14 @@ export default class Run extends Generic {
                     runs.github,
                     runs.closed
                 ORDER BY
-                    runs.id DESC
+                    ${sql.identifier([this._table, query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
             `);
 
-            return pgres.rows.map((run) => {
+            const list = this.deserialize_list(pgres, 'runs');
+
+            list.runs.map((run) => {
                 if (run.status.includes('Fail')) {
                     run.status = 'Fail';
                 } else if (run.status.includes('Pending')) {
@@ -141,6 +147,8 @@ export default class Run extends Generic {
 
                 return run;
             });
+
+            return list;
         } catch (err) {
             throw new Err(500, err, 'failed to fetch runs');
         }

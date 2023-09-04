@@ -99,6 +99,7 @@
 <script>
 import moment from 'moment-timezone';
 import Status from './util/Status.vue';
+import TableFooter from './util/TableFooter.vue';
 import {
     TablerNone,
     TablerBreadCrumb,
@@ -201,6 +202,7 @@ export default {
         }
     },
     components: {
+        TableFooter,
         TablerBreadCrumb,
         TablerLoading,
         TablerNone,

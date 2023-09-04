@@ -15,9 +15,7 @@
                 <div class='col-12 row border rounded'>
                     <div class='col-12'>
                         <h2 class='subheader'>Create New Token</h2>
-                        <button @click='newToken.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                            <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                        </button>
+                        <XIcon @click='newToken.show = false' class='cursor-pointer'/>
                     </div>
 
                     <div class='col-10'>
@@ -74,6 +72,7 @@ import {
     TablerNone
 } from '@tak-ps/vue-tabler';
 import {
+    XIcon,
     PlusIcon,
     TrashIcon,
     RefreshIcon,
@@ -152,6 +151,7 @@ export default {
     },
     components: {
         PlusIcon,
+        XIcon,
         TrashIcon,
         RefreshIcon,
         TablerInput,

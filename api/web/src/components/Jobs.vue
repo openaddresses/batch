@@ -38,7 +38,10 @@
                             <tbody>
                                 <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
                                     <td><Status :status='job.status'/></td>
-                                    <td>Job <span v-text='job.id'/></td>
+                                    <td>
+                                        <LayerIcon class='mr-3' :layer='job.layer'/>
+                                        <span v-text='job.id'/>
+                                    </td>
                                     <td><span v-text='fmt(job.created)'/></td>
                                     <td>
                                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
@@ -72,6 +75,7 @@ import {
     RefreshIcon,
     NotesIcon
 } from 'vue-tabler-icons'
+import LayerIcon from './util/LayerIcon.vue';
 import Status from './util/Status.vue';
 import Download from './util/Download.vue';
 import moment from 'moment-timezone';
@@ -146,6 +150,7 @@ export default {
         TablerLoading,
         TablerBreadCrumb,
         TableFooter,
+        LayerIcon
     },
 }
 </script>

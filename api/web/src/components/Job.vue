@@ -42,6 +42,7 @@
                             <div class='card-title row'>
                                 <div class='d-flex'>
                                     <Status v-if='job.status' :status='job.status'/>
+                                    <LayerIcon class='align-self-center' :layer='job.layer'/>
                                     <div class='mx-2 align-self-center'>
                                         Job <span v-text='$route.params.jobid'/>
                                     </div>
@@ -110,6 +111,7 @@
 </template>
 
 <script>
+import LayerIcon from './util/LayerIcon.vue';
 import {
     LicenseIcon,
     CodeIcon,
@@ -230,6 +232,7 @@ export default {
         NotesIcon,
         RefreshIcon,
         DotsVerticalIcon,
+        LayerIcon
     },
 }
 </script>

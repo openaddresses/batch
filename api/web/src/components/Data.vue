@@ -9,15 +9,15 @@
                     </div>
                     <div class='card-body row'>
                         <div class='col-4 d-flex justify-content-center'>
-                            <BuildingCommunityIcon width="24" height="24"/>
+                            <LayerIcon layer='buildings'/>
                             Buildings
                         </div>
                         <div class='col-4 d-flex justify-content-center'>
-                            <MapPinIcon width="24" height="24"/>
+                            <LayerIcon layer='addresses'/>
                             Addresses
                         </div>
                         <div class='col-4 d-flex justify-content-center'>
-                            <ShapeIcon width="24" height="24"/>
+                            <LayerIcon layer='parcels'/>
                             Parcels
                         </div>
                         <div class='col-12'>
@@ -127,9 +127,13 @@
                                 <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
                                     <td v-text='d.source'></td>
                                     <td>
-                                        <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
-                                        <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
-                                        <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
+                                        <div class='d-flex'>
+                                            <div class='ms-auto btn-list'>
+                                                <LayerIcon v-if='d.has.buildings' layer='buildings'/>
+                                                <LayerIcon v-if='d.has.addresses' layer='addresses'/>
+                                                <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -147,13 +151,11 @@ import {
     SettingsIcon,
     DownloadIcon,
     HistoryIcon,
-    BuildingCommunityIcon,
-    MapPinIcon,
-    ShapeIcon,
     RefreshIcon,
     SearchIcon,
     XIcon,
 } from 'vue-tabler-icons';
+import LayerIcon from './util/LayerIcon.vue';
 import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
@@ -337,10 +339,8 @@ export default {
         TablerLoading,
         SearchIcon,
         XIcon,
-        BuildingCommunityIcon,
         TablerInput,
-        MapPinIcon,
-        ShapeIcon
+        LayerIcon
     }
 }
 </script>

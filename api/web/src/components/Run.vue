@@ -67,27 +67,30 @@
                         </div>
 
                         <TablerLoading v-if='loading.jobs' desc='Loading Jobs'/>
-                        <TablerNone v-else-if='!jobs.jobs.length' :create='false'/>
-                        <table v-else class="table table-hover table-vcenter card-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Job ID</th>
-                                    <th>Created</th>
-                                    <th>Source</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in jobs.jobs' class='cursor-pointer'>
-                                    <td><Status :status='job.status'/></td>
-                                    <td>Job <span v-text='job.id'/></td>
-                                    <td><span v-text='fmt(job.created)'/></td>
-                                    <td>
-                                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <TablerNone v-else-if='!list.jobs.length' :create='false'/>
+                        <template v-else>
+                            <table class="table table-hover table-vcenter card-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Job ID</th>
+                                        <th>Created</th>
+                                        <th>Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
+                                        <td><Status :status='job.status'/></td>
+                                        <td>Job <span v-text='job.id'/></td>
+                                        <td><span v-text='fmt(job.created)'/></td>
+                                        <td>
+                                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -116,10 +119,14 @@ export default {
         return {
             tz: moment.tz.guess(),
             showFilter: false,
-            filter: {
+            paging: {
                 source: '',
                 layer: 'all',
-                status: 'All'
+                status: 'All',
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
             },
             run: {
                 status: '',
@@ -133,7 +140,10 @@ export default {
                     Success: 0
                 }
             },
-            jobs: [],
+            list: {
+                total: 0,
+                jobs: [],
+            },
             loading: {
                 count: true,
                 run: true,
@@ -145,26 +155,26 @@ export default {
         await this.refresh();
     },
     watch: {
-        showFilter: function() {
-            this.filter.source = '';
-            this.filter.layer = 'all';
-            this.filter.status = 'All'
-        },
-        filter: {
+        paging: {
             deep: true,
             handler: async function() {
                 await this.fetchJobs();
             }
-        }
+        },
+        showFilter: function() {
+            this.paging.source = '';
+            this.paging.layer = 'all';
+            this.paging.status = 'All'
+        },
     },
     methods: {
         fmt: function(date) {
             return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
         },
-        filterShortcut: function(filter) {
+        filterShortcut: function(status) {
             this.showFilter = true;
             this.$nextTick(() => {
-                this.filter.status = filter;
+                this.paging.status = status;
             });
         },
         external: function(url) {
@@ -193,11 +203,15 @@ export default {
 
             const url = new URL(`${window.location.origin}/api/job`);
             url.searchParams.set('run', this.runid);
-            if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
-            if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
-            if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
+            url.searchParams.append('limit', this.paging.limit);
+            url.searchParams.append('page', this.paging.page);
+            url.searchParams.append('source', this.paging.source);
+            url.searchParams.append('order', this.paging.order);
+            if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
+            if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
+            if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
 
-            this.jobs = await window.std(url);
+            this.list = await window.std(url);
             this.loading.jobs = false;
         }
     },

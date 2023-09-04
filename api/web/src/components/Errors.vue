@@ -132,7 +132,7 @@ export default {
         paging: {
             deep: true,
             handler: async function() {
-                await this.fetchRuns();
+                await this.fetchProblems();
             }
         }
     },

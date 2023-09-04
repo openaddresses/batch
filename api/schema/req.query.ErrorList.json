@@ -12,6 +12,25 @@
         },
         "status": {
             "$ref": "./util/status.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "job",
+            "enum": [
+                "job",
+                "status",
+                "messages",
+                "source_name",
+                "layer",
+                "name"
+            ],
+            "description": "Field to sort order by"
         }
     }
 }

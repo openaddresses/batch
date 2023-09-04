@@ -38,27 +38,29 @@
                             </div>
                         </template>
 
-                        <TablerLoading v-if='loading' desc='Loading Runs'/>
+                        <TablerLoading v-if='loading' desc='Loading Errors'/>
                         <TablerNone v-else-if='!list.total' label='Errors' :create='false'/>
                         <table v-else class="table table-hover table-vcenter card-table">
                             <thead>
                                 <tr>
                                     <th>Status</th>
-                                    <th>Run ID</th>
-                                    <th>Created</th>
+                                    <th>Job ID</th>
+                                    <th>Job Name</th>
                                     <th>Attributes</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click='$router.push(`/run/${run.id}`);' :key='run.id' v-for='run in list.errors' class='cursor-pointer'>
-                                    <td><Status :status='run.status'/></td>
-                                    <td>Run <span v-text='run.id'/></td>
-                                    <td><span v-text='fmt(run.created)'/></td>
+                                <tr @click='$router.push(`/job/${error.job}`);' :key='error.job' v-for='error in list.errors' class='cursor-pointer'>
+                                    <td><Status :status='error.status'/></td>
+                                    <td>Job <span v-text='error.job'/></td>
+                                    <td><span v-text='`${error.source_name} - ${error.layer} - ${error.name}`'/></td>
                                     <td>
                                         <div class='d-flex'>
                                             <div class='ms-auto btn-list'>
-                                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
-                                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white">Github</span>
+                                                <ErrorsModerate
+                                                    :error='error'
+                                                    @moderated="problems.splice(i, 1)"
+                                                />
                                             </div>
                                         </div>
                                     </td>
@@ -74,42 +76,18 @@
 </div>
 
 <!--
-        <template v-else-if='!problems.length'>
-            <div class='flex flex--center-main w-full'>
-                <div class='py24'>
-                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                </div>
-            </div>
-            <div class='w-full align-center txt-bold'>No Errors Found</div>
-            <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
-        </template>
-        <template v-else>
-            <div @click='$router.push({ path: `/job/${error.job}` })' :key='error.job' v-for='(error, i) in problems' class='col col--12 grid'>
-                <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--1'>
-                        <Status :status='error.status'/>
-                    </div>
-                    <div class='col col--1'>
-                        Job <span v-text='error.job'/>
-                    </div>
-                    <div class='col col--6'>
-                        <span v-text='`${error.source_name} - ${error.layer} - ${error.name}`'/>
-                    </div>
-                    <div class='col col--4'>
-                        <ErrorsModerate
-                            :error='error'
-                            @moderated="problems.splice(i, 1)"
-                        />
-                    </div>
+<div @click='$router.push({ path: `/job/${error.job}` })' :key='error.job' v-for='(error, i) in problems' class='col col--12 grid'>
+    <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+        <div class='col col--6'>
+        </div>
+        <div class='col col--4'>
+        </div>
 
-                    <div class='col col--12 py3'>
-                        <div :key='message' v-for='message in error.messages' class='align-center w-full' v-text='message'></div>
-                    </div>
-                </div>
-            </div>
-
-        </template>
+        <div class='col col--12 py3'>
+            <div :key='message' v-for='message in error.messages' class='align-center w-full' v-text='message'></div>
+        </div>
     </div>
+</div>
 -->
 </template>
 
@@ -141,7 +119,7 @@ export default {
                 source: '',
                 layer: 'all',
                 status: 'All',
-                sort: 'id',
+                sort: 'job',
                 order: 'desc',
                 limit: 100,
                 page: 0
@@ -174,7 +152,6 @@ export default {
                 const url = window.stdurl('/api/job/error');
                 url.searchParams.append('limit', this.paging.limit);
                 url.searchParams.append('page', this.paging.page);
-                url.searchParams.append('filter', this.paging.filter);
                 url.searchParams.append('order', this.paging.order);
                 if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
                 if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);

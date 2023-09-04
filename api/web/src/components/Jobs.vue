@@ -44,7 +44,7 @@
                                         <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
                                     </td>
                                     <td>
-                                        <div class='btn-list'>
+                                        <div v-on:click.stop.prevent='' class='btn-list'>
                                             <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
                                             <span v-on:click.stop.prevent='external(job.source)'>
                                                 <BrandGithubIcon class='cursor-pointer'/>

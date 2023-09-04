@@ -1,60 +1,61 @@
 <template>
-    <span v-on:click.stop.prevent='datapls(job.job)' v-if='job.output.output' class='fr dropdown h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-        <DownloadIcon width="16" height="16"/>
+<TablerDropdown v-on:click.stop.prevent='' v-if='job.output.output'>
+    <slot>
+        <DownloadIcon class='cursor-pointer'/>
+    </slot>
 
-        <div v-on:click.stop class='round dropdown-content cursor-default' style='width: 150px;'>
-            <div class='col col--12'>
+    <template #dropdown>
+        <div class='row'>
+            <div class='flex-inline pb12'>
+                <button @click='mode = "base"' :class='{ "btn--stroke": mode !== "base" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Base</button>
+                <button @click='mode = "validated"' :class='{ "btn--stroke": mode !== "validated" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Validated</button>
+            </div>
 
-                <div class='flex-inline pb12'>
-                    <button @click='mode = "base"' :class='{ "btn--stroke": mode !== "base" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Base</button>
-                    <button @click='mode = "validated"' :class='{ "btn--stroke": mode !== "validated" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Validated</button>
+            <div v-if='mode === "base"' class='col col--12'>
+                <div class='col-12'>
+                    <span @click='datapls(job.job || job.id)' class='txt-underline-on-hover cursor-pointer'>
+                        GeoJSON+LD
+                    </span>
+                    <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
                 </div>
 
-                <div v-if='mode === "base"' class='col col--12'>
-                    <div class='col col--12'>
-                        <span @click='datapls(job.job || job.id)' class='txt-underline-on-hover cursor-pointer'>
-                            GeoJSON+LD
-                        </span>
-                        <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
-                    </div>
+                <div class='col-12'>
+                    <span @click='datapls(job.job || job.id, "shapefile")' class='txt-underline-on-hover cursor-pointer'>
+                        ShapeFile
+                    </span>
+                    <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                </div>
 
-                    <div class='col col--12'>
-                        <span @click='datapls(job.job || job.id, "shapefile")' class='txt-underline-on-hover cursor-pointer'>
-                            ShapeFile
-                        </span>
-                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
-                    </div>
-
-                    <div class='col col--12'>
-                        <span @click='datapls(job.job || job.id, "csv")' class='txt-underline-on-hover cursor-pointer'>
-                            CSV
-                        </span>
-                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"/>
-                    </div>
+                <div class='col-12'>
+                    <span @click='datapls(job.job || job.id, "csv")' class='txt-underline-on-hover cursor-pointer'>
+                        CSV
+                    </span>
+                    <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"/>
                 </div>
-                <div v-else-if='!job.output.validated' class='col col--12'>
-                    <div class='flex flex--center-main'>
-                        <svg class='align-center icon color-gray' style='height: 40px; width: 40px;'><use href='#icon-alert'/></svg>
-                    </div>
-                    <div class='align-center'>No Validated Data</div>
+            </div>
+            <div v-else-if='!job.output.validated' class='col col--12'>
+                <div class='flex flex--center-main'>
+                    <svg class='align-center icon color-gray' style='height: 40px; width: 40px;'><use href='#icon-alert'/></svg>
                 </div>
-                <div v-else-if='auth.level !== "sponsor"' class='col col--12'>
-                    <div class='flex flex--center-main'>
-                        <svg class='align-center icon color-gray' style='height: 40px; width: 40px;'><use href='#icon-info'/></svg>
-                    </div>
-                    <div class='align-center'>Sponsor Benefit</div>
+                <div class='align-center'>No Validated Data</div>
+            </div>
+            <div v-else-if='auth.level !== "sponsor"' class='col col--12'>
+                <div class='flex flex--center-main'>
+                    <svg class='align-center icon color-gray' style='height: 40px; width: 40px;'><use href='#icon-info'/></svg>
                 </div>
-                <div v-else class='col col--12'>
-                    <div class='col col--12'>
-                        <span @click='datapls(job.job || job.id, "geojson", true)' class='txt-underline-on-hover cursor-pointer'>
-                            GeoJSON+LD
-                        </span>
-                        <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
-                    </div>
+                <div class='align-center'>Sponsor Benefit</div>
+            </div>
+            <div v-else class='col col--12'>
+                <div class='col col--12'>
+                    <span @click='datapls(job.job || job.id, "geojson", true)' class='txt-underline-on-hover cursor-pointer'>
+                        GeoJSON+LD
+                    </span>
+                    <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
                 </div>
             </div>
         </div>
-    </span>
+    </template>
+</TablerDropdown>
 </template>
 
 <script>
@@ -62,6 +63,9 @@ import {
     InfoCircleIcon,
     DownloadIcon
 } from 'vue-tabler-icons';
+import {
+    TablerDropdown
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Download',
@@ -108,6 +112,7 @@ export default {
         }
     },
     components: {
+        TablerDropdown,
         InfoCircleIcon,
         DownloadIcon
     }

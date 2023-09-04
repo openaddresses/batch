@@ -50,21 +50,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click='$router.push(`/job/${error.job}`);' :key='error.job' v-for='error in list.errors' class='cursor-pointer'>
-                                    <td><Status :status='error.status'/></td>
-                                    <td>Job <span v-text='error.job'/></td>
-                                    <td><span v-text='`${error.source_name} - ${error.layer} - ${error.name}`'/></td>
-                                    <td>
-                                        <div class='d-flex'>
-                                            <div class='ms-auto btn-list'>
-                                                <ErrorsModerate
-                                                    :error='error'
-                                                    @moderated="problems.splice(i, 1)"
-                                                />
+                                <template :key='error.job' v-for='error in list.errors'>
+                                    <tr @click='$router.push(`/job/${error.job}`);' class='cursor-pointer'>
+                                        <td><Status :status='error.status'/></td>
+                                        <td>Job <span v-text='error.job'/></td>
+                                        <td><span v-text='`${error.source_name} - ${error.layer} - ${error.name}`'/></td>
+                                        <td>
+                                            <div class='d-flex'>
+                                                <div class='ms-auto btn-list'>
+                                                    <ErrorsModerate
+                                                        :error='error'
+                                                        @moderated="problems.splice(i, 1)"
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan='4'>
+                                            <div :key='message' v-for='message in error.messages' class='text-center w-full' v-text='message'></div>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                         <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
@@ -76,18 +83,9 @@
 </div>
 
 <!--
-<div @click='$router.push({ path: `/job/${error.job}` })' :key='error.job' v-for='(error, i) in problems' class='col col--12 grid'>
-    <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-        <div class='col col--6'>
-        </div>
-        <div class='col col--4'>
-        </div>
-
         <div class='col col--12 py3'>
             <div :key='message' v-for='message in error.messages' class='align-center w-full' v-text='message'></div>
         </div>
-    </div>
-</div>
 -->
 </template>
 

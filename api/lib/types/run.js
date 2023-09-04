@@ -1,6 +1,6 @@
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';
-import Generic from '@openaddresses/batch-generic';
+import Generic, { Params } from '@openaddresses/batch-generic';
 import moment from 'moment';
 import Job from './job.js';
 import Data from './data.js';
@@ -132,6 +132,8 @@ export default class Run extends Generic {
                     ${sql.identifier([this._table, query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
+                OFFSET 
+                    ${query.limit * query.page}
             `);
 
             const list = this.deserialize_list(pgres, 'runs');

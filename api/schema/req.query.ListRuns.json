@@ -8,12 +8,15 @@
             "maximum": 100,
             "description": "Limit number of returned runs"
         },
+        "page": {
+            "$ref": "./util/page.json"
+        },
         "order": {
             "$ref": "./util/order.json"
         },
         "sort": {
             "type": "string",
-            "default": "created",
+            "default": "id",
             "enum": [
                 "id",
                 "live",

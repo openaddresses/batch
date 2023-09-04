@@ -18,9 +18,12 @@
         "order": {
             "$ref": "./util/order.json"
         },
+        "page": {
+            "$ref": "./util/page.json"
+        },
         "sort": {
             "type": "string",
-            "default": "created",
+            "default": "id",
             "enum": [
                 "id",
                 "run",

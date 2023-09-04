@@ -41,22 +41,17 @@
                                             <div class='ms-auto btn-list'>
                                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
                                                 <template v-if='auth && auth.access === "admin"'>
-                                                    <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                                        <SettingsIcon class='cursor-pointer'/>
-
-                                                        <div class='round dropdown-content'>
-                                                            <label class='switch-container'>
-                                                                <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
-                                                                <div class='switch switch--blue mx6'></div>
-                                                                Fabric
-                                                            </label>
-                                                        </div>
-                                                    </span>
+                                                    <TablerDropdown>
+                                                        <slot>
+                                                            <SettingsIcon class='cursor-pointer'/>
+                                                        </slot>
+                                                        <template #dropdown>
+                                                            <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
+                                                        </template>
+                                                    </TablerDropdown>
                                                 </template>
 
-                                                <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                                    <HistoryIcon width='16' height='16'/>
-                                                </span>
+                                                <HistoryIcon v-on:click.stop.prevent='emithistory(job.id)' class='cursor-pointer'/>
                                             </div>
                                         </td>
                                     </tr>
@@ -81,7 +76,9 @@ import {
     SettingsIcon
 } from 'vue-tabler-icons';
 import {
-    TablerLoading
+    TablerLoading,
+    TablerDropdown,
+    TablerToggle
 } from '@tak-ps/vue-tabler';
 import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
@@ -143,6 +140,8 @@ export default {
         Download,
         Coverage,
         TablerLoading,
+        TablerDropdown,
+        TablerToggle,
         HistoryIcon,
         SettingsIcon
     },

@@ -72,6 +72,9 @@
                         <h2 class='card-title'>Individual Sources</h2>
 
                         <div class='ms-auto btn-list'>
+                            <ArrowsMaximizeIcon @click='fullscreen = true' v-if='!fullscreen'/>
+                            <ArrowsMinimizeIcon @click='fullscreen = false' v-else/>
+
                             <SearchIcon @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer'/>
                             <XIcon  @click='showFilter = !showFilter' v-else class='cursor-pointer'/>
 
@@ -111,6 +114,7 @@
                     <TablerLoading v-if='loading.sources' desc='Loading Sources'/>
                     <template v-else>
                         <Coverage
+                            :fullscreen='fullscreen'
                             @err='$emit("err", $event)'
                             v-on:point='filter.point = $event'
                             :layer='filter.layer'
@@ -172,6 +176,7 @@ export default {
     data: function() {
         return {
             tz: moment.tz.guess(),
+            fullscreen: false,
             loading: {
                 sources: false,
                 collections: false

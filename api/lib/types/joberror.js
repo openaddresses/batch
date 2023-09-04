@@ -14,10 +14,11 @@ export default class JobError extends Generic {
 
     static async list(pool, query) {
         if (!query) query = {};
-        query.source = Params.string(query.source, { default: '' });
+
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.status) query.status = Status.list();
 
+        query.source = Params.string(query.source, { default: '' });
         query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
 

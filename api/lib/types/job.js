@@ -112,10 +112,6 @@ export default class Job extends Generic {
             throw new Err(500, err, 'Failed to load jobs');
         }
 
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'No job found');
-        }
-
         const list = this.deserialize_list(pgres, 'jobs');
 
         list.jobs.map((job) => {

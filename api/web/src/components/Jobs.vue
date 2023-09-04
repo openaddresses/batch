@@ -27,13 +27,13 @@
                         <template v-if='showFilter'>
                             <div class='card-body row'>
                                 <div class='col-12 col-md-6'>
-                                    <QuerySource @source='filter.source = $event'/>
+                                    <QuerySource @source='paging.source = $event'/>
                                 </div>
                                 <div class='col-12 col-md-3'>
-                                    <QueryLayer @layer='filter.layer = $event' />
+                                    <QueryLayer @layer='paging.layer = $event' />
                                 </div>
                                 <div class='col-12 col-md-3'>
-                                    <QueryStatus @status='filter.status = $event'/>
+                                    <QueryStatus @status='paging.status = $event'/>
                                 </div>
                             </div>
                         </template>
@@ -122,7 +122,9 @@ export default {
             tz: moment.tz.guess(),
             showFilter: false,
             paging: {
-                filter: '',
+                source: '',
+                layer: 'all',
+                status: 'All',
                 sort: 'id',
                 order: 'desc',
                 limit: 100,
@@ -149,8 +151,13 @@ export default {
                 const url = window.stdurl('/api/job');
                 url.searchParams.append('limit', this.paging.limit);
                 url.searchParams.append('page', this.paging.page);
-                url.searchParams.append('filter', this.paging.filter);
+                url.searchParams.append('source', this.paging.source);
                 url.searchParams.append('order', this.paging.order);
+                if (this.showFilter) {
+                    if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
+                    if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
+                    if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
+                }
 
                 this.list = await window.std(url);
 

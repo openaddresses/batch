@@ -27,13 +27,13 @@
                         <template v-if='showFilter'>
                             <div class='card-body row'>
                                 <div class='col-12 col-md-6'>
-                                    <QuerySource @source='filter.source = $event'/>
+                                    <QuerySource @source='paging.source = $event'/>
                                 </div>
                                 <div class='col-12 col-md-3'>
-                                    <QueryLayer @layer='filter.layer = $event' />
+                                    <QueryLayer @layer='paging.layer = $event' />
                                 </div>
                                 <div class='col-12 col-md-3'>
-                                    <QueryStatus @status='filter.status = $event'/>
+                                    <QueryStatus @status='paging.status = $event'/>
                                 </div>
                             </div>
                         </template>
@@ -81,12 +81,6 @@
         </div>
     </div>
 </div>
-
-<!--
-        <div class='col col--12 py3'>
-            <div :key='message' v-for='message in error.messages' class='align-center w-full' v-text='message'></div>
-        </div>
--->
 </template>
 
 <script>

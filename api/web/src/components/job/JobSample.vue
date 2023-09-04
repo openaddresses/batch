@@ -82,7 +82,7 @@ export default {
         getSample: async function() {
             try {
                 this.loading = true;
-                const res = await window.std(`/api/job/${this.job.id}/output/sample`);
+                const res = await window.std(`/api/job/${this.$route.params.jobid}/output/sample`);
                 const props = {};
                 for (const r of res) {
                     for (const key of Object.keys(r.properties)) {

@@ -36,7 +36,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in jobs' class='cursor-pointer'>
+                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
                                     <td><Status :status='job.status'/></td>
                                     <td>Job <span v-text='job.id'/></td>
                                     <td><span v-text='fmt(job.created)'/></td>
@@ -57,6 +57,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
                     </div>
                 </div>
             </div>
@@ -74,6 +75,7 @@ import {
 import Status from './util/Status.vue';
 import Download from './util/Download.vue';
 import moment from 'moment-timezone';
+import TableFooter from './util/TableFooter.vue';
 import {
     TablerLoading,
     TablerBreadCrumb
@@ -85,10 +87,28 @@ export default {
     mounted: function() {
         this.fetchJobs();
     },
+    watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchJobs();
+            }
+        }
+    },
     data: function() {
         return {
             tz: moment.tz.guess(),
-            jobs: [],
+            paging: {
+                filter: '',
+                sort: 'id',
+                order: 'desc',
+                limit: 10,
+                page: 0
+            },
+            list: {
+                total: 0,
+                jobs: []
+            },
             loading: false
         };
     },
@@ -102,7 +122,15 @@ export default {
         fetchJobs: async function() {
             try {
                 this.loading = true;
-                this.jobs = await window.std(window.location.origin + '/api/job');
+
+                const url = window.stdurl('/api/job');
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
+                url.searchParams.append('filter', this.paging.filter);
+                url.searchParams.append('order', this.paging.order);
+
+                this.list = await window.std(url);
+
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
@@ -116,7 +144,8 @@ export default {
         BrandGithubIcon,
         NotesIcon,
         TablerLoading,
-        TablerBreadCrumb
+        TablerBreadCrumb,
+        TableFooter,
     },
 }
 </script>

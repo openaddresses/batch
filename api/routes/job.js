@@ -19,16 +19,16 @@ export default async function router(schema, config) {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
 
-            const jobs = await Job.list(config.pool, req.query);
+            const list = await Job.list(config.pool, req.query);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
-                for (const j of jobs) {
+                for (const j of list.jobs) {
                     delete j.s3;
                     delete j.s3_validated;
                 }
             }
 
-            return res.json(jobs);
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }

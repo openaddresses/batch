@@ -15,6 +15,33 @@
         "status": {
             "$ref": "./util/status.json"
         },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "created",
+            "enum": [
+                "id",
+                "run",
+                "map",
+                "created",
+                "source",
+                "source_name",
+                "layer",
+                "name",
+                "output",
+                "loglink",
+                "status",
+                "stats",
+                "count",
+                "bounds",
+                "version",
+                "size",
+                "license"
+            ],
+            "description": "Field to sort order by"
+        },
         "live": {
             "type": "string",
             "default": "all",

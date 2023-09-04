@@ -52,7 +52,7 @@
                                 <div @click='filterShortcut("Fail")' class='col-3'>
                                     <div class='text-center' v-text='count.status.Fail + " Jobs"'></div>
                                     <div class='d-flex justify-content-center my-2'>
-                                            <Status status='Fail'/>
+                                        <Status status='Fail'/>
                                     </div>
                                     <div class='text-center'>Fail</div>
                                 </div>
@@ -67,7 +67,7 @@
                         </div>
 
                         <TablerLoading v-if='loading.jobs' desc='Loading Jobs'/>
-                        <TablerNone v-else-if='!jobs.length'/>
+                        <TablerNone v-else-if='!jobs.jobs.length' :create='false'/>
                         <table v-else class="table table-hover table-vcenter card-table">
                             <thead>
                                 <tr>
@@ -78,7 +78,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in jobs' class='cursor-pointer'>
+                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in jobs.jobs' class='cursor-pointer'>
                                     <td><Status :status='job.status'/></td>
                                     <td>Job <span v-text='job.id'/></td>
                                     <td><span v-text='fmt(job.created)'/></td>

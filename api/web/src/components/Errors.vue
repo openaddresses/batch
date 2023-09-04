@@ -60,7 +60,7 @@
                                                 <div class='ms-auto btn-list'>
                                                     <ErrorsModerate
                                                         :error='error'
-                                                        @moderated="problems.splice(i, 1)"
+                                                        @moderated="list.errors.splice(i, 1)"
                                                     />
                                                 </div>
                                             </div>
@@ -98,7 +98,7 @@ import Status from './util/Status.vue';
 import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
-import ErrorsModerate from './ErrorsModerate.vue';
+import ErrorsModerate from './util/ErrorsModerate.vue';
 import TableFooter from './util/TableFooter.vue';
 import {
     TablerNone,

@@ -123,7 +123,7 @@ import {
     TablerBreadCrumb,
     TablerLoading,
 } from '@tak-ps/vue-tabler';
-import ErrorsModerate from './ErrorsModerate.vue';
+import ErrorsModerate from './util/ErrorsModerate.vue';
 import Download from './util/Download.vue';
 import Status from './util/Status.vue';
 import JobSample from './job/JobSample.vue';

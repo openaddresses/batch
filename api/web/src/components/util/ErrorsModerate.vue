@@ -1,14 +1,15 @@
 <template>
 <div class='btn-list'>
     <template v-if='error.status === "Warn"'>
-        <button v-on:click.stop.prevent='mod(error.id, true)' class='btn'>Confirm</button>
-        <button v-on:click.stop.prevent='mod(error.id, false)' class='btn'>Reject</button>
+        <button v-on:click.stop.prevent='mod(error.job || error.id, true)' class='btn'>Confirm</button>
+        <button v-on:click.stop.prevent='mod(error.job || error.id, false)' class='btn btn-danger'>Reject</button>
+        <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })' class='btn'>Logs</button>
     </template>
     <template v-else-if='error.status === "Fail"'>
-        <button v-on:click.stop.prevent='mod(error.id, false)' class='btn'>Suppress</button>
-        <button v-on:click.stop.prevent='createRerun(error.id)' class='btn'>Rerun</button>
+        <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })' class='btn'>Logs</button>
+        <button v-on:click.stop.prevent='createRerun(error.job || error.id)' class='btn btn-secondary'>Rerun</button>
+        <button v-on:click.stop.prevent='mod(error.job || error.id, false)' class='btn btn-primary'>Suppress</button>
     </template>
-    <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.id}/log` })' class='btn'>Logs</button>
 </div>
 </template>
 

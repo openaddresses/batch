@@ -72,8 +72,8 @@
                         <h2 class='card-title'>Individual Sources</h2>
 
                         <div class='ms-auto btn-list'>
-                            <ArrowsMaximizeIcon @click='fullscreen = true' v-if='!fullscreen'/>
-                            <ArrowsMinimizeIcon @click='fullscreen = false' v-else/>
+                            <ArrowsMaximizeIcon @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer'/>
+                            <ArrowsMinimizeIcon @click='fullscreen = false' v-else class='cursor-pointer'/>
 
                             <SearchIcon @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer'/>
                             <XIcon  @click='showFilter = !showFilter' v-else class='cursor-pointer'/>
@@ -152,6 +152,8 @@
 
 <script>
 import {
+    ArrowsMaximizeIcon,
+    ArrowsMinimizeIcon,
     SettingsIcon,
     DownloadIcon,
     HistoryIcon,
@@ -333,6 +335,8 @@ export default {
         }
     },
     components: {
+        ArrowsMaximizeIcon,
+        ArrowsMinimizeIcon,
         Coverage,
         QuerySource,
         QueryLayer,

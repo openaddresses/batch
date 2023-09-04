@@ -11,26 +11,32 @@
                 <button @click='mode = "validated"' :class='{ "btn--stroke": mode !== "validated" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Validated</button>
             </div>
 
-            <div v-if='mode === "base"' class='col col--12'>
-                <div class='col-12'>
-                    <span @click='datapls(job.job || job.id)' class='txt-underline-on-hover cursor-pointer'>
+            <div v-if='mode === "base"' class='col-12'>
+                <div class='col-12 d-flex px-2'>
+                    <span @click='datapls(job.job || job.id)' class='cursor-pointer'>
                         GeoJSON+LD
                     </span>
-                    <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                    <div class='ms-auto'>
+                        <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                    </div>
                 </div>
 
-                <div class='col-12'>
-                    <span @click='datapls(job.job || job.id, "shapefile")' class='txt-underline-on-hover cursor-pointer'>
+                <div class='col-12 d-flex px-2'>
+                    <span @click='datapls(job.job || job.id, "shapefile")' class='cursor-pointer'>
                         ShapeFile
                     </span>
-                    <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                    <div class='ms-auto'>
+                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                    </div>
                 </div>
 
-                <div class='col-12'>
-                    <span @click='datapls(job.job || job.id, "csv")' class='txt-underline-on-hover cursor-pointer'>
+                <div class='col-12 d-flex px-2'>
+                    <span @click='datapls(job.job || job.id, "csv")' class='cursor-pointer'>
                         CSV
                     </span>
-                    <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"/>
+                    <div class='ms-auto'>
+                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"/>
+                    </div>
                 </div>
             </div>
             <div v-else-if='!job.output.validated' class='col col--12'>
@@ -47,7 +53,7 @@
             </div>
             <div v-else class='col col--12'>
                 <div class='col col--12'>
-                    <span @click='datapls(job.job || job.id, "geojson", true)' class='txt-underline-on-hover cursor-pointer'>
+                    <span @click='datapls(job.job || job.id, "geojson", true)' class='cursor-pointer'>
                         GeoJSON+LD
                     </span>
                     <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>

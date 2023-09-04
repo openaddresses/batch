@@ -26,11 +26,6 @@
 <script>
 import mapgl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css';
-import {
-    ArrowsMaximizeIcon,
-    ArrowsMinimizeIcon
-} from 'vue-tabler-icons';
-
 let map = null;
 
 export default {
@@ -331,10 +326,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        ArrowsMaximizeIcon,
-        ArrowsMinimizeIcon
     }
 }
 </script>

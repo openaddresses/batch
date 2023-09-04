@@ -155,32 +155,32 @@ export default {
             }
         };
     },
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.refresh();
     },
     methods: {
         datapls: function() {
             if (!this.auth.username) return this.$emit('login');
-            this.external(`${window.location.origin}/api/job/${this.job.id}/output/source.geojson.gz?token=${localStorage.token}`);
+            this.external(`${window.location.origin}/api/job/${this.$route.params.jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         external: function(url) {
             window.open(url, "_blank");
         },
-        refresh: function() {
-            this.getJob();
-            this.getError();
-            this.getDelta();
+        refresh: async function() {
+            await this.getJob();
+            await this.getError();
+            await this.getDelta();
         },
         getError: async function() {
             try {
-                this.joberror = await window.std(`/api/job/error/${this.jobid}`);
+                this.joberror = await window.std(`/api/job/error/${this.$route.params.jobid}`);
             } catch (err) {
                 this.joberror = false;
             }
         },
         getDelta: async function() {
             try {
-                const res = await window.std(window.location.origin + `/api/job/${this.jobid}/delta`);
+                const res = await window.std(window.location.origin + `/api/job/${this.$route.params.jobid}/delta`);
                 this.delta.master = res.master;
                 this.delta.compare = res.compare;
                 this.delta.delta = res.delta;
@@ -191,7 +191,7 @@ export default {
         getJob: async function() {
             try {
                 this.loading = true;
-                this.job = await window.std(`/api/job/${this.jobid}`);
+                this.job = await window.std(`/api/job/${this.$route.params.jobid}`);
                 this.name = this.job.source
                     .replace(/.*sources\//, '')
                     .replace(/\.json/, '');
@@ -204,7 +204,7 @@ export default {
         createRerun: async function() {
             try {
                 this.loading = true;
-                const res = await window.std(`/api/job/${this.jobid}/rerun`, {
+                const res = await window.std(`/api/job/${this.$route.params.jobid}/rerun`, {
                     method: 'POST'
                 });
 

@@ -21,7 +21,7 @@
 
                             <div class='ms-auto btn-list'>
                                 <SearchIcon @click='showFilter = !showFilter' class='cursor-pointer'/>
-                                <RefreshIcon @click='fetchRuns' class='cursor-pointer'/>
+                                <RefreshIcon @click='fetchProblems' class='cursor-pointer'/>
                             </div>
                         </div>
                         <template v-if='showFilter'>
@@ -37,6 +37,35 @@
                                 </div>
                             </div>
                         </template>
+
+                        <TablerLoading v-if='loading' desc='Loading Runs'/>
+                        <TablerNone v-else-if='!list.total' label='Errors' :create='false'/>
+                        <table v-else class="table table-hover table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Run ID</th>
+                                    <th>Created</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr @click='$router.push(`/run/${run.id}`);' :key='run.id' v-for='run in list.errors' class='cursor-pointer'>
+                                    <td><Status :status='run.status'/></td>
+                                    <td>Run <span v-text='run.id'/></td>
+                                    <td><span v-text='fmt(run.created)'/></td>
+                                    <td>
+                                        <div class='d-flex'>
+                                            <div class='ms-auto btn-list'>
+                                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
+                                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white">Github</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
                     </div>
                 </div>
             </div>
@@ -45,15 +74,6 @@
 </div>
 
 <!--
-
-            </div>
-        </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
         <template v-else-if='!problems.length'>
             <div class='flex flex--center-main w-full'>
                 <div class='py24'>
@@ -103,7 +123,9 @@ import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import ErrorsModerate from './ErrorsModerate.vue';
+import TableFooter from './util/TableFooter.vue';
 import {
+    TablerNone,
     TablerLoading,
     TablerBreadCrumb
 } from '@tak-ps/vue-tabler';
@@ -115,44 +137,51 @@ export default {
         return {
             loading: true,
             showFilter: false,
-            filter: {
+            paging: {
                 source: '',
                 layer: 'all',
-                status: 'All'
+                status: 'All',
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
             },
-            problems: []
+            list: {
+                total: 0,
+                problems: []
+            }
         };
     },
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.fetchProblems();
     },
     watch: {
         problems: function() {
             this.$emit('errors', this.problems.length);
         },
-        'filter.source': function() {
-            this.refresh();
-        },
-        'filter.layer': function() {
-            this.refresh();
-        },
-        'filter.status': function() {
-            this.refresh();
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchRuns();
+            }
         }
     },
     methods: {
-        refresh: function() {
-            this.getProblems();
-        },
-        getProblems: async function() {
+        fetchProblems: async function() {
             try {
                 this.loading = true;
-                const url = new URL('/api/job/error', window.location.origin);
-                if (this.filter.source !== '') url.searchParams.set('source', this.filter.source);
-                if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
-                if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
 
-                this.problems = await window.std(url);
+                const url = window.stdurl('/api/job/error');
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
+                url.searchParams.append('filter', this.paging.filter);
+                url.searchParams.append('order', this.paging.order);
+                if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
+                if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
+                if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
+
+                this.list = await window.std(url);
+
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
@@ -171,6 +200,9 @@ export default {
         QueryLayer,
         ErrorsModerate,
         TablerBreadCrumb,
+        TablerLoading,
+        TablerNone,
+        TableFooter
     },
 }
 </script>

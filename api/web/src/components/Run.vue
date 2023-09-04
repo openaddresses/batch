@@ -153,7 +153,7 @@ export default {
         filter: {
             deep: true,
             handler: async function() {
-                await this.getJobs();
+                await this.fetchJobs();
             }
         }
     },

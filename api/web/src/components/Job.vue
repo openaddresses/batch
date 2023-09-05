@@ -69,12 +69,10 @@
                         </div>
 
                         <TablerLoading v-if='loading' :desc='`Loading Job ${$route.params.jobid}`'/>
-                        <div v-else class="card-body">
-                            <JobSample
-                                @err='$emit("err", $event)'
-                                :job='job'
-                            />
-                        </div>
+                        <JobSample v-else
+                            @err='$emit("err", $event)'
+                            :job='job'
+                        />
                     </div>
                 </div>
 

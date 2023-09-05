@@ -125,6 +125,7 @@ export default async function router(schema, config) {
         ':job': 'integer'
     }, async (req, res) => {
         try {
+            console.error(`s3://${process.env.Bucket}/${process.env.StackName}/job/${req.params.job}/source.png`);
             const s3 = new S3({
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${req.params.job}/source.png`

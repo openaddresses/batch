@@ -1,7 +1,7 @@
 <template>
 <div class='col-12'>
     <template v-if='job.output.preview'>
-        <img class='round w-full' :src='`/api/job/${job.id}/output/source.png`'/>
+        <img class='round w-full' :src='local ? `http://localhost:4999/api/job/${job.id}/output/source.png` : `/api/job/${job.id}/output/source.png`'/>
     </template>
     <template v-else>
         <div class='border rounded'>
@@ -15,28 +15,20 @@
         </div>
     </template>
 
-    <div class='col-12 py-4'>
-        <h3 class='fl txt-h4'>Job Sample:</h3>
+    <div class='card-header'>
+        <h3 class='card-title'>Job Sample</h3>
 
-        <div class='flex-inline fr'>
-            <button @click='mode = "props"' :class='{ "btn--stroke": mode !== "props" }' class='btn btn--s btn--pill btn--pill-hl round mx0'>Props</button>
-            <button @click='mode = "raw"' :class='{ "btn--stroke": mode !== "raw" }' class='btn btn--s btn--pill btn--pill-hr round mx0'>Raw</button>
+        <div class='ms-auto btn-list'>
+            <button v-if='mode !== "props"' @click='mode = "props"' class='btn'>Table</button>
+            <button v-if='mode !== "raw"' @click='mode = "raw"' class='btn'>Raw</button>
         </div>
     </div>
 
 
-    <template v-if='loading'>
-        <div class='flex flex--center-main w-full py24'>
-            <div class='loading'></div>
-        </div>
-    </template>
-    <template v-else-if='!sample.length'>
-        <div class='col col--12 flex flex--center-main pt12 pb36'>
-            <h1 class='txt-h4 cursor-default'>File is empty</h1>
-        </div>
-    </template>
+    <TablerLoading v-if='loading' desc='Loading Sample Data'/>
+    <TablerNone v-else-if='!sample.length' :create='false'/>
     <template v-else-if='mode === "props"'>
-        <table class='table txt-xs mb60'>
+        <table class="table table-hover table-vcenter card-table">
             <thead>
                 <tr>
                     <th :key='key' v-for='key of props' v-text='key'></th>
@@ -50,11 +42,7 @@
         </table>
     </template>
     <template v-else-if='mode === "raw"'>
-        <textarea class='col col--12' rows='24' v-text='sample.map(s => JSON.stringify(s)).join("\n")' :style='{
-            "white-space": "pre",
-            "overflow-wrap": "normal",
-            "overflow-x": "scroll"
-        }'/>
+        <pre v-text='sample.map(s => JSON.stringify(s)).join("\n")'/>
     </template>
 </div>
 </template>
@@ -63,12 +51,17 @@
 import {
     InfoCircleIcon
 } from 'vue-tabler-icons';
+import {
+    TablerLoading,
+    TablerNone
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'JobSample',
     props: ['job'],
     data: function() {
         return {
+            local: window.location.hostname === 'localhost',
             mode: 'props',
             loading: true,
             props: [],
@@ -99,6 +92,8 @@ export default {
         }
     },
     components: {
+        TablerLoading,
+        TablerNone,
         InfoCircleIcon
     }
 }

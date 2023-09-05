@@ -1,79 +1,95 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                </button>
-
-                <Status :status='exp.status'/>
-
-                <h2 class='txt-h4 ml12 fl mb6'>
-                    Export #<span v-text='exportid'/>
-                    <div class='cursor-pointer fr dropdown'>
-                        <svg class='icon' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg>
-
-                        <div class='round dropdown-content'>
-                            <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
-                        </div>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
                     </div>
-                </h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
+                </div>
             </div>
         </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
-            </div>
-
-            <template v-if='!["Success", "Fail"].includes(exp.status)'>
-                <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
-                </div>
-                <div class='col col--12 flex flex--center-main'>
-                    <h3 v-if='exp.status === "Pending"' class='flex-child txt-h4 py6'>Your Export Is Queued</h3>
-                    <h3 v-else-if='exp.status === "Running"' class='flex-child txt-h4 py6'>Your Export Is Running</h3>
-                </div>
-            </template>
-            <template v-else-if='exp.status === "Fail"'>
-                <div class='flex flex--center-main w-full'>
-                </div>
-                <div class='col col--12 flex flex--center-main'>
-                    <h3 class='txt-h4 py6'>Your Export Failed - Contact us to find out what went wrong</h3>
-                </div>
-            </template>
-            <template v-else-if='exp.status === "Success"'>
-                <div class='flex flex--center-main w-full py12'>
-                    <button @click='datapls' class='btn btn--stroke round btn--gray'>
-                        <div class='flex flex--center-main'>
-                            <svg class='icon h36 w36'><use xlink:href='#icon-arrow-down'/></svg>
-                        </div>
-                        <div class='align-center'>Download</div>
-                        <div class='align-center' v-text='exp.format'></div>
-                    </button>
-                </div>
-            </template>
-
-            <div v-if='exp.status !== "Pending" && exp.loglink' class='col col--12 py12'>
-                <Log @err='$emit("err", $event)' collapse='true' logtype='export' :id='exp.id'/>
-            </div>
-        </template>
     </div>
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <div class='card-title row'>
+                                <div class='d-flex'>
+                                    <Status v-if='exp.status' :status='exp.status'/>
+                                    <LayerIcon class='align-self-center' :layer='job.layer'/>
+                                    <div class='mx-2 align-self-center'>
+                                        Export #<span v-text='exportid'/>
+                                    </div>
+                                </div>
+                                <div style='padding-left: 50px;' class='subheader' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></div>
+                            </div>
+
+                            <div class='ms-auto btn-list'>
+                                <TablerDropdown>
+                                    <slot>
+                                        <DotsVerticalIcon class='cursor-pointer'/>
+                                    </slot>
+                                    <template #dropdown>
+                                        <div @click='createRerun' class='mx-2 my-2'>Rerun</div>
+                                    </template>
+                                </TablerDropdown>
+
+                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                            </div>
+                        </div>
+                        <div class='card-body'>
+                            <TablerLoading v-if='loading'/>
+                            <template v-else>
+                                <template v-if='!["Success", "Fail"].includes(exp.status)'>
+                                    <TablerLoading v-if='exp.status === "Pending"' desc='Your Export Is Queued'/>
+                                    <TablerLoading v-else-if='exp.status === "Running"' desc='Your Export Is Running'/>
+                                </template>
+                                <template v-else-if='exp.status === "Fail"'>
+                                    <div class='col-12'>
+                                        <h3 class='text-center txt-h4'>Your Export Failed - Contact us to find out what went wrong</h3>
+                                    </div>
+                                </template>
+                                <template v-else-if='exp.status === "Success"'>
+                                    <div class='d-flex justify-content-center mb-3'>
+                                        <button @click='datapls' class='btn btn-primary'>
+                                            <ArrowDownIcon/> Download&nbsp;
+                                            <span v-text='exp.format'/>
+                                        </button>
+                                    </div>
+                                </template>
+
+                                <div v-if='exp.status !== "Pending" && exp.loglink' class='col-12'>
+                                    <Log @err='$emit("err", $event)' collapse='true' logtype='export' :id='exp.id'/>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 
 <script>
 
-import Log from './Log.vue';
-import Status from './Status.vue';
+import Log from './util/Log.vue';
+import Status from './util/Status.vue';
+import LayerIcon from './util/LayerIcon.vue';
+import {
+    ArrowDownIcon,
+    RefreshIcon,
+    DotsVerticalIcon,
+} from 'vue-tabler-icons';
+import {
+    TablerLoading,
+    TablerDropdown,
+    TablerBreadCrumb
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Export',
@@ -146,6 +162,13 @@ export default {
         }
     },
     components: {
+        ArrowDownIcon,
+        RefreshIcon,
+        DotsVerticalIcon,
+        TablerLoading,
+        TablerDropdown,
+        TablerBreadCrumb,
+        LayerIcon,
         Status,
         Log
     }

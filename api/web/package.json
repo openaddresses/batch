@@ -3,41 +3,35 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "vue-cli-service build --watch",
-        "serve": "vue-cli-service serve --watch",
-        "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint"
+        "serve": "vite serve --port 5430",
+        "build": "vite build",
+        "lint": "vite lint"
     },
     "dependencies": {
-        "@mapbox/assembly": "^1.3.0",
-        "vue-tabler-icons": "2.20.0",
-        "chart.js": "^3.7.0",
-        "chartjs-adapter-date-fns": "^2.0.0",
+        "@tabler/core": "^1.0.0-beta17",
+        "@tak-ps/vue-tabler": "^3.8.0",
+        "chart.js": "^4.4.0",
+        "chartjs-adapter-date-fns": "^3.0.0",
         "core-js": "^3.12.0",
         "date-fns": "^2.29.3",
         "floating-vue": "^2.0.0-beta.17",
-        "mapbox-gl": "^2.7.0",
+        "maplibre-gl": "^3.3.1",
         "moment-timezone": "^0.5.33",
         "sass": "^1.32.12",
         "sass-loader": "^13.1.0",
         "vue": "^3.2.31",
-        "vue-chartjs": "^4.1.1",
-        "vue-router": "^4.0.14"
+        "vue-chartjs": "^5.2.0",
+        "vue-router": "^4.0.14",
+        "vue-tabler-icons": "2.21.0"
     },
     "devDependencies": {
-        "@babel/eslint-parser": "^7.17.0",
-        "@vue/cli-plugin-babel": "^5.0.3",
-        "@vue/cli-plugin-eslint": "^5.0.3",
-        "@vue/cli-service": "^5.0.3",
+        "@vitejs/plugin-vue": "^4.2.1",
         "eslint": "^8.11.0",
         "eslint-plugin-vue": "^9.0.0",
-        "vue-template-compiler": "^2.6.11"
+        "vite": "^4.3.5"
     },
     "eslintConfig": {
         "root": true,
-        "globals": {
-            "mapboxgl": true
-        },
         "env": {
             "node": true
         },
@@ -45,9 +39,6 @@
             "plugin:vue/essential",
             "eslint:recommended"
         ],
-        "parserOptions": {
-            "parser": "@babel/eslint-parser"
-        },
         "rules": {
             "vue/multi-word-component-names": 1
         }

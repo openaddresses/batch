@@ -8,7 +8,8 @@ import fs from 'fs';
 import path from 'path';
 import { pipeline } from 'node:stream/promises';
 import { parse as csv } from 'csv-parse';
-import AWS from 'aws-sdk';
+import S3 from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import Stats from './stats.js';
 import find from 'find';
 import { Transform } from 'stream';
@@ -109,31 +110,24 @@ export default class Job {
      *
      * @returns {Promise}
      */
-    s3_down() {
-        return new Promise((resolve, reject) => {
-            if (this.specific.protocol !== 'http') return resolve();
-            if (!this.specific.data.includes('data.openaddresses.io') && !this.specific.data.includes('v2.openaddresses.io')) return resolve();
+    async s3_down() {
+        if (this.specific.protocol !== 'http') return;
+        if (!this.specific.data.includes('data.openaddresses.io') && !this.specific.data.includes('v2.openaddresses.io')) return;
 
-            const url = new URL(this.specific.data);
+        const url = new URL(this.specific.data);
 
-            const loc = path.resolve(this.tmp, url.pathname.replace(/^\//, '').replace(/\//g, '-'));
+        const loc = path.resolve(this.tmp, url.pathname.replace(/^\//, '').replace(/\//g, '-'));
+        this.specific.protocol = 'file';
+        this.specific.data = `file://${loc}`;
 
-            const out = fs.createWriteStream(loc).on('error', (err) => {
-                return reject(err);
-            }).on('close', () => {
-                this.specific.protocol = 'file';
-                this.specific.data = `file://${loc}`;
-                return resolve();
-            });
-
-            const s3 = new AWS.S3({ region: 'us-east-1' });
-            s3.getObject({
+        const s3 = new S3.S3Client({ region: 'us-east-1' });
+        await pipeline(
+            (await s3.send(new S3.GetObjectCommand({
                 Bucket: url.host,
                 Key: url.pathname.replace(/^\//, '')
-            }).createReadStream().on('error', (err) => {
-                return reject(err);
-            }).pipe(out);
-        });
+            }))).Body,
+            fs.createWriteStream(loc)
+        );
     }
 
     async validate() {
@@ -224,9 +218,10 @@ export default class Job {
             return new Error('job state must be "processed" to perform asset upload');
         }
 
-        const s3 = new AWS.S3({ region: 'us-east-1' });
+        const s3 = new S3.S3Client({ region: 'us-east-1' });
 
-        const r2 = new AWS.S3({
+        const r2 = new S3.S3Client({
+            region: 'auto',
             credentials: {
                 accessKeyId: process.env.R2_ACCESS_KEY_ID,
                 secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
@@ -238,19 +233,29 @@ export default class Job {
         if (cache.length === 1) {
             console.error('ok - found cache', cache[0]);
 
-            await s3.upload({
-                ContentType: 'application/zip',
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
-                Body: fs.createReadStream(cache[0])
-            }).promise();
+            const s3uploader = new Upload({
+                client: s3,
+                params: {
+                    ContentType: 'application/zip',
+                    Bucket: process.env.Bucket,
+                    Key: `${process.env.StackName}/job/${this.job}/cache.zip`,
+                    Body: fs.createReadStream(cache[0])
+                }
+            });
 
-            await r2.upload({
-                ContentType: 'application/zip',
-                Bucket: process.env.R2Bucket,
-                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/cache.zip`,
-                Body: fs.createReadStream(cache[0])
-            }).promise();
+            await s3uploader.done();
+
+            const r2uploader = new Upload({
+                client: r2,
+                params: {
+                    ContentType: 'application/zip',
+                    Bucket: process.env.R2Bucket,
+                    Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/cache.zip`,
+                    Body: fs.createReadStream(cache[0])
+                }
+            });
+
+            await r2uploader.done();
 
             console.error('ok - cache.zip uploaded');
             this.assets.cache = true;
@@ -260,19 +265,29 @@ export default class Job {
 
         this.size = fs.statSync(data).size;
 
-        await s3.upload({
-            ContentType: 'application/gzip',
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
-            Body: fs.createReadStream(data)
-        }).promise();
+        const s3uploader = new Upload({
+            client: s3,
+            params: {
+                ContentType: 'application/gzip',
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/job/${this.job}/source.geojson.gz`,
+                Body: fs.createReadStream(data)
+            }
+        });
 
-        await r2.upload({
-            ContentType: 'application/gzip',
-            Bucket: process.env.R2Bucket,
-            Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.geojson.gz`,
-            Body: fs.createReadStream(data)
-        }).promise();
+        await s3uploader.done();
+
+        const r2uploader = new Upload({
+            client: r2,
+            params: {
+                ContentType: 'application/gzip',
+                Bucket: process.env.R2Bucket,
+                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.geojson.gz`,
+                Body: fs.createReadStream(data)
+            }
+        });
+
+        await r2uploader.done();
 
         console.error('ok - source.geojson.gz uploaded');
         this.assets.output = true;

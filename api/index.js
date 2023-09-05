@@ -71,16 +71,6 @@ export default async function server(config) {
 
     if (!config.args['no-tilebase']) {
         try {
-            if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-            config.tb = new TileBase(`s3://${config.Bucket}/${config.StackName}/fabric.tilebase`);
-            if (!config.silent) console.log('ok - loaded TileBase (Fabric)');
-            await config.tb.open();
-        } catch (err) {
-            console.error(err);
-            config.tb = null;
-        }
-
-        try {
             if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
             config.borders = new TileBase(`s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
             if (!config.silent) console.log('ok - loaded TileBase (Borders)');

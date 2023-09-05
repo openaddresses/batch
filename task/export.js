@@ -7,16 +7,18 @@ import { pipeline } from 'stream/promises';
 import fs from 'fs';
 import path from 'path';
 import { mkdirp } from 'mkdirp';
-import AWS from 'aws-sdk';
+import S3 from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { Unzip } from 'zlib';
 import archiver from 'archiver';
 import minimist from 'minimist';
 
-const s3 = new AWS.S3({
+const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
 });
 
-const r2 = new AWS.S3({
+const r2 = new S3.S3Client({
+    region: 'auto',
     credentials: {
         accessKeyId: process.env.R2_ACCESS_KEY_ID,
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
@@ -103,20 +105,32 @@ async function cli() {
         await convert(tmp, loc, exp, job);
         console.error('ok - converted');
 
-        await s3.upload({
-            ContentType: 'application/zip',
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/export/${exp.id}/export.zip`,
-            Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
-        }).promise();
+        const s3uploader = new Upload({
+            client: s3,
+            params: {
+                ContentType: 'application/zip',
+                Bucket: process.env.Bucket,
+                Key: `${process.env.StackName}/export/${exp.id}/export.zip`,
+                Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
+            }
+        });
+
+        await s3uploader.done();
+
         console.error(`ok - uploaded: s3://${process.env.Bucket}/${process.env.StackName}/export/${exp.id}/export.zip`);
 
-        await r2.upload({
-            ContentType: 'application/zip',
-            Bucket: process.env.R2Bucket,
-            Key: `v2.openaddresses.io/${process.env.StackName}/export/${exp.id}/export.zip`,
-            Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
-        }).promise();
+        const r2uploader = new Upload({
+            client: r2,
+            params: {
+                ContentType: 'application/zip',
+                Bucket: process.env.R2Bucket,
+                Key: `v2.openaddresses.io/${process.env.StackName}/export/${exp.id}/export.zip`,
+                Body: fs.createReadStream(path.resolve(tmp, 'export.zip'))
+            }
+        });
+
+        await r2uploader.done();
+
         console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/export/${exp.id}/export.zip`);
 
         await oa.cmd('export', 'update', {

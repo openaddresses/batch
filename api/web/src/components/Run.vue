@@ -1,176 +1,132 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                </button>
-
-                <Status :status='run.status'/>
-
-                <h2 class='txt-h4 ml12 pb12 fl'>Run #<span v-text='runid'/></h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-
-                <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
-                    <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
-                    <svg v-else class='icon'><use href='#icon-close'/></svg>
-                </button>
-
-                <span v-if='run.live' class='fr mx6 bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Live</span>
-                <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
-
-                <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
-                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
-
-                        <div class='col col--3 px6'>
-                            <label>Status</label>
-                            <select v-model='filter.status' class='select'>
-                                <option>All</option>
-                                <option>Pending</option>
-                                <option>Running</option>
-                                <option>Success</option>
-                                <option>Warn</option>
-                                <option>Fail</option>
-                            </select>
-                            <div class='select-arrow'></div>
-                        </div>
-                        <div class='col col--6 px6'>
-                            <label>Source</label>
-                            <input v-model='filter.source' class='input' placeholder='/ca/nb/provincewide' />
-                        </div>
-                        <div class='col col--3 px6'>
-                            <label>Layer</label>
-                            <div class='w-full select-container'>
-                                <select v-model='filter.layer' class='select'>
-                                    <option>all</option>
-                                    <option>addresses</option>
-                                    <option>buildings</option>
-                                    <option>parcels</option>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
-                        </div>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
                     </div>
-                </template>
+                </div>
             </div>
         </div>
-
-        <template v-if='loading.run'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div class='col col--12 pt12'>
-                <h2 class='txt-h4 pb12 fl'>Dashboard:</h2>
-
-                <template v-if='loading.count'>
-                    <div class='flex flex--center-main w-full py24'>
-                        <div class='loading'></div>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class='col col--12 grid border round border--gray-light'>
-                        <div @click='filterShortcut("Pending")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Pending'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Pending' class='fl'/> Pending
-                                </div>
-                            </div>
-                        </div>
-                        <div @click='filterShortcut("Warn")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Warn'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Warn' class='fl'/> Warn
-                                </div>
-                            </div>
-                        </div>
-                        <div @click='filterShortcut("Fail")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Fail'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Fail' class='fl'/> Fail
-                                </div>
-                            </div>
-                        </div>
-                        <div @click='filterShortcut("Success")' class='col col--3 bg-gray-light-on-hover cursor-pointer'>
-                            <div class='align-center' v-text='count.status.Success'></div>
-                            <div class='flex flex--center-main w-full'>
-                                <div>
-                                    <Status status='Success' class='fl'/> Success
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <div class='col col--12 pt12'>
-                <h2 class='txt-h4 pb12 fl'>Jobs:</h2>
-            </div>
-
-            <template v-if='loading.jobs'>
-                <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
-                </div>
-            </template>
-            <template v-else-if='jobs.length'>
-                <div class='col col--1'>
-                    Status
-                </div>
-                <div class='col col--4'>
-                    Job ID
-                </div>
-                <div class='col col--7'>
-                    Source
-                </div>
-
-                <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
-                    <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                        <div class='col col--1'>
-                            <Status :status='job.status'/>
-                        </div>
-                        <div class='col col--4'>
-                            Job <span v-text='job.id'/>
-                        </div>
-                        <div class='col col--7'>
-                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <template v-else-if='!jobs.length'>
-                <div class='w-full flex flex--center-main'>
-                    <div class='py24'>
-                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                    </div>
-                </div>
-                <div class='w-full align-center txt-bold'>No Jobs Found</div>
-                <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
-            </template>
-        </template>
     </div>
+
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>
+                                <Status v-if='run && run.status' :status='run.status'/>
+                                <div class='mx-2 align-self-center'>
+                                    Run <span v-text='$route.params.runid'/>
+                                </div>
+                            </h3>
+
+                            <div class='ms-auto btn-list'>
+                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
+                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white">Github</span>
+                                <RefreshIcon @click='fetchRun' class='cursor-pointer'/>
+                            </div>
+                        </div>
+
+                        <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
+                        <div v-else class='card-body'>
+                            <div class='border round row py-3'>
+                                <div @click='filterShortcut("Pending")' class='col-3'>
+                                    <div class='text-center' v-text='count.status.Pending + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Pending'/>
+                                    </div>
+                                    <div class='text-center'>Pending</div>
+                                </div>
+                                <div @click='filterShortcut("Warn")' class='col-3'>
+                                    <div class='text-center' v-text='count.status.Warn + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Warn'/>
+                                    </div>
+                                    <div class='text-center'>Warn</div>
+                                </div>
+                                <div @click='filterShortcut("Fail")' class='col-3'>
+                                    <div class='text-center' v-text='count.status.Fail + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Fail'/>
+                                    </div>
+                                    <div class='text-center'>Fail</div>
+                                </div>
+                                <div @click='filterShortcut("Success")' class='col-3'>
+                                    <div class='text-center' v-text='count.status.Success + " Jobs"'></div>
+                                    <div class='d-flex justify-content-center my-2'>
+                                        <Status status='Success'/>
+                                    </div>
+                                    <div class='text-center'>Success</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <TablerLoading v-if='loading.jobs' desc='Loading Jobs'/>
+                        <TablerNone v-else-if='!list.jobs.length' :create='false'/>
+                        <template v-else>
+                            <table class="table table-hover table-vcenter card-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Job ID</th>
+                                        <th>Created</th>
+                                        <th>Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
+                                        <td><Status :status='job.status'/></td>
+                                        <td>Job <span v-text='job.id'/></td>
+                                        <td><span v-text='fmt(job.created)'/></td>
+                                        <td>
+                                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 
 <script>
-import Status from './Status.vue';
+import moment from 'moment-timezone';
+import Status from './util/Status.vue';
+import TableFooter from './util/TableFooter.vue';
+import {
+    TablerNone,
+    TablerBreadCrumb,
+    TablerLoading
+} from '@tak-ps/vue-tabler';
+import {
+    RefreshIcon
+} from 'vue-tabler-icons';
 
 export default {
     name: 'Run',
     props: ['runid'],
     data: function() {
         return {
+            tz: moment.tz.guess(),
             showFilter: false,
-            filter: {
+            paging: {
                 source: '',
                 layer: 'all',
-                status: 'All'
+                status: 'All',
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
             },
             run: {
                 status: '',
@@ -184,7 +140,10 @@ export default {
                     Success: 0
                 }
             },
-            jobs: [],
+            list: {
+                total: 0,
+                jobs: [],
+            },
             loading: {
                 count: true,
                 run: true,
@@ -192,83 +151,77 @@ export default {
             }
         };
     },
-    mounted: function() {
-        this.refresh();
-    },
-    components: {
-        Status
+    mounted: async function() {
+        await this.refresh();
     },
     watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchJobs();
+            }
+        },
         showFilter: function() {
-            this.filter.source = '';
-            this.filter.layer = 'all';
-            this.filter.status = 'All'
+            this.paging.source = '';
+            this.paging.layer = 'all';
+            this.paging.status = 'All'
         },
-        'filter.status': function() {
-            this.getJobs();
-        },
-        'filter.layer': function() {
-            this.getJobs();
-        },
-        'filter.source': function() {
-            this.getJobs();
-        }
     },
     methods: {
-        filterShortcut: function(filter) {
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+        },
+        filterShortcut: function(status) {
             this.showFilter = true;
             this.$nextTick(() => {
-                this.filter.status = filter;
+                this.paging.status = status;
             });
         },
         external: function(url) {
             window.open(url, "_blank");
         },
-        refresh: function() {
-            this.getRun();
-            this.getCount();
-            this.getJobs();
-        },
-        emitjob: function(jobid) {
-            this.$router.push({ path: `/job/${jobid}` });
+        refresh: async function() {
+            await this.fetchRun();
+            await this.fetchCount();
+            await this.fetchJobs();
         },
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
         },
-        getRun: async function() {
-            try {
-                this.loading.run = true;
-                this.run = await window.std(`/api/run/${this.runid}`);
-                this.loading.run = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
+        fetchRun: async function() {
+            this.loading.run = true;
+            this.run = await window.std(`/api/run/${this.runid}`);
+            this.loading.run = false;
         },
-        getCount: async function() {
-            try {
-                this.loading.count = true;
-                this.count = await window.std(window.location.origin + `/api/run/${this.runid}/count`);
-                this.loading.count = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
+        fetchCount: async function() {
+            this.loading.count = true;
+            this.count = await window.std(window.location.origin + `/api/run/${this.runid}/count`);
+            this.loading.count = false;
         },
-        getJobs: async function() {
-            try {
-                this.loading.jobs = true;
+        fetchJobs: async function() {
+            this.loading.jobs = true;
 
-                const url = new URL(`${window.location.origin}/api/job`);
-                url.searchParams.set('run', this.runid);
-                if (this.filter.source.length > 0) url.searchParams.set('source', this.filter.source);
-                if (this.filter.layer !== 'all') url.searchParams.set('layer', this.filter.layer);
-                if (this.filter.status !== 'All') url.searchParams.set('status', this.filter.status);
+            const url = new URL(`${window.location.origin}/api/job`);
+            url.searchParams.set('run', this.runid);
+            url.searchParams.append('limit', this.paging.limit);
+            url.searchParams.append('page', this.paging.page);
+            url.searchParams.append('source', this.paging.source);
+            url.searchParams.append('order', this.paging.order);
+            if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
+            if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
+            if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
 
-                this.jobs = await window.std(url);
-                this.loading.jobs = false;
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            this.list = await window.std(url);
+            this.loading.jobs = false;
         }
-    }
+    },
+    components: {
+        TableFooter,
+        TablerBreadCrumb,
+        TablerLoading,
+        TablerNone,
+        RefreshIcon,
+        Status
+    },
 }
 </script>

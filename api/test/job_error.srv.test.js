@@ -114,14 +114,17 @@ test('GET: api/job/error', async () => {
             method: 'GET'
         }, true);
 
-        assert.deepEqual(res.body, [{
-            job: 1,
-            status: 'Fail',
-            messages: ['Something went wrong!'],
-            source_name: 'us/dc/statewide',
-            layer: 'addresses',
-            name: 'dcgis'
-        }]);
+        assert.deepEqual(res.body, {
+            total: 1,
+            errors: [{
+                job: 1,
+                status: 'Fail',
+                messages: ['Something went wrong!'],
+                source_name: 'us/dc/statewide',
+                layer: 'addresses',
+                name: 'dcgis'
+            }]
+        });
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -174,14 +177,17 @@ test('GET: api/job/error', async () => {
             method: 'GET'
         }, true);
 
-        assert.deepEqual(res.body, [{
-            job: 1,
-            status: 'Fail',
-            messages: ['Something went wrong!', 'Another Something went wrong!'],
-            source_name: 'us/dc/statewide',
-            layer: 'addresses',
-            name: 'dcgis'
-        }]);
+        assert.deepEqual(res.body, {
+            total: 1,
+            errors: [{
+                job: 1,
+                status: 'Fail',
+                messages: ['Something went wrong!', 'Another Something went wrong!'],
+                source_name: 'us/dc/statewide',
+                layer: 'addresses',
+                name: 'dcgis'
+            }]
+        });
 
     } catch (err) {
         assert.ifError(err, 'no error');
@@ -235,12 +241,9 @@ test('GET: api/job/error', async () => {
             json: true
         }, false);
 
-        assert.equal(res.status, 404, 'http: 404');
-
         assert.deepEqual(res.body, {
-            status: 404,
-            message: 'No job errors found',
-            messages: []
+            total: 0,
+            errors: []
         });
     } catch (err) {
         assert.ifError(err, 'no error');

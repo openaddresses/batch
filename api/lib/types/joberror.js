@@ -4,7 +4,7 @@ import Run from './run.js';
 import fs from 'fs';
 import { sql } from 'slonik';
 import { Status } from '../util.js';
-import Generic from '@openaddresses/batch-generic';
+import Generic, { Params } from '@openaddresses/batch-generic';
 
 /**
  * @class
@@ -14,14 +14,19 @@ export default class JobError extends Generic {
 
     static async list(pool, query) {
         if (!query) query = {};
-        if (!query.source) query.source = '';
+
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.status) query.status = Status.list();
 
+        query.source = Params.string(query.source, { default: '' });
         query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
 
         Status.verify(query.status);
+
+        query.limit = Params.integer(query.limit, { default: 100 });
+        query.sort = Params.string(query.sort, { default: 'job' });
+        query.order = Params.order(query.order);
 
         let pgres;
         try {
@@ -43,17 +48,17 @@ export default class JobError extends Generic {
                 GROUP BY
                     job.id
                 ORDER BY
-                    job.created DESC
+                    ${sql.identifier([query.sort])} ${query.order}
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.limit * query.page}
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to list job_errors');
         }
 
-        if (pgres.rows.length === 0) {
-            throw new Err(404, null, 'No job errors found');
-        }
-
-        return JobError.deserialize_list(pgres).job_errors;
+        return this.deserialize_list(pgres, 'errors')
     }
 
     serialize() {

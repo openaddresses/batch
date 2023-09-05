@@ -1,79 +1,139 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 pb12 fl'>Jobs:</h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-            </div>
-
-            <div class='col col--1'>
-                Status
-            </div>
-            <div class='col col--2'>
-                Job ID
-            </div>
-            <div class='col col--4'>
-                Source
-            </div>
-            <div class='col col--5'>
-                <span class='fr'>Attributes</span>
-            </div>
-        </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div :key='job.id' v-for='job in jobs' class='col col--12 grid'>
-                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--1'>
-                        <Status :status='job.status'/>
-                    </div>
-                    <div class='col col--2'>
-                        Job <span v-text='job.id'/>
-                    </div>
-                    <div class='col col--4'>
-                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
-                    </div>
-                    <div class='col col--5 pr12'>
-                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-
-                        <span v-on:click.stop.prevent='external(job.source)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                            <BrandGithubIcon width="16" height="16"/>
-                        </span>
-
-                        <span v-on:click.stop.prevent='emitlog(job.id)' v-if='job.loglink' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                            <NotesIcon width="16" height="16"/>
-                        </span>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
     </div>
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>Jobs</h3>
+
+                            <div class='ms-auto btn-list'>
+                                <SearchIcon @click='showFilter = !showFilter' class='cursor-pointer'/>
+                                <RefreshIcon @click='fetchJobs' class='cursor-pointer'/>
+                            </div>
+                        </div>
+                        <template v-if='showFilter'>
+                            <div class='card-body row'>
+                                <div class='col-12 col-md-6'>
+                                    <QuerySource @source='paging.source = $event'/>
+                                </div>
+                                <div class='col-12 col-md-3'>
+                                    <QueryLayer @layer='paging.layer = $event' />
+                                </div>
+                                <div class='col-12 col-md-3'>
+                                    <QueryStatus @status='paging.status = $event'/>
+                                </div>
+                            </div>
+                        </template>
+
+                        <TablerLoading v-if='loading' desc='Loading Jobs'/>
+                        <table v-else class="table table-hover table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Job ID</th>
+                                    <th>Created</th>
+                                    <th>Source</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
+                                    <td><Status :status='job.status'/></td>
+                                    <td>
+                                        <LayerIcon class='mr-3' :layer='job.layer'/>
+                                        <span v-text='job.id'/>
+                                    </td>
+                                    <td><span v-text='fmt(job.created)'/></td>
+                                    <td>
+                                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
+                                    </td>
+                                    <td>
+                                        <div v-on:click.stop.prevent='' class='btn-list'>
+                                            <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                                            <span v-on:click.stop.prevent='external(job.source)'>
+                                                <BrandGithubIcon class='cursor-pointer'/>
+                                            </span>
+                                            <span v-on:click.stop.prevent='$router.push(`/job/${job.id}/log`)' v-if='job.loglink'>
+                                                <NotesIcon class='cursor-pointer'/>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 
 <script>
 import {
+    SearchIcon,
     BrandGithubIcon,
+    RefreshIcon,
     NotesIcon
 } from 'vue-tabler-icons'
-import Status from './Status.vue';
-import Download from './Download.vue';
+import LayerIcon from './util/LayerIcon.vue';
+import Status from './util/Status.vue';
+import Download from './util/Download.vue';
+import moment from 'moment-timezone';
+import TableFooter from './util/TableFooter.vue';
+import QueryStatus from './query/Status.vue';
+import QuerySource from './query/Source.vue';
+import QueryLayer from './query/Layer.vue';
+import {
+    TablerLoading,
+    TablerBreadCrumb
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Jobs',
     props: [ 'auth' ],
     mounted: function() {
-        this.refresh();
+        this.fetchJobs();
+    },
+    watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchJobs();
+            }
+        }
     },
     data: function() {
         return {
-            jobs: [],
+            tz: moment.tz.guess(),
+            showFilter: false,
+            paging: {
+                source: '',
+                layer: 'all',
+                status: 'All',
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
+            },
+            list: {
+                total: 0,
+                jobs: []
+            },
             loading: false
         };
     },
@@ -81,19 +141,26 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        emitlog: function(jobid) {
-            this.$router.push({ path: `/job/${jobid}/log` });
+        fmt: function(date) {
+            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
         },
-        emitjob: function(jobid) {
-            this.$router.push({ path: `/job/${jobid}` });
-        },
-        refresh: function() {
-            this.getJobs();
-        },
-        getJobs: async function() {
+        fetchJobs: async function() {
             try {
                 this.loading = true;
-                this.jobs = await window.std(window.location.origin + '/api/job');
+
+                const url = window.stdurl('/api/job');
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
+                url.searchParams.append('source', this.paging.source);
+                url.searchParams.append('order', this.paging.order);
+                if (this.showFilter) {
+                    if (this.paging.source !== '') url.searchParams.set('source', this.paging.source);
+                    if (this.paging.layer !== 'all') url.searchParams.set('layer', this.paging.layer);
+                    if (this.paging.status !== 'All') url.searchParams.set('status', this.paging.status);
+                }
+
+                this.list = await window.std(url);
+
                 this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
@@ -101,10 +168,19 @@ export default {
         }
     },
     components: {
+        SearchIcon,
         Download,
+        RefreshIcon,
         Status,
         BrandGithubIcon,
-        NotesIcon
+        NotesIcon,
+        TablerLoading,
+        TablerBreadCrumb,
+        TableFooter,
+        LayerIcon,
+        QueryStatus,
+        QuerySource,
+        QueryLayer
     },
 }
 </script>

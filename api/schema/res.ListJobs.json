@@ -1,58 +1,68 @@
 {
-    "type": "array",
-    "items": {
-        "type": "object",
-        "required": [
-            "id",
-            "run",
-            "map",
-            "created",
-            "source",
-            "source_name",
-            "layer",
-            "name",
-            "output",
-            "loglink",
-            "status",
-            "size"
-        ],
-        "additionalProperties": false,
-        "properties": {
-            "id": {
-                "type": "integer"
-            },
-            "run": {
-                "type": "integer"
-            },
-            "map": {
-                "type": ["null", "integer"]
-            },
-            "created": {
-                "$ref": "./util/created.json"
-            },
-            "source": {
-                "type": "string"
-            },
-            "source_name": {
-                "type": "string"
-            },
-            "layer": {
-                "type": "string"
-            },
-            "name": {
-                "type": "string"
-            },
-            "output": {
-                "$ref": "./util/output.json"
-            },
-            "loglink": {
-                "$ref": "./util/loglink.json"
-            },
-            "status": {
-                "$ref": "./util/status.json"
-            },
-            "size": {
-                "$ref": "./util/size.json"
+    "type": "object",
+    "required": ["total", "jobs"],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer"
+        },
+        "jobs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "run",
+                    "map",
+                    "created",
+                    "source",
+                    "source_name",
+                    "layer",
+                    "name",
+                    "output",
+                    "loglink",
+                    "status",
+                    "size"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "run": {
+                        "type": "integer"
+                    },
+                    "map": {
+                        "type": ["null", "integer"]
+                    },
+                    "created": {
+                        "$ref": "./util/created.json"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "source_name": {
+                        "type": "string"
+                    },
+                    "layer": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "output": {
+                        "$ref": "./util/output.json"
+                    },
+                    "loglink": {
+                        "$ref": "./util/loglink.json"
+                    },
+                    "status": {
+                        "$ref": "./util/status.json"
+                    },
+                    "size": {
+                        "$ref": "./util/size.json"
+                    }
+                }
             }
         }
     }

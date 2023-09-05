@@ -1,79 +1,109 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 pb12 fl'>Runs:</h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-            </div>
-            <div class='col col--12 grid border-b border--gray-light'>
-                <div class='col col--1'>
-                    Status
-                </div>
-                <div class='col col--2'>
-                    Run ID
-                </div>
-                <div class='col col--2'>
-                    Created
-                </div>
-                <div class='col col--7'>
-                    <span class='fr'>Attributes</span>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
+                    </div>
                 </div>
             </div>
-
         </div>
+    </div>
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>Source Runs</h3>
 
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div @click='emitrun(run.id)' :key='run.id' v-for='run in runs' class='col col--12 grid'>
-                <div class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--1'>
-                        <Status :status='run.status'/>
-                    </div>
-                    <div class='col col--2'>
-                        Run <span v-text='run.id'/>
-                    </div>
-                    <div class='col col--4'>
-                        <span v-text='fmt(run.created)'/>
-                    </div>
-                    <div class='col col--5 pr12'>
-                        <span v-if='run.live' class='fr mx6 bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Live</span>
-                        <span v-on:click.stop.prevent='github(run)' v-if='run.github.sha' class='fr mx6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>Github</span>
+                            <div class='ms-auto btn-list'>
+                                <RefreshIcon @click='fetchRuns' class='cursor-pointer'/>
+                            </div>
+                        </div>
+
+                        <TablerLoading v-if='loading' desc='Loading Runs'/>
+                        <table v-else class="table table-hover table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Run ID</th>
+                                    <th>Created</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr @click='$router.push(`/run/${run.id}`);' :key='run.id' v-for='run in list.runs' class='cursor-pointer'>
+                                    <td><Status :status='run.status'/></td>
+                                    <td>Run <span v-text='run.id'/></td>
+                                    <td><span v-text='fmt(run.created)'/></td>
+                                    <td>
+                                        <div class='d-flex'>
+                                            <div class='ms-auto btn-list'>
+                                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
+                                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white">Github</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
     </div>
+</div>
 </template>
 
 <script>
-import Status from './Status.vue';
+import Status from './util/Status.vue';
 import moment from 'moment-timezone';
+import TableFooter from './util/TableFooter.vue';
+import {
+    RefreshIcon
+} from 'vue-tabler-icons';
+import {
+    TablerLoading,
+    TablerBreadCrumb
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Runs',
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.fetchRuns();
+    },
+    watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchRuns();
+            }
+        }
     },
     data: function() {
         return {
             tz: moment.tz.guess(),
             loading: false,
-            runs: []
+            paging: {
+                filter: '',
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
+            },
+            list: {
+                total: 0,
+                runs: []
+            }
         };
     },
     methods: {
         fmt: function(date) {
             return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
-        },
-        refresh: function() {
-            this.getRuns();
         },
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);
@@ -81,21 +111,26 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        emitrun: function(run_id) {
-            this.$router.push({ path: `/run/${run_id}` });
-        },
-        getRuns: async function() {
-            try {
+        fetchRuns: async function() {
                 this.loading = true;
-                this.runs = await window.std('/api/run');
+
+                const url = window.stdurl('/api/run');
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
+                url.searchParams.append('filter', this.paging.filter);
+                url.searchParams.append('order', this.paging.order);
+
+                this.list = await window.std(url);
+
                 this.loading = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
         }
     },
     components: {
-        Status
+        Status,
+        RefreshIcon,
+        TableFooter,
+        TablerLoading,
+        TablerBreadCrumb,
     }
 }
 </script>

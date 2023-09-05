@@ -1,233 +1,211 @@
 <template>
-    <div class='col col--12 pt12'>
-
-        <div class='round border border--green pb12 mb12'>
-            <h3 class='align-center pb12'>New Features</h3>
-
-            <div class='grid'>
-                <div class='col col--4 flex flex--center-main'>
-                    <BuildingCommunityIcon width="24" height="24"/>
-                    Buildings
-                </div>
-                <div class='col col--4 flex flex--center-main'>
-                    <MapPinIcon width="24" height="24"/>
-                    Addresses
-                </div>
-                <div class='col col--4 flex flex--center-main'>
-                    <ShapeIcon width="24" height="24"/>
-                    Parcels
-                </div>
-                <div class='col col--12'>
-                    <div class='align-center pt12'>
-                        After many months of work, we've expanded the project to include parcels and building polygons.
-                        Look for the symbols above in the data sources to download the new layers
+<div class='page-body'>
+    <div class='container-xl'>
+        <div class='row row-deck row-cards'>
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h3 class='card-title'>New Features</h3>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class='col col--12'>
-            <div class='col col--12 grid border-b border--gray-light mb12'>
-                <div class='col col--12'>
-                    <h2 class='txt-h4 pb12 fl'>Data Collections:</h2>
-                    <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                        <svg class='icon'><use href='#icon-refresh'/></svg>
-                    </button>
-                </div>
-
-                <div class='col col--5'>Name</div>
-                <div class='col col--2'>Updated</div>
-                <div class='col col--5'><span class='fr'>Attributes</span></div>
-            </div>
-            <div v-on:click.stop.prevent='collectionpls(c)' :key='c.id' v-for='c in collections' class='col col--12 grid pb6'>
-                <div class='col col--12 grid cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--5'>
-                        <span class='ml12' v-text='c.name'/>
-                    </div>
-                    <div class='col col--2'>
-                        <span v-text='fmt(c.created)'/>
-                    </div>
-                    <div class='col col--5'>
-                        <span class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <DownloadIcon width="16" height="16"/>
-                        </span>
-
-                        <span class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(c.size)'></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class='col col--12 grid pt12'>
-            <div class='col col--12'>
-                <div class='col col--12 clearfix pb12'>
-                    <h2 class='txt-h4 fl'>Individual Sources:</h2>
-
-                    <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                        <svg class='icon'><use href='#icon-refresh'/></svg>
-                    </button>
-                    <button @click='showFilter = !showFilter' class='btn round btn--stroke fr color-gray mr12'>
-                        <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
-                        <svg v-else class='icon'><use href='#icon-close'/></svg>
-                    </button>
-                </div>
-
-                <template v-if='showFilter'>
-                    <div class='col col--12 grid border border--gray px6 py6 round mb12 relative'>
-                        <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
-
-                        <div class='col col--9 px6'>
-                            <QuerySource
-                                showValidated=true
-                                @source='filter.source = $event'
-                                @validated='filter.validated = $event'
-                            />
+                    <div class='card-body row'>
+                        <div class='col-4 d-flex justify-content-center'>
+                            <LayerIcon layer='buildings'/>
+                            Buildings
                         </div>
-                        <div class='col col--3 px6'>
-                            <QueryLayer @layer='filter.layer = $event'/>
+                        <div class='col-4 d-flex justify-content-center'>
+                            <LayerIcon layer='addresses'/>
+                            Addresses
                         </div>
-                        <div class='col col--6 px6'>
-                            <label class='switch-container mr6'>
-                                <input type='checkbox' v-model='filter.switches.before'/>
-                                <div class='switch switch--gray'></div>
-                            </label>
-                            <label>Before</label>
-                            <input class='input' type='date' v-model='filter.before'/>
+                        <div class='col-4 d-flex justify-content-center'>
+                            <LayerIcon layer='parcels'/>
+                            Parcels
                         </div>
-                        <div class='col col--6 px6'>
-                            <label class='switch-container mr6'>
-                                <input type='checkbox' v-model='filter.switches.after'/>
-                                <div class='switch switch--gray'></div>
-                            </label>
-                            <label>After</label>
-                            <input class='input' type='date' v-model='filter.after'/>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-        <div class='col col--12 mb12 my12 clearfix'>
-            <Coverage
-                @err='$emit("err", $event)'
-                v-on:point='filter.point = $event'
-                :layer='filter.layer'
-            />
-        </div>
-
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--9'>
-                Source
-            </div>
-            <div class='col col--3'>
-                <span class='fr'>Data Layers</span>
-            </div>
-        </div>
-
-        <template v-if='loading.sources'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else-if='!datas.length'>
-            <div class='flex flex--center-main'>
-                <div class='py24'>
-                    <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
-                </div>
-            </div>
-            <div class='w-full align-center txt-bold'>No Data Found</div>
-            <div @click='external("https://github.com/openaddresses/openaddresses/blob/master/CONTRIBUTING.md")' class='align-center w-full py6 txt-underline-on-hover cursor-pointer'>Missing a source? Add it!</div>
-        </template>
-        <template v-else>
-            <div :key='d.source' v-for='d in datas' class='col col--12 grid'>
-                <div @click='d._open = !d._open' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--9 clearfix'>
-                        <span class='ml12 fl' v-text='d.source'/>
-                        <span v-if='d.map' class='fl ml6'>
-                            <svg @click='$router.push(`/location/${d.map}`)' class='icon color-gray color-black-on-hover' style='height: 20px; width: 20px; padding-top: 5px;'><use href='#icon-map'/></svg>
-                        </span>
-                    </div>
-                    <div class='col col--3 color-gray'>
-                        <span v-if='d.has.buildings' class='fr mx12'><BuildingCommunityIcon width="24" height="24"/></span>
-                        <span v-if='d.has.addresses' class='fr mx12'><MapPinIcon width="24" height="24"/></span>
-                        <span v-if='d.has.parcels' class='fr mx12'><ShapeIcon width="24" height="24"/></span>
-                    </div>
-                </div>
-                <template v-if='d._open'>
-                    <div :key='job.id' v-for='job in d.sources' class='pl24 col col--12'>
-                        <div class='col col--12 grid py12 px12 cursor-pointer bg-darken10-on-hover round'>
-                            <div @click='emitjob(job.job)' class='col col--5'>
-                                <span v-text='job.layer'/> - <span v-text='job.name'/>
-
+                        <div class='col-12'>
+                            <div class='text-center pt-3'>
+                                <div>After many months of work, we've expanded the project to include parcels and building polygons.</div>
+                                <div>Look for the symbols above in the data sources to download the new layers</div>
                             </div>
-                            <div @click='emitjob(job.job)' class='col col--2'>
-                                <span v-text='fmt(job.updated)'/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h2 class='card-title'>Data Collections</h2>
+
+                        <div class='ms-auto btn-list'>
+                            <RefreshIcon @click='fetchCollections' class='cursor-pointer'/>
+                        </div>
+                    </div>
+
+                    <TablerLoading v-if='loading.collections' desc='Loading Collections'/>
+                    <table v-else class="table table-hover table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Updated</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr :key='c.id' v-for='c in collections'>
+                                <td v-text='c.name'></td>
+                                <td v-text='fmt(c.created)'></td>
+                                <td class='d-flex'>
+                                    <span v-text='size(c.size)'/>
+                                    <div class='ms-auto btn-list'>
+                                        <DownloadIcon v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer'/>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class='col-12'>
+                <div class='card'>
+                    <div class='card-header'>
+                        <h2 class='card-title'>Individual Sources</h2>
+
+                        <div class='ms-auto btn-list'>
+                            <ArrowsMaximizeIcon @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer'/>
+                            <ArrowsMinimizeIcon @click='fullscreen = false' v-else class='cursor-pointer'/>
+
+                            <SearchIcon @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer'/>
+                            <XIcon  @click='showFilter = !showFilter' v-else class='cursor-pointer'/>
+
+                            <RefreshIcon @click='fetchData' class='cursor-pointer'/>
+                        </div>
+                    </div>
+
+                    <template v-if='showFilter'>
+                        <div class='card-body row'>
+                            <div class='col col--9 px6'>
+                                <QuerySource
+                                    showValidated=true
+                                    @source='filter.source = $event'
+                                    @validated='filter.validated = $event'
+                                />
                             </div>
-                            <div class='col col--5'>
-                                <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                            <div class='col col--3 px6'>
+                                <QueryLayer @layer='filter.layer = $event'/>
+                            </div>
+                            <div class='col col--6 px6'>
+                                <TablerInput label='Before' type='date' v-model='filter.before'/>
+                                <TablerToggle label='Before Enabled' v-model='filter.switches.before'/>
+                            </div>
+                            <div class='col col--6 px6'>
+                                <TablerInput label='After' type='date' v-model='filter.after'/>
+                                <TablerToggle label='After Enabled' v-model='filter.switches.after'/>
+                            </div>
+                        </div>
+                    </template>
 
-                                <template v-if='auth && auth.access === "admin"'>
-                                    <span class='dropdown fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                        <SettingsIcon width="16" height="16"/>
+                    <TablerLoading v-if='loading.sources' desc='Loading Sources'/>
+                    <template v-else>
+                        <Coverage
+                            :fullscreen='fullscreen'
+                            @err='$emit("err", $event)'
+                            v-on:point='filter.point = $event'
+                            :layer='filter.layer'
+                        />
 
-                                        <div class='round dropdown-content' style='width: 180px;'>
-                                            <template v-if='!job._confirm'>
-                                                <label class='switch-container w-full'>
-                                                    <input @change='updateData(job)' v-model='job.fabric' type='checkbox' />
-                                                    <div class='switch switch--blue mx6'></div>
-                                                    Fabric
-                                                </label>
+                        <table class="table table-hover table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Layers</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template :key='d.source' v-for='d in datas'>
+                                    <tr>
+                                        <td @click='d._open = !d._open' v-text='d.source' class='cursor-pointer'></td>
+                                        <td @click='d._open = !d._open' class='cursor-pointer'>
+                                            <LayerIcon v-if='d.has.buildings' layer='buildings'/>
+                                            <LayerIcon v-if='d.has.addresses' layer='addresses'/>
+                                            <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                        </td>
+                                        <td>
+                                            <div class='d-flex'>
+                                                <div class='ms-auto btn-list'>
+                                                    <MapIcon v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer'/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <template v-if='d._open' :key='job.id' v-for='job in d.sources'>
+                                        <tr><td colspan='3' class='cursor-pointer'>
+                                            <div class='row'>
+                                                <div @click='emitjob(job.job)' class='col-5'>
+                                                    <span v-text='job.layer'/> - <span v-text='job.name'/>
 
-                                                <button @click='job._confirm = true' class='btn btn--s btn--stroke color-gray color-red-on-hover w-full round'>Delete</button>
-                                            </template>
-                                            <template v-else>
-                                                <div class='col col--12 grid'>
-                                                    <div class='col col--12 flex flex--center-main'>
-                                                        <div class='py12'>
-                                                            <svg class='icon h60 w60 color-gray'><use href='#icon-alert'/></svg>
-                                                        </div>
-                                                    </div>
-                                                    <div class='col col--12'><div class='align-center'>Are you sure?</div></div>
-                                                    <div class='col col--6 pr3'>
-                                                        <button @click='job._confirm = false' class='btn btn--s btn--stroke color-gray color-black-on-hover w-full round'>Cancel</button>
-                                                    </div>
-                                                    <div class='col col--6 pl3'>
-                                                        <button @click='deleteData(job)' class='btn btn--s btn--stroke color-red-light color-red-on-hover w-full round'>Delete</button>
+                                                </div>
+                                                <div @click='emitjob(job.job)' class='col-2'>
+                                                    <span v-text='fmt(job.updated)'/>
+                                                </div>
+                                                <div class='col-5 d-flex'>
+                                                    <div class='ms-auto btn-list'>
+                                                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+
+                                                        <template v-if='auth && auth.access === "admin"'>
+                                                            <TablerDropdown>
+                                                                <slot>
+                                                                    <SettingsIcon class='cursor-pointer'/>
+                                                                </slot>
+                                                                <template #dropdown>
+                                                                    <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
+                                                                    <TablerDelete @delete='deleteData(job)'/>
+                                                                </template>
+                                                            </TablerDropdown>
+                                                        </template>
+
+                                                        <HistoryIcon @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer'/>
                                                     </div>
                                                 </div>
-                                            </template>
-                                        </div>
-                                    </span>
+                                            </div>
+                                        </td></tr>
+                                    </template>
                                 </template>
-
-                                <span v-on:click.stop.prevent='emithistory(job.id)' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--transparent border--gray-on-hover'>
-                                    <HistoryIcon width="16" height="16"/>
-                                </span>
-
-                                <span v-if='job.size > 0' class='fr mx6 bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold' v-text='size(job.size)'></span>
-                            </div>
-                        </div>
-                    </div>
-                </template>
+                            </tbody>
+                        </table>
+                    </template>
+                </div>
             </div>
-        </template>
+        </div>
     </div>
+</div>
 </template>
 
 <script>
 import {
+    ArrowsMaximizeIcon,
+    ArrowsMinimizeIcon,
     SettingsIcon,
     DownloadIcon,
     HistoryIcon,
-    BuildingCommunityIcon,
-    MapPinIcon,
-    ShapeIcon
+    RefreshIcon,
+    SearchIcon,
+    MapIcon,
+    XIcon,
 } from 'vue-tabler-icons';
-import Download from './Download.vue';
-import Coverage from './Coverage.vue';
+import LayerIcon from './util/LayerIcon.vue';
+import Download from './util/Download.vue';
+import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
+import {
+    TablerLoading,
+    TablerToggle,
+    TablerDelete,
+    TablerInput
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'OAData',
@@ -235,6 +213,7 @@ export default {
     data: function() {
         return {
             tz: moment.tz.guess(),
+            fullscreen: false,
             loading: {
                 sources: false,
                 collections: false
@@ -257,38 +236,19 @@ export default {
         };
     },
     mounted: function() {
-        this.refresh();
+        this.fetchCollections();
+        this.fetchData();
     },
     watch: {
         showFilter: function() {
             this.filter.source = '';
             this.filter.layer = 'all';
         },
-        'filter.switches.after': function() {
-            this.refresh();
-        },
-        'filter.switches.before': function() {
-            this.refresh();
-        },
-        'filter.after': function() {
-            this.filter.switches.after = true;
-            this.refresh();
-        },
-        'filter.before': function() {
-            this.filter.switches.before = true;
-            this.refresh();
-        },
-        'filter.point': function() {
-            this.refresh();
-        },
-        'filter.layer': function() {
-            this.refresh();
-        },
-        'filter.source': function() {
-            this.refresh();
-        },
-        'filter.validated': function() {
-            this.refresh();
+        filter: {
+            deep: true,
+            handler: async function() {
+                await this.fetchData();
+            }
         }
     },
     methods: {
@@ -300,15 +260,10 @@ export default {
             var e = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes/Math.pow(1024, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
         },
-        refresh: function() {
-            this.getData();
-            this.getCollections();
-        },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` })
         },
         emithistory: function(jobid) {
-            this.$router.push({ path: `/data/${jobid}/history` })
         },
         datapls: function(jobid, fmt) {
             if (!this.auth.username) return this.$emit('login');
@@ -326,7 +281,7 @@ export default {
         external: function(url) {
             window.open(url, "_blank");
         },
-        getCollections: async function() {
+        fetchCollections: async function() {
             try {
                 this.loading.collections = true;
                 this.collections = await window.std('/api/collections');
@@ -358,7 +313,7 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getData: async function() {
+        fetchData: async function() {
             try {
                 this.loading.sources = true;
 
@@ -385,8 +340,8 @@ export default {
 
                 for (const sourcename of Object.keys(dataname)) {
                     const d = {
-                        _open: false,
                         source: sourcename,
+                        _open: false,
                         map: false,
                         has: {
                             addresses: false,
@@ -415,16 +370,24 @@ export default {
         }
     },
     components: {
+        ArrowsMaximizeIcon,
+        ArrowsMinimizeIcon,
         Coverage,
         QuerySource,
         QueryLayer,
         Download,
         SettingsIcon,
         DownloadIcon,
+        RefreshIcon,
         HistoryIcon,
-        BuildingCommunityIcon,
-        MapPinIcon,
-        ShapeIcon
+        TablerLoading,
+        SearchIcon,
+        XIcon,
+        MapIcon,
+        TablerInput,
+        TablerToggle,
+        TablerDelete,
+        LayerIcon
     }
 }
 </script>

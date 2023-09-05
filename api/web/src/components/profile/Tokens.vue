@@ -1,89 +1,82 @@
 <template>
-    <div class='col col--12 grid pt24'>
-        <div class='col col--12 grid border-b border--gray-light pt24'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>API Tokens:</h2>
-
-                <div class='fr'>
-                    <button @click='newToken.show = true' class='btn round btn--stroke color-gray color-green-on-hover mx3'>
-                        <svg class='icon'><use xlink:href='#icon-plus'/></svg>
-                    </button>
-                    <button @click='refresh' class='btn round btn--stroke color-gray mx3'>
-                        <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                    </button>
-                </div>
-            </div>
+<div class='card'>
+    <div class='card-header'>
+        <h3 class='card-title'>API Tokens:</h3>
+        <div class='d-flex ms-auto btn-list'>
+            <PlusIcon @click='newToken.show = true' class='cursor-pointer'/>
+            <RefreshIcon @click='refresh' class='cursor-pointer'/>
         </div>
+    </div>
+    <TablerLoading v-if='loading' desc='Loading Tokens'/>
+    <TablerNone v-else-if='!tokens.length && !newToken.show' :create='false' label='Tokens'/>
+    <template v-else>
+        <template v-if='newToken.show && !newToken.token'>
+            <div class='mx-2 my-2 py-2 px-2'>
+                <div class='col-12 row border rounded'>
+                    <div class='col-12'>
+                        <h2 class='subheader'>Create New Token</h2>
+                        <XIcon @click='newToken.show = false' class='cursor-pointer'/>
+                    </div>
 
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else-if='!tokens.length && !newToken.show'>
-            <div class='col col--12'>
-                <div class='flex flex--center-main'>
-                    <div class='py24'>
-                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                    <div class='col-10'>
+                        <TablerInput label='Token Name' v-model='newToken.name' type='text' placeholder='Token Name'/>
+                    </div>
+                    <div class='col-2'>
+                        <CheckIcon @click='setToken' class='cursor-pointer'/>
                     </div>
                 </div>
-                <div class='w-full align-center'>You haven't created any API tokens yet</div>
+            </div>
+        </template>
+        <template v-if='newToken.show && newToken.token'>
+            <div class='col-12'>
+                <h2 class='txt-bold fl' v-text='newToken.name'></h2>
+                <XIcon @click='newToken.show = false' class='cursor-pointer'/>
+            </div>
+
+            <div class='col-12'>
+                <pre class='pre txt--s' v-text='newToken.token'/>
             </div>
         </template>
         <template v-else>
-            <template v-if='newToken.show && !newToken.token'>
-                <div class='col col--12 border border--gray-light round my12'>
-                    <div class='col col--12 grid grid--gut12 pl12 py6'>
-                        <div class='col col--12 pb6'>
-                            <h2 class='txt-bold fl'>Create New Token</h2>
-                            <button @click='newToken.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                                <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                            </button>
-                        </div>
-
-                        <div class='col col--12'>
-                            <label>Token Name</label>
-                        </div>
-                        <div class='col col--10'>
-                            <input v-model='newToken.name' type='text' class='input' placeholder='Token Name'/>
-                        </div>
-                        <div class='col col--2'>
-                            <button @click='setToken' class='fr btn btn--stroke round color-gray color-green-on-hover h-full w-full'>
-                                <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <template v-if='newToken.show && newToken.token'>
-                <div class='col col--12 border border--gray-light round my12'>
-                    <div class='col col--12 grid grid--gut12 pl12 py6'>
-                        <div class='col col--12 pb6'>
-                            <h2 class='txt-bold fl' v-text='newToken.name'></h2>
-                            <button @click='newToken.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                                <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                            </button>
-                        </div>
-
-                        <div class='col col--12'>
-                            <pre class='pre txt--s' v-text='newToken.token'/>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <div :key='token.id' v-for='token in tokens' class='col col--12 grid bg-gray-light-on-hover cursor-default round px12 py12'>
-                <div class='col col--10' v-text='token.name'></div>
-                <div class='col col--2'>
-                    <button @click='deleteToken(token.id)' class='fr btn round btn--s btn--stroke color-gray color-red-on-hover h-full'>
-                        <svg class='icon'><use xlink:href='#icon-trash'/></svg>
-                    </button>
-                </div>
-            </div>
+            <table class="table table-hover table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Attributes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr :key='token.id' v-for='token in tokens' class='cursor-pointer'>
+                        <td><span v-text='token.name'/></td>
+                        <td>
+                            <div class='d-flex'>
+                                <div class='ms-auto'>
+                                    <TrashIcon @click='deleteToken(token.id)' class='cursor-pointer'/>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </template>
-    </div>
+    </template>
+</div>
 </template>
 
 <script>
+import {
+    TablerLoading,
+    TablerInput,
+    TablerNone
+} from '@tak-ps/vue-tabler';
+import {
+    XIcon,
+    PlusIcon,
+    TrashIcon,
+    RefreshIcon,
+    CheckIcon
+} from 'vue-tabler-icons';
+
 export default {
     name: 'Tokens',
     props: [ ],
@@ -153,6 +146,16 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        PlusIcon,
+        XIcon,
+        TrashIcon,
+        RefreshIcon,
+        TablerInput,
+        CheckIcon,
+        TablerNone,
+        TablerLoading
     }
 }
 </script>

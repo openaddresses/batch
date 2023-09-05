@@ -1,6 +1,6 @@
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';
-import Generic from '@openaddresses/batch-generic';
+import Generic, { Params } from '@openaddresses/batch-generic';
 import moment from 'moment';
 import Job from './job.js';
 import Data from './data.js';
@@ -25,15 +25,15 @@ export default class Run extends Generic {
      */
     static async ping(pool, ci, job) {
         try {
-            const runs = await Run.list(pool, {
+            const list = await Run.list(pool, {
                 run: job.run
             });
 
-            if (runs.length !== 1) {
+            if (list.runs.length !== 1) {
                 throw new Error('Run#ping should always produce a single run');
             }
 
-            const run = runs[0];
+            const run = list.runs[0];
 
             if (run.live && job.status === 'Success') {
                 await Data.update(pool, job);
@@ -71,8 +71,12 @@ export default class Run extends Generic {
      */
     static async list(pool, query) {
         if (!query) query = {};
-        if (!query.limit) query.limit = 100;
         if (!query.status) query.status = Status.list();
+
+        query.page = Params.integer(query.page, { default: 0 });
+        query.limit = Params.integer(query.limit, { default: 100 });
+        query.sort = Params.string(query.sort, { default: 'id' });
+        query.order = Params.order(query.order);
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
@@ -102,6 +106,7 @@ export default class Run extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
+                    count(*) OVER() AS count,
                     runs.id,
                     runs.live,
                     runs.created,
@@ -125,12 +130,16 @@ export default class Run extends Generic {
                     runs.github,
                     runs.closed
                 ORDER BY
-                    runs.id DESC
+                    ${sql.identifier([this._table, query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
+                OFFSET
+                    ${query.limit * query.page}
             `);
 
-            return pgres.rows.map((run) => {
+            const list = this.deserialize_list(pgres, 'runs');
+
+            list.runs.map((run) => {
                 if (run.status.includes('Fail')) {
                     run.status = 'Fail';
                 } else if (run.status.includes('Pending')) {
@@ -141,6 +150,8 @@ export default class Run extends Generic {
 
                 return run;
             });
+
+            return list;
         } catch (err) {
             throw new Err(500, err, 'failed to fetch runs');
         }

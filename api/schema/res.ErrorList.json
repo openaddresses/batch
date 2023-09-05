@@ -1,37 +1,47 @@
 {
-    "type": "array",
-    "items": {
-        "type": "object",
-        "required": [
-            "job",
-            "status",
-            "messages",
-            "source_name",
-            "layer",
-            "name"
-        ],
-        "additionalProperties": false,
-        "properties": {
-            "job": {
-                "type": "integer"
-            },
-            "status": {
-                "$ref": "./util/status.json"
-            },
-            "messages": {
-                "type": "array",
-                "items": {
-                    "type": "string"
+    "type": "object",
+    "required": ["total", "errors"],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer"
+        },
+        "errors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "job",
+                    "status",
+                    "messages",
+                    "source_name",
+                    "layer",
+                    "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "job": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "./util/status.json"
+                    },
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "source_name": {
+                        "type": "string"
+                    },
+                    "layer": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
                 }
-            },
-            "source_name": {
-                "type": "string"
-            },
-            "layer": {
-                "type": "string"
-            },
-            "name": {
-                "type": "string"
             }
         }
     }

@@ -1,102 +1,124 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <div class='col col--12 grid border-b border--gray-light'>
-            <div class='col col--12'>
-                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                </button>
-
-                <h2 class='txt-h4 ml12 pb12 fl' v-text='data.source + " - " + data.layer + " - " + data.name'></h2>
-
-                <button @click='refresh' class='btn round btn--stroke fr color-gray'>
-                    <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                </button>
-            </div>
-        </div>
-
-        <div class='col col--12 pt12'>
-            <h2 class='txt-h4 pb12 fl'>Stats History:</h2>
-
-            <template v-if='loading'>
-                <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
-                </div>
-            </template>
-            <template v-else>
-                <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
-                    "maintainAspectRatio": false,
-                    "scales": {
-                        "xAxis": {
-                            "type": "time",
-                            "time": {
-                                "unit": "day"
-                            },
-                            "distribution": "linear"
-                        },
-                        "yAxis": {
-                            "ticks": {
-                                "beginAtZero": true
-                            }
-                        }
-                    }
-                }'/>
-            </template>
-        </div>
-
-        <div class='col col--12 pt12'>
-            <h2 class='txt-h4 pb12 fl'>Job History:</h2>
-        </div>
-
-        <div class='col col--1'>
-            Status
-        </div>
-        <div class='col col--3'>
-            Job ID
-        </div>
-        <div class='col col--5'>
-            Updated
-        </div>
-        <div class='col col--3'>
-            <span class='fr'>Attributes</span>
-        </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div :key='job.id' v-for='job in history.jobs' class='col col--12 grid'>
-                <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                    <div class='col col--1'>
-                        <template v-if='job.status === "Pending"'>
-                            <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                        </template>
-                        <template v-else-if='job.status === "Success"'>
-                            <svg class='icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                        </template>
-                        <template v-else-if='job.status === "Fail"'>
-                            <svg class='icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                        </template>
-                    </div>
-                    <div class='col col--3'>
-                        Job <span v-text='job.id'/>
-                    </div>
-                    <div class='col col--5'>
-                        <span v-text='fmt(job.created)'></span>
-                    </div>
-                    <div class='col col--3'>
-                        <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                            <DownloadIcon width="16" height="16"/>
-                        </span>
+<div>
+    <div class='page-wrapper'>
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col d-flex">
+                        <TablerBreadCrumb/>
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
     </div>
+
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title' v-text='data.source + " - " + data.layer + " - " + data.name'/>
+
+                            <div class='ms-auto btn-list'>
+                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                            </div>
+                        </div>
+
+                        <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
+                        <div v-else class='card-body'>
+                            <div class='col col--12 pt12'>
+                                <h2 class='txt-h4 pb12 fl'>Stats History:</h2>
+
+                                <template v-if='loading'>
+                                    <div class='flex flex--center-main w-full py24'>
+                                        <div class='loading'></div>
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
+                                        "maintainAspectRatio": false,
+                                        "scales": {
+                                            "xAxis": {
+                                                "type": "time",
+                                                "time": {
+                                                    "unit": "day"
+                                                },
+                                                "distribution": "linear"
+                                            },
+                                            "yAxis": {
+                                                "ticks": {
+                                                    "beginAtZero": true
+                                                }
+                                            }
+                                        }
+                                    }'/>
+                                </template>
+                            </div>
+
+                            <div class='col col--12 pt12'>
+                                <h2 class='txt-h4 pb12 fl'>Job History:</h2>
+                            </div>
+
+                            <div class='col col--1'>
+                                Status
+                            </div>
+                            <div class='col col--3'>
+                                Job ID
+                            </div>
+                            <div class='col col--5'>
+                                Updated
+                            </div>
+                            <div class='col col--3'>
+                                <span class='fr'>Attributes</span>
+                            </div>
+
+                            <template v-if='loading'>
+                                <div class='flex flex--center-main w-full py24'>
+                                    <div class='loading'></div>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div :key='job.id' v-for='job in history.jobs' class='col col--12 grid'>
+                                    <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
+                                        <div class='col col--1'>
+                                            <template v-if='job.status === "Pending"'>
+                                                <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                                            </template>
+                                            <template v-else-if='job.status === "Success"'>
+                                                <svg class='icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                                            </template>
+                                            <template v-else-if='job.status === "Fail"'>
+                                                <svg class='icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
+                                            </template>
+                                        </div>
+                                        <div class='col col--3'>
+                                            Job <span v-text='job.id'/>
+                                        </div>
+                                        <div class='col col--5'>
+                                            <span v-text='fmt(job.created)'></span>
+                                        </div>
+                                        <div class='col col--3'>
+                                            <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
+                                                <DownloadIcon width="16" height="16"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 
 <script>
+import {
+    TablerBreadCrumb
+} from '@tak-ps/vue-tabler';
 import {
     DownloadIcon
 } from 'vue-tabler-icons';
@@ -220,6 +242,7 @@ export default {
     },
     components: {
         LineChart,
+        TablerBreadCrumb,
         DownloadIcon
     },
 }

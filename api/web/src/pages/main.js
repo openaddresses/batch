@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
 import * as VueRouter from 'vue-router';
+
+import 'floating-vue/dist/style.css'
 import FloatingVue from 'floating-vue';
 
 import App from './App.vue'
@@ -13,12 +15,12 @@ const router = new VueRouter.createRouter({
     routes: [
         { path: '/', redirect: '/data' },
 
-        { path: '/errors', component: () => import('../components/Errors.vue') },
+        { path: '/error', component: () => import('../components/Errors.vue') },
 
         { path: '/run', component: () => import('../components/Runs.vue') },
         { path: '/run/:runid', component: () => import('../components/Run.vue'), props: true },
 
-        { path: '/export/', component: () => import('../components/Exports.vue'), props: true },
+        { path: '/export', component: () => import('../components/Exports.vue'), props: true },
         { path: '/export/:exportid', component: () => import('../components/Export.vue'), props: true },
 
         { path: '/job', component: () => import('../components/Jobs.vue') },
@@ -26,6 +28,7 @@ const router = new VueRouter.createRouter({
         { path: '/job/:jobid/log', component: () => import('../components/JobLog.vue'), props: true },
         { path: '/job/:jobid/raw', component: () => import('../components/JobRaw.vue'), props: true },
 
+        { path: '/location', component: () => import('../components/Data.vue') },
         { path: '/location/:locid', component: () => import('../components/Location.vue'), props: true },
 
         { path: '/data', component: () => import('../components/Data.vue') },
@@ -54,7 +57,7 @@ const router = new VueRouter.createRouter({
 
         { path: '/upload', component: () => import('../components/Upload.vue') },
 
-        { path: '/.*', component: () => import('../components/NotFound.vue') }
+        { path: '/:catchAll(.*)', component: () => import('../components/NotFound.vue') }
     ]
 });
 

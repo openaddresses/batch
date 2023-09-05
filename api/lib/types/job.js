@@ -37,8 +37,11 @@ export default class Job extends Generic {
      */
     static async list(pool, query={}) {
         query.limit = Params.integer(query.limit, { default: 100 });
+        query.page = Params.integer(query.page, { default: 0 });
         query.source = Params.string(query.source, { default: '' });
         query.run = Params.integer(query.run);
+        query.sort = Params.string(query.sort, { default: 'id' });
+        query.order = Params.order(query.order);
 
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.live || query.live === 'all') query.live = null;
@@ -73,6 +76,7 @@ export default class Job extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
+                    count(*) OVER() AS count,
                     job.id,
                     job.run,
                     job.map,
@@ -98,19 +102,19 @@ export default class Job extends Generic {
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 ORDER BY
-                    job.id DESC
+                    ${sql.identifier([this._table, query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
+                OFFSET
+                    ${query.limit * query.page}
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to load jobs');
         }
 
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'No job found');
-        }
+        const list = this.deserialize_list(pgres, 'jobs');
 
-        return pgres.rows.map((job) => {
+        list.jobs.map((job) => {
             if (job.output && job.output.output) {
                 job.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/source.geojson.gz`;
             }
@@ -121,8 +125,9 @@ export default class Job extends Generic {
 
             return job;
         });
-    }
 
+        return list;
+    }
 
     async get_raw() {
         if (!this.raw) {

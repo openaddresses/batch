@@ -13,9 +13,9 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
-            const runs = await Run.list(config.pool, req.query);
+            const list = await Run.list(config.pool, req.query);
 
-            return res.json(runs);
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -83,67 +83,72 @@ test('Run#populate', async () => {
 
 test('Run#list', async () => {
     try {
-        const runs = await Run.list(flight.config.pool);
+        const list = await Run.list(flight.config.pool, {
+            order: 'desc'
+        });
 
-        assert.equal(runs.length, 2, 'Runs.length: 2');
+        assert.equal(list.total, 2, 'Runs.total: 2');
+        assert.equal(list.runs.length, 2, 'Runs.length: 2');
 
-        assert.equal(runs[0].id, 2, 'run[0].id: 2');
-        assert.equal(runs[1].id, 1, 'run[1].id: 1');
+        assert.equal(list.runs[0].id, 2, 'run[0].id: 2');
+        assert.equal(list.runs[1].id, 1, 'run[1].id: 1');
 
-        assert.ok(runs[0].created, 'run[0].created: <truthy>');
-        assert.ok(runs[1].created, 'run[1].created: <truthy>');
+        assert.ok(list.runs[0].created, 'run[0].created: <truthy>');
+        assert.ok(list.runs[1].created, 'run[1].created: <truthy>');
 
-        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
-        assert.deepEqual(runs[1].github, {}, 'run[1].github: {}');
+        assert.deepEqual(list.runs[0].github, {}, 'run[0].github: {}');
+        assert.deepEqual(list.runs[1].github, {}, 'run[1].github: {}');
 
-        assert.equal(runs[0].closed, true, 'run[0].closed: false');
-        assert.equal(runs[1].closed, true, 'run[1].closed: false');
+        assert.equal(list.runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(list.runs[1].closed, true, 'run[1].closed: false');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
 
     try {
-        const runs = await Run.list(flight.config.pool, {
+        const list = await Run.list(flight.config.pool, {
+            order: 'desc',
             limit: 1
         });
 
-        assert.equal(runs.length, 1, 'Runs.length: 1');
+        assert.equal(list.runs.length, 1, 'Runs.length: 1');
 
-        assert.equal(runs[0].id, 2, 'run[0].id: 2');
-        assert.ok(runs[0].created, 'run[0].created: <truthy>');
-        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
-        assert.equal(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(list.runs[0].id, 2, 'run[0].id: 2');
+        assert.ok(list.runs[0].created, 'run[0].created: <truthy>');
+        assert.deepEqual(list.runs[0].github, {}, 'run[0].github: {}');
+        assert.equal(list.runs[0].closed, true, 'run[0].closed: false');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
 
     try {
-        const runs = await Run.list(flight.config.pool, {
+        const list = await Run.list(flight.config.pool, {
+            order: 'desc',
             run: 1
         });
 
-        assert.equal(runs.length, 1, 'Runs.length: 1');
+        assert.equal(list.runs.length, 1, 'Runs.length: 1');
 
-        assert.equal(runs[0].id, 1, 'run[0].id: 1');
-        assert.ok(runs[0].created, 'run[0].created: <truthy>');
-        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
-        assert.equal(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(list.runs[0].id, 1, 'run[0].id: 1');
+        assert.ok(list.runs[0].created, 'run[0].created: <truthy>');
+        assert.deepEqual(list.runs[0].github, {}, 'run[0].github: {}');
+        assert.equal(list.runs[0].closed, true, 'run[0].closed: false');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
 
     try {
-        const runs = await Run.list(flight.config.pool, {
+        const list = await Run.list(flight.config.pool, {
             run: 1,
             limit: 1
         });
 
-        assert.equal(runs.length, 1, 'Runs.length: 1');
+        assert.equal(list.runs.length, 1, 'Runs.length: 1');
 
-        assert.equal(runs[0].id, 1, 'run[0].id: 1');
-        assert.ok(runs[0].created, 'run[0].created: <truthy>');
-        assert.deepEqual(runs[0].github, {}, 'run[0].github: {}');
-        assert.equal(runs[0].closed, true, 'run[0].closed: false');
+        assert.equal(list.runs[0].id, 1, 'run[0].id: 1');
+        assert.ok(list.runs[0].created, 'run[0].created: <truthy>');
+        assert.deepEqual(list.runs[0].github, {}, 'run[0].github: {}');
+        assert.equal(list.runs[0].closed, true, 'run[0].closed: false');
     } catch (err) {
         assert.ifError(err, 'no error');
     }

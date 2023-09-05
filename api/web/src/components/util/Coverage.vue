@@ -1,68 +1,80 @@
 <template>
-    <div class='col col--12' :class='{ h300: !fullscreen, h600: fullscreen }'>
-        <div class='col col--12' :class='{ absolute: fullscreen, right: fullscreen, left: fullscreen }'>
-            <div class='col col--12 relative'>
-                <div class='absolute top right z1'>
-                    <button @click='setFull' class='btn round btn--stroke fr color-gray bg-white my12 mx12'>
-                        <svg v-if='!fullscreen' class='icon'><use href='#icon-fullscreen'/></svg>
-                        <svg v-else class='icon'><use href='#icon-shrink'/></svg>
-                    </button>
-                </div>
-
-                <div v-if='point' class='absolute top left z1'>
-                    <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
-                        <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
-                    </button>
-                </div>
-
-                <div id="map" class='w-full' :class='{ h300: !fullscreen, h600: fullscreen }'></div>
+<div :style='{
+        "height": (!fullscreen ? 300 : 600) + "px"
+    }'>
+    <div class='row'>
+        <div class='col-12' :class='{
+            "absolute right left": fullscreen,
+        }'>
+            <div class='absolute top right z1'>
             </div>
+
+            <div v-if='point' class='absolute top left z1'>
+                <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
+                    <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
+                </button>
+            </div>
+
+            <div ref='map' class='w-100' :style='{
+                "height": (!fullscreen ? 300 : 600) + "px"
+            }'></div>
         </div>
     </div>
+</div>
 </template>
 
 <script>
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import mapgl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css';
+let map = null;
 
 export default {
     name: 'Coverage',
-    props: ['layer', 'filter', 'bbox'],
+    props: {
+        layer: {
+            type: String
+        },
+        filter: {
+            type: String
+        }, 
+        bbox: {
+            type: Array
+        }
+    },
     data: function() {
         return {
             layers: ['addresses', 'parcels', 'buildings'],
             fullscreen: false,
             point: false,
-            map: ''
         }
     },
     watch: {
         layer: function() {
             for (const layer of this.layers) {
-                this.map.setLayoutProperty(`coverage-${layer}-poly`, 'visibility', 'none');
-                this.map.setLayoutProperty(`coverage-${layer}-point`, 'visibility', 'none');
+                map.setLayoutProperty(`coverage-${layer}-poly`, 'visibility', 'none');
+                map.setLayoutProperty(`coverage-${layer}-point`, 'visibility', 'none');
             }
 
             if (this.layer !== 'all') {
-                this.map.setLayoutProperty('coverage-poly', 'visibility', 'none');
-                this.map.setLayoutProperty('coverage-point', 'visibility', 'none');
+                map.setLayoutProperty('coverage-poly', 'visibility', 'none');
+                map.setLayoutProperty('coverage-point', 'visibility', 'none');
 
-                this.map.setLayoutProperty(`coverage-${this.layer}-poly`, 'visibility', 'visible');
-                this.map.setLayoutProperty(`coverage-${this.layer}-point`, 'visibility', 'visible');
+                map.setLayoutProperty(`coverage-${this.layer}-poly`, 'visibility', 'visible');
+                map.setLayoutProperty(`coverage-${this.layer}-point`, 'visibility', 'visible');
             } else {
-                this.map.setLayoutProperty('coverage-poly', 'visibility', 'visible');
-                this.map.setLayoutProperty('coverage-point', 'visibility', 'visible');
+                map.setLayoutProperty('coverage-poly', 'visibility', 'visible');
+                map.setLayoutProperty('coverage-point', 'visibility', 'visible');
             }
 
         },
         point: function() {
             if (!this.point) {
-                this.map.getSource('click').setData({
+                map.getSource('click').setData({
                     type: 'FeatureCollection',
                     features: []
                 });
             } else {
-                this.map.getSource('click').setData({
+                map.getSource('click').setData({
                     type: 'Feature',
                     properties: {},
                     geometry: {
@@ -74,34 +86,66 @@ export default {
             this.$emit('point', this.point);
         }
     },
-    mounted: function() {
-        this.init();
+    mounted: async function() {
+        this.$nextTick(async () => {
+            await this.init();
+        });
     },
     methods: {
         setFull: function() {
             this.fullscreen = !this.fullscreen;
             this.$nextTick(() => {
-                this.map.resize();
+                map.resize();
             });
         },
         init: async function() {
             try {
                 const res = await window.std('/api/map');
-                mapboxgl.accessToken = res.token;
 
-                const opts = {
-                    container: 'map',
-                    style: 'mapbox://styles/mapbox/light-v9'
-                };
+                const tmpmap = new mapgl.Map({
+                    container: this.$refs.map,
+                    hash: "map",
+                    zoom: 0,
+                    center: [0, 0],
+                    style: {
+                        version: 8,
+                        sources: {
+                            basemap: {
+                                type: 'raster',
+                                tileSize: 256,
+                                tiles: [
+                                    `https://api.mapbox.com/styles/v1/ingalls/ckvh0wwm8g2cw15r05ozt0ybr/tiles/256/{z}/{x}/{y}@2x?access_token=${res.token}`
+                                ]
+                            }
+                        },
+                        layers: [{
+                            id: 'background',
+                            type: 'background',
+                            paint: {
+                                'background-color': 'rgb(4,7,14)'
+                            }
+                        },{
+                            id: 'basemap',
+                            type: 'raster',
+                            source: 'basemap',
+                            minzoom: 0,
+                            maxzoom: 15
+                        }]
+                    }
 
-                if (this.bbox) opts.bounds = this.bbox;
+                });
 
-                this.map = new mapboxgl.Map(opts);
+                tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
 
-                this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+                map.once('load', () => {
+                    map = tmpmap;
 
-                this.map.on('load', () => {
-                    this.map.addSource('coverage', {
+                    map.addSource('basemap', {
+                        type: 'vector',
+                    });
+
+
+                    map.addSource('coverage', {
                         type: 'vector',
                         tiles: [
                             `${window.location.origin}/api/map/{z}/{x}/{y}.mvt`
@@ -110,13 +154,13 @@ export default {
                         maxzoom: 6
                     });
 
-                    this.map.on('click', (e) => {
+                    map.on('click', (e) => {
                         this.point = [ e.lngLat.lng, e.lngLat.lat ]
                     });
 
                     const base = '#0b6623';
 
-                    this.map.addLayer({
+                    map.addLayer({
                         id: `coverage-poly`,
                         type: 'fill',
                         source: 'coverage',
@@ -138,7 +182,7 @@ export default {
                         }
                     });
 
-                    this.map.addLayer({
+                    map.addLayer({
                         id: `coverage-point`,
                         type: 'circle',
                         source: 'coverage',
@@ -163,7 +207,7 @@ export default {
 
                     for (const layer of ['coverage-poly', 'coverage-point']) {
                         if (this.filter) {
-                            this.map.setFilter(layer, [
+                            map.setFilter(layer, [
                                 '==',
                                 ['id'],
                                 parseInt(this.filter)
@@ -172,7 +216,7 @@ export default {
                     }
 
                     for (const layer of ['addresses', 'parcels', 'buildings']) {
-                        this.map.addLayer({
+                        map.addLayer({
                             id: `coverage-${layer}-poly`,
                             type: 'fill',
                             source: 'coverage',
@@ -191,7 +235,7 @@ export default {
                             }
                         });
 
-                        this.map.addLayer({
+                        map.addLayer({
                             id: `coverage-${layer}-point`,
                             type: 'circle',
                             source: 'coverage',
@@ -223,13 +267,13 @@ export default {
                         });
 
                         if (this.filter) {
-                            this.map.setFilter(`coverage-${layer}-poly`, [
+                            map.setFilter(`coverage-${layer}-poly`, [
                                 '==',
                                 ['id'],
                                 parseInt(this.filter)
                             ]);
 
-                            this.map.setFilter(`coverage-${layer}-point`, [
+                            map.setFilter(`coverage-${layer}-point`, [
                                 '==',
                                 ['id'],
                                 parseInt(this.filter)
@@ -237,7 +281,7 @@ export default {
                         }
                     }
 
-                    this.map.addLayer({
+                    map.addLayer({
                         id: `borders`,
                         type: 'line',
                         source: 'coverage',
@@ -250,7 +294,7 @@ export default {
                         }
                     });
 
-                    this.map.addLayer({
+                    map.addLayer({
                         'id': 'borders-label',
                         'type': 'symbol',
                         'minzoom': 7,
@@ -261,7 +305,7 @@ export default {
                         }
                     });
 
-                    this.map.addSource('click', {
+                    map.addSource('click', {
                         type: 'geojson',
                         data: {
                             type: 'FeatureCollection',
@@ -269,7 +313,7 @@ export default {
                         }
                     });
 
-                    this.map.addLayer({
+                    map.addLayer({
                         id: 'click',
                         type: 'symbol',
                         source: 'click',

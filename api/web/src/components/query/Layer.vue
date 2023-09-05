@@ -1,30 +1,34 @@
 <template>
-<div class='col col--12'>
-    <label>Layer</label>
-    <div class='w-full select-container'>
-        <select v-model='layer' class='select select--stroke'>
-            <option>all</option>
-            <option>addresses</option>
-            <option>buildings</option>
-            <option>parcels</option>
-        </select>
-        <div class='select-arrow'></div>
-    </div>
+<div class='col-12'>
+    <TablerEnum v-model='layer' label='Layer' :options='options'/>
 </div>
 </template>
 
 <script>
+import {
+    TablerEnum
+} from '@tak-ps/vue-tabler';
+
 export default {
     name: 'QueryLayer',
     data: function() {
         return {
-            layer: 'all'
+            layer: 'all',
+            options: [
+                'all',
+                'addresses',
+                'buildings',
+                'parcels'
+            ]
         };
     },
     watch: {
         layer: function() {
             this.$emit('layer', this.layer);
         }
+    },
+    components: {
+        TablerEnum
     }
 }
 </script>

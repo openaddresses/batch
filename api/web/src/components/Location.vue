@@ -22,10 +22,6 @@
                         <div class='card-body row'>
                             <TablerLoading v-if='loading'/>
                             <template v-else>
-                                <button @click='$router.go(-1)' class='btn round btn--stroke fl color-gray'>
-                                    <svg class='icon'><use xlink:href='#icon-arrow-left'/></svg>
-                                </button>
-
                                 <div class='col-12'>
                                     <Coverage
                                         @err='$emit("err", $event)'
@@ -70,7 +66,7 @@
                                     </tbody>
                                 </table>
 
-                                <div class='col-12 align-center'>
+                                <div class='col-12 text-center pt-3'>
                                     OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
                                 </div>
                             </template>

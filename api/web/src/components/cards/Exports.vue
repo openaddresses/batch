@@ -3,11 +3,11 @@
     <div class='card-header'>
         <h3 class='card-title'>Exports</h3>
         <div class='d-flex ms-auto btn-list'>
-            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+            <RefreshIcon @click='fetchExports' class='cursor-pointer'/>
         </div>
     </div>
     <TablerLoading v-if='loading' desc='Loading Exports'/>
-    <TablerNone v-else-if='!exps.length'/>
+    <TablerNone v-else-if='!list.total'/>
     <template v-else>
         <table class="table table-hover table-vcenter card-table">
             <thead>
@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr @click='$router.push(`/export/${exp.id}`);' :key='exp.id' v-for='exp in exps' class='cursor-pointer'>
+                <tr @click='$router.push(`/export/${exp.id}`);' :key='exp.id' v-for='exp in list.exports' class='cursor-pointer'>
                     <td><Status :status='exp.status'/></td>
                     <td><span class='pl6' v-text='"Export #" + exp.id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/></td>
                     <td><span v-text='fmt(exp.created)'/></td>
@@ -28,7 +28,7 @@
             </tbody>
         </table>
 
-        <TablerPager v-if='exps.length' @page='page = $event' :perpage='perpage' :total='total'/>
+        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
     </template>
 </div>
 </template>
@@ -36,8 +36,8 @@
 <script>
 import Status from '../util/Status.vue';
 import moment from 'moment-timezone';
+import TableFooter from '../util/TableFooter.vue';
 import {
-    TablerPager,
     TablerLoading,
     TablerNone,
 } from '@tak-ps/vue-tabler';
@@ -51,43 +51,49 @@ export default {
     data: function() {
         return {
             tz: moment.tz.guess(),
-            exps: [],
-            page: 0,
-            perpage: 10,
-            total: 100,
-            loading: false
+            loading: false,
+            list: {
+                total: 0,
+                exports: []
+            },
+            paging: {
+                sort: 'id',
+                order: 'desc',
+                limit: 100,
+                page: 0
+            },
         };
     },
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.fetchExports();
     },
     watch: {
-        page: function() {
-            this.getExports();
-        },
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchJobs();
+            }
+        }
     },
     methods: {
-        refresh: function() {
-            this.getExports();
-        },
         fmt: function(date) {
             return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
         },
-        getExports: async function() {
+        fetchExports: async function() {
             try {
                 this.loading = true;
 
-                const url = new URL(`${window.location.origin}/api/export`);
-                url.searchParams.append('limit', this.perpage)
-                url.searchParams.append('page', this.page)
+                const url = window.stdurl('/api/export');
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
+                url.searchParams.append('source', this.paging.source);
+                url.searchParams.append('order', this.paging.order);
 
                 if (this.profile) {
                     url.searchParams.append('uid', this.profile.uid)
                 }
 
-                const res = await window.std(url);
-                this.exps = res.exports;
-                this.total = res.total;
+                this.list = await window.std(url);
 
                 this.loading = false;
             } catch(err) {
@@ -97,7 +103,7 @@ export default {
     },
     components: {
         RefreshIcon,
-        TablerPager,
+        TableFooter,
         TablerLoading,
         TablerNone,
         Status

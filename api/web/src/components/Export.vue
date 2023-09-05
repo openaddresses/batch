@@ -21,13 +21,14 @@
                             <h3 class='card-title'>Export #<span v-text='exportid'/></h3>
 
                             <div class='ms-auto btn-list'>
-                                <div class='cursor-pointer fr dropdown'>
-                                    <svg class='icon' style='margin-top: 5px;'><use xlink:href='#icon-chevron-down'/></svg>
-
-                                    <div class='round dropdown-content'>
-                                        <div @click='createRerun' class='round bg-gray-faint-on-hover'>Rerun</div>
-                                    </div>
-                                </div>
+                                <TablerDropdown>
+                                    <slot>
+                                        <DotsVerticalIcon class='cursor-pointer'/>
+                                    </slot>
+                                    <template #dropdown>
+                                        <div @click='createRerun' class='mx-2 my-2'>Rerun</div>
+                                    </template>
+                                </TablerDropdown>
 
                                 <RefreshIcon @click='refresh' class='cursor-pointer'/>
                             </div>
@@ -85,10 +86,12 @@
 import Log from './util/Log.vue';
 import Status from './util/Status.vue';
 import {
-    RefreshIcon
+    RefreshIcon,
+    DotsVerticalIcon,
 } from 'vue-tabler-icons';
 import {
     TablerLoading,
+    TablerDropdown,
     TablerBreadCrumb
 } from '@tak-ps/vue-tabler';
 
@@ -164,7 +167,9 @@ export default {
     },
     components: {
         RefreshIcon,
+        DotsVerticalIcon,
         TablerLoading,
+        TablerDropdown,
         TablerBreadCrumb,
         Status,
         Log

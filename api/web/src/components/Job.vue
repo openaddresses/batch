@@ -30,7 +30,7 @@
                         <div :key='message' v-for='message in joberror.messages' class='text-center' v-text='message'></div>
 
                         <div class='d-flex justify-content-center pt-3'>
-                            <ErrorsModerate @moderated='joberror = false' class='py12' :error='job'/>
+                            <ErrorsModerate @moderated='joberror = false' :error='job'/>
                         </div>
                     </div>
                 </div>

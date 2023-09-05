@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import SM from '@aws-sdk/client-secrets-manager';
 import { createAppAuth } from '@octokit/auth-app';
 import { Octokit } from '@octokit/rest';
 import fs from 'fs';
@@ -110,13 +110,13 @@ export default class Config {
     }
 
     static async secret(secretName) {
-        const client = new AWS.SecretsManager({
+        const client = new SM.SecretsManagerClient({
             region: process.env.AWS_DEFAULT_REGION
         });
 
-        const data = await client.getSecretValue({
+        const data = await client.send(new SM.GetSecretValueCommand({
             SecretId: secretName
-        }).promise();
+        }));
 
         return JSON.parse(data.SecretString);
     }

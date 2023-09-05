@@ -131,8 +131,8 @@
                             <tbody>
                                 <template :key='d.source' v-for='d in datas'>
                                     <tr>
-                                        <td v-text='d.source'></td>
-                                        <td>
+                                        <td @click='d._open = !d._open' v-text='d.source' class='cursor-pointer'></td>
+                                        <td @click='d._open = !d._open' class='cursor-pointer'>
                                             <LayerIcon v-if='d.has.buildings' layer='buildings'/>
                                             <LayerIcon v-if='d.has.addresses' layer='addresses'/>
                                             <LayerIcon v-if='d.has.parcels' layer='parcels'/>
@@ -141,20 +141,42 @@
                                             <div class='d-flex'>
                                                 <div class='ms-auto btn-list'>
                                                     <MapIcon v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer'/>
-                                                    <template v-if='auth && auth.access === "admin"'>
-                                                        <TablerDropdown>
-                                                            <slot>
-                                                                <SettingsIcon class='cursor-pointer'/>
-                                                            </slot>
-                                                            <template #dropdown>
-                                                                <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
-                                                            </template>
-                                                        </TablerDropdown>
-                                                    </template>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
+                                    <template v-if='d._open' :key='job.id' v-for='job in d.sources'>
+                                        <tr><td colspan='3' class='cursor-pointer'>
+                                            <div class='row'>
+                                                <div @click='emitjob(job.job)' class='col-5'>
+                                                    <span v-text='job.layer'/> - <span v-text='job.name'/>
+
+                                                </div>
+                                                <div @click='emitjob(job.job)' class='col-2'>
+                                                    <span v-text='fmt(job.updated)'/>
+                                                </div>
+                                                <div class='col-5 d-flex'>
+                                                    <div class='ms-auto btn-list'>
+                                                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+
+                                                        <template v-if='auth && auth.access === "admin"'>
+                                                            <TablerDropdown>
+                                                                <slot>
+                                                                    <SettingsIcon class='cursor-pointer'/>
+                                                                </slot>
+                                                                <template #dropdown>
+                                                                    <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
+                                                                    <TablerDelete @delete='deleteData(job)'/>
+                                                                </template>
+                                                            </TablerDropdown>
+                                                        </template>
+
+                                                        <HistoryIcon @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer'/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td></tr>
+                                    </template>
                                 </template>
                             </tbody>
                         </table>
@@ -186,6 +208,7 @@ import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 import {
     TablerLoading,
+    TablerDelete,
     TablerInput
 } from '@tak-ps/vue-tabler';
 
@@ -246,7 +269,6 @@ export default {
             this.$router.push({ path: `/job/${jobid}` })
         },
         emithistory: function(jobid) {
-            this.$router.push({ path: `/data/${jobid}/history` })
         },
         datapls: function(jobid, fmt) {
             if (!this.auth.username) return this.$emit('login');
@@ -368,6 +390,7 @@ export default {
         XIcon,
         MapIcon,
         TablerInput,
+        TablerDelete,
         LayerIcon
     }
 }

@@ -17,8 +17,16 @@
                 <div class='col-12'>
                     <div class='card'>
                         <div class='card-header'>
-                            <Status :status='exp.status'/>
-                            <h3 class='card-title'>Export #<span v-text='exportid'/></h3>
+                            <div class='card-title row'>
+                                <div class='d-flex'>
+                                    <Status v-if='exp.status' :status='exp.status'/>
+                                    <LayerIcon class='align-self-center' :layer='job.layer'/>
+                                    <div class='mx-2 align-self-center'>
+                                        Export #<span v-text='exportid'/>
+                                    </div>
+                                </div>
+                                <div style='padding-left: 50px;' class='subheader' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></div>
+                            </div>
 
                             <div class='ms-auto btn-list'>
                                 <TablerDropdown>
@@ -36,7 +44,7 @@
                         <div class='card-body'>
                             <TablerLoading v-if='loading'/>
                             <template v-else>
-                                <div class='col col--12 flex flex--center-main'>
+                                <div class='col-12'>
                                     <h3 class='txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
                                 </div>
 
@@ -85,6 +93,7 @@
 
 import Log from './util/Log.vue';
 import Status from './util/Status.vue';
+import LayerIcon from './util/LayerIcon.vue';
 import {
     RefreshIcon,
     DotsVerticalIcon,
@@ -171,6 +180,7 @@ export default {
         TablerLoading,
         TablerDropdown,
         TablerBreadCrumb,
+        LayerIcon,
         Status,
         Log
     }

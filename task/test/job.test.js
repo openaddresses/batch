@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import Job from '../lib/job.js';
 import test from 'tape';
-import AWS from '@mapbox/mock-aws-sdk-js';
 import stream from 'stream';
+import Sinon from 'sinon';
+import S3 from '@aws-sdk/client-s3';
 
 test('Job#compress', async (t) => {
     try {
@@ -94,18 +95,21 @@ test('Job#s3_down', async (t) => {
 
         job.specific = JSON.parse(fs.readFileSync(new URL('./fixtures/us-or-clackamas.json', import.meta.url))).layers.addresses[0];
 
-        AWS.stub('S3', 'getObject', async function(params) {
-            t.deepEquals(params, {
+        Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
+            t.ok(command instanceof S3.GetObjectCommand);
+            t.deepEquals(command.input, {
                 Bucket: 'data.openaddresses.io',
                 Key: 'cache/us-or-clackamas.zip'
             });
 
-            this.request.createReadStream.returns(new stream.Readable({
-                read: function() {
-                    this.push('123');
-                    this.push(null);
-                }
-            }));
+            return {
+                Body: new stream.Readable({
+                    read: function() {
+                        this.push('123');
+                        this.push(null);
+                    }
+                })
+            };
         });
 
         await job.s3_down();
@@ -116,7 +120,7 @@ test('Job#s3_down', async (t) => {
         t.error(err);
     }
 
-    AWS.S3.restore();
+    Sinon.restore();
 
     t.end();
 });

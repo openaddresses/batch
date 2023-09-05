@@ -12,16 +12,18 @@ import { pipeline } from 'stream/promises';
 import fs from 'fs';
 import path from 'path';
 import { mkdirp } from 'mkdirp';
-import AWS from 'aws-sdk';
+import S3 from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
 import minimist from 'minimist';
 import { Transform } from 'stream';
 
-const s3 = new AWS.S3({
+const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
 });
 
-const r2 = new AWS.S3({
+const r2 = new S3.S3Client({
+    region: 'auto',
     credentials: {
         accessKeyId: process.env.R2_ACCESS_KEY_ID,
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
@@ -157,10 +159,10 @@ async function get_source(oa, tmp, data, stats) {
 
     try {
         await pipeline(
-            s3.getObject({
+            (await s3.send(new S3.GetObjectCommand({
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-            }).createReadStream(),
+            }))).Body,
             Unzip(),
             split(),
             new Transform({
@@ -182,21 +184,31 @@ async function get_source(oa, tmp, data, stats) {
 }
 
 async function upload_collection(file, name) {
-    await s3.upload({
-        ContentType: 'application/zip',
-        Body: fs.createReadStream(file),
-        Bucket: process.env.Bucket,
-        Key: `${process.env.StackName}/collection-${name}.zip`
-    }).promise();
+    const s3uploader = new Upload({
+        client: s3,
+        params: {
+            ContentType: 'application/zip',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/collection-${name}.zip`
+        }
+    });
+
+    await s3uploader.done();
 
     console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
 
-    await r2.upload({
-        ContentType: 'application/zip',
-        Body: fs.createReadStream(file),
-        Bucket: process.env.R2Bucket,
-        Key: `v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`
-    }).promise();
+    const r2uploader = new Upload({
+        client: r2,
+        params: {
+            ContentType: 'application/zip',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`
+        }
+    });
+
+    await r2uploader.done();
 
     console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`);
 

@@ -54,18 +54,15 @@
                                     </div>
                                 </template>
                                 <template v-else-if='exp.status === "Success"'>
-                                    <div class='flex flex--center-main w-full py12'>
-                                        <button @click='datapls' class='btn btn--stroke round btn--gray'>
-                                            <div class='flex flex--center-main'>
-                                                <svg class='icon h36 w36'><use xlink:href='#icon-arrow-down'/></svg>
-                                            </div>
-                                            <div class='align-center'>Download</div>
-                                            <div class='align-center' v-text='exp.format'></div>
+                                    <div class='d-flex justify-content-center mb-3'>
+                                        <button @click='datapls' class='btn btn-primary'>
+                                            <ArrowDownIcon/> Download&nbsp;
+                                            <span v-text='exp.format'/>
                                         </button>
                                     </div>
                                 </template>
 
-                                <div v-if='exp.status !== "Pending" && exp.loglink' class='col col--12 py12'>
+                                <div v-if='exp.status !== "Pending" && exp.loglink' class='col-12'>
                                     <Log @err='$emit("err", $event)' collapse='true' logtype='export' :id='exp.id'/>
                                 </div>
                             </template>
@@ -84,6 +81,7 @@ import Log from './util/Log.vue';
 import Status from './util/Status.vue';
 import LayerIcon from './util/LayerIcon.vue';
 import {
+    ArrowDownIcon,
     RefreshIcon,
     DotsVerticalIcon,
 } from 'vue-tabler-icons';
@@ -164,6 +162,7 @@ export default {
         }
     },
     components: {
+        ArrowDownIcon,
         RefreshIcon,
         DotsVerticalIcon,
         TablerLoading,

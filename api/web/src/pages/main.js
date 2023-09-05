@@ -20,7 +20,7 @@ const router = new VueRouter.createRouter({
         { path: '/run', component: () => import('../components/Runs.vue') },
         { path: '/run/:runid', component: () => import('../components/Run.vue'), props: true },
 
-        { path: '/export/', component: () => import('../components/Exports.vue'), props: true },
+        { path: '/export', component: () => import('../components/Exports.vue'), props: true },
         { path: '/export/:exportid', component: () => import('../components/Export.vue'), props: true },
 
         { path: '/job', component: () => import('../components/Jobs.vue') },

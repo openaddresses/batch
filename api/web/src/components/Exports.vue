@@ -15,7 +15,7 @@
         <div class='container-xl'>
             <div class='row row-deck row-cards'>
                 <div class='col-12'>
-                    <Exports/>
+                    <CardExports/>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import Exports from './cards/Exports.vue';
+import CardExports from './cards/Exports.vue';
 import {
     TablerBreadCrumb
 } from '@tak-ps/vue-tabler';
@@ -33,7 +33,7 @@ export default {
     name: 'Exports',
     components: {
         TablerBreadCrumb,
-        Exports
+        CardExports
     }
 }
 </script>

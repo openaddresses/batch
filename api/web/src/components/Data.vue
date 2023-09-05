@@ -83,7 +83,7 @@
                     </div>
 
                     <template v-if='showFilter'>
-                        <div class='row'>
+                        <div class='card-body row'>
                             <div class='col col--9 px6'>
                                 <QuerySource
                                     showValidated=true
@@ -95,18 +95,12 @@
                                 <QueryLayer @layer='filter.layer = $event'/>
                             </div>
                             <div class='col col--6 px6'>
-                                <label class='switch-container mr6'>
-                                    <input type='checkbox' v-model='filter.switches.before'/>
-                                    <div class='switch switch--gray'></div>
-                                </label>
-                                <TablerInput label='After' type='date' v-model='filter.after'/>
+                                <TablerInput label='Before' type='date' v-model='filter.before'/>
+                                <TablerToggle label='Before Enabled' v-model='filter.switches.before'/>
                             </div>
                             <div class='col col--6 px6'>
-                                <label class='switch-container mr6'>
-                                    <input type='checkbox' v-model='filter.switches.after'/>
-                                    <div class='switch switch--gray'></div>
-                                </label>
                                 <TablerInput label='After' type='date' v-model='filter.after'/>
+                                <TablerToggle label='After Enabled' v-model='filter.switches.after'/>
                             </div>
                         </div>
                     </template>
@@ -208,6 +202,7 @@ import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 import {
     TablerLoading,
+    TablerToggle,
     TablerDelete,
     TablerInput
 } from '@tak-ps/vue-tabler';
@@ -390,6 +385,7 @@ export default {
         XIcon,
         MapIcon,
         TablerInput,
+        TablerToggle,
         TablerDelete,
         LayerIcon
     }

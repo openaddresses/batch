@@ -124,19 +124,33 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>Layers</th>
                                     <th>Attributes</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template :key='d.source' v-for='d in datas'>
-                                    <tr @click='$router.push(`/location/${d.map}`)' class='cursor-pointer'>
+                                    <tr>
                                         <td v-text='d.source'></td>
+                                        <td>
+                                            <LayerIcon v-if='d.has.buildings' layer='buildings'/>
+                                            <LayerIcon v-if='d.has.addresses' layer='addresses'/>
+                                            <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                        </td>
                                         <td>
                                             <div class='d-flex'>
                                                 <div class='ms-auto btn-list'>
-                                                    <LayerIcon v-if='d.has.buildings' layer='buildings'/>
-                                                    <LayerIcon v-if='d.has.addresses' layer='addresses'/>
-                                                    <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                                    <MapIcon v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer'/>
+                                                    <template v-if='auth && auth.access === "admin"'>
+                                                        <TablerDropdown>
+                                                            <slot>
+                                                                <SettingsIcon class='cursor-pointer'/>
+                                                            </slot>
+                                                            <template #dropdown>
+                                                                <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
+                                                            </template>
+                                                        </TablerDropdown>
+                                                    </template>
                                                 </div>
                                             </div>
                                         </td>
@@ -161,6 +175,7 @@ import {
     HistoryIcon,
     RefreshIcon,
     SearchIcon,
+    MapIcon,
     XIcon,
 } from 'vue-tabler-icons';
 import LayerIcon from './util/LayerIcon.vue';
@@ -309,6 +324,7 @@ export default {
                 for (const sourcename of Object.keys(dataname)) {
                     const d = {
                         source: sourcename,
+                        _open: false,
                         map: false,
                         has: {
                             addresses: false,
@@ -350,6 +366,7 @@ export default {
         TablerLoading,
         SearchIcon,
         XIcon,
+        MapIcon,
         TablerInput,
         LayerIcon
     }

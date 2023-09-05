@@ -103,6 +103,18 @@ export default {
         fmt: function(date) {
             return moment(date).tz(this.tz).format('YYYY-MM-DD');
         },
+        updateData: async function(job) {
+            try {
+                await window.std(`/api/data/${job.id}`, {
+                    method: 'PATCH',
+                    body: {
+                        fabric: job.fabric
+                    }
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });
         },

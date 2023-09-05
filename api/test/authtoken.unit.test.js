@@ -20,8 +20,8 @@ test('Token#generate', async () => {
         });
         assert.fail('token.generate should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 400)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 400);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Only a user session can create a token');
     }
 
@@ -31,8 +31,8 @@ test('Token#generate', async () => {
         });
         assert.fail('token.generate should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 500)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 500);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Server could not determine user id');
     }
 
@@ -43,8 +43,8 @@ test('Token#generate', async () => {
         });
         assert.fail('token.generate should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 400)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 400);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Token name required');
     }
 
@@ -80,8 +80,8 @@ test('Token#list', async () => {
         });
         assert.fail('token.list should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 500)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 500);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Server could not determine user id');
     }
 
@@ -110,8 +110,8 @@ test('Token#validate', async () => {
 
         assert.fail('token.validate should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 401)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 401);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Invalid token');
     }
 
@@ -121,8 +121,8 @@ test('Token#validate', async () => {
 
         assert.fail('token.validate should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 401)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 401);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Invalid token');
     }
 
@@ -148,8 +148,8 @@ test('Token#delete', async () => {
 
         assert.fail('token.delete should fail');
     } catch (err) {
-        assert.deepEqual(err.status, 500)
-        assert.deepEqual(err.err, null)
+        assert.deepEqual(err.status, 500);
+        assert.deepEqual(err.err, null);
         assert.deepEqual(err.safe, 'Server could not determine user id');
     }
 

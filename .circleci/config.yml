@@ -21,12 +21,15 @@ jobs:
             - run:
                 name: "Install NodeJS"
                 command: |
-                  curl 'https://nodejs.org/dist/v19.0.0/node-v19.0.0-linux-x64.tar.gz' | tar -xzv \
-                  && cp ./node-v19.0.0-linux-x64/bin/node /usr/bin/ \
-                  && ./node-19.0.0-linux-x64/bin/npm install -g yarn \
-                  && ./node-19.0.0-linux-x64/bin/npm install -g npm \
-                  && echo "export PATH=$(yarn global bin):$PATH" >> $BASH_ENV \
-                  yarn install
+                  export NODEV='20.6.0' \
+                  && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
+                  && cp ./node-v${NODEV}-linux-x64/bin/node /usr/bin/ \
+                  && ./node-v${NODEV}-linux-x64/bin/npm install -g npm
+
+            - run:
+                name: "Install Node Deps"
+                command: |
+                  npm install
 
             - run:
                 name: "Test"

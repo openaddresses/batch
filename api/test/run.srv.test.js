@@ -40,7 +40,7 @@ test('GET: api/run', async () => {
         assert.equal(res.status, 200, 'http: 200');
 
         // Run will not return as it has not yet been populated
-        assert.equal(res.body.length, 0, 'run.length: 0');
+        assert.equal(res.body.runs.length, 0, 'run.length: 0');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -75,7 +75,7 @@ test('GET: api/data', async () => {
             method: 'GET'
         }, true);
 
-        assert.deepEqual(res.body, [], 'run.length: 0');
+        assert.deepEqual(res.body, [], 'data.length: 0');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -139,7 +139,7 @@ test('GET: api/data', async () => {
                 validated: false
             },
             map: 1
-        }], JSON.stringify(res.body));
+        }]);
     } catch (err) {
         assert.ifError(err, 'no error');
     }

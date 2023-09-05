@@ -73,6 +73,7 @@ export default class Run extends Generic {
         if (!query) query = {};
         if (!query.status) query.status = Status.list();
 
+        query.page = Params.integer(query.page, { default: 0 });
         query.limit = Params.integer(query.limit, { default: 100 });
         query.sort = Params.string(query.sort, { default: 'id' });
         query.order = Params.order(query.order);
@@ -132,7 +133,7 @@ export default class Run extends Generic {
                     ${sql.identifier([this._table, query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
-                OFFSET 
+                OFFSET
                     ${query.limit * query.page}
             `);
 

@@ -129,7 +129,7 @@
                             </thead>
                             <tbody>
                                 <template :key='d.source' v-for='d in datas'>
-                                    <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
+                                    <tr @click='$router.push(`/location/${d.map}`)' class='cursor-pointer'>
                                         <td v-text='d.source'></td>
                                         <td>
                                             <div class='d-flex'>

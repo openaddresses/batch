@@ -44,24 +44,13 @@
                         <div class='card-body'>
                             <TablerLoading v-if='loading'/>
                             <template v-else>
-                                <div class='col-12'>
-                                    <h3 class='txt-h4 py6' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></h3>
-                                </div>
-
                                 <template v-if='!["Success", "Fail"].includes(exp.status)'>
-                                    <div class='flex flex--center-main w-full py24'>
-                                        <div class='loading'></div>
-                                    </div>
-                                    <div class='col col--12 flex flex--center-main'>
-                                        <h3 v-if='exp.status === "Pending"' class='flex-child txt-h4 py6'>Your Export Is Queued</h3>
-                                        <h3 v-else-if='exp.status === "Running"' class='flex-child txt-h4 py6'>Your Export Is Running</h3>
-                                    </div>
+                                    <TablerLoading v-if='exp.status === "Pending"' desc='Your Export Is Queued'/>
+                                    <TablerLoading v-else-if='exp.status === "Running"' desc='Your Export Is Running'/>
                                 </template>
                                 <template v-else-if='exp.status === "Fail"'>
-                                    <div class='flex flex--center-main w-full'>
-                                    </div>
-                                    <div class='col col--12 flex flex--center-main'>
-                                        <h3 class='txt-h4 py6'>Your Export Failed - Contact us to find out what went wrong</h3>
+                                    <div class='col-12'>
+                                        <h3 class='text-center txt-h4'>Your Export Failed - Contact us to find out what went wrong</h3>
                                     </div>
                                 </template>
                                 <template v-else-if='exp.status === "Success"'>

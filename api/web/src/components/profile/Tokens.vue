@@ -30,12 +30,10 @@
         <template v-if='newToken.show && newToken.token'>
             <div class='col-12'>
                 <h2 class='txt-bold fl' v-text='newToken.name'></h2>
-                <button @click='newToken.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                    <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                </button>
+                <XIcon @click='newToken.show = false' class='cursor-pointer'/>
             </div>
 
-            <div class='col col--12'>
+            <div class='col-12'>
                 <pre class='pre txt--s' v-text='newToken.token'/>
             </div>
         </template>

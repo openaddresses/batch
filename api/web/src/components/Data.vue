@@ -128,18 +128,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
-                                    <td v-text='d.source'></td>
-                                    <td>
-                                        <div class='d-flex'>
-                                            <div class='ms-auto btn-list'>
-                                                <LayerIcon v-if='d.has.buildings' layer='buildings'/>
-                                                <LayerIcon v-if='d.has.addresses' layer='addresses'/>
-                                                <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                <template :key='d.source' v-for='d in datas'>
+                                    <tr @click='$router.push(`/location/${d.map}`)' :key='d.source' v-for='d in datas' class='cursor-pointer'>
+                                        <td v-text='d.source'></td>
+                                        <td>
+                                            <div class='d-flex'>
+                                                <div class='ms-auto btn-list'>
+                                                    <LayerIcon v-if='d.has.buildings' layer='buildings'/>
+                                                    <LayerIcon v-if='d.has.addresses' layer='addresses'/>
+                                                    <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                     </template>

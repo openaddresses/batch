@@ -140,27 +140,30 @@ test('GET: /api/job', async () => {
             method: 'GET'
         }, true);
 
-        assert.ok(res.body[0].created);
-        delete res.body[0].created;
+        assert.ok(res.body.jobs[0].created);
+        delete res.body.jobs[0].created;
 
-        assert.deepEqual(res.body, [{
-            id: 1,
-            run: 1,
-            map: 1,
-            source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json',
-            source_name: 'us/dc/statewide',
-            layer: 'addresses',
-            name: 'dcgis',
-            output: {
-                cache: true,
-                output: true,
-                preview: true,
-                validated: true
-            },
-            loglink: null,
-            status: 'Success',
-            size: 339560
-        }]);
+        assert.deepEqual(res.body, {
+            total: 1,
+            jobs: [{
+                id: 1,
+                run: 1,
+                map: 1,
+                source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/39e3218cee02100ce614e10812bdd74afa509dc4/sources/us/dc/statewide.json',
+                source_name: 'us/dc/statewide',
+                layer: 'addresses',
+                name: 'dcgis',
+                output: {
+                    cache: true,
+                    output: true,
+                    preview: true,
+                    validated: true
+                },
+                loglink: null,
+                status: 'Success',
+                size: 339560
+            }]
+        });
     } catch (err) {
         assert.ifError(err, 'no error');
     }

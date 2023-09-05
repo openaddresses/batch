@@ -25,15 +25,15 @@ export default class Run extends Generic {
      */
     static async ping(pool, ci, job) {
         try {
-            const runs = await Run.list(pool, {
+            const list = await Run.list(pool, {
                 run: job.run
             });
 
-            if (runs.length !== 1) {
+            if (list.runs.length !== 1) {
                 throw new Error('Run#ping should always produce a single run');
             }
 
-            const run = runs[0];
+            const run = list.runs[0];
 
             if (run.live && job.status === 'Success') {
                 await Data.update(pool, job);

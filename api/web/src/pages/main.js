@@ -28,6 +28,7 @@ const router = new VueRouter.createRouter({
         { path: '/job/:jobid/log', component: () => import('../components/JobLog.vue'), props: true },
         { path: '/job/:jobid/raw', component: () => import('../components/JobRaw.vue'), props: true },
 
+        { path: '/location', component: () => import('../components/Data.vue') },
         { path: '/location/:locid', component: () => import('../components/Location.vue'), props: true },
 
         { path: '/data', component: () => import('../components/Data.vue') },

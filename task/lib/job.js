@@ -295,19 +295,29 @@ export default class Job {
         if (this.validated) {
             this.validated = await Job.gz(this.validated);
 
-            await s3.upload({
-                ContentType: 'application/gzip',
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
-                Body: fs.createReadStream(this.validated)
-            }).promise();
+            const s3uploader = new Upload({
+                client: s3,
+                params: {
+                    ContentType: 'application/gzip',
+                    Bucket: process.env.Bucket,
+                    Key: `${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
+                    Body: fs.createReadStream(this.validated)
+                }
+            });
 
-            await r2.upload({
-                ContentType: 'application/gzip',
-                Bucket: process.env.R2Bucket,
-                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
-                Body: fs.createReadStream(this.validated)
-            }).promise();
+            await s3uploader.done();
+
+            const r2uploader = new Upload({
+                client: r2,
+                params: {
+                    ContentType: 'application/gzip',
+                    Bucket: process.env.R2Bucket,
+                    Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/validated.geojson.gz`,
+                    Body: fs.createReadStream(this.validated)
+                }
+            });
+
+            await r2uploader.done();
 
             console.error('ok - validated.geojson.gz uploaded');
             this.assets.validated = true;
@@ -319,19 +329,29 @@ export default class Job {
         if (preview.length === 1) {
             console.error('ok - found preview', preview[0]);
 
-            await s3.upload({
-                ContentType: 'image/png',
-                Bucket: process.env.Bucket,
-                Key: `${process.env.StackName}/job/${this.job}/source.png`,
-                Body: fs.createReadStream(preview[0])
-            }).promise();
+            const s3uploader = new Upload({
+                client: s3,
+                params: {
+                    ContentType: 'image/png',
+                    Bucket: process.env.Bucket,
+                    Key: `${process.env.StackName}/job/${this.job}/source.png`,
+                    Body: fs.createReadStream(preview[0])
+                }
+            });
 
-            await r2.upload({
-                ContentType: 'image/png',
-                Bucket: process.env.R2Bucket,
-                Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.png`,
-                Body: fs.createReadStream(preview[0])
-            }).promise();
+            await s3uploader.done();
+
+            const r2uploader = new Upload({
+                client: r2,
+                params: {
+                    ContentType: 'image/png',
+                    Bucket: process.env.R2Bucket,
+                    Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.png`,
+                    Body: fs.createReadStream(preview[0])
+                }
+            });
+
+            await r2uploader.done();
 
             console.error('ok - source.png uploaded');
             this.assets.preview = true;

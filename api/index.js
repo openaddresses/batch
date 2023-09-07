@@ -120,8 +120,6 @@ export default async function server(config) {
 
     app.use(minify());
 
-    app.use(express.static('web/dist'));
-
     app.get('/api', (req, res) => {
         return res.json({
             version: pkg.version
@@ -138,7 +136,6 @@ export default async function server(config) {
     });
 
     app.use('/api', schema.router);
-    app.use('/*', express.static('web/dist'));
 
     // Unified Auth
     schema.router.use(async (req, res, next) => {
@@ -213,6 +210,7 @@ export default async function server(config) {
     );
 
     app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
+    app.use('/*', express.static('web/dist'));
 
     schema.not_found();
     schema.error();

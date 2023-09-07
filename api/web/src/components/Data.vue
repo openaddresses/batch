@@ -179,6 +179,8 @@
             </div>
         </div>
     </div>
+
+    <MustLogin v-if='loginModal === true'/>
 </div>
 </template>
 
@@ -195,6 +197,7 @@ import {
     XIcon,
 } from 'vue-tabler-icons';
 import LayerIcon from './util/LayerIcon.vue';
+import MustLogin from './util/MustLogin.vue';
 import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
@@ -202,6 +205,7 @@ import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
 import {
     TablerLoading,
+    TablerDropdown,
     TablerToggle,
     TablerDelete,
     TablerInput
@@ -219,6 +223,7 @@ export default {
                 collections: false
             },
             showFilter: false,
+            loginModal: false,
             filter: {
                 switches: {
                     before: false,
@@ -275,7 +280,7 @@ export default {
             this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
         },
         collectionpls: function(c) {
-            if (!this.auth.username) return this.$emit('login');
+            if (!this.auth.username) return this.loginModal = true;
             this.external(`${window.location.origin}/api/collections/${c.id}/data?token=${localStorage.token}`);
         },
         external: function(url) {
@@ -370,6 +375,7 @@ export default {
         }
     },
     components: {
+        MustLogin,
         ArrowsMaximizeIcon,
         ArrowsMinimizeIcon,
         Coverage,
@@ -386,6 +392,7 @@ export default {
         MapIcon,
         TablerInput,
         TablerToggle,
+        TablerDropdown,
         TablerDelete,
         LayerIcon
     }

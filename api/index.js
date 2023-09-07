@@ -138,7 +138,6 @@ export default async function server(config) {
     });
 
     app.use('/api', schema.router);
-    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
     app.use('/*', express.static('web/dist'));
 
     // Unified Auth
@@ -215,6 +214,8 @@ export default async function server(config) {
 
     schema.not_found();
     schema.error();
+
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {

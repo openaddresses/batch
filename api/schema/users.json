@@ -5,12 +5,6 @@
         "id": {
             "$ref": "./users/id.json"
         },
-        "created": {
-            "$ref": "./users/created.json"
-        },
-        "level": {
-            "$ref": "./users/level.json"
-        },
         "access": {
             "$ref": "./users/access.json"
         },
@@ -26,19 +20,25 @@
         "password": {
             "$ref": "./users/password.json"
         },
+        "created": {
+            "$ref": "./users/created.json"
+        },
         "validated": {
             "$ref": "./users/validated.json"
+        },
+        "level": {
+            "$ref": "./users/level.json"
         }
     },
     "required": [
         "id",
-        "created",
-        "level",
         "access",
         "flags",
         "username",
         "email",
         "password",
-        "validated"
+        "created",
+        "validated",
+        "level"
     ]
 }

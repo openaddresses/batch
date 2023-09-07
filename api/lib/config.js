@@ -23,6 +23,7 @@ export default class Config {
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
+            console.error(process.env.StackName);
             if (!process.env.StackName || process.env.StackName === 'test') {
                 if (!this.silent) console.error('ok - set env StackName: test');
                 process.env.StackName = 'test';

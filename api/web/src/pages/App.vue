@@ -32,7 +32,17 @@
                     </div>
 
                     <a class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <UserIcon @click='$router.push("/profile")' v-if='auth.username'/>
+                        <div v-if='auth.username' class='dropdown'>
+                            <div type='button' id="userProfileButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <UserIcon/>
+                            </div>
+                            <ul class="dropdown-menu" aria-labelledby='userProfileButton'>
+                                <a @click='$router.push("/profile")' class="cursor-pointer dropdown-item">Profile</a>
+                                <a @click='$router.push("/logout")' class="cursor-pointer dropdown-item">Logout</a>
+                            </ul>
+                        </div>
+
+
                         <LoginIcon @click='$router.push("/login")' v-else/>
                     </a>
                 </div>
@@ -105,6 +115,12 @@ export default {
                 this.auth = await window.std('/api/login');
             } catch (err) {
                 delete localStorage.token;
+                this.auth = {
+                    username: false,
+                    email: false,
+                    access: false,
+                    flags: {}
+                };
             }
         },
         getCount: async function() {

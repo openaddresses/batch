@@ -61,6 +61,8 @@
             </div>
         </div>
     </template>
+
+    <MustLogin v-if='loginModal === true' @close='loginModal = false'/>
 </TablerDropdown>
 </template>
 
@@ -69,6 +71,7 @@ import {
     InfoCircleIcon,
     DownloadIcon
 } from 'vue-tabler-icons';
+import MustLogin from './MustLogin.vue';
 import {
     TablerDropdown
 } from '@tak-ps/vue-tabler';
@@ -78,12 +81,14 @@ export default {
     props: ['job', 'auth'],
     data: function() {
         return {
+            loginModal: false,
+            perkModal: false,
             mode: 'base'
         }
     },
     methods: {
         datapls: function(jobid, fmt="geojson", validated=false) {
-            if (!this.auth.username) return this.$emit('login');
+            if (!this.auth.username) return this.loginModal = true;
 
             if (fmt !== "geojson" && this.auth.level === 'basic') {
                 return this.$emit('perk');
@@ -118,6 +123,7 @@ export default {
         }
     },
     components: {
+        MustLogin,
         TablerDropdown,
         InfoCircleIcon,
         DownloadIcon

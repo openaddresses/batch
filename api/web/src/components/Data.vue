@@ -180,7 +180,7 @@
         </div>
     </div>
 
-    <MustLogin v-if='loginModal === true'/>
+    <MustLogin v-if='loginModal === true' @close='loginModal = false'/>
 </div>
 </template>
 

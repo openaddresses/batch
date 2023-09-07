@@ -212,10 +212,10 @@ export default async function server(config) {
         }
     );
 
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
+
     schema.not_found();
     schema.error();
-
-    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {

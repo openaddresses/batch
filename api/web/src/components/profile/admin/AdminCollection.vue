@@ -1,39 +1,33 @@
 <template>
-    <div class='col col--12 grid py24'>
-        <div class='col col--12 grid border-b border--gray-light pt24'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>
-                    <span class='bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold'>Admin</span>
-                    Collections:
-                </h2>
+<div class='card'>
+    <div class='card-header d-flex'>
+        <h2 class='card-title'>Collections</h2>
 
-                <div class='fr'>
-                    <button @click='collections.splice(0, 0, {})' class='btn round btn--stroke color-gray color-green-on-hover mx3'>
-                        <svg class='icon'><use xlink:href='#icon-plus'/></svg>
-                    </button>
-                    <button @click='refresh' class='btn round btn--stroke color-gray mx3'>
-                        <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                    </button>
-                </div>
-            </div>
+        <div class='ms-auto btn-list'>
+            <PlusIcon @click='collections.splice(0, 0, {})' class='cursor-pointer'/>
+            <RefreshIcon @click='refresh' class='cursor-pointer'/>
         </div>
-
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else>
-            <div :key='collection.id' v-for='collection in collections' class='col col--12 grid'>
-                <Collection @refresh='refresh' :collection='collection'/>
-            </div>
-        </template>
     </div>
+
+    <TablerLoading v-if='loading'/>
+    <template v-else>
+        <div :key='collection.id' v-for='collection in collections' class='col col--12 grid'>
+            <Collection @refresh='refresh' :collection='collection'/>
+        </div>
+    </template>
+</div>
 </template>
 
 <script>
-
 import Collection from './Collection.vue';
+import {
+    PlusIcon,
+    RefreshIcon,
+} from 'vue-tabler-icons';
+
+import {
+    TablerLoading
+} from '@tak-ps/vue-tabler';
 
 export default {
     name: 'AdminCollections',
@@ -68,6 +62,9 @@ export default {
         }
     },
     components: {
+        TablerLoading,
+        PlusIcon,
+        RefreshIcon,
         Collection
     }
 }

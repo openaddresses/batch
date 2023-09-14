@@ -61,40 +61,30 @@
     </div>
 
     <TablerLoading v-if='loading'/>
-    <TablerNone v-else-if='!list.total'/>
+    <TablerNone v-else-if='!list.total' :create='false'/>
     <template v-else>
         <table class="table table-vcenter card-table">
             <thead>
                 <tr>
-                    <th>Username</th>
-                    <th>Email</th>
+                    <th>Pattern</th>
+                    <th>Level</th>
                     <th>Attributes</th>
                 </tr>
             </thead>
             <tbody>
                 <template v-for='level in list.levels'>
+                    <tr>
+                        <td v-text='level.pattern'></td>
+                        <td v-text='level.level'></td>
+                        <td>
+                            <TrashIcon @click='deleteLevel(level)' class='cursor-pointer'/>
+                        </td>
+                    </tr>
                 </template>
             </tbody>
         </table>
         <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
     </template>
-
-<!--
-    <div class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round relative'>
-        <div class='col col--11 relative'>
-            <span class='txt-truncate pre' v-text='level.pattern'/>
-
-            <div class='absolute' style='top: 11px; right: 11px;'>
-                <span class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='level.level'></span>
-            </div>
-        </div>
-        <div class='col col--1'>
-            <button @click='deleteLevel(level)' style='margin-top: 9px;' class='mx6 btn btn--stroke round color-gray color-red-on-hover'>
-                <svg class='icon'><use xlink:href='#icon-trash'/></svg>
-            </button>
-        </div>
-    </div>
--->
 </div>
 </template>
 
@@ -104,6 +94,7 @@ import {
     SearchIcon,
     PlusIcon,
     RefreshIcon,
+    TrashIcon,
     XIcon
 } from 'vue-tabler-icons';
 
@@ -200,6 +191,7 @@ export default {
         PlusIcon,
         SearchIcon,
         RefreshIcon,
+        TrashIcon,
         TablerNone,
         TablerInput,
         TablerEnum,

@@ -52,12 +52,14 @@
                         <td v-text='user.username'></td>
                         <td v-text='user.email'></td>
                         <td>
-                            <span v-if='user.access === "disabled"' class='mx3 fr bg-red-faint color-red round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
-                            <span v-else class='mx3 fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='user.access'></span>
+                            <div class='btn-list'>
+                                <span v-if='user.access === "disabled"' class='badge bg-gray text-white' v-text='user.access'></span>
+                                <span v-else class='badge bg-blue text-white' v-text='user.access'></span>
 
-                            <span v-if='user.level !== "basic"' class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='user.level'></span>
+                                <span v-if='user.level !== "basic"' class='badge bg-purple text-white' v-text='user.level'></span>
 
-                            <span v-if='!user.validated' class='mx3 fr bg-purple-faint color-gray round inline-block px6 py3 txt-xs txt-bold'>Unvalidated</span>
+                                <span v-if='!user.validated' class='badge bg-black text-white'>Unvalidated</span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -131,6 +133,7 @@ import Pager from '../../util/Pager.vue';
 import TableFooter from '../../util/TableFooter.vue';
 import {
     TablerLoading,
+    TablerToggle,
     TablerEnum,
     TablerInput,
     TablerNone,
@@ -249,8 +252,10 @@ export default {
         }
     },
     components: {
+        TableFooter,
         TablerLoading,
         TablerNone,
+        TablerToggle,
         TablerEnum,
         TablerInput,
         RefreshIcon,

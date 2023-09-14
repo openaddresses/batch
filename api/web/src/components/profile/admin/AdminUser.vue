@@ -132,12 +132,10 @@ export default {
                 },
                 sort: 'id',
                 order: 'desc',
-                limit: 100,
+                limit: 20,
                 page: 0
             },
             showFilter: false,
-            page: 0,
-            perpage: 15,
             list: {
                 total: 0,
                 users: []
@@ -175,8 +173,8 @@ export default {
         getUsers: async function() {
             try {
                 const url = new URL(`${window.location.origin}/api/user`);
-                url.searchParams.append('limit', this.perpage);
-                url.searchParams.append('page', this.page);
+                url.searchParams.append('limit', this.paging.limit);
+                url.searchParams.append('page', this.paging.page);
                 url.searchParams.append('filter', this.paging.name);
 
                 if (this.paging.level !== 'all') url.searchParams.append('level', this.paging.level);

@@ -39,7 +39,7 @@
     <TablerLoading v-if='loading' desc='Loading Users'/>
     <TablerNone v-else-if='!list.total' :create='false'/>
     <template v-else>
-            <table class="table table-hover table-vcenter card-table">
+            <table class="table table-vcenter card-table">
                 <thead>
                     <tr>
                         <th>Username</th>
@@ -48,82 +48,50 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr :key='user.id' v-for='user in list.users' class='cursor-pointer'>
-                        <td v-text='user.username'></td>
-                        <td v-text='user.email'></td>
-                        <td>
-                            <div class='btn-list'>
-                                <span v-if='user.access === "disabled"' class='badge bg-gray text-white' v-text='user.access'></span>
-                                <span v-else class='badge bg-blue text-white' v-text='user.access'></span>
+                    <template v-for='user in list.users'>
+                        <tr @click='user._open = !user._open' class='cursor-pointer'>
+                            <td v-text='user.username'></td>
+                            <td v-text='user.email'></td>
+                            <td>
+                                <div class='btn-list'>
+                                    <span v-if='user.access === "disabled"' class='badge bg-gray text-white' v-text='user.access'></span>
+                                    <span v-if='user.access === "admin"' class='badge bg-red text-white' v-text='user.access'></span>
+                                    <span v-else class='badge bg-blue text-white' v-text='user.access'></span>
 
-                                <span v-if='user.level !== "basic"' class='badge bg-purple text-white' v-text='user.level'></span>
+                                    <span v-if='user.level !== "basic"' class='badge bg-purple text-white' v-text='user.level'></span>
 
-                                <span v-if='!user.validated' class='badge bg-black text-white'>Unvalidated</span>
-                            </div>
-                        </td>
-                    </tr>
+                                    <span v-if='!user.validated' class='badge bg-black text-white'>Unvalidated</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if='user._open'>
+                            <td colspan='3'>
+                                <div class='row'>
+                                    <div class='col-12 d-flex'>
+                                        <h3 class='subheader'>User Settings</h3>
+                                        <div class='ms-auto'>
+                                            <RefreshIcon @click='getUser(user)' class='cursor-pointer'/>
+                                        </div>
+                                    </div>
+                                   <div class='col-12' >
+                                        <TablerEnum
+                                            label='Access Level'
+                                            @change='patchUser(user)'
+                                            v-model='user.access'
+                                            :options='["disabled", "admin", "user"]'
+                                        />
+
+                                        <TablerToggle label='Email Validated' @change='patchUser(user)' v-model='user.validated'/>
+                                        <TablerToggle @change='patchUser(user)' label='Source Upload' v-model='user.flags.upload'/>
+                                        <TablerToggle @change='patchUser(user)' label='Source Moderator' v-model='user.flags.moderator'/>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
             <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
-
-
-            <!--
-
-            <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
-                <template v-if='user._loading'>
-                    <div class='flex flex--center-main w-full py24'>
-                        <div class='loading'></div>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class='col col--12'>
-                        <h3 class='pb6 fl'>User Access</h3>
-
-                        <button @click='getUser(user)' class='btn btn--stroke round color-gray color-blue-on-hover fr'>
-                            <svg class='icon'><use xlink:href='#icon-refresh'/></svg>
-                        </button>
-
-                        <label class='fr switch-container mr6'>
-                            Validated
-                            <input @change='patchUser(user)' v-model='user.validated' type='checkbox'/>
-                            <div class='switch ml3'></div>
-                        </label>
-                    </div>
-
-                    <div class='col col--12'>
-                        <div class='w-full select-container'>
-                            <select @change='patchUser(user)' v-model='user.access' class='select select--stroke'>
-                                <option>disabled</option>
-                                <option>admin</option>
-                                <option>user</option>
-                            </select>
-                            <div class='select-arrow'></div>
-                        </div>
-                    </div>
-
-                    <h3 class='pb6 w-full'>User Flags</h3>
-
-                    <div class='col col--6'>
-                        <label class='checkbox-container'>
-                            <input @change='patchUser(user)' v-model='user.flags.upload' type='checkbox' />
-                            <div class='checkbox mr6'>
-                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                            </div>
-                            Source Upload
-                        </label>
-                    </div>
-                    <div class='col col--6'>
-                        <label class='checkbox-container'>
-                            <input @change='patchUser(user)' v-model='user.flags.moderator' type='checkbox' />
-                            <div class='checkbox mr6'>
-                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                            </div>
-                            Source Moderator
-                        </label>
-                    </div>
-                </template>
-        </div>
-                -->
     </template>
 </div>
 </template>

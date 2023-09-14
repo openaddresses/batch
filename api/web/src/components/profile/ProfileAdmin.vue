@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class='row row-cards'>
     <div class='col-12'>
         <AdminActions
             v-if='profile.access === "admin"'

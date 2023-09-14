@@ -9,7 +9,7 @@
 
                         <div class='ms-auto btn-list'>
                             <button
-                                v-if='auth && auth.access === "admin"'
+                                v-if='auth && auth.access === "admin" && $route.name === "ProfileDefault"'
                                 @click='$router.push(`/profile/admin`)'
                                 class='btn btn-primary'
                             >Admin</button>

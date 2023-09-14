@@ -1,25 +1,30 @@
 <template>
-    <div class='col col--12 grid pt24'>
+<div>
+    <div class='col-12'>
         <AdminActions
             v-if='profile.access === "admin"'
             @err='$emit("err", $event)'
         />
-
+    </div>
+    <div class='col-12'>
         <AdminUser
             v-if='profile.access === "admin"'
             @err='$emit("err", $event)'
         />
-
+    </div>
+    <div class='col-12'>
         <AdminOverrides
             v-if='profile.access === "admin"'
             @err='$emit("err", $event)'
         />
-
+    </div>
+    <div class='col-12'>
         <AdminCollections
             v-if='profile.access === "admin"'
             @err='$emit("err", $event)'
         />
     </div>
+</div>
 </template>
 
 <script>

@@ -87,8 +87,8 @@ async function cli() {
                     attribution: 'OpenAddresses',
                     description: 'OpenAddresses Borders',
                     limit: {
-                        features: false,
-                        size: false
+                        features: true,
+                        size: true
                     },
                     zoom: {
                         max: 6,

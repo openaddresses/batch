@@ -4,8 +4,16 @@
         <div class="page-header d-print-none">
             <div class="container-xl">
                 <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
+                    <div class="d-flex">
                         <TablerBreadCrumb/>
+
+                        <div class='ms-auto btn-list'>
+                            <button
+                                v-if='auth && auth.access === "admin"'
+                                @click='$router.push(`/profile/admin`)'
+                                class='btn btn-primary'
+                            >Admin</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -28,7 +36,7 @@ import {
 
 export default {
     name: 'Profile',
-    props: [ ],
+    props: [ 'auth' ],
     data: function() {
         return {
             profile: {

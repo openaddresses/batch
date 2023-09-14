@@ -9,39 +9,17 @@
 
             <PlusIcon @click='addLevel' :disabled='add' class='cursor-pointer'/>
 
-            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+            <RefreshIcon @click='getLevels' class='cursor-pointer'/>
         </div>
     </div>
 
     <template v-if='showFilter'>
         <div class='card-body row'>
             <div class='col-6'>
-                <label>Username/Email Filter</label>
-                <input v-model='filter.pattern' class='input' placeholder='john-doe' />
+                <TablerInput label='Username/Email Filter' v-model='paging.pattern'/>
             </div>
-            <div class='col-3'>
-                <label>Access</label>
-                <div class='w-full select-container'>
-                    <select v-model='filter.access' class='select select--stroke'>
-                        <option>all</option>
-                        <option>disabled</option>
-                        <option>admin</option>
-                        <option>user</option>
-                    </select>
-                    <div class='select-arrow'></div>
-                </div>
-            </div>
-            <div class='col-3'>
-                <label>Level</label>
-                <div class='w-full select-container'>
-                    <select v-model='filter.level' class='select select--stroke'>
-                        <option>all</option>
-                        <option>basic</option>
-                        <option>backer</option>
-                        <option>sponsor</option>
-                    </select>
-                    <div class='select-arrow'></div>
-                </div>
+            <div class='col-6'>
+                <TablerEnum label='Level' v-model='paging.level' :options='["all", "basic", "backer", "sponsor"]'/>
             </div>
         </div>
     </template>
@@ -83,32 +61,45 @@
     </div>
 
     <TablerLoading v-if='loading'/>
-    <TablerNone v-else-if='!levels.length'/>
+    <TablerNone v-else-if='!list.total'/>
     <template v-else>
-        <div :key='level.id' v-for='level in levels' class='col col--12 grid'>
-            <div class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round relative'>
-                <div class='col col--11 relative'>
-                    <span class='txt-truncate pre' v-text='level.pattern'/>
-
-                    <div class='absolute' style='top: 11px; right: 11px;'>
-                        <span class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='level.level'></span>
-                    </div>
-                </div>
-                <div class='col col--1'>
-                    <button @click='deleteLevel(level)' style='margin-top: 9px;' class='mx6 btn btn--stroke round color-gray color-red-on-hover'>
-                        <svg class='icon'><use xlink:href='#icon-trash'/></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Attributes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for='level in list.levels'>
+                </template>
+            </tbody>
+        </table>
+        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
     </template>
 
-    <Pager v-if='levels.length' @page='page = $event' :perpage='perpage' :total='total'/>
+<!--
+    <div class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round relative'>
+        <div class='col col--11 relative'>
+            <span class='txt-truncate pre' v-text='level.pattern'/>
+
+            <div class='absolute' style='top: 11px; right: 11px;'>
+                <span class='mx3 fr bg-purple-faint color-purple round inline-block px6 py3 txt-xs txt-bold' v-text='level.level'></span>
+            </div>
+        </div>
+        <div class='col col--1'>
+            <button @click='deleteLevel(level)' style='margin-top: 9px;' class='mx6 btn btn--stroke round color-gray color-red-on-hover'>
+                <svg class='icon'><use xlink:href='#icon-trash'/></svg>
+            </button>
+        </div>
+    </div>
+-->
 </div>
 </template>
 
 <script>
-import Pager from '../../util/Pager.vue';
+import TableFooter from '../../util/TableFooter.vue';
 import {
     SearchIcon,
     PlusIcon,
@@ -117,6 +108,8 @@ import {
 } from 'vue-tabler-icons';
 
 import {
+    TablerInput,
+    TablerEnum,
     TablerLoading,
     TablerNone
 } from '@tak-ps/vue-tabler';
@@ -132,99 +125,86 @@ export default {
                 pattern: '',
                 level: 'basic'
             },
-            filter: {
+            paging: {
                 pattern: '',
                 level: 'all',
-                access: 'all'
+                page: 0,
+                limit: 10,
+                sort: 'id',
+                order: 'desc'
             },
             showFilter: false,
-            page: 0,
-            perpage: 15,
-            total: 100,
-            levels: []
+            list: {
+                total: 0,
+                levels: []
+            }
         };
     },
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.getLevels();
     },
     watch:  {
-        page: function() {
-            this.getLevels();
-        },
-        'filter.pattern': function() {
-            this.page = 0;
-            this.getLevels();
-        },
-        'filter.level': function() {
-            this.page = 0;
-            this.getLevels();
-        },
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.getLevels();
+            },
+        }
     },
     methods: {
-        refresh: function() {
-            this.getLevels();
-        },
         addLevel: async function() {
             this.add = true;
         },
         getLevels: async function() {
-            try {
-                this.loading = true;
+            this.loading = true;
 
-                const url = new URL(`${window.location.origin}/api/level`);
-                url.searchParams.append('limit', this.perpage)
-                url.searchParams.append('page', this.page)
-                url.searchParams.append('filter', this.filter.pattern)
+            const url = new URL(`${window.location.origin}/api/level`);
+            url.searchParams.append('limit', this.paging.limit)
+            url.searchParams.append('page', this.paging.page)
+            url.searchParams.append('filter', this.paging.pattern)
 
-                if (this.filter.level !== 'all') url.searchParams.append('level', this.filter.level)
+            if (this.paging.level !== 'all') url.searchParams.append('level', this.paging.level)
 
-                const res = await window.std(url);
-                this.total = res.total;
-                this.levels = res.level_override;
-
-                this.loading = false;
-            } catch (err) {
-                this.$emit('err', err);
+            const res = await window.std(url);
+            this.list = {
+                total: res.total,
+                levels: res.level_override
             }
+
+            this.loading = false;
         },
         createLevel: async function() {
-            try {
-                const res = await window.std(`/api/level`, {
-                    method: 'POST',
-                    body: {
-                        pattern: this.newLevel.pattern,
-                        level: this.newLevel.level
-                    }
-                });
+            const res = await window.std(`/api/level`, {
+                method: 'POST',
+                body: {
+                    pattern: this.newLevel.pattern,
+                    level: this.newLevel.level
+                }
+            });
 
-                this.levels.push(res);
+            this.list.levels.push(res);
 
-                this.add = false;
-                this.newLevel.pattern = '';
-                this.newLevel.level = 'basic';
-            } catch (err) {
-                this.$emit('err', err);
-            }
+            this.add = false;
+            this.newLevel.pattern = '';
+            this.newLevel.level = 'basic';
         },
         deleteLevel: async function(level) {
-            try {
-                await window.std(`/api/level/${level.id}`, {
-                    method: 'DELETE'
-                });
+            await window.std(`/api/level/${level.id}`, {
+                method: 'DELETE'
+            });
 
-                this.getLevels();
-            } catch (err) {
-                this.$emit('err', err);
-            }
+            this.getLevels();
         },
     },
     components: {
-        Pager,
         PlusIcon,
         SearchIcon,
         RefreshIcon,
         TablerNone,
+        TablerInput,
+        TablerEnum,
         TablerLoading,
+        TableFooter,
         XIcon,
     }
 }

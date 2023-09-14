@@ -28,17 +28,13 @@ export default {
             loading: true
         }
     },
-    mounted: function() {
-        this.verify();
+    mounted: async function() {
+        await this.verify();
     },
     methods: {
         verify: async function() {
             this.loading = true;
-            try {
-                await window.std(`/api/login/verify?token=${this.$route.query.token}`, {}, false);
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            await window.std(`/api/login/verify?token=${this.$route.query.token}`, {}, false);
             this.loading = false;
         }
     }

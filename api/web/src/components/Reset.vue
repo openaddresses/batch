@@ -59,26 +59,22 @@ export default {
     },
     methods: {
         forgot: async function() {
-            try {
-                this.attempted = true;
+            this.attempted = true;
 
-                if (!this.password.length) return;
-                if (!this.token.length) return;
-                this.loading = true;
+            if (!this.password.length) return;
+            if (!this.token.length) return;
+            this.loading = true;
 
-                await window.std('/api/login/reset', {
-                    method: 'POST',
-                    body: {
-                        token: this.token,
-                        password: this.password
-                    }
-                });
+            await window.std('/api/login/reset', {
+                method: 'POST',
+                body: {
+                    token: this.token,
+                    password: this.password
+                }
+            });
 
-                this.loading = false;
-                this.reset = true;
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            this.loading = false;
+            this.reset = true;
         }
     }
 }

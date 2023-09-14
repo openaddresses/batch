@@ -39,65 +39,65 @@
     <TablerLoading v-if='loading' desc='Loading Users'/>
     <TablerNone v-else-if='!list.total' :create='false'/>
     <template v-else>
-            <table class="table table-vcenter card-table">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Attributes</th>
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Attributes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for='user in list.users'>
+                    <tr @click='user._open = !user._open' class='cursor-pointer'>
+                        <td v-text='user.username'></td>
+                        <td v-text='user.email'></td>
+                        <td>
+                            <div class='btn-list'>
+                                <span v-if='user.access === "disabled"' class='badge bg-gray text-white' v-text='user.access'></span>
+                                <span v-if='user.access === "admin"' class='badge bg-red text-white' v-text='user.access'></span>
+                                <span v-else class='badge bg-blue text-white' v-text='user.access'></span>
+
+                                <span v-if='user.level !== "basic"' class='badge bg-purple text-white' v-text='user.level'></span>
+
+                                <span v-if='!user.validated' class='badge bg-black text-white'>Unvalidated</span>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <template v-for='user in list.users'>
-                        <tr @click='user._open = !user._open' class='cursor-pointer'>
-                            <td v-text='user.username'></td>
-                            <td v-text='user.email'></td>
-                            <td>
-                                <div class='btn-list'>
-                                    <span v-if='user.access === "disabled"' class='badge bg-gray text-white' v-text='user.access'></span>
-                                    <span v-if='user.access === "admin"' class='badge bg-red text-white' v-text='user.access'></span>
-                                    <span v-else class='badge bg-blue text-white' v-text='user.access'></span>
-
-                                    <span v-if='user.level !== "basic"' class='badge bg-purple text-white' v-text='user.level'></span>
-
-                                    <span v-if='!user.validated' class='badge bg-black text-white'>Unvalidated</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if='user._open'>
-                            <td colspan='3'>
-                                <div class='row'>
-                                    <div class='col-12 d-flex'>
-                                        <h3 class='subheader'>User Settings</h3>
-                                        <div class='ms-auto'>
-                                            <RefreshIcon @click='getUser(user)' class='cursor-pointer'/>
-                                        </div>
-                                    </div>
-                                   <div class='col-12' >
-                                        <TablerEnum
-                                            label='Access Level'
-                                            @change='patchUser(user)'
-                                            v-model='user.access'
-                                            :options='["disabled", "admin", "user"]'
-                                        />
-
-                                        <TablerToggle label='Email Validated' @change='patchUser(user)' v-model='user.validated'/>
-                                        <TablerToggle @change='patchUser(user)' label='Source Upload' v-model='user.flags.upload'/>
-                                        <TablerToggle @change='patchUser(user)' label='Source Moderator' v-model='user.flags.moderator'/>
+                    <tr v-if='user._open'>
+                        <td colspan='3'>
+                            <div class='row'>
+                                <div class='col-12 d-flex'>
+                                    <h3 class='subheader'>User Settings</h3>
+                                    <div class='ms-auto'>
+                                        <RefreshIcon @click='getUser(user)' class='cursor-pointer'/>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
-            <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
+                               <div class='col-12' >
+                                    <TablerEnum
+                                        label='Access Level'
+                                        @change='patchUser(user)'
+                                        v-model='user.access'
+                                        :options='["disabled", "admin", "user"]'
+                                    />
+
+                                    <TablerToggle label='Email Validated' @change='patchUser(user)' v-model='user.validated'/>
+                                    <TablerToggle @change='patchUser(user)' label='Source Upload' v-model='user.flags.upload'/>
+                                    <TablerToggle @change='patchUser(user)' label='Source Moderator' v-model='user.flags.moderator'/>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+
+        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
     </template>
 </div>
 </template>
 
 <script>
-import Pager from '../../util/Pager.vue';
 import TableFooter from '../../util/TableFooter.vue';
 import {
     TablerLoading,
@@ -227,7 +227,6 @@ export default {
         RefreshIcon,
         SearchIcon,
         XIcon,
-        Pager
     }
 }
 </script>

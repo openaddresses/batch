@@ -87,13 +87,13 @@ export default {
         }
     },
     methods: {
-        datapls: function(jobid, fmt="geojson", validated=false) {
+        datapls: async function(jobid, fmt="geojson", validated=false) {
             if (!this.auth.username) return this.loginModal = true;
 
             if (fmt !== "geojson" && this.auth.level === 'basic') {
                 return this.$emit('perk');
             } else if (fmt !== "geojson") {
-                return this.createExport(jobid, fmt);
+                return await this.createExport(jobid, fmt);
             }
 
             if (!validated) {
@@ -106,20 +106,16 @@ export default {
             window.open(url, "_blank");
         },
         createExport: async function(jobid, fmt) {
-            try {
-                this.loading = true;
-                const res = await window.std('/api/export', {
-                    method: 'POST',
-                    body: {
-                        job_id: jobid,
-                        format: fmt
-                    }
-                });
+            this.loading = true;
+            const res = await window.std('/api/export', {
+                method: 'POST',
+                body: {
+                    job_id: jobid,
+                    format: fmt
+                }
+            });
 
-                this.$router.push({ path: `/export/${res.id}` });
-            } catch (err) {
-                this.$emit('err', err);
-            }
+            this.$router.push({ path: `/export/${res.id}` });
         }
     },
     components: {

@@ -1,12 +1,6 @@
 <template>
 <div class='row row-cards'>
     <div class='col-12'>
-        <AdminActions
-            v-if='profile.access === "admin"'
-            @err='$emit("err", $event)'
-        />
-    </div>
-    <div class='col-12'>
         <AdminUser
             v-if='profile.access === "admin"'
             @err='$emit("err", $event)'
@@ -29,7 +23,6 @@
 
 <script>
 import AdminUser from './admin/AdminUser.vue'
-import AdminActions from './admin/AdminActions.vue'
 import AdminCollections from './admin/AdminCollection.vue'
 import AdminOverrides from './admin/AdminOverrides.vue'
 
@@ -45,7 +38,6 @@ export default {
         AdminUser,
         AdminCollections,
         AdminOverrides,
-        AdminActions
     }
 }
 </script>

@@ -6,28 +6,26 @@
                 <div class="container-tight">
                     <div class="card card-md">
                         <div class="card-body">
-                            <template v-if='reset'>
-                                <div class='col col--12 flex flex--center-main'>
-                                    <h3 class='txt-h4 py6'>Reset Login</h3>
+                            <div class='text-center' style='margin-bottom: 24px;'>
+                                <img src='/logo.jpg' height='150'/>
+                            </div>
+                            <h2 class="h2 text-center mb-4">Reset Password</h2>
+
+                            <TablerLoading v-if='loading' desc='Sending Reset Email'/>
+                            <template v-else-if='reset'>
+                                <div class='text-center'>
+                                    A password reset email has been sent
                                 </div>
-                                <div class='col col--12 flex flex--center-main'>
-                                    <div class='py6'>A password reset email has been sent</div>
+                                <div class='text-center py-2'>
+                                    (If a user account exists)
                                 </div>
-                                <div class='col col--12 flex flex--center-main'>
-                                    <div class='py6'>(If a user account exists)</div>
-                                </div>
-                                <div class='col col--12 flex flex--center-main'>
-                                    <button @click='$router.push({ path: "/data" })' class='btn btn--stroke round my12'>Thanks</button>
-                                </div>
+
+                                <button @click='$router.push({ path: "/data" })' class='btn btn-primary w-100 mt-4'>Home</button>
                             </template>
                             <template v-else>
-                                <div class='text-center' style='margin-bottom: 24px;'>
-                                    <img src='/logo.jpg' height='150'/>
-                                </div>
-                                <h2 class="h2 text-center mb-4">Reset Password</h2>
                                 <div class="mb-3">
                                     <label class="form-label">Username or Email</label>
-                                    <input v-model='username' v-on:keyup.enter='createLogin' type="text" class="form-control" placeholder="your@email.com" autocomplete="off">
+                                    <input v-model='user' v-on:keyup.enter='forgot' type="text" class="form-control" placeholder="your@email.com" autocomplete="off">
                                 </div>
                                 <button @click='forgot' type="submit" class="btn btn-primary w-100">Reset Login</button>
                             </template>
@@ -55,31 +53,23 @@ export default {
     data: function() {
         return {
             loading: false,
-            attempted: false,
             user: '',
             reset: false
         }
     },
     methods: {
         forgot: async function() {
-            try {
-                this.attempted = true;
+            this.loading = true;
 
-                if (!this.user.length) return;
-                this.loading = true;
+            await window.std('/api/login/forgot', {
+                method: 'POST',
+                body: {
+                    user: this.user
+                }
+            });
 
-                await window.std('/api/login/forgot', {
-                    method: 'POST',
-                    body: {
-                        user: this.user
-                    }
-                });
-
-                this.loading = false;
-                this.reset = true;
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            this.loading = false;
+            this.reset = true;
         }
     },
     components: {

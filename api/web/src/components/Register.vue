@@ -16,21 +16,17 @@
                                 <p class='txt-h4 py6'>Please check your email for a verification link!</p>
                             </div>
 
-                            <button :disabled='loading.resend || resent' @click='resend' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>
-                                <template v-if='!loading.resend'>
+                            <TablerLoading v-if='loading.resend' desc='Sending Email'/>
+                            <button v-if='!loading.resend' :disabled='resent' @click='resend' class='btn w-full'>
+                                <template v-if='!resent'>
                                     Resend Email
                                 </template>
                                 <template v-else-if='resent'>
                                     Email Resent
                                 </template>
-                                <template v-else>
-                                    <div class='col col--12 flex flex--center-main'>
-                                        <div class='loading loading--s'></div>
-                                    </div>
-                                </template>
                             </button>
 
-                            <button @click='$router.push("/login")' class='btn btn-primary w-full mt-4'>Login</button>
+                            <button v-if='!loading.resend' @click='$router.push("/login")' class='btn btn-primary w-full mt-4'>Login</button>
                         </div>
                         <div v-else class="card-body">
                             <div class='text-center' style='margin-bottom: 24px;'>

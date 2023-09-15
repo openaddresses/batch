@@ -29,7 +29,7 @@ export default async function router(schema, config) {
         name: 'Create User',
         group: 'User',
         auth: 'public',
-        description: 'Create a new user',
+        description: 'Create a new user or resend the verification email',
         body: 'req.body.CreateUser.json',
         res: 'res.User.json'
     }, async (req, res) => {

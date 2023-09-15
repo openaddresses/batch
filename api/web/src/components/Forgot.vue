@@ -1,45 +1,54 @@
 <template>
-    <div class='col col--12 grid pt12'>
-        <template v-if='loading'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
-            </div>
-        </template>
-        <template v-else-if='reset'>
-            <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6'>Reset Login</h3>
-            </div>
-            <div class='col col--12 flex flex--center-main'>
-                <div class='py6'>A password reset email has been sent</div>
-            </div>
-            <div class='col col--12 flex flex--center-main'>
-                <div class='py6'>(If a user account exists)</div>
-            </div>
-            <div class='col col--12 flex flex--center-main'>
-                <button @click='$router.push({ path: "/data" })' class='btn btn--stroke round my12'>Thanks</button>
-            </div>
-        </template>
-        <template v-else>
-            <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6'>Reset Login</h3>
-            </div>
-
-            <div class='col col--12 flex flex--center-main'>
-                <div class='w240 col col--12 grid grid--gut12'>
-                    <label class='mt12 w-full'>Username or Email:</label>
-                    <input v-on:keyup.enter='forgot' :class='{
-                         "input--border-red": attempted && !user
-                    }' v-model='user' type='text' class='input'/>
-
-                    <button @click='forgot' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Reset</button>
+<div class="page page-center">
+    <div class="container container-normal py-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg">
+                <div class="container-tight">
+                    <div class="card card-md">
+                        <div class="card-body">
+                            <template v-if='reset'>
+                                <div class='col col--12 flex flex--center-main'>
+                                    <h3 class='txt-h4 py6'>Reset Login</h3>
+                                </div>
+                                <div class='col col--12 flex flex--center-main'>
+                                    <div class='py6'>A password reset email has been sent</div>
+                                </div>
+                                <div class='col col--12 flex flex--center-main'>
+                                    <div class='py6'>(If a user account exists)</div>
+                                </div>
+                                <div class='col col--12 flex flex--center-main'>
+                                    <button @click='$router.push({ path: "/data" })' class='btn btn--stroke round my12'>Thanks</button>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div class='text-center' style='margin-bottom: 24px;'>
+                                    <img src='/logo.jpg' height='150'/>
+                                </div>
+                                <h2 class="h2 text-center mb-4">Reset Password</h2>
+                                <div class="mb-3">
+                                    <label class="form-label">Username or Email</label>
+                                    <input v-model='username' v-on:keyup.enter='createLogin' type="text" class="form-control" placeholder="your@email.com" autocomplete="off">
+                                </div>
+                                <button @click='forgot' type="submit" class="btn btn-primary w-100">Reset Login</button>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="text-center text-muted mt-3">
+                        Don't have account yet? <a @click='$router.push("/register")' class='cursor-pointer'>Create Account</a> or <a @click='$router.push("/login")' class='cursor-pointer'>Login</a>
+                    </div>
                 </div>
             </div>
-
-        </template>
+        </div>
     </div>
+</div>
 </template>
 
 <script>
+import {
+    TablerLoading,
+    TablerInput
+} from '@tak-ps/vue-tabler';
+
 export default {
     name: 'Forgot',
     props: [],
@@ -72,6 +81,10 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        TablerLoading,
+        TablerInput
     }
 }
 </script>

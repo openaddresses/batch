@@ -51,7 +51,7 @@
                         </thead>
                         <tbody>
                             <tr :key='c.id' v-for='c in collections'>
-                                <td v-text='c.name'></td>
+                                <td v-text='c.human'></td>
                                 <td v-text='fmt(c.created)'></td>
                                 <td class='d-flex'>
                                     <span v-text='size(c.size)'/>

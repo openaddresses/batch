@@ -11,9 +11,18 @@
 
     <TablerLoading v-if='loading'/>
     <template v-else>
-        <div :key='collection.id' v-for='collection in collections' class='col col--12 grid'>
-            <Collection @refresh='refresh' :collection='collection'/>
-        </div>
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for='collection in collections'>
+                    <Collection @refresh='refresh' :collection='collection'/>
+                </template>
+            </tbody>
+        </table>
     </template>
 </div>
 </template>

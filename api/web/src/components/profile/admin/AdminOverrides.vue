@@ -77,7 +77,11 @@
                         <td v-text='level.pattern'></td>
                         <td v-text='level.level'></td>
                         <td>
-                            <TrashIcon @click='deleteLevel(level)' class='cursor-pointer'/>
+                            <div class='d-flex'>
+                                <div class='ms-auto btn-list'>
+                                    <TrashIcon @click='deleteLevel(level)' class='cursor-pointer'/>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </template>

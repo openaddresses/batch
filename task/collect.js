@@ -131,12 +131,20 @@ async function sources(oa, tmp, datas) {
         sources: datas.length
     };
 
-    try {
-        for (const data of datas) {
-            await get_source(oa, tmp, data, stats);
-        }
-    } catch (err) {
-        throw new Error(err);
+    for (const data of datas) {
+        const attempt = 1;
+        let done = false;
+        let error = false;
+
+        do {
+            try {
+                done = await get_source(oa, tmp, data, stats);
+            } catch (err) {
+                console.error(`Attempt ${attempt}: ${err}`);
+                error = err;
+            }
+        } while (!done || attempt < 5);
+        if (!done && error) throw error;
     }
 
     return stats;

@@ -3,6 +3,7 @@
 // Does not need to mark instance
 // as protected as it runs on a managed queue
 import { interactive } from './lib/pre.js';
+import { PromisePool } from '@supercharge/promise-pool';
 
 import { globSync } from 'glob';
 import os from 'os';
@@ -20,15 +21,6 @@ import { Transform } from 'stream';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
-});
-
-const r2 = new S3.S3Client({
-    region: 'auto',
-    credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
-    },
-    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
 });
 
 const DRIVE = '/tmp';
@@ -131,22 +123,25 @@ async function sources(oa, tmp, datas) {
         sources: datas.length
     };
 
-    for (const data of datas) {
-        const attempt = 0;
-        let done = false;
-        let error = false;
+    const { results, errors } = await PromisePool
+        .for(datas)
+        .withConcurrency(50)
+        .process(async (data) => {
+            let attempt = 0;
+            let done = false;
+            let error = false;
 
-        do {
-            try {
-                ++attempt;
-                done = await get_source(oa, tmp, data, stats);
-            } catch (err) {
-                console.error(`Attempt ${attempt}: ${err}`);
-                error = err;
-            }
-        } while (!done || attempt < 5);
-        if (!done && error) throw error;
-    }
+            do {
+                try {
+                    ++attempt;
+                    done = await get_source(oa, tmp, data, stats);
+                } catch (err) {
+                    console.error(`Attempt ${attempt}: ${err}`);
+                    error = err;
+                }
+            } while (!done || attempt < 5);
+            if (!done && error) throw error;
+        })
 
     return stats;
 }
@@ -206,6 +201,16 @@ async function upload_collection(file, name) {
     await s3uploader.done();
 
     console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.zip`);
+
+    const r2 = new S3.S3Client({
+        region: 'auto',
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+        },
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    });
+
 
     const r2uploader = new Upload({
         client: r2,

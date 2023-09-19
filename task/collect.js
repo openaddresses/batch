@@ -132,12 +132,13 @@ async function sources(oa, tmp, datas) {
     };
 
     for (const data of datas) {
-        const attempt = 1;
+        const attempt = 0;
         let done = false;
         let error = false;
 
         do {
             try {
+                ++attempt;
                 done = await get_source(oa, tmp, data, stats);
             } catch (err) {
                 console.error(`Attempt ${attempt}: ${err}`);

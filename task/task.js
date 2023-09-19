@@ -2,9 +2,9 @@
 import { interactive } from './lib/pre.js';
 
 import Job from './lib/job.js';
-import path from 'path';
+import path from 'node:path';
 import CP from 'child_process';
-import fs from 'fs';
+import fs from 'node:fs';
 import Meta from './lib/meta.js';
 import minimist from 'minimist';
 
@@ -90,7 +90,10 @@ async function flow(job) {
 
         await process_job(job);
 
-        await job.convert();
+        const output = await Job.find('out.geojson', job.tmp);
+        if (output.length !== 1) throw new Error('out.geojson not found');
+        fs.renameSync(output[0], path.resolve(job.tmp, 'out.geojson'));
+
         await job.validate();
         await job.compress();
 

@@ -1,4 +1,3 @@
-import wkt from 'wellknown';
 import {
     bboxPolygon
 } from '@turf/turf';
@@ -7,12 +6,10 @@ import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import { pipeline } from 'node:stream/promises';
-import { parse as csv } from 'csv-parse';
 import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import Stats from './stats.js';
 import find from 'find';
-import { Transform } from 'stream';
 
 /**
  * @class Job
@@ -141,47 +138,6 @@ export default class Job {
         this.bounds = bboxPolygon(stats.stats.bounds).geometry;
         this.count = stats.stats.count;
         this.stats = stats.stats[stats.layer];
-    }
-
-    async convert() {
-        let output;
-
-        try {
-            output = await Job.find('out.csv', this.tmp);
-        } catch (err) {
-            throw new Error(err);
-        }
-
-        if (output.length !== 1) throw new Error('out.csv not found');
-
-        await pipeline(
-            fs.createReadStream(output[0]),
-            csv({
-                columns: true,
-                skip_empty_lines: true,
-                delimiter: ','
-            }),
-            new Transform({
-                objectMode: true,
-                transform: (data, _, cb) => {
-                    const geom = wkt.parse(data.GEOM);
-                    delete data.GEOM;
-                    const props = {};
-                    for (const prop of Object.keys(data)) {
-                        props[prop.toLowerCase()] = data[prop];
-                    }
-
-                    return cb(null, JSON.stringify({
-                        type: 'Feature',
-                        properties: props,
-                        geometry: geom
-                    }) + '\n');
-                }
-            }),
-            fs.createWriteStream(path.resolve(this.tmp, 'out.geojson'))
-        );
-
-        return path.resolve(this.tmp, 'out.geojson');
     }
 
     async compress() {

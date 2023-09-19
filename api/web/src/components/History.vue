@@ -25,53 +25,9 @@
                             </div>
                         </div>
 
-                        <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
-                        <div v-else class='card-body'>
-                            <div class='col col--12 pt12'>
-                                <h2 class='txt-h4 pb12 fl'>Stats History:</h2>
-
-                                <template v-if='loading'>
-                                    <div class='flex flex--center-main w-full py24'>
-                                        <div class='loading'></div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
-                                        "maintainAspectRatio": false,
-                                        "scales": {
-                                            "xAxis": {
-                                                "type": "time",
-                                                "time": {
-                                                    "unit": "day"
-                                                },
-                                                "distribution": "linear"
-                                            },
-                                            "yAxis": {
-                                                "ticks": {
-                                                    "beginAtZero": true
-                                                }
-                                            }
-                                        }
-                                    }'/>
-                                </template>
-                            </div>
-
-                            <div class='col col--12 pt12'>
-                                <h2 class='txt-h4 pb12 fl'>Job History:</h2>
-                            </div>
-
-                            <div class='col col--1'>
-                                Status
-                            </div>
-                            <div class='col col--3'>
-                                Job ID
-                            </div>
-                            <div class='col col--5'>
-                                Updated
-                            </div>
-                            <div class='col col--3'>
-                                <span class='fr'>Attributes</span>
-                            </div>
+                        <TablerLoading v-if='loading.history' :desc='`Loading Job History`'/>
+                        <template v-else>
+                            <h2 class='subheader mx-3 my-3'>Stats History</h2>
 
                             <template v-if='loading'>
                                 <div class='flex flex--center-main w-full py24'>
@@ -79,34 +35,56 @@
                                 </div>
                             </template>
                             <template v-else>
-                                <div :key='job.id' v-for='job in history.jobs' class='col col--12 grid'>
-                                    <div @click='emitjob(job.id)' class='col col--12 grid py12 cursor-pointer bg-darken10-on-hover round'>
-                                        <div class='col col--1'>
-                                            <template v-if='job.status === "Pending"'>
-                                                <svg class='icon ml12 color-yellow opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                                            </template>
-                                            <template v-else-if='job.status === "Success"'>
-                                                <svg class='icon ml12 color-green opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                                            </template>
-                                            <template v-else-if='job.status === "Fail"'>
-                                                <svg class='icon ml12 color-red opacity50' style='height: 16px; margin-top: 2px;'><use xlink:href='#icon-circle'/></svg>
-                                            </template>
-                                        </div>
-                                        <div class='col col--3'>
-                                            Job <span v-text='job.id'/>
-                                        </div>
-                                        <div class='col col--5'>
-                                            <span v-text='fmt(job.created)'></span>
-                                        </div>
-                                        <div class='col col--3'>
-                                            <span v-on:click.stop.prevent='datapls(job.id)' v-if='job.output.output' class='fr h24 cursor-pointer mx3 px12 round color-gray border border--gray-light border--gray-on-hover'>
-                                                <DownloadIcon width="16" height="16"/>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
+                                    "maintainAspectRatio": false,
+                                    "scales": {
+                                        "xAxis": {
+                                            "type": "time",
+                                            "time": {
+                                                "unit": "day"
+                                            },
+                                            "distribution": "linear"
+                                        },
+                                        "yAxis": {
+                                            "ticks": {
+                                                "beginAtZero": true
+                                            }
+                                        }
+                                    }
+                                }'/>
                             </template>
-                        </div>
+
+                            <h2 class='subheader mx-3 my-3'>Job History</h2>
+
+                            <table class="table table-hover table-vcenter card-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Job ID</th>
+                                        <th>Updated</th>
+                                        <th>Attributes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr :key='job.id' v-for='job in history.jobs'>
+                                        <td>
+                                            <Status :status='job.status'/>
+                                        </td>
+                                        <td v-text='job.id'/>
+                                        <td>
+                                            <span v-text='fmt(job.created)'></span>
+                                        </td>
+                                        <td>
+                                            <div class='d-flex'>
+                                                <div class='ms-auto'>
+                                                    <DownloadIcon v-if='job.output.output' v-on:click.stop.prevent='datapls(job.id)' class='cursor-pointer'/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -117,9 +95,12 @@
 
 <script>
 import {
-    TablerBreadCrumb
+    TablerBreadCrumb,
+    TablerLoading,
 } from '@tak-ps/vue-tabler';
+import Status from './util/Status.vue';
 import {
+    RefreshIcon,
     DownloadIcon
 } from 'vue-tabler-icons';
 import { Line as LineChart } from 'vue-chartjs';
@@ -136,7 +117,9 @@ export default {
     data: function() {
         return {
             tz: moment.tz.guess(),
-            loading: false,
+            loading: {
+
+            },
             colours: [ /* Thanks for the colours! https://github.com/johannesbjork/LaCroixColoR */ ],
             chart: {
                 datasets: [{
@@ -175,7 +158,7 @@ export default {
         },
         getHistory: async function() {
             try {
-                this.loading = true;
+                this.loading.history = true;
                 this.history = await window.std(`/api/data/${this.dataid}/history`);
 
                 this.chart = {
@@ -227,7 +210,7 @@ export default {
                     });
                 }
 
-                this.loading = false;
+                this.loading.history = false;
             } catch (err) {
                 this.$emit('err', err);
             }
@@ -241,6 +224,9 @@ export default {
         }
     },
     components: {
+        Status,
+        RefreshIcon,
+        TablerLoading,
         LineChart,
         TablerBreadCrumb,
         DownloadIcon

@@ -24,8 +24,8 @@ export default {
             lines: []
         };
     },
-    mounted: function() {
-        this.getLog();
+    mounted: async function() {
+        await this.getLog();
     },
     methods: {
         downloadLog: async function() {

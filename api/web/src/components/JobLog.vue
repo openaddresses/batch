@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <TablerLoading v-if='loading'/>
-                        <Log v-else @err='$emit("err", $event)' logtype='job' :id='$route.params.jobid'/>
+                        <Log v-else logtype='job' :id='$route.params.jobid'/>
                     </div>
                 </div>
             </div>

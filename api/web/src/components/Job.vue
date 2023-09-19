@@ -69,14 +69,19 @@
                         </div>
 
                         <TablerLoading v-if='loading' :desc='`Loading Job ${$route.params.jobid}`'/>
-                        <JobSample v-else
-                            @err='$emit("err", $event)'
-                            :job='job'
-                        />
+                        <template v-else-if='job.status === "Fail"'>
+                             <Log logtype='job' :id='$route.params.jobid'/>
+                        </template>
+                        <template v-else>
+                            <JobSample
+                                @err='$emit("err", $event)'
+                                :job='job'
+                            />
+                        </template>
                     </div>
                 </div>
 
-                <div class='col-12'>
+                <div v-if='job.status !== "Fail"' class='col-12'>
                     <div class='card'>
                         <div class='card-header'>
                             <div class='card-title'>Job Statistics</div>
@@ -88,7 +93,7 @@
                         />
                     </div>
                 </div>
-                <div class='col-12'>
+                <div v-if='job.status !== "Fail"' class='col-12'>
                     <div class='card'>
                         <div class='card-header'>
                             <div class='card-title'>Job Map</div>
@@ -109,6 +114,7 @@
 </template>
 
 <script>
+import Log from './util/Log.vue';
 import LayerIcon from './util/LayerIcon.vue';
 import {
     LicenseIcon,
@@ -217,6 +223,7 @@ export default {
         }
     },
     components: {
+        Log,
         JobMap,
         JobSample,
         Download,

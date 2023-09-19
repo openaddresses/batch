@@ -16,6 +16,9 @@
         },
         "size": {
             "$ref": "./collections/size.json"
+        },
+        "human": {
+            "$ref": "./collections/human.json"
         }
     },
     "required": [
@@ -23,6 +26,7 @@
         "name",
         "sources",
         "created",
-        "size"
+        "size",
+        "human"
     ]
 }

@@ -3,6 +3,7 @@
     "required": [
         "id",
         "name",
+        "human",
         "sources",
         "created",
         "size"
@@ -15,6 +16,10 @@
         "name": {
             "type": "string",
             "description": "The name of the collection"
+        },
+        "human": {
+            "type": "string",
+            "description": "The Human Readable name of the collection"
         },
         "sources": {
             "type": "array",

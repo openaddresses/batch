@@ -6,6 +6,7 @@
         "required": [
             "id",
             "size",
+            "human",
             "name",
             "created",
             "s3",
@@ -19,6 +20,9 @@
                 "$ref": "./util/size.json"
             },
             "name": {
+                "type": "string"
+            },
+            "human": {
                 "type": "string"
             },
             "created": {

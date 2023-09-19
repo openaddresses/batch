@@ -14,11 +14,7 @@ export default class Collection extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    id,
-                    name,
-                    created,
-                    sources,
-                    size
+                    *
                 FROM
                     collections
             `);

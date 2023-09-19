@@ -15,6 +15,8 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Code</th>
+                    <th>Attributes</th>
                 </tr>
             </thead>
             <tbody>

@@ -1,10 +1,8 @@
 <template>
 <tr>
-    <div @click='open = !open' class='col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
-        <span v-text='name'/>
-
-        <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='sources.length + " rules"'></span>
-    </div>
+    <td v-text='human'/>
+    <td v-text='name'/>
+    <td v-text='`${sources.length} rule${sources.length > 1 ? "s" : ""}`'/>
 
     <div v-if='open' class='col col-12 border border--gray-light round px12 py12 my6 relative grid'>
         <template v-if='!edit'>
@@ -65,6 +63,7 @@ export default {
             edit: !this.collection.id,
             open: !this.collection.id,
             name: this.collection.name || '',
+            human: this.collection.human || '',
             source: '',
             sources: this.collection.sources ? JSON.parse(JSON.stringify(this.collection.sources)) : []
         };

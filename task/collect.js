@@ -123,7 +123,7 @@ async function sources(oa, tmp, datas) {
         sources: datas.length
     };
 
-    const { results, errors } = await PromisePool
+    await PromisePool
         .for(datas)
         .withConcurrency(50)
         .process(async (data) => {
@@ -145,7 +145,7 @@ async function sources(oa, tmp, datas) {
             if (!done && error) throw error;
 
             return done;
-        })
+        });
 
     return stats;
 }

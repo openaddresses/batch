@@ -128,8 +128,8 @@ async function sources(oa, tmp, datas) {
         .withConcurrency(50)
         .process(async (data) => {
             let attempt = 0;
-            let done = false;
             let error = false;
+            let done = false;
 
             do {
                 try {
@@ -139,8 +139,12 @@ async function sources(oa, tmp, datas) {
                     console.error(`Attempt ${attempt}: ${err}`);
                     error = err;
                 }
-            } while (!done || attempt < 5);
+
+                console.error(done);
+            } while (!done && attempt < 5);
             if (!done && error) throw error;
+
+            return done;
         })
 
     return stats;
@@ -185,6 +189,8 @@ async function get_source(oa, tmp, data, stats) {
     }
 
     console.error('ok - ' + path.resolve(tmp, 'sources',  dir, source));
+
+    return path.resolve(tmp, 'sources',  dir, source);
 }
 
 async function upload_collection(file, name) {

@@ -246,7 +246,7 @@ async function get_source(tmp, jobid) {
         (await s3.send(new S3.GetObjectCommand({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
-        }))).Body),
+        }))).Body,
         Unzip(),
         fs.createWriteStream(path.resolve(tmp, 'source.geojson'))
     );

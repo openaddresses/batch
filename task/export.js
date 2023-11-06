@@ -243,10 +243,10 @@ function convert(tmp, loc, exp, job) {
 
 async function get_source(tmp, jobid) {
     await pipeline(
-        s3.getObject({
+        (await s3.send(new S3.GetObjectCommand({
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
-        }).createReadStream(),
+        }))).Body),
         Unzip(),
         fs.createWriteStream(path.resolve(tmp, 'source.geojson'))
     );

@@ -113,7 +113,7 @@ export default class Run extends Generic {
                     runs.github,
                     runs.closed,
                     ARRAY_AGG(job.status) AS status,
-                    COUNT(job.*) AS jobs
+                    ARRAY_LENGTH(ARRAY_AGG(job.status), 0) AS jobs
                 FROM
                     runs
                         LEFT JOIN job

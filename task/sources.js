@@ -80,6 +80,7 @@ async function cli() {
         console.error(`ok - run: ${r.id} created`);
 
         console.error('ok - populating run');
+
         await oa.cmd('run', 'create_jobs', {
             ':run': r.id,
             jobs

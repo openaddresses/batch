@@ -9,6 +9,12 @@
         "run": {
             "type": "integer"
         },
+        "errors": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        },
         "jobs": {
             "type": "array",
             "items": {

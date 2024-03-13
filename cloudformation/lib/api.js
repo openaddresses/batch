@@ -37,6 +37,10 @@ export default {
                 Name: cf.stackName,
                 Type: 'application',
                 SecurityGroups: [cf.ref('APIELBSecurityGroup')],
+                "LoadBalancerAttributes": [{
+                    Key: "idle_timeout.timeout_seconds",
+                    Value: 600
+                }],
                 Subnets:  [
                     'subnet-de35c1f5',
                     'subnet-e67dc7ea',

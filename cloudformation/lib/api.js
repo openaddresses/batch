@@ -235,7 +235,7 @@ export default {
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
                         { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
                         { Name: 'OPENCOLLECTIVE_API_KEY', Value: cf.ref('OpenCollective') },
-                        { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstanceVPC', 'Endpoint.Address'), ':5432/openaddresses']) },
+                        { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstanceVPC', 'Endpoint.Address'), ':5432/openaddresses?sslmode=no-verify']) },
                         { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },
                         { Name: 'GithubSecret', Value: cf.ref('GithubSecret') },
                         { Name: 'Bucket', Value: cf.ref('Bucket') },

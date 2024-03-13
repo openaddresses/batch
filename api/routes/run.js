@@ -114,12 +114,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            return res.json(await Run.populate(
-                config.pool,
-                req.params.run,
-                req.body.jobs,
-                req.body.close
-            ));
+            return res.json(await Run.populate(config.pool, req.params.run, req.body.jobs));
         } catch (err) {
             return Err.respond(err, res);
         }

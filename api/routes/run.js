@@ -118,7 +118,7 @@ export default async function router(schema, config) {
                 config.pool,
                 req.params.run,
                 req.body.jobs,
-                req.body.close,
+                req.body.close
             ));
         } catch (err) {
             return Err.respond(err, res);

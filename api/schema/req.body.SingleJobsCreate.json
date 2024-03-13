@@ -5,6 +5,11 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "close": {
+            "type": "boolean",
+            "description": "Should the run be closed after auto-population",
+            "default": true
+        },
         "jobs": {
             "type": "array",
             "items": {

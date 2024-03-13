@@ -73,19 +73,21 @@ async function cli() {
         const jobs = list(tmp, sha);
         console.error(`ok - ${jobs.length} jobs found`);
 
-        console.error('ok - creating run');
-        const r = await oa.cmd('run', 'create', {
-            live: true
-        });
-        console.error(`ok - run: ${r.id} created`);
+        do {
+            console.error('ok - creating run');
+            const r = await oa.cmd('run', 'create', {
+                live: true
+            });
+            console.error(`ok - run: ${r.id} created`);
 
-        console.error('ok - populating run');
+            console.error('ok - populating run');
 
-        await oa.cmd('run', 'create_jobs', {
-            ':run': r.id,
-            jobs
-        });
-        console.error('ok - run populated');
+            await oa.cmd('run', 'create_jobs', {
+                ':run': r.id,
+                jobs: jobs.splice(0, 50)
+            });
+            console.error('ok - run populated');
+        } while (jobs.length);
 
         await meta.protection(false);
     } catch (err) {

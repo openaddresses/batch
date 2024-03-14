@@ -36,10 +36,13 @@ export default {
         },
         filter: {
             type: String
-        }, 
+        },
         bbox: {
             type: Array
-        }
+        },
+        features: {
+            type: Object
+        },
     },
     data: function() {
         return {
@@ -102,11 +105,10 @@ export default {
             try {
                 const res = await window.std('/api/map');
 
-                const tmpmap = new mapgl.Map({
+                const opts = {
                     container: this.$refs.map,
                     hash: "map",
                     zoom: 0,
-                    center: [0, 0],
                     style: {
                         version: 8,
                         sources: {
@@ -133,7 +135,15 @@ export default {
                         }]
                     }
 
-                });
+                }
+
+                if (this.bbox) {
+                    opts.bounds = this.bbox;
+                } else {
+                    opts.center = [0, 0];
+                }
+
+                const tmpmap = new mapgl.Map(opts);
 
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
 
@@ -312,6 +322,27 @@ export default {
                             features: []
                         }
                     });
+
+                    map.addSource('features', {
+                        type: 'geojson',
+                        data: this.features
+                    });
+
+                    map.addLayer({
+                        id: `features-poly`,
+                        type: 'fill',
+                        source: 'features',
+                        layout: { },
+                        filter: [
+                            "all",
+                            ['==', ['geometry-type'], 'Polygon'],
+                        ],
+                        paint: {
+                            'fill-color': base,
+                            'fill-opacity': 0.8
+                        }
+                    });
+
 
                     map.addLayer({
                         id: 'click',

@@ -27,6 +27,14 @@
                                         @err='$emit("err", $event)'
                                         :filter='locid'
                                         :bbox='location.bbox'
+                                        :features='{
+                                            type: "FeatureCollection",
+                                            features: [{
+                                                type: "Feature",
+                                                properties: {},
+                                                geometry: location.geom
+                                            }]
+                                        }'
                                     />
                                 </div>
 
@@ -97,8 +105,8 @@ import moment from 'moment-timezone';
 export default {
     name: 'Location',
     props: [ 'auth', 'locid' ],
-    mounted: function() {
-        this.refresh();
+    mounted: async function() {
+        await this.refresh();
     },
     data: function() {
         return {
@@ -136,9 +144,9 @@ export default {
             var e = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes/Math.pow(1024, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
         },
-        refresh: function() {
-            this.getLocation();
-            this.getJobs();
+        refresh: async function() {
+            await this.getLocation();
+            await this.getJobs();
         },
         getLocation: async function() {
             try {

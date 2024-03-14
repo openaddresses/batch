@@ -7,7 +7,8 @@ export default {
             Default: 'db.t3.micro',
             Description: 'Database size to create',
             AllowedValues: [
-                'db.t3.micro'
+                'db.t3.micro',
+                'db.t3.medium'
             ]
         },
         DatabasePassword: {

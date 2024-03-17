@@ -38,41 +38,43 @@
                                     />
                                 </div>
 
-                                <table class="table table-vcenter card-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Updated</th>
-                                            <th>Size</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr :key='job.id' v-for='job in jobs'>
-                                            <td @click='emitjob(job.job)'>
-                                                <span v-text='job.layer'/> - <span v-text='job.name'/>
-                                            </td>
-                                            <td v-text='fmt(job.updated)'></td>
-                                            <td class='d-flex'>
-                                                <span v-text='size(job.size)'/>
-                                                <div class='ms-auto btn-list'>
-                                                    <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-                                                    <template v-if='auth && auth.access === "admin"'>
-                                                        <TablerDropdown>
-                                                            <slot>
-                                                                <SettingsIcon class='cursor-pointer'/>
-                                                            </slot>
-                                                            <template #dropdown>
-                                                                <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
-                                                            </template>
-                                                        </TablerDropdown>
-                                                    </template>
+                                <div class='table-responsive'>
+                                    <table class="table table-hover table-vcenter card-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Updated</th>
+                                                <th>Size</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr :key='job.id' v-for='job in jobs'>
+                                                <td @click='emitjob(job.job)' class='cursor-pointer'>
+                                                    <span v-text='job.layer'/> - <span v-text='job.name'/>
+                                                </td>
+                                                <td v-text='fmt(job.updated)'></td>
+                                                <td class='d-flex'>
+                                                    <span v-text='size(job.size)'/>
+                                                    <div class='ms-auto btn-list'>
+                                                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
+                                                        <template v-if='auth && auth.access === "admin"'>
+                                                            <TablerDropdown>
+                                                                <slot>
+                                                                    <IconSettings size='32' class='cursor-pointer'/>
+                                                                </slot>
+                                                                <template #dropdown>
+                                                                    <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
+                                                                </template>
+                                                            </TablerDropdown>
+                                                        </template>
 
-                                                    <HistoryIcon v-on:click.stop.prevent='emithistory(job.id)' class='cursor-pointer'/>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                        <IconHistory v-on:click.stop.prevent='emithistory(job.id)' size='32' class='cursor-pointer'/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
                                 <div class='col-12 text-center pt-3'>
                                     OpenAddresses tracks free &amp; open data for <span v-text='location.name'/> including <span v-text='types.join(", ")'/>
@@ -89,9 +91,9 @@
 
 <script>
 import {
-    HistoryIcon,
-    SettingsIcon
-} from 'vue-tabler-icons';
+    IconHistory,
+    IconSettings
+} from '@tabler/icons-vue';
 import {
     TablerLoading,
     TablerDropdown,
@@ -122,16 +124,12 @@ export default {
             return moment(date).tz(this.tz).format('YYYY-MM-DD');
         },
         updateData: async function(job) {
-            try {
-                await window.std(`/api/data/${job.id}`, {
-                    method: 'PATCH',
-                    body: {
-                        fabric: job.fabric
-                    }
-                });
-            } catch (err) {
-                this.$emit('err', err);
-            }
+            await window.std(`/api/data/${job.id}`, {
+                method: 'PATCH',
+                body: {
+                    fabric: job.fabric
+                }
+            });
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });
@@ -151,19 +149,11 @@ export default {
             this.loading = false;
         },
         getLocation: async function() {
-            try {
-                this.location = await window.std(window.location.origin + `/api/map/${this.locid}`);
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            this.location = await window.std(window.location.origin + `/api/map/${this.locid}`);
         },
         getJobs: async function() {
-            try {
-                this.jobs = await window.std(window.location.origin + `/api/data?map=${this.locid}`);
-                this.types = this.jobs.map(j => j.layer).sort();
-            } catch(err) {
-                this.$emit('err', err);
-            }
+            this.jobs = await window.std(window.location.origin + `/api/data?map=${this.locid}`);
+            this.types = this.jobs.map(j => j.layer).sort();
         }
     },
     components: {
@@ -173,8 +163,8 @@ export default {
         TablerDropdown,
         TablerBreadCrumb,
         TablerToggle,
-        HistoryIcon,
-        SettingsIcon
+        IconHistory,
+        IconSettings
     },
 }
 </script>

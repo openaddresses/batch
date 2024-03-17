@@ -1,7 +1,7 @@
 <template>
 <TablerDropdown v-on:click.stop.prevent='' v-if='job.output.output'>
     <slot>
-        <DownloadIcon class='cursor-pointer'/>
+        <IconDownload size='32' class='cursor-pointer'/>
     </slot>
 
     <template #dropdown>
@@ -17,7 +17,7 @@
                         GeoJSON+LD
                     </span>
                     <div class='ms-auto'>
-                        <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                        <IconInfoCircle @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' size='16'/>
                     </div>
                 </div>
 
@@ -26,7 +26,7 @@
                         ShapeFile
                     </span>
                     <div class='ms-auto'>
-                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                        <IconInfoCircle @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' size='16'/>
                     </div>
                 </div>
 
@@ -35,7 +35,7 @@
                         CSV
                     </span>
                     <div class='ms-auto'>
-                        <InfoCircleIcon @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' width="16" height="16"/>
+                        <IconInfoCircle @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' size='16'/>
                     </div>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                     <span @click='datapls(job.job || job.id, "geojson", true)' class='cursor-pointer'>
                         GeoJSON+LD
                     </span>
-                    <InfoCircleIcon @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                    <IconInfoCircle @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
                 </div>
             </div>
         </div>
@@ -68,9 +68,9 @@
 
 <script>
 import {
-    InfoCircleIcon,
-    DownloadIcon
-} from 'vue-tabler-icons';
+    IconInfoCircle,
+    IconDownload
+} from '@tabler/icons-vue';
 import MustLogin from './MustLogin.vue';
 import {
     TablerDropdown
@@ -121,8 +121,8 @@ export default {
     components: {
         MustLogin,
         TablerDropdown,
-        InfoCircleIcon,
-        DownloadIcon
+        IconInfoCircle,
+        IconDownload
     }
 }
 </script>

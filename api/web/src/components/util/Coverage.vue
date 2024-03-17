@@ -112,7 +112,6 @@ export default {
                 const opts = {
                     container: this.$refs.map,
                     hash: "map",
-                    zoom: 0,
                     style: {
                         version: 8,
                         sources: {
@@ -122,7 +121,15 @@ export default {
                                 tiles: [
                                     `https://api.mapbox.com/styles/v1/ingalls/ckvh0wwm8g2cw15r05ozt0ybr/tiles/256/{z}/{x}/{y}@2x?access_token=${res.token}`
                                 ]
-                            }
+                            },
+                            coverage: {
+                                type: 'vector',
+                                tiles: [
+                                    String(window.stdurl('/api')) + '/map/{z}/{x}/{y}.mvt'
+                                ],
+                                minzoom: 0,
+                                maxzoom: 6
+                            },
                         },
                         layers: [{
                             id: 'background',
@@ -141,27 +148,14 @@ export default {
 
                 }
 
-                if (this.bbox) {
-                    opts.bounds = this.bbox;
-                } else {
-                    opts.center = [0, 0];
-                }
+                opts.center = [0, 0];
+                opts.zoom = 0;
 
                 const tmpmap = new mapgl.Map(opts);
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
-                tmpmap.once('load', () => {
-                    map.addSource('basemap', {
-                        type: 'vector',
-                    });
-
-                    map.addSource('coverage', {
-                        type: 'vector',
-                        tiles: [
-                            `${window.location.origin}/api/map/{z}/{x}/{y}.mvt`
-                        ],
-                        minzoom: 0,
-                        maxzoom: 6
-                    });
+                tmpmap.once('idle', () => {
+                    map = tmpmap;
+                    if (this.bbox) map.fitBounds(this.bbox);
 
                     map.addSource('features', {
                         type: 'geojson',
@@ -305,17 +299,6 @@ export default {
                         paint: {
                             'line-color': 'rgba(0, 0, 0, 0.1)',
                             'line-width': 1
-                        }
-                    });
-
-                    map.addLayer({
-                        'id': 'borders-label',
-                        'type': 'symbol',
-                        'minzoom': 7,
-                        'source-layer': 'data',
-                        'source': 'coverage',
-                        'layout': {
-                            'text-field': ['get', 'name']
                         }
                     });
 

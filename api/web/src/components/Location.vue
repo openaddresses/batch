@@ -113,7 +113,7 @@ export default {
             tz: moment.tz.guess(),
             location: {},
             jobs: [],
-            loading: false,
+            loading: true,
             types: []
         };
     },
@@ -145,14 +145,14 @@ export default {
             return (bytes/Math.pow(1024, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
         },
         refresh: async function() {
+            this.loading = true;
             await this.getLocation();
             await this.getJobs();
+            this.loading = false;
         },
         getLocation: async function() {
             try {
-                this.loading = true;
                 this.location = await window.std(window.location.origin + `/api/map/${this.locid}`);
-                this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
             }

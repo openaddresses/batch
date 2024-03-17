@@ -41,7 +41,11 @@ export default {
             type: Array
         },
         features: {
-            type: Object
+            type: Object,
+            default: {
+                type: 'FeatureCollection',
+                features: []
+            }
         },
     },
     data: function() {
@@ -144,16 +148,11 @@ export default {
                 }
 
                 const tmpmap = new mapgl.Map(opts);
-
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
-
-                map.once('load', () => {
-                    map = tmpmap;
-
+                tmpmap.once('load', () => {
                     map.addSource('basemap', {
                         type: 'vector',
                     });
-
 
                     map.addSource('coverage', {
                         type: 'vector',
@@ -162,6 +161,11 @@ export default {
                         ],
                         minzoom: 0,
                         maxzoom: 6
+                    });
+
+                    map.addSource('features', {
+                        type: 'geojson',
+                        data: JSON.parse(JSON.stringify(this.features))
                     });
 
                     map.on('click', (e) => {
@@ -323,26 +327,17 @@ export default {
                         }
                     });
 
-                    map.addSource('features', {
-                        type: 'geojson',
-                        data: this.features
-                    });
-
                     map.addLayer({
                         id: `features-poly`,
                         type: 'fill',
                         source: 'features',
+                        filter: ['==', '$type', 'Polygon'],
                         layout: { },
-                        filter: [
-                            "all",
-                            ['==', ['geometry-type'], 'Polygon'],
-                        ],
                         paint: {
                             'fill-color': base,
-                            'fill-opacity': 0.8
+                            'fill-opacity': 0.5
                         }
                     });
-
 
                     map.addLayer({
                         id: 'click',

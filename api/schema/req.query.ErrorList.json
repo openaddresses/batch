@@ -16,6 +16,10 @@
         "page": {
             "$ref": "./util/page.json"
         },
+        "limit": {
+            "type": "integer",
+            "default": 100
+        },
         "order": {
             "$ref": "./util/order.json"
         },

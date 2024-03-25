@@ -131,7 +131,7 @@ export default async function router(schema, config) {
                 Key: `${process.env.StackName}/job/${req.params.job}/source.png`
             });
 
-            return s3.stream(res);
+            return await s3.stream(res);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -14,8 +14,9 @@ export default class S3Helper {
     }
 
     async stream(res, name) {
+        let s3headers;
         try {
-            const s3headers = await s3.send(new S3.HeadObjectCommand(this.params));
+            s3headers = await s3.send(new S3.HeadObjectCommand(this.params));
         } catch (err) {
             if (err.Code === 'NoSuchKey') throw new Err(404, null, 'No File Found');
             throw new Err(500, err, 'Internal Error');
@@ -26,7 +27,7 @@ export default class S3Helper {
         res.writeHead(200, {
             'Content-Disposition': `inline; filename="${name}"`,
             'Content-Length': s3headers.ContentLength,
-            'ContentType': s3headers.ContentType,
+            'ContentType': s3headers.ContentType
         });
 
         s3request.Body.pipe(res);

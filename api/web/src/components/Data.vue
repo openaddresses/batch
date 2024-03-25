@@ -59,7 +59,6 @@
                                         <IconDownload v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer' size='32'/>
                                     </div>
                                 </td>
-
                             </tr>
                         </tbody>
                     </table>
@@ -142,11 +141,11 @@
                                     <template v-if='d._open' :key='job.id' v-for='job in d.sources'>
                                         <tr><td colspan='3' class='cursor-pointer'>
                                             <div class='row'>
-                                                <div @click='emitjob(job.job)' class='col-5'>
-                                                    <span v-text='job.layer'/> - <span v-text='job.name'/>
+                                                <div @click='emitjob(job.job)' class='col-5 d-flex align-items-center'>
+                                                    <span v-text='job.layer'/>&nbsp;-&nbsp;<span v-text='job.name'/>
 
                                                 </div>
-                                                <div @click='emitjob(job.job)' class='col-2'>
+                                                <div @click='emitjob(job.job)' class='col-2 d-flex align-items-center'>
                                                     <span v-text='fmt(job.updated)'/>
                                                 </div>
                                                 <div class='col-5 d-flex'>

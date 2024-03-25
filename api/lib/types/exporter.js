@@ -132,7 +132,7 @@ export default class Exporter extends Generic {
             Key: `${process.env.StackName}/export/${export_id}/export.zip`
         });
 
-        return s3.stream(res, `export-${export_id}.zip`);
+        return await s3.stream(res, `export-${export_id}.zip`);
     }
 
     /**

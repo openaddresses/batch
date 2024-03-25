@@ -21,7 +21,7 @@
                             <h3 class='card-title' v-text='data.source + " - " + data.layer + " - " + data.name'/>
 
                             <div class='ms-auto btn-list'>
-                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                                <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
 
@@ -63,7 +63,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr :key='job.id' v-for='job in history.jobs'>
+                                    <tr :key='job.id' v-for='job in computedPage'>
                                         <td>
                                             <Status :status='job.status'/>
                                         </td>
@@ -74,13 +74,14 @@
                                         <td>
                                             <div class='d-flex'>
                                                 <div class='ms-auto'>
-                                                    <DownloadIcon v-if='job.output.output' v-on:click.stop.prevent='datapls(job.id)' class='cursor-pointer'/>
+                                                    <IconDownload v-if='job.output.output' v-on:click.stop.prevent='datapls(job.id)' class='cursor-pointer' size='32'/>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <TableFooter :limit='paging.limit' :total='history.jobs.length' @page='paging.page = $event'/>
                         </template>
                     </div>
                 </div>
@@ -95,11 +96,12 @@ import {
     TablerBreadCrumb,
     TablerLoading,
 } from '@tak-ps/vue-tabler';
+import TableFooter from './util/TableFooter.vue';
 import Status from './util/Status.vue';
 import {
-    RefreshIcon,
-    DownloadIcon
-} from 'vue-tabler-icons';
+    IconRefresh,
+    IconDownload
+} from '@tabler/icons-vue';
 import { Line as LineChart } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale } from 'chart.js'
 import moment from 'moment-timezone';
@@ -116,6 +118,10 @@ export default {
             tz: moment.tz.guess(),
             loading: {
                 history: true
+            },
+            paging: {
+                limit: 10,
+                page: 0
             },
             colours: [ /* Thanks for the colours! https://github.com/johannesbjork/LaCroixColoR */ ],
             chart: {
@@ -135,6 +141,11 @@ export default {
             '#EA7580','#F6A1A5','#F8CD9C','#1BB6AF','#088BBE','#172869' // Pamplemousse
         ]
         this.refresh();
+    },
+    computed: {
+        computedPage: function() {
+            return this.history.jobs.slice(this.paging.limit * this.paging.page, this.paging.limit * (this.paging.page + 1))
+        }
     },
     methods: {
         fmt: function(date) {
@@ -222,11 +233,12 @@ export default {
     },
     components: {
         Status,
-        RefreshIcon,
+        IconRefresh,
+        IconDownload,
         TablerLoading,
+        TableFooter,
         LineChart,
         TablerBreadCrumb,
-        DownloadIcon
     },
 }
 </script>

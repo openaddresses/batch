@@ -245,29 +245,19 @@ export default class Run extends Generic {
         try {
             const pgres = await pool.query(sql`
                 SELECT
-                    id,
-                    run,
-                    map,
-                    created,
-                    source,
-                    source_name,
-                    layer,
-                    name,
-                    output,
-                    loglink,
-                    status,
-                    stats,
-                    count,
-                    ST_AsGeoJSON(bounds)::JSON AS bounds,
-                    version,
-                    size
+                    id
                 FROM
                     job
                 WHERE
                     job.run = ${run_id}
             `);
 
-            return pgres.rows;
+            const jobs = [];
+            for (const row of pgres.rows) {
+                jobs.push(await Job.from(pool, row.id));
+            }
+
+            return jobs;
         } catch (err) {
             throw new Err(500, err, 'failed to fetch jobs');
         }

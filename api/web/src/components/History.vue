@@ -21,7 +21,7 @@
                             <h3 class='card-title' v-text='data.source + " - " + data.layer + " - " + data.name'/>
 
                             <div class='ms-auto btn-list'>
-                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                                <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
 
@@ -29,29 +29,26 @@
                         <template v-else>
                             <h2 class='subheader mx-3 my-3'>Stats History</h2>
 
-                            <template v-if='loading'>
-                                <div class='flex flex--center-main w-full py24'>
-                                    <div class='loading'></div>
-                                </div>
-                            </template>
+                            <TablerLoading v-if='loading.history' desc='Loading Stats'/>
                             <template v-else>
-                                <LineChart class='w-full mb24' style='height: 200px' :chart-data='chart' :chart-options='{
-                                    "maintainAspectRatio": false,
-                                    "scales": {
-                                        "xAxis": {
-                                            "type": "time",
-                                            "time": {
-                                                "unit": "day"
+                                <div class='card-body'>
+                                    <LineChart class='w-100' style='height: 200px' :data='chart' :options='{
+                                        "scales": {
+                                            "xAxis": {
+                                                "type": "time",
+                                                "time": {
+                                                    "unit": "day"
+                                                },
+                                                "distribution": "linear"
                                             },
-                                            "distribution": "linear"
-                                        },
-                                        "yAxis": {
-                                            "ticks": {
-                                                "beginAtZero": true
+                                            "yAxis": {
+                                                "ticks": {
+                                                    "beginAtZero": true
+                                                }
                                             }
                                         }
-                                    }
-                                }'/>
+                                    }'/>
+                                </div>
                             </template>
 
                             <h2 class='subheader mx-3 my-3'>Job History</h2>
@@ -66,7 +63,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr :key='job.id' v-for='job in history.jobs'>
+                                    <tr :key='job.id' v-for='job in computedPage'>
                                         <td>
                                             <Status :status='job.status'/>
                                         </td>
@@ -77,13 +74,14 @@
                                         <td>
                                             <div class='d-flex'>
                                                 <div class='ms-auto'>
-                                                    <DownloadIcon v-if='job.output.output' v-on:click.stop.prevent='datapls(job.id)' class='cursor-pointer'/>
+                                                    <IconDownload v-if='job.output.output' v-on:click.stop.prevent='datapls(job.id)' class='cursor-pointer' size='32'/>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <TableFooter :limit='paging.limit' :total='history.jobs.length' @page='paging.page = $event'/>
                         </template>
                     </div>
                 </div>
@@ -98,16 +96,17 @@ import {
     TablerBreadCrumb,
     TablerLoading,
 } from '@tak-ps/vue-tabler';
+import TableFooter from './util/TableFooter.vue';
 import Status from './util/Status.vue';
 import {
-    RefreshIcon,
-    DownloadIcon
-} from 'vue-tabler-icons';
+    IconRefresh,
+    IconDownload
+} from '@tabler/icons-vue';
 import { Line as LineChart } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement } from 'chart.js'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale } from 'chart.js'
 import moment from 'moment-timezone';
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement)
+ChartJS.register(Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale)
 
 import 'chartjs-adapter-date-fns';
 
@@ -118,7 +117,11 @@ export default {
         return {
             tz: moment.tz.guess(),
             loading: {
-
+                history: true
+            },
+            paging: {
+                limit: 10,
+                page: 0
             },
             colours: [ /* Thanks for the colours! https://github.com/johannesbjork/LaCroixColoR */ ],
             chart: {
@@ -138,6 +141,11 @@ export default {
             '#EA7580','#F6A1A5','#F8CD9C','#1BB6AF','#088BBE','#172869' // Pamplemousse
         ]
         this.refresh();
+    },
+    computed: {
+        computedPage: function() {
+            return this.history.jobs.slice(this.paging.limit * this.paging.page, this.paging.limit * (this.paging.page + 1))
+        }
     },
     methods: {
         fmt: function(date) {
@@ -225,11 +233,12 @@ export default {
     },
     components: {
         Status,
-        RefreshIcon,
+        IconRefresh,
+        IconDownload,
         TablerLoading,
+        TableFooter,
         LineChart,
         TablerBreadCrumb,
-        DownloadIcon
     },
 }
 </script>

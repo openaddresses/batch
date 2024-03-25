@@ -1,17 +1,17 @@
 <template>
 <span>
-    <BuildingCommunityIcon v-if='layer === "buildings"'/>
-    <MapPinIcon v-else-if='layer === "addresses"'/>
-    <ShapeIcon v-else-if='layer === "parcels"'/>
+    <IconBuildingCommunity v-if='layer === "buildings"' size='32'/>
+    <IconMapPin v-else-if='layer === "addresses"' size='32'/>
+    <IconShape v-else-if='layer === "parcels"' size='32'/>
 </span>
 </template>
 
 <script>
 import {
-    BuildingCommunityIcon,
-    MapPinIcon,
-    ShapeIcon,
-} from 'vue-tabler-icons';
+    IconBuildingCommunity,
+    IconMapPin,
+    IconShape,
+} from '@tabler/icons-vue';
 
 export default {
     name: 'OAType',
@@ -21,9 +21,9 @@ export default {
         }
     },
     components: {
-        BuildingCommunityIcon,
-        MapPinIcon,
-        ShapeIcon,
+        IconBuildingCommunity,
+        IconMapPin,
+        IconShape,
     }
 }
 </script>

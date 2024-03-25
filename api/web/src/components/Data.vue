@@ -8,16 +8,16 @@
                         <h3 class='card-title'>New Features</h3>
                     </div>
                     <div class='card-body row'>
-                        <div class='col-4 d-flex justify-content-center'>
-                            <LayerIcon layer='buildings'/>
+                        <div class='col-4 d-flex justify-content-center align-items-center'>
+                            <LayerIcon layer='buildings' size='32'/>
                             Buildings
                         </div>
-                        <div class='col-4 d-flex justify-content-center'>
-                            <LayerIcon layer='addresses'/>
+                        <div class='col-4 d-flex justify-content-center align-items-center'>
+                            <LayerIcon layer='addresses' size='32'/>
                             Addresses
                         </div>
-                        <div class='col-4 d-flex justify-content-center'>
-                            <LayerIcon layer='parcels'/>
+                        <div class='col-4 d-flex justify-content-center align-items-center'>
+                            <LayerIcon layer='parcels' size='32'/>
                             Parcels
                         </div>
                         <div class='col-12'>
@@ -36,7 +36,7 @@
                         <h2 class='card-title'>Data Collections</h2>
 
                         <div class='ms-auto btn-list'>
-                            <RefreshIcon @click='fetchCollections' class='cursor-pointer'/>
+                            <IconRefresh @click='fetchCollections' class='cursor-pointer' size='32'/>
                         </div>
                     </div>
 
@@ -56,7 +56,7 @@
                                 <td class='d-flex'>
                                     <span v-text='size(c.size)'/>
                                     <div class='ms-auto btn-list'>
-                                        <DownloadIcon v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer'/>
+                                        <IconDownload v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer' size='32'/>
                                     </div>
                                 </td>
 
@@ -72,13 +72,13 @@
                         <h2 class='card-title'>Individual Sources</h2>
 
                         <div class='ms-auto btn-list'>
-                            <ArrowsMaximizeIcon @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer'/>
-                            <ArrowsMinimizeIcon @click='fullscreen = false' v-else class='cursor-pointer'/>
+                            <IconArrowsMaximize @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer' size='32'/>
+                            <IconArrowsMinimize @click='fullscreen = false' v-else class='cursor-pointer' size='32'/>
 
-                            <SearchIcon @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer'/>
-                            <XIcon  @click='showFilter = !showFilter' v-else class='cursor-pointer'/>
+                            <IconSearch @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer' size='32'/>
+                            <IconX  @click='showFilter = !showFilter' v-else class='cursor-pointer' size='32'/>
 
-                            <RefreshIcon @click='fetchData' class='cursor-pointer'/>
+                            <IconRefresh @click='fetchData' class='cursor-pointer' size='32'/>
                         </div>
                     </div>
 
@@ -127,14 +127,14 @@
                                     <tr>
                                         <td @click='d._open = !d._open' v-text='d.source' class='cursor-pointer'></td>
                                         <td @click='d._open = !d._open' class='cursor-pointer'>
-                                            <LayerIcon v-if='d.has.buildings' layer='buildings'/>
-                                            <LayerIcon v-if='d.has.addresses' layer='addresses'/>
-                                            <LayerIcon v-if='d.has.parcels' layer='parcels'/>
+                                            <LayerIcon v-if='d.has.buildings' layer='buildings' size='32'/>
+                                            <LayerIcon v-if='d.has.addresses' layer='addresses' size='32'/>
+                                            <LayerIcon v-if='d.has.parcels' layer='parcels' size='32'/>
                                         </td>
                                         <td>
                                             <div class='d-flex'>
                                                 <div class='ms-auto btn-list'>
-                                                    <MapIcon v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer'/>
+                                                    <IconMap v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer' size='32'/>
                                                 </div>
                                             </div>
                                         </td>
@@ -156,7 +156,7 @@
                                                         <template v-if='auth && auth.access === "admin"'>
                                                             <TablerDropdown>
                                                                 <slot>
-                                                                    <SettingsIcon class='cursor-pointer'/>
+                                                                    <IconSettings class='cursor-pointer' size='32'/>
                                                                 </slot>
                                                                 <template #dropdown>
                                                                     <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
@@ -165,7 +165,7 @@
                                                             </TablerDropdown>
                                                         </template>
 
-                                                        <HistoryIcon @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer'/>
+                                                        <IconHistory @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer' size='32'/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -185,17 +185,6 @@
 </template>
 
 <script>
-import {
-    ArrowsMaximizeIcon,
-    ArrowsMinimizeIcon,
-    SettingsIcon,
-    DownloadIcon,
-    HistoryIcon,
-    RefreshIcon,
-    SearchIcon,
-    MapIcon,
-    XIcon,
-} from 'vue-tabler-icons';
 import LayerIcon from './util/LayerIcon.vue';
 import MustLogin from './util/MustLogin.vue';
 import Download from './util/Download.vue';
@@ -203,6 +192,17 @@ import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import moment from 'moment-timezone';
+import {
+    IconArrowsMaximize,
+    IconArrowsMinimize,
+    IconSettings,
+    IconDownload,
+    IconHistory,
+    IconRefresh,
+    IconSearch,
+    IconMap,
+    IconX,
+} from '@tabler/icons-vue';
 import {
     TablerLoading,
     TablerDropdown,
@@ -376,20 +376,20 @@ export default {
     },
     components: {
         MustLogin,
-        ArrowsMaximizeIcon,
-        ArrowsMinimizeIcon,
+        IconArrowsMaximize,
+        IconArrowsMinimize,
+        IconSettings,
+        IconDownload,
+        IconHistory,
+        IconRefresh,
+        IconSearch,
+        IconMap,
+        IconX,
         Coverage,
         QuerySource,
         QueryLayer,
         Download,
-        SettingsIcon,
-        DownloadIcon,
-        RefreshIcon,
-        HistoryIcon,
         TablerLoading,
-        SearchIcon,
-        XIcon,
-        MapIcon,
         TablerInput,
         TablerToggle,
         TablerDropdown,

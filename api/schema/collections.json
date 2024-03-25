@@ -5,9 +5,6 @@
         "id": {
             "$ref": "./collections/id.json"
         },
-        "size": {
-            "$ref": "./collections/size.json"
-        },
         "name": {
             "$ref": "./collections/name.json"
         },
@@ -17,16 +14,19 @@
         "created": {
             "$ref": "./collections/created.json"
         },
+        "size": {
+            "$ref": "./collections/size.json"
+        },
         "human": {
             "$ref": "./collections/human.json"
         }
     },
     "required": [
         "id",
-        "size",
         "name",
         "sources",
         "created",
+        "size",
         "human"
     ]
 }

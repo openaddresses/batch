@@ -166,7 +166,7 @@ export default class Job extends Generic {
         } else if (datas.length === 0) {
             throw new Err(400, null, 'Job does not match a live job');
         } else {
-            master = await Job.from(pool, datas[0].job);
+            master = await Job.from(pool, datas.results[0].job);
         }
 
         const stats = JSON.parse(JSON.stringify(compare.stats));
@@ -256,7 +256,7 @@ export default class Job extends Generic {
         let events = [];
 
         try {
-            const res = await cwl.send(new CloudWatchLogs.GetLogEventsComment({
+            const res = await cwl.send(new CloudWatchLogs.GetLogEventsCommand({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink,
                 startFromHead: true

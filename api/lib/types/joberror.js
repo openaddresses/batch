@@ -32,6 +32,7 @@ export default class JobError extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
+                    count(*) OVER() AS count,
                     job.id AS job,
                     job.status,
                     JSON_AGG(job_errors.message) AS messages,

@@ -1,3 +1,4 @@
+import Err from '@openaddresses/batch-error';
 import readline from 'readline';
 import zlib from 'zlib';
 import S3 from '@aws-sdk/client-s3';
@@ -7,21 +8,22 @@ const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 /**
  * @class
  */
-export default class S3 {
+export default class S3Helper {
     constructor(params) {
         this.params = params;
     }
 
     async stream(res, name) {
-        const s3headers = await s3.send(new S3.HeadObjectCommand(this.params));
+        try {
+            const s3headers = await s3.send(new S3.HeadObjectCommand(this.params));
+        } catch (err) {
+            if (err.Code === 'NoSuchKey') throw new Err(404, null, 'No File Found');
+            throw new Err(500, err, 'Internal Error');
+        }
+
         const s3request = await s3.send(new S3.GetObjectCommand(this.params));
 
-        s3request.on('httpHeaders', (statusCode, headers) => {
-            headers['Content-disposition'] = `inline; filename="${name}"`;
-
-        });
-
-        res.writeHead(statusCode, {
+        res.writeHead(200, {
             'Content-Disposition': `inline; filename="${name}"`,
             'Content-Length': s3headers.ContentLength,
             'ContentType': s3headers.ContentType,
@@ -31,14 +33,14 @@ export default class S3 {
     }
 
     async sample() {
-        return new Promise((resolve, reject) => {
-            const buffer = [];
-            const req = await s3.send(new S3.GetObjectCommand(this.params));
+        const buffer = [];
+        const req = await s3.send(new S3.GetObjectCommand(this.params));
 
+        return new Promise((resolve, reject) => {
             const zlibstream = zlib.createGunzip();
             zlibstream.on('error', error);
 
-            const input = s3stream.Body.pipe(zlibstream);
+            const input = req.Body.pipe(zlibstream);
 
             new readline.createInterface({
                 input: input
@@ -47,7 +49,6 @@ export default class S3 {
                     buffer.push(JSON.parse(line));
 
                     if (buffer.length === 20) {
-                        req.abort();
                         return resolve(buffer);
                     }
                 }

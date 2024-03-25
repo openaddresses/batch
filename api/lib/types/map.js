@@ -5,12 +5,13 @@ import split from 'split';
 import SM from '@mapbox/sphericalmercator';
 import { pipeline } from 'stream/promises';
 import transform from 'parallel-transform';
-import AWS from 'aws-sdk';
+import S3 from '@aws-sdk/client-s3';
+
 import Generic from '@openaddresses/batch-generic';
 import Err from '@openaddresses/batch-error';
 import { Transform } from 'stream';
 
-const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
+const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 
 const MAP_LAYERS = [
     'district.geojson',
@@ -335,10 +336,10 @@ export default class Map extends Generic {
 
         for (const layer of MAP_LAYERS) {
             await pipeline(
-                s3.getObject({
+                (s3.send(new S3.GetObjectCommand({
                     Bucket: 'v2.openaddresses.io',
                     Key: layer
-                }).createReadStream(),
+                }))).Body,
                 split(),
                 transform(100, (feat, cb) => {
                     if (!feat || !feat.trim()) return cb(null, '');

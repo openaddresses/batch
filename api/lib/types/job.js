@@ -2,7 +2,7 @@ import Err from '@openaddresses/batch-error';
 import Generic, { Params } from '@openaddresses/batch-generic';
 import moment from 'moment';
 import { difference, area } from '@turf/turf';
-import AWS from 'aws-sdk';
+import CloudWatchLogs from '@aws-sdk/client-cloudwatch-logs';
 import Data from './data.js';
 import { Status } from '../util.js';
 import { sql } from 'slonik';
@@ -13,7 +13,7 @@ import request from 'request';
 import { promisify } from 'util';
 
 const prequest = promisify(request);
-const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
+const cwl = new CloudWatchLogs.CloudWatchLogsClient({ region: process.env.AWS_DEFAULT_REGION });
 const pkg  = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
 
 /**
@@ -256,11 +256,11 @@ export default class Job extends Generic {
         let events = [];
 
         try {
-            const res = await cwl.getLogEvents({
+            const res = await cwl.send(new CloudWatchLogs.GetLogEventsComment({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink,
                 startFromHead: true
-            }).promise();
+            }));
 
             events = res.events;
         } catch (err) {

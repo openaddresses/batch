@@ -20,9 +20,11 @@
     "dependencies": {
         "@aws-sdk/client-auto-scaling": "^3.369.0",
         "@aws-sdk/client-batch": "^3.369.0",
-        "@aws-sdk/client-s3": "^3.369.0",
+        "@aws-sdk/client-cloudwatch-logs": "^3.540.0",
+        "@aws-sdk/client-s3": "^3.540.0",
         "@aws-sdk/client-secrets-manager": "^3.405.0",
         "@aws-sdk/client-ses": "^3.405.0",
+        "@aws-sdk/lib-storage": "^3.540.0",
         "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^4.0.6",
         "@octokit/rest": "^19.0.4",

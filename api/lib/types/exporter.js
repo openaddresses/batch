@@ -4,11 +4,11 @@ import Generic from '@openaddresses/batch-generic';
 import { Status } from '../util.js';
 import { trigger } from '../batch.js';
 import moment from 'moment';
-import AWS from 'aws-sdk';
+import CloudWatchLogs from '@aws-sdk/client-cloudwatch-logs';
 import S3 from '../s3.js';
 import { sql } from 'slonik';
 
-const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
+const cwl = new CloudWatchLogs.CloudWatchLogsClient({ region: process.env.AWS_DEFAULT_REGION });
 
 /**
  * @class
@@ -161,10 +161,10 @@ export default class Exporter extends Generic {
         if (!this.loglink) throw new Err(404, null, 'Export has not produced a log');
 
         try {
-            const res = await cwl.getLogEvents({
+            const res = await cwl.send(new CloudWatchLogs.GetLogEventsCommand({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.loglink
-            }).promise();
+            }));
 
             let line = 0;
             return res.events.map((event) => {

@@ -3,7 +3,7 @@
     <div class='card-header'>
         <h3 class='card-title'>Exports</h3>
         <div class='d-flex ms-auto btn-list'>
-            <RefreshIcon @click='fetchExports' class='cursor-pointer'/>
+            <IconRefresh @click='fetchExports' class='cursor-pointer' size='32'/>
         </div>
     </div>
     <TablerLoading v-if='loading' desc='Loading Exports'/>
@@ -42,8 +42,8 @@ import {
     TablerNone,
 } from '@tak-ps/vue-tabler';
 import {
-    RefreshIcon
-} from 'vue-tabler-icons';
+    IconRefresh
+} from '@tabler/icons-vue';
 
 export default {
     name: 'CardExports',
@@ -102,7 +102,7 @@ export default {
         }
     },
     components: {
-        RefreshIcon,
+        IconRefresh,
         TableFooter,
         TablerLoading,
         TablerNone,

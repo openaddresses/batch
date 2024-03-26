@@ -20,8 +20,8 @@
                             <h3 class='card-title'>Jobs</h3>
 
                             <div class='ms-auto btn-list'>
-                                <SearchIcon @click='showFilter = !showFilter' class='cursor-pointer'/>
-                                <RefreshIcon @click='fetchJobs' class='cursor-pointer'/>
+                                <IconSearch @click='showFilter = !showFilter' class='cursor-pointer' size='32'/>
+                                <IconRefresh @click='fetchJobs' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
                         <template v-if='showFilter'>
@@ -64,10 +64,10 @@
                                         <div v-on:click.stop.prevent='' class='btn-list'>
                                             <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
                                             <span v-on:click.stop.prevent='external(job.source)'>
-                                                <BrandGithubIcon class='cursor-pointer'/>
+                                                <IconBrandGithub class='cursor-pointer' size='32'/>
                                             </span>
                                             <span v-on:click.stop.prevent='$router.push(`/job/${job.id}/log`)' v-if='job.loglink'>
-                                                <NotesIcon class='cursor-pointer'/>
+                                                <IconNotes class='cursor-pointer' size='32'/>
                                             </span>
                                         </div>
                                     </td>
@@ -85,11 +85,11 @@
 
 <script>
 import {
-    SearchIcon,
-    BrandGithubIcon,
-    RefreshIcon,
-    NotesIcon
-} from 'vue-tabler-icons'
+    IconSearch,
+    IconBrandGithub,
+    IconRefresh,
+    IconNotes
+} from '@tabler/icons-vue'
 import LayerIcon from './util/LayerIcon.vue';
 import Status from './util/Status.vue';
 import Download from './util/Download.vue';
@@ -168,12 +168,12 @@ export default {
         }
     },
     components: {
-        SearchIcon,
+        IconSearch,
+        IconBrandGithub,
+        IconRefresh,
+        IconNotes,
         Download,
-        RefreshIcon,
         Status,
-        BrandGithubIcon,
-        NotesIcon,
         TablerLoading,
         TablerBreadCrumb,
         TableFooter,

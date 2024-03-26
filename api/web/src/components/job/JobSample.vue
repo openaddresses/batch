@@ -6,7 +6,7 @@
     <template v-else>
         <div class='border rounded'>
             <div class='d-flex justify-content-center my-4'>
-                <InfoCircleIcon size='40'/>
+                <IconInfoCircle size='40'/>
             </div>
 
             <div class='text-center'>
@@ -49,8 +49,8 @@
 
 <script>
 import {
-    InfoCircleIcon
-} from 'vue-tabler-icons';
+    IconInfoCircle
+} from '@tabler/icons-vue';
 import {
     TablerLoading,
     TablerNone
@@ -94,7 +94,7 @@ export default {
     components: {
         TablerLoading,
         TablerNone,
-        InfoCircleIcon
+        IconInfoCircle
     }
 }
 </script>

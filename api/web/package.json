@@ -22,8 +22,7 @@
         "sass-loader": "^14.1.0",
         "vue": "^3.2.31",
         "vue-chartjs": "^5.2.0",
-        "vue-router": "^4.0.14",
-        "vue-tabler-icons": "2.21.0"
+        "vue-router": "^4.0.14"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^5.0.0",

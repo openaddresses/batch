@@ -8,19 +8,19 @@
                     "color-gray": !filter.layers.buildings,
                     "color-blue": filter.layers.buildings
                 }'>
-                    <BuildingCommunityIcon width="24" height="24"/>
+                    <IconBuildingCommunity size='24'/>
                 </button>
                 <button @click='filter.layers.addresses = !filter.layers.addresses' class='btn btn--stroke btn--s mx3 round' :class='{
                     "color-gray": !filter.layers.addresses,
                     "color-blue": filter.layers.addresses
                 }'>
-                    <MapPinIcon width="24" height="24"/>
+                    <IconMapPin size='24'/>
                 </button>
                 <button @click='filter.layers.parcels = !filter.layers.parcels' class='btn btn--stroke btn--s mx3 round' :class='{
                     "color-gray": !filter.layers.parcels,
                     "color-blue": filter.layers.parcels
                 }'>
-                    <ShapeIcon width="24" height="24"/>
+                    <IconShape size='24'/>
                 </button>
             </div>
 
@@ -30,10 +30,10 @@
 
 <script>
 import {
-    ShapeIcon,
-    MapPinIcon,
-    BuildingCommunityIcon
-} from 'vue-tabler-icons';
+    IconShape,
+    IconMapPin,
+    IconBuildingCommunity
+} from '@tabler/icons-vue';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -156,9 +156,9 @@ export default {
         }
     },
     components: {
-        ShapeIcon,
-        MapPinIcon,
-        BuildingCommunityIcon
+        IconShape,
+        IconMapPin,
+        IconBuildingCommunity
     }
 }
 </script>

@@ -3,7 +3,7 @@
     <button type="button" class="btn-close" @click='close' aria-label="Close"></button>
     <div class="modal-status bg-yellow"></div>
     <div class="modal-body text-center py-4">
-        <UserExclamationIcon size='60'/>
+        <IconUserExclamation size='60'/>
         <h3>Login Required</h3>
 
         <p class='my6'>
@@ -28,13 +28,13 @@ import {
     TablerModal 
 } from '@tak-ps/vue-tabler';
 import {
-    UserExclamationIcon
-} from 'vue-tabler-icons';
+    IconUserExclamation
+} from '@tabler/icons-vue';
 
 export default {
     name: 'MustLogin',
     components: {
-        UserExclamationIcon,
+        IconUserExclamation,
         TablerModal
     }
 }

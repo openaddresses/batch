@@ -31,14 +31,14 @@
                             <div class='ms-auto btn-list'>
                                 <TablerDropdown>
                                     <slot>
-                                        <DotsVerticalIcon class='cursor-pointer'/>
+                                        <IconDotsVertical class='cursor-pointer' size='32'/>
                                     </slot>
                                     <template #dropdown>
                                         <div @click='createRerun' class='mx-2 my-2'>Rerun</div>
                                     </template>
                                 </TablerDropdown>
 
-                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                                <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
                         <div class='card-body'>
@@ -56,7 +56,7 @@
                                 <template v-else-if='exp.status === "Success"'>
                                     <div class='d-flex justify-content-center mb-3'>
                                         <button @click='datapls' class='btn btn-primary'>
-                                            <ArrowDownIcon/> Download&nbsp;
+                                            <IconArrowDown size='32'/> Download&nbsp;
                                             <span v-text='exp.format'/>
                                         </button>
                                     </div>
@@ -81,10 +81,10 @@ import Log from './util/Log.vue';
 import Status from './util/Status.vue';
 import LayerIcon from './util/LayerIcon.vue';
 import {
-    ArrowDownIcon,
-    RefreshIcon,
-    DotsVerticalIcon,
-} from 'vue-tabler-icons';
+    IconArrowDown,
+    IconRefresh,
+    IconDotsVertical,
+} from '@tabler/icons-vue';
 import {
     TablerLoading,
     TablerDropdown,
@@ -162,9 +162,9 @@ export default {
         }
     },
     components: {
-        ArrowDownIcon,
-        RefreshIcon,
-        DotsVerticalIcon,
+        IconArrowDown,
+        IconRefresh,
+        IconDotsVertical,
         TablerLoading,
         TablerDropdown,
         TablerBreadCrumb,

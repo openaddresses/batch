@@ -4,8 +4,8 @@
         <h2 class='card-title'>Collections</h2>
 
         <div class='ms-auto btn-list'>
-            <PlusIcon @click='collections.splice(0, 0, {})' class='cursor-pointer'/>
-            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+            <IconPlus @click='collections.splice(0, 0, {})' class='cursor-pointer' size='32'/>
+            <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
         </div>
     </div>
 
@@ -32,9 +32,9 @@
 <script>
 import Collection from './Collection.vue';
 import {
-    PlusIcon,
-    RefreshIcon,
-} from 'vue-tabler-icons';
+    IconPlus,
+    IconRefresh,
+} from '@tabler/icons-vue';
 
 import {
     TablerLoading
@@ -74,8 +74,8 @@ export default {
     },
     components: {
         TablerLoading,
-        PlusIcon,
-        RefreshIcon,
+        IconPlus,
+        IconRefresh,
         Collection
     }
 }

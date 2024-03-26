@@ -52,14 +52,14 @@
 
                             <div class='ms-auto btn-list'>
                                 <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-                                <LicenseIcon v-if='job.license' class='cursor-pointer'/>
-                                <CodeIcon @click='$router.push({ path: `/job/${$route.params.jobid}/raw` })' class='cursor-pointer'/>
-                                <NotesIcon @click='$router.push({ path: `/job/${$route.params.jobid}/log` })' v-if='job.loglink' class='cursor-pointer'/>
-                                <RefreshIcon @click='refresh' class='cursor-pointer'/>
+                                <IconLicense v-if='job.license' class='cursor-pointer' size='32'/>
+                                <IconCode @click='$router.push({ path: `/job/${$route.params.jobid}/raw` })' class='cursor-pointer' size='32'/>
+                                <IconNotes @click='$router.push({ path: `/job/${$route.params.jobid}/log` })' v-if='job.loglink' class='cursor-pointer' size='32'/>
+                                <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
 
                                 <div class='dropdown'>
                                     <div type="button" id="jobAdmin" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <DotsVerticalIcon class='cursor-pointer'/>
+                                        <IconDotsVertical class='cursor-pointer' size='32'/>
                                     </div>
                                     <ul class="dropdown-menu" aria-labelledby='jobAdmin'>
                                         <a @click='createRerun' class="dropdown-item cursor-pointer">Create ReRun</a>
@@ -117,12 +117,12 @@
 import Log from './util/Log.vue';
 import LayerIcon from './util/LayerIcon.vue';
 import {
-    LicenseIcon,
-    CodeIcon,
-    NotesIcon,
-    RefreshIcon,
-    DotsVerticalIcon,
-} from 'vue-tabler-icons'
+    IconLicense,
+    IconCode,
+    IconNotes,
+    IconRefresh,
+    IconDotsVertical,
+} from '@tabler/icons-vue'
 import {
     TablerBreadCrumb,
     TablerLoading,
@@ -232,11 +232,11 @@ export default {
         TablerLoading,
         ErrorsModerate,
         Status,
-        LicenseIcon,
-        CodeIcon,
-        NotesIcon,
-        RefreshIcon,
-        DotsVerticalIcon,
+        IconLicense,
+        IconCode,
+        IconNotes,
+        IconRefresh,
+        IconDotsVertical,
         LayerIcon
     },
 }

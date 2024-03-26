@@ -19,12 +19,12 @@
                                 <TablerLoading v-if='loading.cache' :inline='true' desc='Reset Cache'/>
                                 <TablerLoading v-if='loading.fabric' :inline='true' desc='Refresh Fabric'/>
 
-                                <span v-if='done.cache' @click='done.cache = false' class='cursor-pointer'><CheckIcon/>Cache Cleared</span>
-                                <span v-if='done.collections' @click='done.cache = false' class='cursor-pointer'><CheckIcon/>Collection Refresh Submitted</span>
-                                <span v-if='done.fabric' @click='done.cache = false' class='cursor-pointer'><CheckIcon/>Fabric Refresh Submitted</span>
+                                <span v-if='done.cache' @click='done.cache = false' class='cursor-pointer'><IconCheck size='32'/>Cache Cleared</span>
+                                <span v-if='done.collections' @click='done.cache = false' class='cursor-pointer'><IconCheck size='32'/>Collection Refresh Submitted</span>
+                                <span v-if='done.fabric' @click='done.cache = false' class='cursor-pointer'><IconCheck size='32'/>Fabric Refresh Submitted</span>
 
                                 <TablerDropdown>
-                                    <slot><SettingsIcon class='cursor-pointer mx-3'/></slot>
+                                    <slot><IconSettings class='cursor-pointer mx-3' size='32'/></slot>
                                     <template #dropdown>
                                         <div @click='fabric' class='cursor-pointer text-center my-2'>Refresh Fabric</div>
                                         <div @click='clear' class='cursor-pointer text-center my-2'>Clear Cache</div>
@@ -49,9 +49,9 @@
 
 <script>
 import {
-    SettingsIcon,
-    CheckIcon,
-} from 'vue-tabler-icons';
+    IconSettings,
+    IconCheck,
+} from '@tabler/icons-vue';
 
 import {
     TablerLoading,
@@ -128,11 +128,11 @@ export default {
         }
     },
     components: {
-        SettingsIcon,
+        IconSettings,
         TablerBreadCrumb,
         TablerLoading,
         TablerDropdown,
-        CheckIcon,
+        IconCheck,
     }
 }
 </script>

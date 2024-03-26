@@ -5,9 +5,9 @@
                 <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='$route.params.jobid'/></h2>
 
                 <div class='ms-auto btn-list'>
-                    <RefreshIcon @click='refresh' class='cursor-pointer'/>
-                    <BrandGithubIcon @click='external(job.source)' class='cursor-pointer'/>
-                    <LinkIcon v-if='job.source' @click='external(raw.data)'/>
+                    <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
+                    <IconBrandGithub @click='external(job.source)' class='cursor-pointer' size='32'/>
+                    <IconLink v-if='job.source' @click='external(raw.data)' size='32'/>
                 </div>
             </div>
         </div>
@@ -26,10 +26,10 @@
 
 <script>
 import {
-    RefreshIcon,
-    BrandGithubIcon,
-    LinkIcon
-} from 'vue-tabler-icons';
+    IconRefresh,
+    IconBrandGithub,
+    IconLink
+} from '@tabler/icons-vue';
 
 export default {
     name: 'JobRaw',
@@ -85,9 +85,9 @@ export default {
         },
     },
     components: {
-        RefreshIcon,
-        BrandGithubIcon,
-        LinkIcon
+        IconRefresh,
+        IconBrandGithub,
+        IconLink
     }
 }
 </script>

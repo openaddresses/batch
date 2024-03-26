@@ -3,8 +3,8 @@
     <div class='card-header'>
         <h3 class='card-title'>API Tokens:</h3>
         <div class='d-flex ms-auto btn-list'>
-            <PlusIcon @click='newToken.show = true' class='cursor-pointer'/>
-            <RefreshIcon @click='refresh' class='cursor-pointer'/>
+            <IconPlus @click='newToken.show = true' class='cursor-pointer' size='32'/>
+            <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
         </div>
     </div>
     <TablerLoading v-if='loading' desc='Loading Tokens'/>
@@ -15,14 +15,14 @@
                 <div class='col-12 row border rounded'>
                     <div class='col-12'>
                         <h2 class='subheader'>Create New Token</h2>
-                        <XIcon @click='newToken.show = false' class='cursor-pointer'/>
+                        <IconX @click='newToken.show = false' class='cursor-pointer' size='32'/>
                     </div>
 
                     <div class='col-10'>
                         <TablerInput label='Token Name' v-model='newToken.name' type='text' placeholder='Token Name'/>
                     </div>
                     <div class='col-2'>
-                        <CheckIcon @click='setToken' class='cursor-pointer'/>
+                        <IconCheck @click='setToken' class='cursor-pointer' size='32'/>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
         <template v-if='newToken.show && newToken.token'>
             <div class='col-12'>
                 <h2 class='txt-bold fl' v-text='newToken.name'></h2>
-                <XIcon @click='newToken.show = false' class='cursor-pointer'/>
+                <IconX @click='newToken.show = false' class='cursor-pointer' size='32'/>
             </div>
 
             <div class='col-12'>
@@ -51,7 +51,7 @@
                         <td>
                             <div class='d-flex'>
                                 <div class='ms-auto'>
-                                    <TrashIcon @click='deleteToken(token.id)' class='cursor-pointer'/>
+                                    <IconTrash @click='deleteToken(token.id)' class='cursor-pointer' size='32'/>
                                 </div>
                             </div>
                         </td>
@@ -70,12 +70,12 @@ import {
     TablerNone
 } from '@tak-ps/vue-tabler';
 import {
-    XIcon,
-    PlusIcon,
-    TrashIcon,
-    RefreshIcon,
-    CheckIcon
-} from 'vue-tabler-icons';
+    IconX,
+    IconPlus,
+    IconTrash,
+    IconRefresh,
+    IconCheck
+} from '@tabler/icons-vue';
 
 export default {
     name: 'Tokens',
@@ -148,12 +148,12 @@ export default {
         }
     },
     components: {
-        PlusIcon,
-        XIcon,
-        TrashIcon,
-        RefreshIcon,
+        IconX,
+        IconPlus,
+        IconTrash,
+        IconRefresh,
+        IconCheck,
         TablerInput,
-        CheckIcon,
         TablerNone,
         TablerLoading
     }

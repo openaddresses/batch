@@ -4,12 +4,12 @@
         <h2 class='card-title'>Level Overrides</h2>
 
         <div class='ms-auto btn-list'>
-            <SearchIcon @click='showFilter = true' v-if='!showFilter' class='cursor-pointer'/>
-            <XIcon @click='showFilter = false' v-else class='cursor-pointer'/>
+            <IconSearch @click='showFilter = true' v-if='!showFilter' class='cursor-pointer' size='32'/>
+            <IconX @click='showFilter = false' v-else class='cursor-pointer' size='32'/>
 
-            <PlusIcon @click='addLevel' :disabled='add' class='cursor-pointer'/>
+            <IconPlus @click='addLevel' :disabled='add' class='cursor-pointer' size='32'/>
 
-            <RefreshIcon @click='getLevels' class='cursor-pointer'/>
+            <IconRefresh @click='getLevels' class='cursor-pointer' size='32'/>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
                         <td>
                             <div class='d-flex'>
                                 <div class='ms-auto btn-list'>
-                                    <TrashIcon @click='deleteLevel(level)' class='cursor-pointer'/>
+                                    <IconTrash @click='deleteLevel(level)' class='cursor-pointer' size='32'/>
                                 </div>
                             </div>
                         </td>
@@ -95,12 +95,12 @@
 <script>
 import TableFooter from '../../util/TableFooter.vue';
 import {
-    SearchIcon,
-    PlusIcon,
-    RefreshIcon,
-    TrashIcon,
-    XIcon
-} from 'vue-tabler-icons';
+    IconSearch,
+    IconPlus,
+    IconRefresh,
+    IconTrash,
+    IconX
+} from '@tabler/icons-vue';
 
 import {
     TablerInput,
@@ -192,16 +192,16 @@ export default {
         },
     },
     components: {
-        PlusIcon,
-        SearchIcon,
-        RefreshIcon,
-        TrashIcon,
+        IconSearch,
+        IconPlus,
+        IconRefresh,
+        IconTrash,
+        IconX,
         TablerNone,
         TablerInput,
         TablerEnum,
         TablerLoading,
         TableFooter,
-        XIcon,
     }
 }
 </script>

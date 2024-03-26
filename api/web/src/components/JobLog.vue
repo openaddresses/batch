@@ -29,7 +29,7 @@
                             </div>
 
                             <div class='ms-auto btn-list'>
-                                <RefreshIcon @click='getJob' class='cursor-pointer'/>
+                                <IconRefresh @click='getJob' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
                         <TablerLoading v-if='loading'/>
@@ -46,8 +46,8 @@
 import Log from './util/Log.vue'
 import Status from './util/Status.vue'
 import {
-    RefreshIcon
-} from 'vue-tabler-icons';
+    IconRefresh
+} from '@tabler/icons-vue';
 import {
     TablerBreadCrumb,
     TablerLoading
@@ -76,7 +76,7 @@ export default {
         },
     },
     components: {
-        RefreshIcon,
+        IconRefresh,
         TablerLoading,
         TablerBreadCrumb,
         Status,

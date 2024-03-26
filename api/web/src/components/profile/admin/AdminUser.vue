@@ -4,10 +4,10 @@
         <h2 class='card-title'>Users</h2>
 
         <div class='d-flex ms-auto btn-list'>
-            <SearchIcon v-if='!showFilter' @click='showFilter = true' class='cursor-pointer'/>
-            <XIcon v-else @click='showFilter = false' class='cursor-pointer'/>
+            <IconSearch v-if='!showFilter' @click='showFilter = true' class='cursor-pointer' size='32'/>
+            <IconX v-else @click='showFilter = false' class='cursor-pointer' size='32'/>
 
-            <RefreshIcon @click='getUsers' class='cursor-pointer'/>
+            <IconRefresh @click='getUsers' class='cursor-pointer' size='32'/>
         </div>
     </div>
 
@@ -70,7 +70,7 @@
                                 <div class='col-12 d-flex'>
                                     <h3 class='subheader'>User Settings</h3>
                                     <div class='ms-auto'>
-                                        <RefreshIcon @click='getUser(user)' class='cursor-pointer'/>
+                                        <IconRefresh @click='getUser(user)' class='cursor-pointer' size='32'/>
                                     </div>
                                 </div>
                                <div class='col-12' >
@@ -108,10 +108,10 @@ import {
 } from '@tak-ps/vue-tabler';
 
 import {
-    RefreshIcon,
-    SearchIcon,
-    XIcon,
-} from 'vue-tabler-icons';
+    IconRefresh,
+    IconSearch,
+    IconX,
+} from '@tabler/icons-vue';
 
 export default {
     name: 'AdminUser',
@@ -224,9 +224,9 @@ export default {
         TablerToggle,
         TablerEnum,
         TablerInput,
-        RefreshIcon,
-        SearchIcon,
-        XIcon,
+        IconRefresh,
+        IconSearch,
+        IconX,
     }
 }
 </script>

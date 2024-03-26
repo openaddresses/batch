@@ -20,8 +20,8 @@
                             <h3 class='card-title'>Job Errors</h3>
 
                             <div class='ms-auto btn-list'>
-                                <SearchIcon @click='showFilter = !showFilter' class='cursor-pointer'/>
-                                <RefreshIcon @click='fetchProblems' class='cursor-pointer'/>
+                                <IconSearch @click='showFilter = !showFilter' class='cursor-pointer' size='32'/>
+                                <IconRefresh @click='fetchProblems' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
                         <template v-if='showFilter'>
@@ -85,9 +85,9 @@
 
 <script>
 import {
-    RefreshIcon,
-    SearchIcon
-} from 'vue-tabler-icons';
+    IconRefresh,
+    IconSearch
+} from '@tabler/icons-vue';
 import Status from './util/Status.vue';
 import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
@@ -164,8 +164,8 @@ export default {
         }
     },
     components: {
-        SearchIcon,
-        RefreshIcon,
+        IconSearch,
+        IconRefresh,
         Status,
         QueryStatus,
         QuerySource,

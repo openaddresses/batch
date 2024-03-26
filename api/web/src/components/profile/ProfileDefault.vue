@@ -27,7 +27,7 @@
                 <h3 class='card-title'>Contribution</h3>
 
                 <div class='d-flex ms-auto'>
-                    <RefreshIcon @click='$emit("refresh")' class='cursor-pointer'/>'
+                    <IconRefresh @click='$emit("refresh")' class='cursor-pointer' size='32'/>'
                 </div>
             </div>
             <div class='card-body row'>
@@ -54,43 +54,43 @@
                         "cursor-pointer": profile.level !== "basic",
                         "border border--gray-light": profile.level === "basic",
                     }'>
-                        <UserIcon class='w-100 text-center my-2' width='36' height='36'/>
+                        <IconUser class='w-100 text-center my-2' size='36'/>
 
                         <div class='text-center'>Basic</div>
                         <div class='text-center txt-s'>No Cost</div>
 
                         <div class='col-12 pt-2'>
-                            <CircleCheckIcon v-if='profile.level === "basic"' class='w-100 text-center'/>
-                            <CircleIcon v-else-if='hover === "basic"' class='w-100 text-center'/>
-                            <CircleDottedIcon v-else class='w-full text-center'/>
+                            <IconCircleCheck v-if='profile.level === "basic"' class='w-100 text-center' size='32'/>
+                            <IconCircle v-else-if='hover === "basic"' class='w-100 text-center' size='32'/>
+                            <IconCircleDotted v-else class='w-full text-center' size='32'/>
                         </div>
                     </div>
                     <div @click='oc("backer")' class='col-4 rounded py-2 my-2' @mouseover="hover = 'backer'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "backer",
                         "border border--gray-light": profile.level === "backer",
                     }'>
-                        <CoinIcon class='w-full text-center my-2' width="36" height="36"/>
+                        <IconCoin class='w-full text-center my-2' size='36'/>
                         <div class='text-center'>Backer</div>
                         <div class='text-center txt-s'>&gt;= $5</div>
 
                         <div class='col col--12 pt12'>
-                            <CircleCheckIcon v-if='profile.level === "backer"' class='w-full text-center' width="18" height="18"/>
-                            <CircleIcon v-else-if='hover === "backer"' class='w-full text-center' width="18" height="18"/>
-                            <CircleDottedIcon v-else class='w-full text-center' width="18" height="18"/>
+                            <IconCircleCheck v-if='profile.level === "backer"' class='w-full text-center' size='18'/>
+                            <IconCircle v-else-if='hover === "backer"' class='w-full text-center' size='18'/>
+                            <IconCircleDotted v-else class='w-full text-center' size='18'/>
                         </div>
                     </div>
                     <div @click='oc("sponsor")' class='col-4 rounded py-2 my-2' @mouseover="hover = 'sponsor'" @mouseleave="hover = false" :class='{
                         "cursor-pointer": profile.level !== "sponsor",
                         "border border--gray-light": profile.level === "sponsor",
                     }'>
-                        <TrophyIcon class='w-100 text-center my-2' width="36" height="36"/>
+                        <IconTrophy class='w-100 text-center my-2' size='36'/>
                         <div class='text-center'>Sponsor</div>
                         <div class='text-center txt-s'>&gt;= $100</div>
 
                         <div class='col col--12 pt12'>
-                            <CircleCheckIcon v-if='profile.level === "sponsor"' class='w-full text-center' width="18" height="18"/>
-                            <CircleIcon v-else-if='hover === "sponsor"' class='w-full text-center' width="18" height="18"/>
-                            <CircleDottedIcon v-else class='w-full text-center' width="18" height="18"/>
+                            <IconCircleCheck v-if='profile.level === "sponsor"' class='w-full text-center' size='18'/>
+                            <IconCircle v-else-if='hover === "sponsor"' class='w-full text-center' size='18'/>
+                            <IconCircleDotted v-else class='w-full text-center' size='18'/>
                         </div>
                     </div>
 
@@ -143,14 +143,14 @@ import {
 } from '@tak-ps/vue-tabler';
 
 import {
-    UserIcon,
-    CoinIcon,
-    RefreshIcon,
-    TrophyIcon,
-    CircleCheckIcon,
-    CircleDottedIcon,
-    CircleIcon
-} from 'vue-tabler-icons';
+    IconUser,
+    IconCoin,
+    IconRefresh,
+    IconTrophy,
+    IconCircleCheck,
+    IconCircleDotted,
+    IconCircle
+} from '@tabler/icons-vue';
 import Tokens from './Tokens.vue'
 import Exports from '../cards/Exports.vue'
 
@@ -193,13 +193,13 @@ export default {
     components: {
         Tokens,
         Exports,
-        UserIcon,
-        CoinIcon,
-        RefreshIcon,
-        TrophyIcon,
-        CircleCheckIcon,
-        CircleDottedIcon,
-        CircleIcon,
+        IconUser,
+        IconCoin,
+        IconRefresh,
+        IconTrophy,
+        IconCircleCheck,
+        IconCircleDotted,
+        IconCircle,
         TablerInput
     }
 }

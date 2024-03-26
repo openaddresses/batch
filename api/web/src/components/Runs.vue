@@ -20,7 +20,7 @@
                             <h3 class='card-title'>Source Runs</h3>
 
                             <div class='ms-auto btn-list'>
-                                <RefreshIcon @click='fetchRuns' class='cursor-pointer'/>
+                                <IconRefresh @click='fetchRuns' class='cursor-pointer' size='32'/>
                             </div>
                         </div>
 
@@ -64,8 +64,8 @@ import Status from './util/Status.vue';
 import moment from 'moment-timezone';
 import TableFooter from './util/TableFooter.vue';
 import {
-    RefreshIcon
-} from 'vue-tabler-icons';
+    IconRefresh
+} from '@tabler/icons-vue';
 import {
     TablerLoading,
     TablerBreadCrumb
@@ -127,7 +127,7 @@ export default {
     },
     components: {
         Status,
-        RefreshIcon,
+        IconRefresh,
         TableFooter,
         TablerLoading,
         TablerBreadCrumb,

@@ -13,15 +13,15 @@
             <div class='ms-auto'>
                 <div class='btn-list'>
                     <a href="/docs" class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <HelpIcon/>
+                        <IconHelp size='32'/>
                     </a>
                     <a v-if='false' href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <MapIcon/>
+                        <IconMap size='32'/>
                     </a>
 
                     <div class='dropdown'>
                         <div type="button" id="userProfileButton" data-bs-toggle="dropdown" aria-expanded="false" class='btn btn-dark'>
-                            <MenuIcon/>
+                            <IconMenu size='32'/>
                         </div>
                         <ul class="dropdown-menu" aria-labelledby='userProfileButton'>
                             <a @click='$router.push("/run")' class="dropdown-item cursor-pointer">Runs</a>
@@ -34,7 +34,7 @@
                     <a class="btn btn-dark" target="_blank" rel="noreferrer">
                         <div v-if='auth.username' class='dropdown'>
                             <div type='button' id="userProfileButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <UserIcon/>
+                                <IconUser size='32'/>
                             </div>
                             <ul class="dropdown-menu" aria-labelledby='userProfileButton'>
                                 <a @click='$router.push("/profile")' class="cursor-pointer dropdown-item">Profile</a>
@@ -48,7 +48,7 @@
                         </div>
 
 
-                        <LoginIcon @click='$router.push("/login")' v-else/>
+                        <IconLogin @click='$router.push("/login")' v-else size='32'/>
                     </a>
                 </div>
             </div>
@@ -69,12 +69,12 @@ import '@tabler/core/dist/js/tabler.min.js';
 import '@tabler/core/dist/css/tabler.min.css';
 import Err from '../components/Err.vue'
 import {
-    HelpIcon,
-    MenuIcon,
-    UserIcon,
-    LoginIcon,
-    MapIcon
-} from 'vue-tabler-icons'
+    IconHelp,
+    IconMenu,
+    IconUser,
+    IconLogin,
+    IconMap
+} from '@tabler/icons-vue'
 import {
     TablerError
 } from '@tak-ps/vue-tabler';
@@ -154,11 +154,11 @@ export default {
     },
     components: {
         Err,
-        UserIcon,
-        MenuIcon,
-        LoginIcon,
-        MapIcon,
-        HelpIcon,
+        IconHelp,
+        IconMenu,
+        IconUser,
+        IconLogin,
+        IconMap,
         TablerError
     }
 }

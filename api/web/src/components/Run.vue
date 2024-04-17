@@ -27,7 +27,7 @@
 
                             <div class='ms-auto btn-list'>
                                 <span v-if='run.live' class="badge bg-green text-white" style='height: 20px;'>Live</span>
-                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' style='height: 20px;' class="badge bg-blue text-white">Github</span>
+                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' style='height: 20px;' class="badge bg-blue text-white cursor-pointer">Github</span>
                                 <IconRefresh @click='fetchRun' class='cursor-pointer' size='32'/>
                             </div>
                         </div>

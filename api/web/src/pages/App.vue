@@ -12,7 +12,7 @@
 
             <div class='ms-auto'>
                 <div class='btn-list'>
-                    <a href="/docs" class="btn btn-dark" target="_blank" rel="noreferrer">
+                    <a href="/docs/" class="btn btn-dark" target="_blank" rel="noreferrer">
                         <IconHelp size='32'/>
                     </a>
                     <a v-if='false' href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">

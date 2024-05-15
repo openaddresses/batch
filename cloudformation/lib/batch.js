@@ -21,6 +21,10 @@ export default {
                             Action: ['s3:PutObject', 's3:GetObject'],
                             Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
                         },{
+                            Effect: 'Allow',
+                            Action: ['s3:GetObject'],
+                            Resource: [cf.join(['arn:aws:s3:::data.openaddresses.io/*'])]
+                        },{
                             Effect: 'Allow' ,
                             Action: ['batch:DescribeJobs'],
                             Resource: ['*']

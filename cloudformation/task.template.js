@@ -13,6 +13,37 @@ export default {
                 State: 'ENABLED'
             }
         },
+        BatchLargeComputeEnvironment: {
+            Type: 'AWS::Batch::ComputeEnvironment',
+            Properties: {
+                Type: 'MANAGED',
+                ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
+                ComputeEnvironmentName: 'large',
+                ComputeResources: {
+                    ImageId: 'ami-0914ebfbccd143a3f',
+                    MaxvCpus: 16,
+                    DesiredvCpus: 0,
+                    MinvCpus: 0,
+                    SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    LaunchTemplate: {
+                        LaunchTemplateId: cf.ref('BatchLargeLaunchTemplate'),
+                        Version: cf.getAtt('BatchLargeLaunchTemplate', 'LatestVersionNumber')
+                    },
+                    Subnets:  [
+                        'subnet-de35c1f5',
+                        'subnet-e67dc7ea',
+                        'subnet-38b72502',
+                        'subnet-76ae3713',
+                        'subnet-35d87242',
+                        'subnet-b978ade0'
+                    ],
+                    Type : 'EC2',
+                    InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
+                    InstanceTypes : ['m5.large', 'c5.large']
+                },
+                State: 'ENABLED'
+            }
+        },
         BatchMegaComputeEnvironment: {
             Type: 'AWS::Batch::ComputeEnvironment',
             Properties: {
@@ -66,6 +97,22 @@ export default {
             Properties: {
                 Roles: [cf.ref('BatchInstanceRole')],
                 Path: '/'
+            }
+        },
+        BatchLargeLaunchTemplate: {
+            Type: 'AWS::EC2::LaunchTemplate',
+            Properties: {
+                LaunchTemplateData: {
+                    BlockDeviceMappings: [{
+                        DeviceName: '/dev/xvda',
+                        Ebs: {
+                            Encrypted: true,
+                            VolumeSize: 100,
+                            VolumeType: 'gp3'
+                        }
+                    }]
+                },
+                LaunchTemplateName: 'large'
             }
         },
         BatchMegaLaunchTemplate: {
@@ -161,6 +208,13 @@ export default {
                 Name: 't3-queue'
             }
         },
+        LargeQueue: {
+            Description: 'Large Queue',
+            Value: cf.ref('BatchLargeJobQueue'),
+            Export: {
+                Name: 'large-queue'
+            }
+        }
         MegaQueue: {
             Description: 'Mega Queue',
             Value: cf.ref('BatchMegaJobQueue'),

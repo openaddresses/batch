@@ -214,7 +214,7 @@ export default {
             Export: {
                 Name: 'large-queue'
             }
-        }
+        },
         MegaQueue: {
             Description: 'Mega Queue',
             Value: cf.ref('BatchMegaJobQueue'),

@@ -156,6 +156,18 @@ export default {
                 Path: '/service-role/'
             }
         },
+        BatchLargeJobQueue: {
+            Type: 'AWS::Batch::JobQueue',
+            Properties: {
+                ComputeEnvironmentOrder: [{
+                    Order: 1,
+                    ComputeEnvironment: cf.ref('BatchLargeComputeEnvironment')
+                }],
+                State: 'ENABLED',
+                Priority: 1,
+                JobQueueName: 'large'
+            }
+        },
         BatchJobQueue: {
             Type: 'AWS::Batch::JobQueue',
             Properties: {

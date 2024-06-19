@@ -112,6 +112,7 @@ export default {
                 const opts = {
                     container: this.$refs.map,
                     hash: "map",
+                    attributionControl: false,
                     style: {
                         version: 8,
                         sources: {
@@ -153,6 +154,9 @@ export default {
 
                 const tmpmap = new mapgl.Map(opts);
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
+                tmpmap.addControl(new mapgl.AttributionControl({
+                  customAttribution: '© <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> | © <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a> Contributors'
+                }));
                 tmpmap.once('idle', () => {
                     map = tmpmap;
                     if (this.bbox) map.fitBounds(this.bbox);

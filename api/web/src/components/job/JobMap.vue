@@ -36,6 +36,7 @@ export default {
                     container: this.$refs.map,
                     hash: "map",
                     zoom: 1,
+                    attributionControl: false,
                     bounds: [
                         bounds[0][0][0],
                         bounds[0][0][1],
@@ -71,6 +72,9 @@ export default {
                 });
 
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
+                tmpmap.addControl(new mapgl.AttributionControl({
+                    customAttribution: '© <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> | © <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a> Contributors'
+                }));
 
                 tmpmap.once('load', () => {
                     map = tmpmap;

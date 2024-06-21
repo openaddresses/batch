@@ -71,10 +71,10 @@ export default {
 
                 });
 
-                tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
                 tmpmap.addControl(new mapgl.AttributionControl({
                     customAttribution: '© <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> | © <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a> Contributors'
                 }));
+                tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
 
                 tmpmap.once('load', () => {
                     map = tmpmap;

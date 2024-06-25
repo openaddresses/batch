@@ -142,11 +142,11 @@ export default async function router(schema, config) {
         group: 'Job',
         auth: 'user',
         description: `
-            Sponsors of our project recieve access to validated data as a way of saying thanks for
+            Sponsors of our project receive access to validated data as a way of saying thanks for
             keeping our project alive.
 
             Note: the user must be authenticated to perform a download. One of our largest costs is
-            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+            S3 egress, authenticated downloads allow us to prevent abuse, keep the project running, and the data free.
 
             Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
             to a requester pays object on S3. For those that are able, this is the best way to download data.
@@ -175,7 +175,7 @@ export default async function router(schema, config) {
         auth: 'user',
         description: `
             Note: the user must be authenticated to perform a download. One of our largest costs is
-            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data free.
 
             Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
             to a requester pays object on S3. For those that are able, this is the best way to download data.
@@ -223,7 +223,7 @@ export default async function router(schema, config) {
         auth: 'user',
         description: `
             Note: the user must be authenticated to perform a download. One of our largest costs is
-            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data freetw
+            S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data free.
 
             Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return an "s3" property which links
             to a requester pays object on S3. For those that are able, this is the best way to download data.
@@ -249,7 +249,7 @@ export default async function router(schema, config) {
         description: `
             Return the batch-machine processing log for a given job
             Note: These are stored in AWS CloudWatch and *do* expire
-            The presence of a loglink on a job, does not guarentree log retention
+            The presence of a loglink on a job, does not guarantee log retention
         `,
         ':job': 'integer',
         query: 'req.query.SingleLog.json',

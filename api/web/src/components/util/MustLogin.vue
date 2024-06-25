@@ -13,7 +13,7 @@
         </p>
         <p class='my6'>
             Financial backers of the project can also export in CSV &amp; Shapefile, and sponsors
-            recieve access to our validated data as well as direct AWS S3 access.
+            receive access to our validated data as well as direct AWS S3 access.
         </p>
     </div>
     <div class="modal-footer">
@@ -25,7 +25,7 @@
 
 <script>
 import {
-    TablerModal 
+    TablerModal
 } from '@tak-ps/vue-tabler';
 import {
     IconUserExclamation

@@ -40,6 +40,7 @@ export default class Cacher {
 
             return cached;
         } catch (err) {
+            console.error(err);
             if (res) return res;
 
             const fresh = await miss();
@@ -100,6 +101,7 @@ export default class Cacher {
         try {
             await this.cache.flush();
         } catch (err) {
+            console.error(err);
             throw new Error('Failed to flush cache');
         }
     }

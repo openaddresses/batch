@@ -25,7 +25,7 @@ export default async function router(schema, config) {
         try {
             req.body = JSON.parse(req.body);
         } catch (err) {
-            res.status(400).send('Invalid JSON Body');
+            res.status(400).send(`Invalid JSON Body: ${String(err)}`);
         }
 
         try {

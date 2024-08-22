@@ -5,6 +5,8 @@ import assert from 'assert';
 
 import { globSync } from 'glob';
 import $RefParser from 'json-schema-ref-parser';
+
+// eslint-disable-next-line n/no-extraneous-import
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 

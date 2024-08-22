@@ -1,7 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import Job from './job.js';
 import Run from './run.js';
-import fs from 'fs';
 import { sql } from 'slonik';
 import { Status } from '../util.js';
 import Generic, { Params } from '@openaddresses/batch-generic';
@@ -59,14 +58,14 @@ export default class JobError extends Generic {
             throw new Err(500, err, 'Failed to list job_errors');
         }
 
-        return this.deserialize_list(pgres, 'errors')
+        return this.deserialize_list(pgres, 'errors');
     }
 
     serialize() {
         const json = super.serialize();
 
         if (this.message && !json.messages) {
-            json.messages = [ this.message ];
+            json.messages = [this.message];
             delete json.message;
         } else if (this.messages) {
             json.messages = this.messages;

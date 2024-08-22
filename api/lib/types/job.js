@@ -35,7 +35,7 @@ export default class Job extends Generic {
      * @param {String} [query.source=Null] - Filter results by source
      * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
      */
-    static async list(pool, query={}) {
+    static async list(pool, query = {}) {
         query.limit = Params.integer(query.limit, { default: 100 });
         query.page = Params.integer(query.page, { default: 0 });
         query.source = Params.string(query.source, { default: '' });
@@ -235,6 +235,7 @@ export default class Job extends Generic {
             try {
                 job.license = JSON.parse(job.license);
             } catch (err) {
+                console.error(err);
                 job.license = true;
             }
         }
@@ -289,8 +290,6 @@ export default class Job extends Generic {
     }
 
     static async generate(pool, job) {
-        let pgres;
-
         if (!job.output) {
             job.output = {
                 cache: false,

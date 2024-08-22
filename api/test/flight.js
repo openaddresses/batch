@@ -9,6 +9,7 @@ import KnexConfig from '../knexfile.js';
 import Config from '../lib/config.js';
 import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
+// eslint-disable-next-line n/no-extraneous-import
 import Ajv from 'ajv';
 import api from '../index.js';
 

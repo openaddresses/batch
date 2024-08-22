@@ -20,7 +20,7 @@ try {
 
     Object.assign(process.env, JSON.parse(String(fs.readFileSync(dotfile))));
 } catch (err) {
-    console.log('ok - no .env file loaded');
+    console.log(`ok - no .env file loaded: ${String(err)}`);
 }
 
 const pkg = JSON.parse(String(fs.readFileSync(new URL('./package.json', import.meta.url))));
@@ -45,6 +45,7 @@ async function configure(args) {
         return server(await Config.env(args));
     } catch (err) {
         console.error(err);
+        // eslint-disable-next-line n/no-process-exit
         process.exit(1);
     }
 }
@@ -190,6 +191,7 @@ export default async function server(config) {
                 req.token = await user.user(decoded.u);
                 req.token.type = 'token';
             } catch (err) {
+                console.error(err);
                 // Login/Verify uses non-jwt token
             }
         } else {

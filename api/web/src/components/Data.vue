@@ -9,15 +9,15 @@
                     </div>
                     <div class='card-body row'>
                         <div class='col-4 d-flex justify-content-center align-items-center'>
-                            <LayerIcon layer='buildings' size='32'/>
+                            <LayerIcon layer='buildings' size='32' stroke='1'/>
                             Buildings
                         </div>
                         <div class='col-4 d-flex justify-content-center align-items-center'>
-                            <LayerIcon layer='addresses' size='32'/>
+                            <LayerIcon layer='addresses' size='32' stroke='1'/>
                             Addresses
                         </div>
                         <div class='col-4 d-flex justify-content-center align-items-center'>
-                            <LayerIcon layer='parcels' size='32'/>
+                            <LayerIcon layer='parcels' size='32' stroke='1'/>
                             Parcels
                         </div>
                         <div class='col-12'>
@@ -36,7 +36,7 @@
                         <h2 class='card-title'>Data Collections</h2>
 
                         <div class='ms-auto btn-list'>
-                            <IconRefresh @click='fetchCollections' class='cursor-pointer' size='32'/>
+                            <IconRefresh @click='fetchCollections' class='cursor-pointer' size='32' stroke='1'/>
                         </div>
                     </div>
 
@@ -56,7 +56,7 @@
                                 <td class='d-flex'>
                                     <span v-text='size(c.size)'/>
                                     <div class='ms-auto btn-list'>
-                                        <IconDownload v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer' size='32'/>
+                                        <IconDownload v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer' size='32' stroke='1'/>
                                     </div>
                                 </td>
                             </tr>
@@ -71,13 +71,13 @@
                         <h2 class='card-title'>Individual Sources</h2>
 
                         <div class='ms-auto btn-list'>
-                            <IconArrowsMaximize @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer' size='32'/>
-                            <IconArrowsMinimize @click='fullscreen = false' v-else class='cursor-pointer' size='32'/>
+                            <IconArrowsMaximize @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer' size='32' stroke='1'/>
+                            <IconArrowsMinimize @click='fullscreen = false' v-else class='cursor-pointer' size='32' stroke='1'/>
 
-                            <IconSearch @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer' size='32'/>
-                            <IconX  @click='showFilter = !showFilter' v-else class='cursor-pointer' size='32'/>
+                            <IconSearch @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer' size='32' stroke='1'/>
+                            <IconX  @click='showFilter = !showFilter' v-else class='cursor-pointer' size='32' stroke='1'/>
 
-                            <IconRefresh @click='fetchData' class='cursor-pointer' size='32'/>
+                            <IconRefresh @click='fetchData' class='cursor-pointer' size='32' stroke='1'/>
                         </div>
                     </div>
 
@@ -126,14 +126,14 @@
                                     <tr>
                                         <td @click='d._open = !d._open' v-text='d.source' class='cursor-pointer'></td>
                                         <td @click='d._open = !d._open' class='cursor-pointer'>
-                                            <LayerIcon v-if='d.has.buildings' layer='buildings' size='32'/>
-                                            <LayerIcon v-if='d.has.addresses' layer='addresses' size='32'/>
-                                            <LayerIcon v-if='d.has.parcels' layer='parcels' size='32'/>
+                                            <LayerIcon v-if='d.has.buildings' layer='buildings' size='32' stroke='1'/>
+                                            <LayerIcon v-if='d.has.addresses' layer='addresses' size='32' stroke='1'/>
+                                            <LayerIcon v-if='d.has.parcels' layer='parcels' size='32' stroke='1'/>
                                         </td>
                                         <td>
                                             <div class='d-flex'>
                                                 <div class='ms-auto btn-list'>
-                                                    <IconMap v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer' size='32'/>
+                                                    <IconMap v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer' size='32' stroke='1'/>
                                                 </div>
                                             </div>
                                         </td>
@@ -155,7 +155,7 @@
                                                         <template v-if='auth && auth.access === "admin"'>
                                                             <TablerDropdown>
                                                                 <slot>
-                                                                    <IconSettings class='cursor-pointer' size='32'/>
+                                                                    <IconSettings class='cursor-pointer' size='32' stroke='1'/>
                                                                 </slot>
                                                                 <template #dropdown>
                                                                     <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
@@ -164,7 +164,7 @@
                                                             </TablerDropdown>
                                                         </template>
 
-                                                        <IconHistory @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer' size='32'/>
+                                                        <IconHistory @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer' size='32' stroke='1'/>
                                                     </div>
                                                 </div>
                                             </div>

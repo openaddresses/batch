@@ -1,7 +1,7 @@
 <template>
 <TablerDropdown v-on:click.stop.prevent='' v-if='job.output.output'>
     <slot>
-        <IconDownload size='32' class='cursor-pointer'/>
+        <IconDownload size='32' class='cursor-pointer' stroke='1'/>
     </slot>
 
     <template #dropdown>
@@ -17,7 +17,7 @@
                         GeoJSON+LD
                     </span>
                     <div class='ms-auto'>
-                        <IconInfoCircle @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' size='16'/>
+                        <IconInfoCircle @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' size='16' stroke='1'/>
                     </div>
                 </div>
 
@@ -26,7 +26,7 @@
                         ShapeFile
                     </span>
                     <div class='ms-auto'>
-                        <IconInfoCircle @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' size='16'/>
+                        <IconInfoCircle @click='external("https://en.wikipedia.org/wiki/Shapefile")' class='fr color-blue-on-hover cursor-pointer mt3' size='16' stroke='1'/>
                     </div>
                 </div>
 
@@ -35,7 +35,7 @@
                         CSV
                     </span>
                     <div class='ms-auto'>
-                        <IconInfoCircle @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' size='16'/>
+                        <IconInfoCircle @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")' class='fr cursor-pointer color-blue-on-hover mt3' size='16' stroke='1'/>
                     </div>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                     <span @click='datapls(job.job || job.id, "geojson", true)' class='cursor-pointer'>
                         GeoJSON+LD
                     </span>
-                    <IconInfoCircle @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' width="16" height="16"/>
+                    <IconInfoCircle @click='external("https://stevage.github.io/ndgeojson/")' class='fr color-blue-on-hover cursor-pointer mt3' size='16' stroke='1'/>
                 </div>
             </div>
         </div>

@@ -28,7 +28,7 @@
         "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^4.0.6",
         "@octokit/rest": "^19.0.4",
-        "@octokit/webhooks": "11.0.0",
+        "@octokit/webhooks": "11.1.2",
         "@openaddresses/batch-error": "^2.1.0",
         "@openaddresses/batch-generic": "^14.0.0",
         "@openaddresses/batch-schema": "^9.0.0",

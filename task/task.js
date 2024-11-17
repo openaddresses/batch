@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { interactive } from './lib/pre.js';
 
 import Job from './lib/job.js';
@@ -55,7 +54,7 @@ async function cli() {
 
     flow(job).catch((err) => {
         console.error(err);
-        process.exit(1);
+        throw err;
     });
 }
 
@@ -134,6 +133,7 @@ async function flow(job) {
             console.error(err);
         } finally {
             await meta.protection(false);
+            // eslint-disable-next-line n/no-process-exit
             process.exit(1);
         }
     }

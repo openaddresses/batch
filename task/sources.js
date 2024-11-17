@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { interactive } from './lib/pre.js';
 
 import Meta from './lib/meta.js';
@@ -93,7 +91,7 @@ async function cli() {
     } catch (err) {
         console.error(err);
         await meta.protection(false);
-        process.exit(1);
+        throw err;
     }
 }
 

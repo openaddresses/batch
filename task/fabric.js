@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 // Does not need to mark instance
 // as protected as it runs on a managed queue
 import { interactive } from './lib/pre.js';
@@ -183,7 +181,7 @@ async function cli() {
     } catch (err) {
         await meta.protection(false);
         console.error(err);
-        process.exit();
+        throw err;
     }
 }
 
@@ -195,7 +193,7 @@ async function get_source(out, data) {
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
         }))).Body,
-        Unzip(),
+        new Unzip(),
         fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
     );
 }

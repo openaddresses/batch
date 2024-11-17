@@ -5,6 +5,9 @@
     "main": "index.js",
     "license": "MIT",
     "private": true,
+    "engines": {
+        "node": ">=22.0.0"
+    },
     "scripts": {
         "test": "tape test/**.test.js",
         "lint": "eslint *.js lib/ test/"

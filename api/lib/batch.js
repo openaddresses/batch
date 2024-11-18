@@ -104,7 +104,7 @@ export async function trigger(event) {
             jobQueue: event.type === 'job' ? t3_queue : t3_priority_queue,
             jobName: `OA_Job_${event.job}`,
             containerOverrides: {
-                command: ['./task.js'],
+                command: ['node', 'task.js'],
                 environment: [
                     { name: 'OA_JOB_ID', value: String(event.job) }
                 ]
@@ -121,7 +121,7 @@ export async function trigger(event) {
             jobQueue: t3_priority_queue,
             jobName: `OA_Export_${event.id}`,
             containerOverrides: {
-                command: ['./export.js'],
+                command: ['node', 'export.js'],
                 environment: [
                     { name: 'OA_EXPORT_ID', value: String(event.id) }
                 ]
@@ -136,7 +136,7 @@ export async function trigger(event) {
             jobQueue: mega_queue,
             jobName: 'OA_Collect',
             containerOverrides: {
-                command: ['./collect.js'],
+                command: ['node', 'collect.js'],
                 environment: []
             }
         };
@@ -146,7 +146,7 @@ export async function trigger(event) {
             jobQueue: mega_queue,
             jobName: 'OA_Fabric',
             containerOverrides: {
-                command: ['./fabric.js'],
+                command: ['node', 'fabric.js'],
                 environment: []
             }
         };
@@ -156,7 +156,7 @@ export async function trigger(event) {
             jobQueue: t3_queue,
             jobName: 'OA_Sources',
             containerOverrides: {
-                command: ['./sources.js'],
+                command: ['node', 'sources.js'],
                 environment: []
             }
         };

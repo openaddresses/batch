@@ -31,7 +31,7 @@ export default class Map extends Generic {
 
     static map() {
         return {
-            token: process.env.MAPBOX_TOKEN
+            protomaps_key: process.env.PROTOMAPS_KEY
         };
     }
 

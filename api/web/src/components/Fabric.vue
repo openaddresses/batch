@@ -85,13 +85,12 @@ export default {
         init: async function() {
             try {
                 const res = await window.std('/api/map');
-                mapboxgl.accessToken = res.token;
 
                 this.map = new mapboxgl.Map({
                     container: 'map',
                     center: this.tilejson.center,
                     zoom: this.tilejson.minzoom,
-                    style: 'mapbox://styles/ingalls/ckvh0wwm8g2cw15r05ozt0ybr'
+                    style: 'https://api.protomaps.com/styles/v2/grayscale.json?key=' + res.protomaps_key
                 });
 
                 this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');

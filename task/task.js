@@ -150,7 +150,7 @@ function process_job(job) {
             '--layer', job.layer,
             '--layersource', job.name,
             '--render-preview',
-            '--mapbox-key', process.env.MAPBOX_TOKEN,
+            '--protomaps-key', process.env.PROTOMAPS_KEY,
             '--verbose'
         ],{
             env: process.env

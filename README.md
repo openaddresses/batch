@@ -27,9 +27,9 @@ On every commit, GitHub actions will build the latest Docker image and push it t
 This parameter will be populated automatically by the `deploy` cli and simply points the stack
 to use the correspondingly Docker image from ECR.
 
-#### MapboxToken
+#### ProtomapsKey
 
-A read-only Mapbox API token for displaying base maps underneath our address data. (Token should start with `pk.`)
+A Protomaps API key ([from here](https://protomaps.com/dashboard)) for displaying base maps underneath our address data.
 
 #### Bucket
 

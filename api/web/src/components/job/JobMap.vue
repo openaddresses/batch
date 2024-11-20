@@ -36,44 +36,15 @@ export default {
                     container: this.$refs.map,
                     hash: "map",
                     zoom: 1,
-                    attributionControl: false,
                     bounds: [
                         bounds[0][0][0],
                         bounds[0][0][1],
                         bounds[0][2][0],
                         bounds[0][2][1]
                     ],
-                    style: {
-                        version: 8,
-                        sources: {
-                            basemap: {
-                                type: 'raster',
-                                tileSize: 256,
-                                tiles: [
-                                    `https://api.mapbox.com/styles/v1/ingalls/ckvh0wwm8g2cw15r05ozt0ybr/tiles/256/{z}/{x}/{y}@2x?access_token=${res.token}`
-                                ]
-                            }
-                        },
-                        layers: [{
-                            id: 'background',
-                            type: 'background',
-                            paint: {
-                                'background-color': 'rgb(4,7,14)'
-                            }
-                        },{
-                            id: 'basemap',
-                            type: 'raster',
-                            source: 'basemap',
-                            minzoom: 0,
-                            maxzoom: 15
-                        }]
-                    }
-
+                    style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key,
                 });
 
-                tmpmap.addControl(new mapgl.AttributionControl({
-                    customAttribution: '© <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> | © <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a> Contributors'
-                }));
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
 
                 tmpmap.once('load', () => {

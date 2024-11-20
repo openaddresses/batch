@@ -113,7 +113,6 @@ export default {
                     container: this.$refs.map,
                     hash: "map",
                     style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key,
-
                 }
 
                 opts.center = [0, 0];
@@ -124,6 +123,15 @@ export default {
                 tmpmap.once('idle', () => {
                     map = tmpmap;
                     if (this.bbox) map.fitBounds(this.bbox);
+
+                    map.addSource('coverage', {
+                        type: 'vector',
+                        tiles: [
+                            String(window.stdurl('/api')) + '/map/{z}/{x}/{y}.mvt'
+                        ],
+                        minzoom: 0,
+                        maxzoom: 6
+                    })
 
                     map.addSource('features', {
                         type: 'geojson',

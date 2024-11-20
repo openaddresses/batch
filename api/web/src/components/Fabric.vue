@@ -90,7 +90,7 @@ export default {
                     container: 'map',
                     center: this.tilejson.center,
                     zoom: this.tilejson.minzoom,
-                    style: 'https://api.protomaps.com/styles/v2/grayscale.json?key=' + res.protomaps_key
+                    style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key
                 });
 
                 this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');

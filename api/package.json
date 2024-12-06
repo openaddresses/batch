@@ -40,7 +40,7 @@
         "cors": "^2.8.5",
         "csv-stringify": "^6.0.0",
         "d3-queue": "^3.0.7",
-        "express": "^4.17.1",
+        "express": "^4.21.2",
         "express-minify": "^1.0.0",
         "json-schema-ref-parser": "^9.0.9",
         "jsonwebtoken": "^9.0.0",

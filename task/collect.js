@@ -19,6 +19,7 @@ import archiver from 'archiver';
 import parquetjs from '@dsnp/parquetjs';
 import minimist from 'minimist';
 import { Transform } from 'stream';
+import wkx from 'wkx';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
@@ -322,7 +323,7 @@ function parquet_datas(tmp, datas, name) {
     return new Promise((resolve, reject) => {
         const schema = {
             source_name: { type: 'UTF8' },
-            geometry: { type: 'blob' },
+            geometry: { type: 'BINARY' },
             id: { type: 'UTF8' },
             pid: { type: 'UTF8' },
             number: { type: 'UTF8' },
@@ -346,9 +347,11 @@ function parquet_datas(tmp, datas, name) {
             data_lines.on('data', (line) => {
                 const record = JSON.parse(line);
                 const properties = record.properties;
+                const wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+
                 writer.appendRow({
                     source_name: data,
-                    geometry: record.geometry, // TODO: Convert to WKB
+                    geometry: wkbGeometry,
                     id: properties.id,
                     pid: properties.pid,
                     number: properties.number,

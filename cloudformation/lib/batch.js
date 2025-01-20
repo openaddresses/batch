@@ -52,7 +52,7 @@ export default {
                 ContainerProperties: {
                     Environment: [
                         { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
-                        { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
+                        { Name: 'PROTOMAPS_KEY', Value: cf.ref('ProtomapsKey') },
                         { Name: 'R2_ACCESS_KEY_ID', Value: cf.ref('R2AccessKeyID') },
                         { Name: 'R2_SECRET_ACCESS_KEY', Value: cf.ref('R2SecretAccessKey') },
                         { Name: 'CLOUDFLARE_ACCOUNT_ID', Value: cf.ref('CloudflareAccountID') },

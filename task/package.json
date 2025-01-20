@@ -5,9 +5,12 @@
     "main": "index.js",
     "license": "MIT",
     "private": true,
+    "engines": {
+        "node": ">=22.0.0"
+    },
     "scripts": {
         "test": "tape test/**.test.js",
-        "lint": "eslint *.js lib/**.js test/**.js"
+        "lint": "eslint *.js lib/ test/"
     },
     "dependencies": {
         "@aws-sdk/client-auto-scaling": "^3.363.0",
@@ -29,7 +32,7 @@
         "minimist": "^1.2.5",
         "mkdirp": "^3.0.0",
         "npm": "^10.1.0",
-        "oa": "5.1.0",
+        "oa": "^5.6.0",
         "ogr2ogr": "^2.1.1",
         "prompts": "^2.4.0",
         "request": "^2.88.2",
@@ -38,9 +41,9 @@
         "wellknown": "^0.5.0"
     },
     "devDependencies": {
-        "eslint": "^8.1.0",
-        "eslint-plugin-node": "^11.0.0",
-        "sinon": "^17.0.0",
+        "eslint": "^9.0.0",
+        "eslint-plugin-n": "^17.10.2",
+        "sinon": "^19.0.0",
         "tape": "^5.0.0"
     }
 }

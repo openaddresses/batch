@@ -27,7 +27,7 @@ export default class S3Helper {
         res.writeHead(200, {
             'Content-Disposition': `inline; filename="${name}"`,
             'Content-Length': s3headers.ContentLength,
-            'ContentType': s3headers.ContentType
+            'Content-Type': s3headers.ContentType
         });
 
         s3request.Body.pipe(res);

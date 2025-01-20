@@ -83,8 +83,8 @@ export default class Config {
                 this.R2Bucket = process.env.R2Bucket;
             }
 
-            if (!process.env.MAPBOX_TOKEN) {
-                throw new Error('not ok - MAPBOX_TOKEN env var required');
+            if (!process.env.PROTOMAPS_KEY) {
+                throw new Error('not ok - PROTOMAPS_KEY env var required');
             }
 
             if (!process.env.CLOUDFLARE_ACCOUNT_ID) {

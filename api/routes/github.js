@@ -9,7 +9,7 @@ export default async function router(schema, config) {
         group: 'Github',
         auth: 'admin',
         description: 'Callback endpoint for GitHub Webhooks. Should not be called by user functions'
-    }, bodyparser.raw({ type: '*/*' }), async (req, res) => {
+    }, bodyparser.raw({ type: '*/*', limit: '500kb' }), async (req, res) => {
         if (!process.env.GithubSecret) return res.status(400).send('Invalid X-Hub-Signature');
 
         const ci = new CI(config);
@@ -25,7 +25,7 @@ export default async function router(schema, config) {
         try {
             req.body = JSON.parse(req.body);
         } catch (err) {
-            res.status(400).send('Invalid JSON Body');
+            res.status(400).send(`Invalid JSON Body: ${String(err)}`);
         }
 
         try {

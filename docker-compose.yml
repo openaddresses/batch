@@ -9,7 +9,7 @@ services:
             - 5001:5000
         environment:
             - POSTGRES=postgres://docker:docker@postgis:5432/gis
-            - MAPBOX_TOKEN
+            - PROTOMAPS_KEY
 
     postgis:
         image: kartoza/postgis:13.0

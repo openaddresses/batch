@@ -19,9 +19,9 @@ const stack = {
             Type: 'String',
             Description: 'Gitsha to Deploy'
         },
-        MapboxToken: {
+        ProtomapsKey: {
             Type: 'String',
-            Description: '[secure] Mapbox API Token to create Slippy Maps With'
+            Description: '[secure] Protomaps API Key to create Slippy Maps With'
         },
         Bucket: {
             Type: 'String',

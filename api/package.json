@@ -7,10 +7,10 @@
     "license": "MIT",
     "private": true,
     "engines": {
-        "node": ">= 18"
+        "node": ">= 22"
     },
     "scripts": {
-        "lint": "eslint index.js routes/**.js lib/**.js test/**.js",
+        "lint": "eslint index.js routes/ lib/ test/",
         "test": "./test/test | tap-merge",
         "start": "node index.js --email",
         "dev": "nodemon -i ./web -e ./schema index.js",
@@ -28,19 +28,19 @@
         "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^4.0.6",
         "@octokit/rest": "^19.0.4",
-        "@octokit/webhooks": "11.0.0",
+        "@octokit/webhooks": "11.1.2",
         "@openaddresses/batch-error": "^2.1.0",
         "@openaddresses/batch-generic": "^14.0.0",
         "@openaddresses/batch-schema": "^9.0.0",
         "@turf/turf": "^6.5.0",
-        "ajv-formats": "^2.1.1",
+        "ajv-formats": "^3.0.0",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.20.2",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "csv-stringify": "^6.0.0",
         "d3-queue": "^3.0.7",
-        "express": "^4.17.1",
+        "express": "^4.21.2",
         "express-minify": "^1.0.0",
         "json-schema-ref-parser": "^9.0.9",
         "jsonwebtoken": "^9.0.0",
@@ -64,12 +64,12 @@
     "devDependencies": {
         "@mapbox/mock-aws-sdk-js": "^1.0.0",
         "codecov": "^3.8.2",
-        "eslint": "^8.1.0",
-        "eslint-plugin-node": "^11.0.0",
+        "eslint": "^9.0.0",
+        "eslint-plugin-n": "^17.10.2",
         "glob": "^10.0.1",
         "nock": "^13.0.8",
         "nodemon": "^3.0.0",
-        "nyc": "^15.1.0",
+        "nyc": "^17.0.0",
         "path-to-regexp": "^6.2.1",
         "tap-merge": "^0.3.1"
     }

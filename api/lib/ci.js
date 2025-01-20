@@ -200,7 +200,7 @@ export default class CI {
      *
      * @param {String} ref Github Ref
      */
-    // eslint-disable-next-line no-use-before-define
+
     async filediff(ref) {
         console.error(`ok - FileDiff: ${ref}`);
 
@@ -224,7 +224,7 @@ export default class CI {
      * Given a list of filediffs, calculate what sources in the JSON file changed
      * @param {Object[]} files
      */
-    // eslint-disable-next-line no-use-before-define
+
     static async internaldiff(files) {
         const jobs = [];
 
@@ -295,6 +295,7 @@ export default class CI {
                 try {
                     assert.deepEqual(master_sources[branch], branch_sources[branch]);
                 } catch (err) {
+                    console.error(err);
                     jobs.push({
                         source: file.raw,
                         layer: branch_sources[branch]._layer,

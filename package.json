@@ -7,16 +7,19 @@
     "repository": "git@github.com:openaddresses/batch",
     "author": "ingalls <nick@ingalls.ca>",
     "private": false,
+    "engines": {
+        "node": ">=22.0.0"
+    },
     "scripts": {
         "test": "echo 'no tests'",
-        "lint": "eslint cloudformation/*.js cloudformation/**/*.js"
+        "lint": "eslint cloudformation/"
     },
     "dependencies": {
-        "@openaddresses/cloudfriend": "^7.0.0",
-        "@openaddresses/batch-alarms": "^4.0.0"
+        "@openaddresses/batch-alarms": "^4.0.0",
+        "@openaddresses/cloudfriend": "^7.0.0"
     },
     "devDependencies": {
-        "eslint": "^8.0.1",
-        "eslint-plugin-node": "^11.0.0"
+        "eslint": "^9.0.0",
+        "eslint-plugin-n": "^17.10.2"
     }
 }

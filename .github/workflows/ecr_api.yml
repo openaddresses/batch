@@ -16,7 +16,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event.pull_request.draft == false
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -24,7 +24,7 @@ jobs:
               run: docker build -t api api/
 
             - name: Configure AWS Credentials
-              uses: aws-actions/configure-aws-credentials@v1
+              uses: aws-actions/configure-aws-credentials@v4
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -32,7 +32,7 @@ jobs:
 
             - name: Login to Amazon ECR
               id: login-ecr
-              uses: aws-actions/amazon-ecr-login@v1
+              uses: aws-actions/amazon-ecr-login@v2
 
             - name: Docker Tag API
               run: docker tag api ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${{ github.event.pull_request.head.sha || github.sha }}

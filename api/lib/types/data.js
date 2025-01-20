@@ -1,7 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import Map from './map.js';
-import fs from 'fs';
 import moment from 'moment';
 import { sql } from 'slonik';
 

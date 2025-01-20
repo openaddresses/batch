@@ -1,4 +1,3 @@
-import fs from 'fs';
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import { Status } from '../util.js';
@@ -42,7 +41,7 @@ export default class Exporter extends Generic {
             try {
                 query.after = moment(query.after);
             } catch (err) {
-                throw new Err(400, null, 'after param is not recognized as a valid date');
+                throw new Err(400, err, 'after param is not recognized as a valid date');
             }
         }
 
@@ -50,7 +49,7 @@ export default class Exporter extends Generic {
             try {
                 query.before = moment(query.before);
             } catch (err) {
-                throw new Err(400, null, 'before param is not recognized as a valid date');
+                throw new Err(400, err, 'before param is not recognized as a valid date');
             }
         }
 

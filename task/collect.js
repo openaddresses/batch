@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 // Does not need to mark instance
 // as protected as it runs on a managed queue
 import { interactive } from './lib/pre.js';
@@ -68,7 +66,7 @@ async function cli() {
 
         tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     } catch (err) {
-        console.error(`ok - could not find ${DRIVE}`);
+        console.error(`ok - could not find ${DRIVE}: ${err}`);
     }
 
     fs.mkdirSync(tmp);
@@ -89,7 +87,7 @@ async function cli() {
         }
     } catch (err) {
         console.error(err);
-        process.exit(1);
+        throw err;
     }
 }
 
@@ -179,7 +177,7 @@ async function get_source(oa, tmp, data, stats) {
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
             }))).Body,
-            Unzip(),
+            new Unzip(),
             split(),
             new Transform({
                 objectMode: true,

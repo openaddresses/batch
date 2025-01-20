@@ -112,54 +112,26 @@ export default {
                 const opts = {
                     container: this.$refs.map,
                     hash: "map",
-                    attributionControl: false,
-                    style: {
-                        version: 8,
-                        sources: {
-                            basemap: {
-                                type: 'raster',
-                                tileSize: 256,
-                                tiles: [
-                                    `https://api.mapbox.com/styles/v1/ingalls/ckvh0wwm8g2cw15r05ozt0ybr/tiles/256/{z}/{x}/{y}@2x?access_token=${res.token}`
-                                ]
-                            },
-                            coverage: {
-                                type: 'vector',
-                                tiles: [
-                                    String(window.stdurl('/api')) + '/map/{z}/{x}/{y}.mvt'
-                                ],
-                                minzoom: 0,
-                                maxzoom: 6
-                            },
-                        },
-                        layers: [{
-                            id: 'background',
-                            type: 'background',
-                            paint: {
-                                'background-color': 'rgb(4,7,14)'
-                            }
-                        },{
-                            id: 'basemap',
-                            type: 'raster',
-                            source: 'basemap',
-                            minzoom: 0,
-                            maxzoom: 15
-                        }]
-                    }
-
+                    style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key,
                 }
 
                 opts.center = [0, 0];
                 opts.zoom = 0;
 
                 const tmpmap = new mapgl.Map(opts);
-                tmpmap.addControl(new mapgl.AttributionControl({
-                  customAttribution: '© <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> | © <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a> Contributors'
-                }));
                 tmpmap.addControl(new mapgl.NavigationControl(), 'bottom-right');
                 tmpmap.once('idle', () => {
                     map = tmpmap;
                     if (this.bbox) map.fitBounds(this.bbox);
+
+                    map.addSource('coverage', {
+                        type: 'vector',
+                        tiles: [
+                            String(window.stdurl('/api')) + '/map/{z}/{x}/{y}.mvt'
+                        ],
+                        minzoom: 0,
+                        maxzoom: 6
+                    })
 
                     map.addSource('features', {
                         type: 'geojson',

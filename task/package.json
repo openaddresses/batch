@@ -38,7 +38,8 @@
         "request": "^2.88.2",
         "split2": "^4.1.0",
         "tilebase": "^4.0.0",
-        "wellknown": "^0.5.0"
+        "wellknown": "^0.5.0",
+        "wkx": "^0.5.0"
     },
     "devDependencies": {
         "eslint": "^9.0.0",

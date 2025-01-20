@@ -14,7 +14,7 @@ import { mkdirp } from 'mkdirp';
 import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
-import parquetjs from '@dsnp/parquetjs';
+import parquet from '@dsnp/parquetjs';
 import minimist from 'minimist';
 import { Transform } from 'stream';
 import wkx from 'wkx';
@@ -318,7 +318,7 @@ function zip_datas(tmp, datas, name) {
 }
 
 function parquet_datas(tmp, datas, name) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const schema = {
             source_name: { type: 'UTF8' },
             geometry: { type: 'BINARY' },
@@ -332,7 +332,7 @@ function parquet_datas(tmp, datas, name) {
             district: { type: 'UTF8' },
             region: { type: 'UTF8' },
             addrtype: { type: 'UTF8' },
-            notes: { type: 'UTF8' },
+            notes: { type: 'UTF8' }
         };
         const writer = parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
 
@@ -360,7 +360,7 @@ function parquet_datas(tmp, datas, name) {
                     district: properties.district,
                     region: properties.region,
                     addrtype: properties.addrtype,
-                    notes: properties.notes,
+                    notes: properties.notes
                 });
             });
             data_lines.on('end', () => {

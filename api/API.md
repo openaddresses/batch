@@ -20,8 +20,12 @@ Note: Basic authentication (username, password) is not supported by any API endp
 A valid API token must be generated for programmatic access
 
 _Example_
-```
+``` 
+##### To Get List of Collections ##Rest HTTP
+GET https://batch.openaddresses.io/api/collections
 Authorization: Bearer {api token}
+Content-Type: application/json
+
 ```
 
 #### Javascript Fetch Example

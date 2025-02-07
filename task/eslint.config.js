@@ -30,6 +30,7 @@ export default [
             'space-infix-ops': 'error',
             'spaced-comment': ['error', 'always'],
             'keyword-spacing': ['error', { 'before': true, 'after': true }],
+            'n/no-extraneous-import': ['warn'],
             'template-curly-spacing': ['error', 'never'],
             'semi-spacing': 'error',
             'strict': 'error'

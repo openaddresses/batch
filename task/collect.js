@@ -4,19 +4,19 @@ import { interactive } from './lib/pre.js';
 import { PromisePool } from '@supercharge/promise-pool';
 
 import { globSync } from 'glob';
-import os from 'os';
+import os from 'node:os';
 import { Unzip } from 'zlib';
 import split from 'split2';
 import { pipeline } from 'stream/promises';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { mkdirp } from 'mkdirp';
 import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
 import parquet from '@dsnp/parquetjs';
 import minimist from 'minimist';
-import { Transform } from 'stream';
+import { Transform } from 'node:stream';
 import wkx from 'wkx';
 
 const s3 = new S3.S3Client({

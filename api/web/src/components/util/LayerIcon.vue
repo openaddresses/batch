@@ -1,8 +1,8 @@
 <template>
 <span>
-    <IconBuildingCommunity v-if='layer === "buildings"' size='32'/>
-    <IconMapPin v-else-if='layer === "addresses"' size='32'/>
-    <IconShape v-else-if='layer === "parcels"' size='32'/>
+    <IconBuildingCommunity v-if='layer === "buildings"' size='32' stroke='1'/>
+    <IconMapPin v-else-if='layer === "addresses"' size='32' stroke='1'/>
+    <IconShape v-else-if='layer === "parcels"' size='32' stroke='1'/>
 </span>
 </template>
 

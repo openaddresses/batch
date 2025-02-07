@@ -3,8 +3,8 @@ version: 2
 jobs:
     build:
         docker:
-            - image: ubuntu:20.04
-            - image: postgis/postgis:14-master
+            - image: ubuntu:24.04
+            - image: postgis/postgis:17-master
               environment:
                   POSTGRES_HOST_AUTH_METHOD: trust
             - image: memcached:1.6
@@ -21,7 +21,7 @@ jobs:
             - run:
                 name: "Install NodeJS"
                 command: |
-                  export NODEV='20.6.0' \
+                  export NODEV='22.13.1' \
                   && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
                   && cp ./node-v${NODEV}-linux-x64/bin/node /usr/bin/ \
                   && ./node-v${NODEV}-linux-x64/bin/npm install -g npm

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 
 // Does not need to mark instance
 // as protected as it runs on a managed queue

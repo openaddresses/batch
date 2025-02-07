@@ -7,6 +7,9 @@
     "repository": "git@github.com:openaddresses/batch",
     "author": "ingalls <nick@ingalls.ca>",
     "private": false,
+    "engines": {
+        "node": ">= 22"
+    },
     "scripts": {
         "test": "echo 'no tests'",
         "lint": "eslint cloudformation/"

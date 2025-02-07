@@ -9,6 +9,9 @@
         "test": "tape test/**.test.js",
         "lint": "eslint *.js lib/ test/"
     },
+    "engines": {
+        "node": ">= 22"
+    },
     "dependencies": {
         "@aws-sdk/client-auto-scaling": "^3.363.0",
         "@aws-sdk/client-batch": "^3.365.0",

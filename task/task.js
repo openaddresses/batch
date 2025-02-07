@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { interactive } from './lib/pre.js';
 
 import Job from './lib/job.js';

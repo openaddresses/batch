@@ -1,4 +1,3 @@
-
 // Does not need to mark instance
 // as protected as it runs on a managed queue
 import { interactive } from './lib/pre.js';
@@ -15,8 +14,10 @@ import { mkdirp } from 'mkdirp';
 import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
+import parquet from '@dsnp/parquetjs';
 import minimist from 'minimist';
 import { Transform } from 'stream';
+import wkx from 'wkx';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
@@ -65,7 +66,7 @@ async function cli() {
 
         tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     } catch (err) {
-        console.error(`ok - could not find ${DRIVE}`);
+        console.error(`ok - could not find ${DRIVE}: ${err}`);
     }
 
     fs.mkdirSync(tmp);
@@ -86,7 +87,7 @@ async function cli() {
         }
     } catch (err) {
         console.error(err);
-        process.exit(1);
+        throw err;
     }
 }
 
@@ -107,8 +108,14 @@ async function collect(tmp, collection, oa) {
     const zip = await zip_datas(tmp, collection_data, collection.name);
 
     console.error(`ok - zip created: ${zip}`);
-    await upload_collection(zip, collection.name);
+    await upload_zip_collection(zip, collection.name);
     console.error('ok - archive uploaded');
+
+    const pq = await parquet_datas(tmp, collection_data, collection.name);
+
+    console.error(`ok - parquet created: ${pq}`);
+    await upload_parquet_collection(pq, collection.name);
+    console.error('ok - parquet uploaded');
 
     await oa.cmd('collection', 'update', {
         ':collection': collection.id,
@@ -170,7 +177,7 @@ async function get_source(oa, tmp, data, stats) {
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
             }))).Body,
-            Unzip(),
+            new Unzip(),
             split(),
             new Transform({
                 objectMode: true,
@@ -192,7 +199,7 @@ async function get_source(oa, tmp, data, stats) {
     return path.resolve(tmp, 'sources',  dir, source);
 }
 
-async function upload_collection(file, name) {
+async function upload_zip_collection(file, name) {
     const s3uploader = new Upload({
         client: s3,
         params: {
@@ -216,7 +223,6 @@ async function upload_collection(file, name) {
         endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
     });
 
-
     const r2uploader = new Upload({
         client: r2,
         params: {
@@ -230,7 +236,45 @@ async function upload_collection(file, name) {
     await r2uploader.done();
 
     console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`);
+}
 
+async function upload_parquet_collection(file, name) {
+    const s3uploader = new Upload({
+        client: s3,
+        params: {
+            ContentType: 'application/vnd.apache.parquet',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/collection-${name}.parquet`
+        }
+    });
+
+    await s3uploader.done();
+
+    console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}.parquet`);
+
+    const r2 = new S3.S3Client({
+        region: 'auto',
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+        },
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    });
+
+    const r2uploader = new Upload({
+        client: r2,
+        params: {
+            ContentType: 'application/vnd.apache.parquet',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/collection-${name}.parquet`
+        }
+    });
+
+    await r2uploader.done();
+
+    console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}.parquet`);
 }
 
 function zip_datas(tmp, datas, name) {
@@ -270,5 +314,61 @@ function zip_datas(tmp, datas, name) {
 
 
         archive.finalize();
+    });
+}
+
+function parquet_datas(tmp, datas, name) {
+    return new Promise((resolve) => {
+        const schema = {
+            source_name: { type: 'UTF8' },
+            geometry: { type: 'BINARY' },
+            id: { type: 'UTF8' },
+            pid: { type: 'UTF8' },
+            number: { type: 'UTF8' },
+            street: { type: 'UTF8' },
+            unit: { type: 'UTF8' },
+            city: { type: 'UTF8' },
+            postcode: { type: 'UTF8' },
+            district: { type: 'UTF8' },
+            region: { type: 'UTF8' },
+            addrtype: { type: 'UTF8' },
+            notes: { type: 'UTF8' }
+        };
+        const writer = parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
+
+        for (const data of datas) {
+            const resolved_data_filename = path.resolve(tmp, 'sources', data);
+
+            // Read the file and parse it as linefeed-delimited JSON
+            const data_stream = fs.createReadStream(resolved_data_filename);
+            const data_lines = data_stream.pipe(split());
+            data_lines.on('data', (line) => {
+                const record = JSON.parse(line);
+                const properties = record.properties;
+                const wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+
+                writer.appendRow({
+                    source_name: data,
+                    geometry: wkbGeometry,
+                    id: properties.id,
+                    pid: properties.pid,
+                    number: properties.number,
+                    street: properties.street,
+                    unit: properties.unit,
+                    city: properties.city,
+                    postcode: properties.postcode,
+                    district: properties.district,
+                    region: properties.region,
+                    addrtype: properties.addrtype,
+                    notes: properties.notes
+                });
+            });
+            data_lines.on('end', () => {
+                console.error(`ok - ${resolved_data_filename} processed and appended to parquet file`);
+            });
+        }
+
+        writer.close();
+        return resolve(path.resolve(tmp, `${name}.parquet`));
     });
 }

@@ -54,7 +54,7 @@ async function cli() {
 
     flow(job).catch((err) => {
         console.error(err);
-        process.exit(1);
+        throw err;
     });
 }
 
@@ -133,6 +133,7 @@ async function flow(job) {
             console.error(err);
         } finally {
             await meta.protection(false);
+            // eslint-disable-next-line n/no-process-exit
             process.exit(1);
         }
     }
@@ -149,7 +150,7 @@ function process_job(job) {
             '--layer', job.layer,
             '--layersource', job.name,
             '--render-preview',
-            '--mapbox-key', process.env.MAPBOX_TOKEN,
+            '--protomaps-key', process.env.PROTOMAPS_KEY,
             '--verbose'
         ],{
             env: process.env

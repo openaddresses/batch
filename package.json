@@ -8,7 +8,11 @@
     "author": "ingalls <nick@ingalls.ca>",
     "private": false,
     "engines": {
+<<<<<<< HEAD
         "node": ">= 22"
+=======
+        "node": ">=22.0.0"
+>>>>>>> b11e386ef1ce3048808f495032374b5151fc922f
     },
     "scripts": {
         "test": "echo 'no tests'",

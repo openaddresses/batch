@@ -150,6 +150,7 @@ async function cli() {
             });
         } finally {
             await meta.protection(false);
+            // eslint-disable-next-line n/no-process-exit
             process.exit(1);
         }
     }
@@ -246,7 +247,7 @@ async function get_source(tmp, jobid) {
             Bucket: process.env.Bucket,
             Key: `${process.env.StackName}/job/${jobid}/source.geojson.gz`
         }))).Body,
-        Unzip(),
+        new Unzip(),
         fs.createWriteStream(path.resolve(tmp, 'source.geojson'))
     );
 

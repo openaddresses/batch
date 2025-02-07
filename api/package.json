@@ -28,7 +28,7 @@
         "@mapbox/sphericalmercator": "^1.1.0",
         "@octokit/auth-app": "^4.0.6",
         "@octokit/rest": "^19.0.4",
-        "@octokit/webhooks": "11.0.0",
+        "@octokit/webhooks": "11.1.2",
         "@openaddresses/batch-error": "^2.1.0",
         "@openaddresses/batch-generic": "^14.0.0",
         "@openaddresses/batch-schema": "^9.0.0",
@@ -40,7 +40,7 @@
         "cors": "^2.8.5",
         "csv-stringify": "^6.0.0",
         "d3-queue": "^3.0.7",
-        "express": "^4.17.1",
+        "express": "^4.21.2",
         "express-minify": "^1.0.0",
         "json-schema-ref-parser": "^9.0.9",
         "jsonwebtoken": "^9.0.0",
@@ -58,7 +58,7 @@
         "swagger-ui-express": "^5.0.0",
         "tape": "^5.6.1",
         "tilebase": "^4.0.0",
-        "undici": "^6.0.0"
+        "undici": "^6.21.1"
     },
     "devDependencies": {
         "@mapbox/mock-aws-sdk-js": "^1.0.0",

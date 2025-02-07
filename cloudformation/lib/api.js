@@ -233,7 +233,7 @@ export default {
                         { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
                         { Name: 'MEGA_QUEUE', Value: cf.importValue('mega-queue') },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
-                        { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxToken') },
+                        { Name: 'PROTOMAPS_KEY', Value: cf.ref('ProtomapsKey') },
                         { Name: 'OPENCOLLECTIVE_API_KEY', Value: cf.ref('OpenCollective') },
                         { Name: 'POSTGRES', Value: cf.join(['postgresql://openaddresses:', cf.ref('DatabasePassword'), '@', cf.getAtt('DBInstanceVPC', 'Endpoint.Address'), ':5432/openaddresses?sslmode=no-verify']) },
                         { Name: 'SharedSecret', Value: cf.sub('{{resolve:secretsmanager:${AWS::StackName}/api/signing-secret:SecretString::AWSCURRENT}}') },

@@ -12,6 +12,9 @@
         "test": "tape test/**.test.js",
         "lint": "eslint *.js lib/ test/"
     },
+    "engines": {
+        "node": ">= 22"
+    },
     "dependencies": {
         "@aws-sdk/client-auto-scaling": "^3.363.0",
         "@aws-sdk/client-batch": "^3.365.0",
@@ -28,7 +31,6 @@
         "decompress": "^4.2.1",
         "find": "^0.3.0",
         "glob": "^10.0.0",
-        "i": "^0.3.7",
         "inquirer": "^9.0.0",
         "minimist": "^1.2.5",
         "mkdirp": "^3.0.0",

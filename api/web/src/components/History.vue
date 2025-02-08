@@ -1,94 +1,128 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
-                        <TablerBreadCrumb/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class='page-body'>
-        <div class='container-xl'>
-            <div class='row row-deck row-cards'>
-                <div class='col-12'>
-                    <div class='card'>
-                        <div class='card-header'>
-                            <h3 class='card-title' v-text='data.source + " - " + data.layer + " - " + data.name'/>
-
-                            <div class='ms-auto btn-list'>
-                                <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
-                            </div>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <TablerLoading v-if='loading.history' :desc='`Loading Job History`'/>
-                        <template v-else>
-                            <h2 class='subheader mx-3 my-3'>Stats History</h2>
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <div class='card'>
+                            <div class='card-header'>
+                                <h3
+                                    class='card-title'
+                                    v-text='data.source + " - " + data.layer + " - " + data.name'
+                                />
 
-                            <TablerLoading v-if='loading.history' desc='Loading Stats'/>
-                            <template v-else>
-                                <div class='card-body'>
-                                    <LineChart class='w-100' style='height: 200px' :data='chart' :options='{
-                                        "scales": {
-                                            "xAxis": {
-                                                "type": "time",
-                                                "time": {
-                                                    "unit": "day"
-                                                },
-                                                "distribution": "linear"
-                                            },
-                                            "yAxis": {
-                                                "ticks": {
-                                                    "beginAtZero": true
-                                                }
-                                            }
-                                        }
-                                    }'/>
+                                <div class='ms-auto btn-list'>
+                                    <IconRefresh
+                                        class='cursor-pointer'
+                                        size='32'
+                                        @click='refresh'
+                                    />
                                 </div>
-                            </template>
+                            </div>
 
-                            <h2 class='subheader mx-3 my-3'>Job History</h2>
+                            <TablerLoading
+                                v-if='loading.history'
+                                :desc='`Loading Job History`'
+                            />
+                            <template v-else>
+                                <h2 class='subheader mx-3 my-3'>
+                                    Stats History
+                                </h2>
 
-                            <table class="table table-hover table-vcenter card-table">
-                                <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Job ID</th>
-                                        <th>Updated</th>
-                                        <th>Attributes</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr :key='job.id' v-for='job in computedPage'>
-                                        <td>
-                                            <Status :status='job.status'/>
-                                        </td>
-                                        <td v-text='job.id'/>
-                                        <td>
-                                            <span v-text='fmt(job.created)'></span>
-                                        </td>
-                                        <td>
-                                            <div class='d-flex'>
-                                                <div class='ms-auto'>
-                                                    <IconDownload v-if='job.output.output' v-on:click.stop.prevent='datapls(job.id)' class='cursor-pointer' size='32'/>
+                                <TablerLoading
+                                    v-if='loading.history'
+                                    desc='Loading Stats'
+                                />
+                                <template v-else>
+                                    <div class='card-body'>
+                                        <LineChart
+                                            class='w-100'
+                                            style='height: 200px'
+                                            :data='chart'
+                                            :options='{
+                                                "scales": {
+                                                    "xAxis": {
+                                                        "type": "time",
+                                                        "time": {
+                                                            "unit": "day"
+                                                        },
+                                                        "distribution": "linear"
+                                                    },
+                                                    "yAxis": {
+                                                        "ticks": {
+                                                            "beginAtZero": true
+                                                        }
+                                                    }
+                                                }
+                                            }'
+                                        />
+                                    </div>
+                                </template>
+
+                                <h2 class='subheader mx-3 my-3'>
+                                    Job History
+                                </h2>
+
+                                <table class='table table-hover table-vcenter card-table'>
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Job ID</th>
+                                            <th>Updated</th>
+                                            <th>Attributes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for='job in computedPage'
+                                            :key='job.id'
+                                        >
+                                            <td>
+                                                <Status :status='job.status' />
+                                            </td>
+                                            <td v-text='job.id' />
+                                            <td>
+                                                <span v-text='fmt(job.created)' />
+                                            </td>
+                                            <td>
+                                                <div class='d-flex'>
+                                                    <div class='ms-auto'>
+                                                        <IconDownload
+                                                            v-if='job.output.output'
+                                                            class='cursor-pointer'
+                                                            size='32'
+                                                            @click.stop.prevent='datapls(job.id)'
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <TableFooter :limit='paging.limit' :total='history.jobs.length' @page='paging.page = $event'/>
-                        </template>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <TableFooter
+                                    :limit='paging.limit'
+                                    :total='history.jobs.length'
+                                    @page='paging.page = $event'
+                                />
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -112,6 +146,15 @@ import 'chartjs-adapter-date-fns';
 
 export default {
     name: 'History',
+    components: {
+        Status,
+        IconRefresh,
+        IconDownload,
+        TablerLoading,
+        TableFooter,
+        LineChart,
+        TablerBreadCrumb,
+    },
     props: ['dataid'],
     data: function() {
         return {
@@ -136,16 +179,16 @@ export default {
             }
         }
     },
+    computed: {
+        computedPage: function() {
+            return this.history.jobs.slice(this.paging.limit * this.paging.page, this.paging.limit * (this.paging.page + 1))
+        }
+    },
     mounted: function() {
         this.colours = [
             '#EA7580','#F6A1A5','#F8CD9C','#1BB6AF','#088BBE','#172869' // Pamplemousse
         ]
         this.refresh();
-    },
-    computed: {
-        computedPage: function() {
-            return this.history.jobs.slice(this.paging.limit * this.paging.page, this.paging.limit * (this.paging.page + 1))
-        }
     },
     methods: {
         fmt: function(date) {
@@ -230,15 +273,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        Status,
-        IconRefresh,
-        IconDownload,
-        TablerLoading,
-        TableFooter,
-        LineChart,
-        TablerBreadCrumb,
     },
 }
 </script>

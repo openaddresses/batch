@@ -1,26 +1,26 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
-                        <TablerBreadCrumb/>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <CardExports />
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class='page-body'>
-        <div class='container-xl'>
-            <div class='row row-deck row-cards'>
-                <div class='col-12'>
-                    <CardExports/>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </template>
 
 <script>

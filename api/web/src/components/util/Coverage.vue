@@ -1,26 +1,40 @@
 <template>
-<div :style='{
-        "height": (!fullscreen ? 300 : 600) + "px"
-    }'>
-    <div class='row'>
-        <div class='col-12' :class='{
-            "absolute right left": fullscreen,
-        }'>
-            <div class='absolute top right z1'>
-            </div>
+    <div
+        :style='{
+            "height": (!fullscreen ? 300 : 600) + "px"
+        }'
+    >
+        <div class='row'>
+            <div
+                class='col-12'
+                :class='{
+                    "absolute right left": fullscreen,
+                }'
+            >
+                <div class='absolute top right z1' />
 
-            <div v-if='point' class='absolute top left z1'>
-                <button @click='point = false' class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'>
-                    <span><svg class='icon fl h24'><use href='#icon-close'/></svg> Clear Filter</span>
-                </button>
-            </div>
+                <div
+                    v-if='point'
+                    class='absolute top left z1'
+                >
+                    <button
+                        class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'
+                        @click='point = false'
+                    >
+                        <span><svg class='icon fl h24'><use href='#icon-close' /></svg> Clear Filter</span>
+                    </button>
+                </div>
 
-            <div ref='map' class='w-100' :style='{
-                "height": (!fullscreen ? 300 : 600) + "px"
-            }'></div>
+                <div
+                    ref='map'
+                    class='w-100'
+                    :style='{
+                        "height": (!fullscreen ? 300 : 600) + "px"
+                    }'
+                />
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>

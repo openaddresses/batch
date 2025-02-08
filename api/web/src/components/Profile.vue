@@ -1,50 +1,104 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="d-flex">
-                        <TablerBreadCrumb/>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='d-flex'>
+                            <TablerBreadCrumb />
 
-                        <div class='ms-auto btn-list'>
-                            <template v-if='auth && auth.access === "admin" && $route.name === "ProfileDefault"'>
-                                <button
-                                    @click='$router.push(`/profile/admin`)'
-                                    class='btn btn-primary'
-                                >Admin</button>
-                            </template>
-                            <template v-else-if='auth && auth.access === "admin" && $route.name === "ProfileAdmin"'>
-                                <TablerLoading v-if='loading.collections' :inline='true' desc='Refresh Collections'/>
-                                <TablerLoading v-if='loading.cache' :inline='true' desc='Reset Cache'/>
-                                <TablerLoading v-if='loading.fabric' :inline='true' desc='Refresh Fabric'/>
+                            <div class='ms-auto btn-list'>
+                                <template v-if='auth && auth.access === "admin" && $route.name === "ProfileDefault"'>
+                                    <button
+                                        class='btn btn-primary'
+                                        @click='$router.push(`/profile/admin`)'
+                                    >
+                                        Admin
+                                    </button>
+                                </template>
+                                <template v-else-if='auth && auth.access === "admin" && $route.name === "ProfileAdmin"'>
+                                    <TablerLoading
+                                        v-if='loading.collections'
+                                        :inline='true'
+                                        desc='Refresh Collections'
+                                    />
+                                    <TablerLoading
+                                        v-if='loading.cache'
+                                        :inline='true'
+                                        desc='Reset Cache'
+                                    />
+                                    <TablerLoading
+                                        v-if='loading.fabric'
+                                        :inline='true'
+                                        desc='Refresh Fabric'
+                                    />
 
-                                <span v-if='done.cache' @click='done.cache = false' class='cursor-pointer'><IconCheck size='32'/>Cache Cleared</span>
-                                <span v-if='done.collections' @click='done.cache = false' class='cursor-pointer'><IconCheck size='32'/>Collection Refresh Submitted</span>
-                                <span v-if='done.fabric' @click='done.cache = false' class='cursor-pointer'><IconCheck size='32'/>Fabric Refresh Submitted</span>
+                                    <span
+                                        v-if='done.cache'
+                                        class='cursor-pointer'
+                                        @click='done.cache = false'
+                                    ><IconCheck size='32' />Cache Cleared</span>
+                                    <span
+                                        v-if='done.collections'
+                                        class='cursor-pointer'
+                                        @click='done.cache = false'
+                                    ><IconCheck size='32' />Collection Refresh Submitted</span>
+                                    <span
+                                        v-if='done.fabric'
+                                        class='cursor-pointer'
+                                        @click='done.cache = false'
+                                    ><IconCheck size='32' />Fabric Refresh Submitted</span>
 
-                                <TablerDropdown>
-                                    <slot><IconSettings class='cursor-pointer mx-3' size='32'/></slot>
-                                    <template #dropdown>
-                                        <div @click='fabric' class='cursor-pointer text-center my-2'>Refresh Fabric</div>
-                                        <div @click='clear' class='cursor-pointer text-center my-2'>Clear Cache</div>
-                                        <div @click='collections' class='cursor-pointer text-center my-2'>Refresh Collections</div>
-                                    </template>
-                                </TablerDropdown>
-                            </template>
+                                    <TablerDropdown>
+                                        <slot>
+                                            <IconSettings
+                                                class='cursor-pointer mx-3'
+                                                size='32'
+                                            />
+                                        </slot>
+                                        <template #dropdown>
+                                            <div
+                                                class='cursor-pointer text-center my-2'
+                                                @click='fabric'
+                                            >
+                                                Refresh Fabric
+                                            </div>
+                                            <div
+                                                class='cursor-pointer text-center my-2'
+                                                @click='clear'
+                                            >
+                                                Clear Cache
+                                            </div>
+                                            <div
+                                                class='cursor-pointer text-center my-2'
+                                                @click='collections'
+                                            >
+                                                Refresh Collections
+                                            </div>
+                                        </template>
+                                    </TablerDropdown>
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class='page-body'>
-        <div class='container-xl'>
-            <TablerLoading v-if='loading.profile' desc='Loading Profile'/>
-            <router-view v-else :profile='profile' @refresh='getLogin' @err='$emit("err", $event)'/>
+        <div class='page-body'>
+            <div class='container-xl'>
+                <TablerLoading
+                    v-if='loading.profile'
+                    desc='Loading Profile'
+                />
+                <router-view
+                    v-else
+                    :profile='profile'
+                    @refresh='getLogin'
+                    @err='$emit("err", $event)'
+                />
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -61,6 +115,13 @@ import {
 
 export default {
     name: 'Profile',
+    components: {
+        IconSettings,
+        TablerBreadCrumb,
+        TablerLoading,
+        TablerDropdown,
+        IconCheck,
+    },
     props: [ 'auth' ],
     data: function() {
         return {
@@ -126,13 +187,6 @@ export default {
             this.profile = await window.std(url)
             this.loading.profile = false;
         }
-    },
-    components: {
-        IconSettings,
-        TablerBreadCrumb,
-        TablerLoading,
-        TablerDropdown,
-        IconCheck,
     }
 }
 </script>

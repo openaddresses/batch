@@ -2,17 +2,22 @@
     <div class='z2 fixed top right bottom left scroll-auto bg-darken50'>
         <div class='flex flex--center-main pt36'>
             <div class='bg-white round relative w600'>
-                <button @click='$emit("perk", false)' class='absolute top right px12 py12'>
-                    <svg class='icon link color-darken50'><use xlink:href='#icon-close'></use></svg>
+                <button
+                    class='absolute top right px12 py12'
+                    @click='$emit("perk", false)'
+                >
+                    <svg class='icon link color-darken50'><use xlink:href='#icon-close' /></svg>
                 </button>
 
                 <div class='flex flex--center-main'>
                     <div class='pt12'>
-                        <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
+                        <svg class='icon h60 w60 color-gray'><use href='#icon-info' /></svg>
                     </div>
                 </div>
 
-                <div class='txt-l mb12 align-center'>Donor Perk</div>
+                <div class='txt-l mb12 align-center'>
+                    Donor Perk
+                </div>
                 <div class='txt-m align-center'>
                     <p>The OpenAddresses project relies on donations to keeps the lights on</p>
                 </div>
@@ -21,7 +26,12 @@
                     way to say thank-you
                 </div>
 
-                <button @click='donate' class='fr mb12 mr12 btn round btn--gray btn--stroke'>Donate</button>
+                <button
+                    class='fr mb12 mr12 btn round btn--gray btn--stroke'
+                    @click='donate'
+                >
+                    Donate
+                </button>
             </div>
         </div>
     </div>

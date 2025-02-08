@@ -1,11 +1,21 @@
 <template>
-<div>
-    <TablerLoading v-if='loading'/>
-    <TablerNone v-else-if='alert' :create='false' label='Log Yet Produced'/>
-    <pre v-else>
-        <div @click='linenum(line)' v-for='line in lines' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
+    <div>
+        <TablerLoading v-if='loading' />
+        <TablerNone
+            v-else-if='alert'
+            :create='false'
+            label='Log Yet Produced'
+        />
+        <pre v-else>
+        <div
+v-for='line in lines'
+:key='line.id'
+class='cursor-pointer bg-darken10-on-hover'
+@click='linenum(line)'
+v-text='line.message'
+/>
     </pre>
-</div>
+    </div>
 </template>
 
 <script>
@@ -16,6 +26,10 @@ import {
 
 export default {
     name: 'Log',
+    components: {
+        TablerNone,
+        TablerLoading
+    },
     props: ['logtype', 'id', 'collapse'],
     data: function() {
         return {
@@ -47,10 +61,6 @@ export default {
         linenum: function(line) {
             window.location.hash = `${this.logtype}:${this.id}:log:${line.id}`
         }
-    },
-    components: {
-        TablerNone,
-        TablerLoading
     }
 }
 </script>

@@ -1,102 +1,171 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
-                        <TablerBreadCrumb/>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <div class='card'>
+                            <div class='card-header'>
+                                <h3 class='card-title'>
+                                    <Status
+                                        v-if='run && run.status'
+                                        :status='run.status'
+                                    />
+                                    <div class='mx-2 align-self-center'>
+                                        Run <span v-text='$route.params.runid' />
+                                    </div>
+                                </h3>
+
+                                <div class='ms-auto btn-list'>
+                                    <span
+                                        v-if='run.live'
+                                        class='badge bg-green text-white'
+                                        style='height: 20px;'
+                                    >Live</span>
+                                    <span
+                                        v-if='run.github.sha'
+                                        style='height: 20px;'
+                                        class='badge bg-blue text-white cursor-pointer'
+                                        @click.stop.prevent='github(run)'
+                                    >Github</span>
+                                    <IconRefresh
+                                        class='cursor-pointer'
+                                        size='32'
+                                        @click='fetchRun'
+                                    />
+                                </div>
+                            </div>
+
+                            <TablerLoading
+                                v-if='loading.run'
+                                :desc='`Loading Run ${$route.params.runid}`'
+                            />
+                            <div
+                                v-else
+                                class='card-body'
+                            >
+                                <div class='border round row py-3'>
+                                    <div
+                                        class='col-3'
+                                        @click='filterShortcut("Pending")'
+                                    >
+                                        <div
+                                            class='text-center'
+                                            v-text='count.status.Pending + " Jobs"'
+                                        />
+                                        <div class='d-flex justify-content-center my-2'>
+                                            <Status status='Pending' />
+                                        </div>
+                                        <div class='text-center'>
+                                            Pending
+                                        </div>
+                                    </div>
+                                    <div
+                                        class='col-3'
+                                        @click='filterShortcut("Warn")'
+                                    >
+                                        <div
+                                            class='text-center'
+                                            v-text='count.status.Warn + " Jobs"'
+                                        />
+                                        <div class='d-flex justify-content-center my-2'>
+                                            <Status status='Warn' />
+                                        </div>
+                                        <div class='text-center'>
+                                            Warn
+                                        </div>
+                                    </div>
+                                    <div
+                                        class='col-3'
+                                        @click='filterShortcut("Fail")'
+                                    >
+                                        <div
+                                            class='text-center'
+                                            v-text='count.status.Fail + " Jobs"'
+                                        />
+                                        <div class='d-flex justify-content-center my-2'>
+                                            <Status status='Fail' />
+                                        </div>
+                                        <div class='text-center'>
+                                            Fail
+                                        </div>
+                                    </div>
+                                    <div
+                                        class='col-3'
+                                        @click='filterShortcut("Success")'
+                                    >
+                                        <div
+                                            class='text-center'
+                                            v-text='count.status.Success + " Jobs"'
+                                        />
+                                        <div class='d-flex justify-content-center my-2'>
+                                            <Status status='Success' />
+                                        </div>
+                                        <div class='text-center'>
+                                            Success
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <TablerLoading
+                                v-if='loading.jobs'
+                                desc='Loading Jobs'
+                            />
+                            <TablerNone
+                                v-else-if='!list.jobs.length'
+                                :create='false'
+                            />
+                            <template v-else>
+                                <table class='table table-hover table-vcenter card-table'>
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Job ID</th>
+                                            <th>Created</th>
+                                            <th>Source</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for='job in list.jobs'
+                                            :key='job.id'
+                                            class='cursor-pointer'
+                                            @click='$router.push(`/job/${job.id}`);'
+                                        >
+                                            <td><Status :status='job.status' /></td>
+                                            <td>Job <span v-text='job.id' /></td>
+                                            <td><span v-text='fmt(job.created)' /></td>
+                                            <td>
+                                                <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`' />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <TableFooter
+                                    :limit='paging.limit'
+                                    :total='list.total'
+                                    @page='paging.page = $event'
+                                />
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class='page-body'>
-        <div class='container-xl'>
-            <div class='row row-deck row-cards'>
-                <div class='col-12'>
-                    <div class='card'>
-                        <div class='card-header'>
-                            <h3 class='card-title'>
-                                <Status v-if='run && run.status' :status='run.status'/>
-                                <div class='mx-2 align-self-center'>
-                                    Run <span v-text='$route.params.runid'/>
-                                </div>
-                            </h3>
-
-                            <div class='ms-auto btn-list'>
-                                <span v-if='run.live' class="badge bg-green text-white" style='height: 20px;'>Live</span>
-                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' style='height: 20px;' class="badge bg-blue text-white cursor-pointer">Github</span>
-                                <IconRefresh @click='fetchRun' class='cursor-pointer' size='32'/>
-                            </div>
-                        </div>
-
-                        <TablerLoading v-if='loading.run' :desc='`Loading Run ${$route.params.runid}`'/>
-                        <div v-else class='card-body'>
-                            <div class='border round row py-3'>
-                                <div @click='filterShortcut("Pending")' class='col-3'>
-                                    <div class='text-center' v-text='count.status.Pending + " Jobs"'></div>
-                                    <div class='d-flex justify-content-center my-2'>
-                                        <Status status='Pending'/>
-                                    </div>
-                                    <div class='text-center'>Pending</div>
-                                </div>
-                                <div @click='filterShortcut("Warn")' class='col-3'>
-                                    <div class='text-center' v-text='count.status.Warn + " Jobs"'></div>
-                                    <div class='d-flex justify-content-center my-2'>
-                                        <Status status='Warn'/>
-                                    </div>
-                                    <div class='text-center'>Warn</div>
-                                </div>
-                                <div @click='filterShortcut("Fail")' class='col-3'>
-                                    <div class='text-center' v-text='count.status.Fail + " Jobs"'></div>
-                                    <div class='d-flex justify-content-center my-2'>
-                                        <Status status='Fail'/>
-                                    </div>
-                                    <div class='text-center'>Fail</div>
-                                </div>
-                                <div @click='filterShortcut("Success")' class='col-3'>
-                                    <div class='text-center' v-text='count.status.Success + " Jobs"'></div>
-                                    <div class='d-flex justify-content-center my-2'>
-                                        <Status status='Success'/>
-                                    </div>
-                                    <div class='text-center'>Success</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <TablerLoading v-if='loading.jobs' desc='Loading Jobs'/>
-                        <TablerNone v-else-if='!list.jobs.length' :create='false'/>
-                        <template v-else>
-                            <table class="table table-hover table-vcenter card-table">
-                                <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Job ID</th>
-                                        <th>Created</th>
-                                        <th>Source</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
-                                        <td><Status :status='job.status'/></td>
-                                        <td>Job <span v-text='job.id'/></td>
-                                        <td><span v-text='fmt(job.created)'/></td>
-                                        <td>
-                                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </template>
 
 <script>
@@ -114,6 +183,14 @@ import {
 
 export default {
     name: 'Run',
+    components: {
+        TableFooter,
+        TablerBreadCrumb,
+        TablerLoading,
+        TablerNone,
+        IconRefresh,
+        Status
+    },
     props: ['runid'],
     data: function() {
         return {
@@ -151,9 +228,6 @@ export default {
             }
         };
     },
-    mounted: async function() {
-        await this.refresh();
-    },
     watch: {
         paging: {
             deep: true,
@@ -166,6 +240,9 @@ export default {
             this.paging.layer = 'all';
             this.paging.status = 'All'
         },
+    },
+    mounted: async function() {
+        await this.refresh();
     },
     methods: {
         fmt: function(date) {
@@ -214,14 +291,6 @@ export default {
             this.list = await window.std(url);
             this.loading.jobs = false;
         }
-    },
-    components: {
-        TableFooter,
-        TablerBreadCrumb,
-        TablerLoading,
-        TablerNone,
-        IconRefresh,
-        Status
     },
 }
 </script>

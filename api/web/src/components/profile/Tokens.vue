@@ -1,66 +1,116 @@
 <template>
-<div class='card'>
-    <div class='card-header'>
-        <h3 class='card-title'>API Tokens:</h3>
-        <div class='d-flex ms-auto btn-list'>
-            <IconPlus @click='newToken.show = true' class='cursor-pointer' size='32'/>
-            <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
+    <div class='card'>
+        <div class='card-header'>
+            <h3 class='card-title'>
+                API Tokens:
+            </h3>
+            <div class='d-flex ms-auto btn-list'>
+                <IconPlus
+                    class='cursor-pointer'
+                    size='32'
+                    @click='newToken.show = true'
+                />
+                <IconRefresh
+                    class='cursor-pointer'
+                    size='32'
+                    @click='refresh'
+                />
+            </div>
         </div>
-    </div>
-    <TablerLoading v-if='loading' desc='Loading Tokens'/>
-    <TablerNone v-else-if='!tokens.length && !newToken.show' :create='false' label='Tokens'/>
-    <template v-else>
-        <template v-if='newToken.show && !newToken.token'>
-            <div class='mx-2 my-2 py-2 px-2'>
-                <div class='col-12 row border rounded'>
-                    <div class='col-12'>
-                        <h2 class='subheader'>Create New Token</h2>
-                        <IconX @click='newToken.show = false' class='cursor-pointer' size='32'/>
-                    </div>
+        <TablerLoading
+            v-if='loading'
+            desc='Loading Tokens'
+        />
+        <TablerNone
+            v-else-if='!tokens.length && !newToken.show'
+            :create='false'
+            label='Tokens'
+        />
+        <template v-else>
+            <template v-if='newToken.show && !newToken.token'>
+                <div class='mx-2 my-2 py-2 px-2'>
+                    <div class='col-12 row border rounded'>
+                        <div class='col-12'>
+                            <h2 class='subheader'>
+                                Create New Token
+                            </h2>
+                            <IconX
+                                class='cursor-pointer'
+                                size='32'
+                                @click='newToken.show = false'
+                            />
+                        </div>
 
-                    <div class='col-10'>
-                        <TablerInput label='Token Name' v-model='newToken.name' type='text' placeholder='Token Name'/>
-                    </div>
-                    <div class='col-2'>
-                        <IconCheck @click='setToken' class='cursor-pointer' size='32'/>
+                        <div class='col-10'>
+                            <TablerInput
+                                v-model='newToken.name'
+                                label='Token Name'
+                                type='text'
+                                placeholder='Token Name'
+                            />
+                        </div>
+                        <div class='col-2'>
+                            <IconCheck
+                                class='cursor-pointer'
+                                size='32'
+                                @click='setToken'
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
-        </template>
-        <template v-if='newToken.show && newToken.token'>
-            <div class='col-12'>
-                <h2 class='txt-bold fl' v-text='newToken.name'></h2>
-                <IconX @click='newToken.show = false' class='cursor-pointer' size='32'/>
-            </div>
+            </template>
+            <template v-if='newToken.show && newToken.token'>
+                <div class='col-12'>
+                    <h2
+                        class='txt-bold fl'
+                        v-text='newToken.name'
+                    />
+                    <IconX
+                        class='cursor-pointer'
+                        size='32'
+                        @click='newToken.show = false'
+                    />
+                </div>
 
-            <div class='col-12'>
-                <pre class='pre txt--s' v-text='newToken.token'/>
-            </div>
-        </template>
-        <template v-else>
-            <table class="table table-hover table-vcenter card-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Attributes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr :key='token.id' v-for='token in tokens' class='cursor-pointer'>
-                        <td><span v-text='token.name'/></td>
-                        <td>
-                            <div class='d-flex'>
-                                <div class='ms-auto'>
-                                    <IconTrash @click='deleteToken(token.id)' class='cursor-pointer' size='32'/>
+                <div class='col-12'>
+                    <pre
+                        class='pre txt--s'
+                        v-text='newToken.token'
+                    />
+                </div>
+            </template>
+            <template v-else>
+                <table class='table table-hover table-vcenter card-table'>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Attributes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for='token in tokens'
+                            :key='token.id'
+                            class='cursor-pointer'
+                        >
+                            <td><span v-text='token.name' /></td>
+                            <td>
+                                <div class='d-flex'>
+                                    <div class='ms-auto'>
+                                        <IconTrash
+                                            class='cursor-pointer'
+                                            size='32'
+                                            @click='deleteToken(token.id)'
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </template>
         </template>
-    </template>
-</div>
+    </div>
 </template>
 
 <script>
@@ -79,6 +129,16 @@ import {
 
 export default {
     name: 'Tokens',
+    components: {
+        IconX,
+        IconPlus,
+        IconTrash,
+        IconRefresh,
+        IconCheck,
+        TablerInput,
+        TablerNone,
+        TablerLoading
+    },
     props: [ ],
     data: function() {
         return {
@@ -91,9 +151,6 @@ export default {
             loading: false
         };
     },
-    mounted: function() {
-        this.refresh();
-    },
     watch: {
         'newToken.show': function() {
             if (!this.newToken.show) {
@@ -103,6 +160,9 @@ export default {
 
             this.getTokens();
         }
+    },
+    mounted: function() {
+        this.refresh();
     },
     methods: {
         refresh: function() {
@@ -146,16 +206,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        IconX,
-        IconPlus,
-        IconTrash,
-        IconRefresh,
-        IconCheck,
-        TablerInput,
-        TablerNone,
-        TablerLoading
     }
 }
 </script>

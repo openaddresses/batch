@@ -1,45 +1,60 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
-                        <TablerBreadCrumb/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class='page-body'>
-        <div class='container-xl'>
-            <div class='row row-deck row-cards'>
-                <div class='col-12'>
-                    <div class='card'>
-                        <div class='card-header'>
-                            <div class='card-title row'>
-                                <div class='d-flex'>
-                                    <Status v-if='job.status' :status='job.status'/>
-                                    <div class='mx-2 align-self-center'>
-                                        Job <span v-text='$route.params.jobid'/>
-                                    </div>
-                                </div>
-                                <div style='padding-left: 50px;' class='subheader' v-text='`${job.source_name} - ${job.layer} - ${job.name}`'></div>
-                            </div>
-
-                            <div class='ms-auto btn-list'>
-                                <IconRefresh @click='getJob' class='cursor-pointer' size='32'/>
-                            </div>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
                         </div>
-                        <TablerLoading v-if='loading'/>
-                        <Log v-else logtype='job' :id='$route.params.jobid'/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <div class='card'>
+                            <div class='card-header'>
+                                <div class='card-title row'>
+                                    <div class='d-flex'>
+                                        <Status
+                                            v-if='job.status'
+                                            :status='job.status'
+                                        />
+                                        <div class='mx-2 align-self-center'>
+                                            Job <span v-text='$route.params.jobid' />
+                                        </div>
+                                    </div>
+                                    <div
+                                        style='padding-left: 50px;'
+                                        class='subheader'
+                                        v-text='`${job.source_name} - ${job.layer} - ${job.name}`'
+                                    />
+                                </div>
+
+                                <div class='ms-auto btn-list'>
+                                    <IconRefresh
+                                        class='cursor-pointer'
+                                        size='32'
+                                        @click='getJob'
+                                    />
+                                </div>
+                            </div>
+                            <TablerLoading v-if='loading' />
+                            <Log
+                                v-else
+                                :id='$route.params.jobid'
+                                logtype='job'
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -55,6 +70,13 @@ import {
 
 export default {
     name: 'JobLog',
+    components: {
+        IconRefresh,
+        TablerLoading,
+        TablerBreadCrumb,
+        Status,
+        Log
+    },
     data: function() {
         return {
             loading: true,
@@ -74,13 +96,6 @@ export default {
                 this.$emit('err', err);
             }
         },
-    },
-    components: {
-        IconRefresh,
-        TablerLoading,
-        TablerBreadCrumb,
-        Status,
-        Log
     }
 }
 </script>

@@ -3,20 +3,26 @@
         <div>
             <template v-if='parseInt(total) <= parseInt(perpage)'>
                 <button
-                    @click='page(0)'
                     class='btn btn--s round'
+                    @click='page(0)'
                 >
-                    <svg class='fl icon' style='margin-top: 4px;'><use xlink:href='#icon-home'/></svg>
+                    <svg
+                        class='fl icon'
+                        style='margin-top: 4px;'
+                    ><use xlink:href='#icon-home' /></svg>
                     Home
                 </button>
             </template>
             <template v-else>
                 <button
-                    @click='page(0)'
                     class='btn btn--s btn--pill btn--pill-hl'
                     :class='{ "btn--stroke": current !== 0 }'
+                    @click='page(0)'
                 >
-                    <svg class='fl icon' style='margin-top: 4px;'><use xlink:href='#icon-home'/></svg>
+                    <svg
+                        class='fl icon'
+                        style='margin-top: 4px;'
+                    ><use xlink:href='#icon-home' /></svg>
                     Home
                 </button>
 
@@ -26,25 +32,24 @@
 
                 <template v-if='parseInt(total) / parseInt(perpage) > 2'>
                     <button
-                        :key=i
                         v-for='i in middle'
-                        @click='page(i)'
+                        :key='i'
                         class='btn btn--s btn--pill btn--pill-hc'
-                        v-text='i + 1'
                         :class='{ "btn--stroke": current !== i }'
-                    >
-                    </button>
+                        @click='page(i)'
+                        v-text='i + 1'
+                    />
                 </template>
 
                 <template v-if='end > 5 && current < end - spread'>
                     <span class=''> ... </span>
                 </template>
                 <button
-                    @click='page(end - 1)'
                     class='btn btn--s btn--pill btn--pill-hr'
-                    v-text='end'
                     :class='{ "btn--stroke": current !== end - 1 }'
-                ></button>
+                    @click='page(end - 1)'
+                    v-text='end'
+                />
             </template>
         </div>
     </div>

@@ -1,16 +1,46 @@
 <template>
-<div class='btn-list'>
-    <template v-if='error.status === "Warn"'>
-        <button v-on:click.stop.prevent='mod(error.job || error.id, true)' class='btn'>Confirm</button>
-        <button v-on:click.stop.prevent='mod(error.job || error.id, false)' class='btn btn-danger'>Reject</button>
-        <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })' class='btn'>Logs</button>
-    </template>
-    <template v-else-if='error.status === "Fail"'>
-        <button v-on:click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })' class='btn'>Logs</button>
-        <button v-on:click.stop.prevent='createRerun(error.job || error.id)' class='btn btn-secondary'>Rerun</button>
-        <button v-on:click.stop.prevent='mod(error.job || error.id, false)' class='btn btn-primary'>Suppress</button>
-    </template>
-</div>
+    <div class='btn-list'>
+        <template v-if='error.status === "Warn"'>
+            <button
+                class='btn'
+                @click.stop.prevent='mod(error.job || error.id, true)'
+            >
+                Confirm
+            </button>
+            <button
+                class='btn btn-danger'
+                @click.stop.prevent='mod(error.job || error.id, false)'
+            >
+                Reject
+            </button>
+            <button
+                class='btn'
+                @click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })'
+            >
+                Logs
+            </button>
+        </template>
+        <template v-else-if='error.status === "Fail"'>
+            <button
+                class='btn'
+                @click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })'
+            >
+                Logs
+            </button>
+            <button
+                class='btn btn-secondary'
+                @click.stop.prevent='createRerun(error.job || error.id)'
+            >
+                Rerun
+            </button>
+            <button
+                class='btn btn-primary'
+                @click.stop.prevent='mod(error.job || error.id, false)'
+            >
+                Suppress
+            </button>
+        </template>
+    </div>
 </template>
 
 <script>

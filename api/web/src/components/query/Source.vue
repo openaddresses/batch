@@ -1,11 +1,20 @@
 <template>
-<div class='col-12'>
-    <TablerInput v-model='source' label='Source'/>
+    <div class='col-12'>
+        <TablerInput
+            v-model='source'
+            label='Source'
+        />
 
-    <label v-if='showValidated' class='w-full'>
-        <TablerToggle label='Validated Data' v-model='validated'/>
-    </label>
-</div>
+        <label
+            v-if='showValidated'
+            class='w-full'
+        >
+            <TablerToggle
+                v-model='validated'
+                label='Validated Data'
+            />
+        </label>
+    </div>
 </template>
 
 <script>
@@ -16,6 +25,10 @@ import {
 
 export default {
     name: 'QuerySource',
+    components: {
+        TablerInput,
+        TablerToggle
+    },
     props: {
         showValidated: {
             type: Boolean,
@@ -35,10 +48,6 @@ export default {
         validated: function() {
             this.$emit('validated', this.validated);
         }
-    },
-    components: {
-        TablerInput,
-        TablerToggle
     }
 }
 </script>

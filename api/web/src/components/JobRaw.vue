@@ -2,25 +2,41 @@
     <div class='col col--12'>
         <div class='col col--12 grid border-b border--gray-light bg-white pt12'>
             <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>Job #<span v-text='$route.params.jobid'/></h2>
+                <h2 class='txt-h4 ml12 pb12 fl'>
+                    Job #<span v-text='$route.params.jobid' />
+                </h2>
 
                 <div class='ms-auto btn-list'>
-                    <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
-                    <IconBrandGithub @click='external(job.source)' class='cursor-pointer' size='32'/>
-                    <IconLink v-if='job.source' @click='external(raw.data)' size='32'/>
+                    <IconRefresh
+                        class='cursor-pointer'
+                        size='32'
+                        @click='refresh'
+                    />
+                    <IconBrandGithub
+                        class='cursor-pointer'
+                        size='32'
+                        @click='external(job.source)'
+                    />
+                    <IconLink
+                        v-if='job.source'
+                        size='32'
+                        @click='external(raw.data)'
+                    />
                 </div>
             </div>
         </div>
 
         <template v-if='loading.job || loading.raw'>
             <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
+                <div class='loading' />
             </div>
         </template>
         <template v-else>
-            <pre class='pre' v-text='JSON.stringify(raw, null, 4)'/>
+            <pre
+                class='pre'
+                v-text='JSON.stringify(raw, null, 4)'
+            />
         </template>
-
     </div>
 </template>
 
@@ -33,6 +49,11 @@ import {
 
 export default {
     name: 'JobRaw',
+    components: {
+        IconRefresh,
+        IconBrandGithub,
+        IconLink
+    },
     data: function () {
         return {
             loading: {
@@ -83,11 +104,6 @@ export default {
                 this.$emit('err', err);
             }
         },
-    },
-    components: {
-        IconRefresh,
-        IconBrandGithub,
-        IconLink
     }
 }
 </script>

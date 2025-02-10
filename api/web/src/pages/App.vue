@@ -1,67 +1,141 @@
 <template>
-<div class='page relative'>
-    <header class='navbar navbar-expand-md d-print-none sticky-top' data-bs-theme="dark">
-        <div class="container-xl">
-            <div class="col-auto">
-                <img @click='$router.push("/")' class='cursor-pointer' height='40' width='40' src='/logo.jpg'>
-            </div>
-            <div class="col mx-2">
-                <div class="page-pretitle">OpenAddresses</div>
-                <h2 class="page-title">Batch Processing</h2>
-            </div>
-
-            <div class='ms-auto'>
-                <div class='btn-list'>
-                    <a href="/docs/" class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <IconHelp size='32'/>
-                    </a>
-                    <a v-if='false' href="/map" class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <IconMap size='32'/>
-                    </a>
-
-                    <div class='dropdown'>
-                        <div type="button" id="userProfileButton" data-bs-toggle="dropdown" aria-expanded="false" class='btn btn-dark'>
-                            <IconMenu size='32'/>
-                        </div>
-                        <ul class="dropdown-menu" aria-labelledby='userProfileButton'>
-                            <a @click='$router.push("/run")' class="dropdown-item cursor-pointer">Runs</a>
-                            <a @click='$router.push("/job")' class="dropdown-item cursor-pointer">Jobs</a>
-                            <a @click='$router.push("/error")' class="dropdown-item cursor-pointer">Errors</a>
-                            <a @click='$router.push("/upload")' class="dropdown-item cursor-pointer"> Contribute</a>
-                        </ul>
+    <div class='page relative'>
+        <header
+            class='navbar navbar-expand-md d-print-none sticky-top'
+            data-bs-theme='dark'
+        >
+            <div class='container-xl'>
+                <div class='col-auto'>
+                    <img
+                        class='cursor-pointer'
+                        height='40'
+                        width='40'
+                        src='/logo.jpg'
+                        @click='$router.push("/")'
+                    >
+                </div>
+                <div class='col mx-2'>
+                    <div class='page-pretitle'>
+                        OpenAddresses
                     </div>
+                    <h2 class='page-title'>
+                        Batch Processing
+                    </h2>
+                </div>
 
-                    <a class="btn btn-dark" target="_blank" rel="noreferrer">
-                        <div v-if='auth.username' class='dropdown'>
-                            <div type='button' id="userProfileButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <IconUser size='32'/>
+                <div class='ms-auto'>
+                    <div class='btn-list'>
+                        <a
+                            href='/docs/'
+                            class='btn btn-dark'
+                            target='_blank'
+                            rel='noreferrer'
+                        >
+                            <IconHelp size='32' />
+                        </a>
+                        <a
+                            v-if='false'
+                            href='/map'
+                            class='btn btn-dark'
+                            target='_blank'
+                            rel='noreferrer'
+                        >
+                            <IconMap size='32' />
+                        </a>
+
+                        <div class='dropdown'>
+                            <div
+                                id='userProfileButton'
+                                type='button'
+                                data-bs-toggle='dropdown'
+                                aria-expanded='false'
+                                class='btn btn-dark'
+                            >
+                                <IconMenu size='32' />
                             </div>
-                            <ul class="dropdown-menu" aria-labelledby='userProfileButton'>
-                                <a @click='$router.push("/profile")' class="cursor-pointer dropdown-item">Profile</a>
+                            <ul
+                                class='dropdown-menu'
+                                aria-labelledby='userProfileButton'
+                            >
                                 <a
-                                    @click='$router.push(`/profile/admin`)'
-                                    v-if='auth && auth.access === "admin"'
-                                    class='cursor-pointer dropdown-item'
-                                >Admin</a>
-                                <a @click='$router.push("/logout")' class="cursor-pointer dropdown-item">Logout</a>
+                                    class='dropdown-item cursor-pointer'
+                                    @click='$router.push("/run")'
+                                >Runs</a>
+                                <a
+                                    class='dropdown-item cursor-pointer'
+                                    @click='$router.push("/job")'
+                                >Jobs</a>
+                                <a
+                                    class='dropdown-item cursor-pointer'
+                                    @click='$router.push("/error")'
+                                >Errors</a>
+                                <a
+                                    class='dropdown-item cursor-pointer'
+                                    @click='$router.push("/upload")'
+                                > Contribute</a>
                             </ul>
                         </div>
 
+                        <a
+                            class='btn btn-dark'
+                            target='_blank'
+                            rel='noreferrer'
+                        >
+                            <div
+                                v-if='auth.username'
+                                class='dropdown'
+                            >
+                                <div
+                                    id='userProfileButton'
+                                    type='button'
+                                    data-bs-toggle='dropdown'
+                                    aria-expanded='false'
+                                >
+                                    <IconUser size='32' />
+                                </div>
+                                <ul
+                                    class='dropdown-menu'
+                                    aria-labelledby='userProfileButton'
+                                >
+                                    <a
+                                        class='cursor-pointer dropdown-item'
+                                        @click='$router.push("/profile")'
+                                    >Profile</a>
+                                    <a
+                                        v-if='auth && auth.access === "admin"'
+                                        class='cursor-pointer dropdown-item'
+                                        @click='$router.push(`/profile/admin`)'
+                                    >Admin</a>
+                                    <a
+                                        class='cursor-pointer dropdown-item'
+                                        @click='$router.push("/logout")'
+                                    >Logout</a>
+                                </ul>
+                            </div>
 
-                        <IconLogin @click='$router.push("/login")' v-else size='32'/>
-                    </a>
+
+                            <IconLogin
+                                v-else
+                                size='32'
+                                @click='$router.push("/login")'
+                            />
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <router-view
-        @auth='getLogin'
-        :auth='auth'
-    />
+        <router-view
+            :auth='auth'
+            @auth='getLogin'
+        />
 
-    <TablerError v-if='err' :err='err' @close='err = null'/>
-</div>
+        <TablerError
+            v-if='err'
+            :err='err'
+            @close='err = null'
+        />
+    </div>
 </template>
 
 <script>
@@ -81,9 +155,14 @@ import {
 
 export default {
     name: 'OpenAddresses',
-    mounted: async function() {
-        await this.getLogin();
-        await this.getCount();
+    components: {
+        Err,
+        IconHelp,
+        IconMenu,
+        IconUser,
+        IconLogin,
+        IconMap,
+        TablerError
     },
     data: function() {
         return {
@@ -101,6 +180,10 @@ export default {
             jobid: false,
             dataid: false
         };
+    },
+    mounted: async function() {
+        await this.getLogin();
+        await this.getCount();
     },
     errorCaptured: function(err) {
         this.err = err;
@@ -151,15 +234,6 @@ export default {
                 window.open(url, "_blank");
             }
         },
-    },
-    components: {
-        Err,
-        IconHelp,
-        IconMenu,
-        IconUser,
-        IconLogin,
-        IconMap,
-        TablerError
     }
 }
 </script>

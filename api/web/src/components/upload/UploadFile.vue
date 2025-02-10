@@ -1,35 +1,70 @@
 <template>
     <div class='col col--12 py12 px12 border border--gray-light round'>
-        <div id='dragndrop' class='col col--12'>
-
-            <div class='col col--12' :class='{ "none": progress !== 0 }'>
-                <div class='pb6'>Select a file to upload</div>
+        <div
+            id='dragndrop'
+            class='col col--12'
+        >
+            <div
+                class='col col--12'
+                :class='{ "none": progress !== 0 }'
+            >
+                <div class='pb6'>
+                    Select a file to upload
+                </div>
                 <form>
-                    <input ref='fileInput' type='file' id='file' name='file' accept='*' @change='upload' />
+                    <input
+                        id='file'
+                        ref='fileInput'
+                        type='file'
+                        name='file'
+                        accept='*'
+                        @change='upload'
+                    >
                 </form>
             </div>
 
-            <div v-if='progress && progress < 101' class='col col--12'>
+            <div
+                v-if='progress && progress < 101'
+                class='col col--12'
+            >
                 <div class='flex flex--center-main w-full py24'>
-                    <div class='loading'></div>
+                    <div class='loading' />
                 </div>
 
-                <div class='align-center txt-truncate' v-text='name'></div>
+                <div
+                    class='align-center txt-truncate'
+                    v-text='name'
+                />
 
                 <div class='col col--12 border border--gray-light round h12 my12'>
-                    <div :style='{ "width": progress + "%" }' class='h-full bg-gray-light'></div>
+                    <div
+                        :style='{ "width": progress + "%" }'
+                        class='h-full bg-gray-light'
+                    />
                 </div>
             </div>
             <div v-else-if='progress === 101'>
-                <div class='align-center txt-truncate' v-text='name'></div>
+                <div
+                    class='align-center txt-truncate'
+                    v-text='name'
+                />
                 <div class='col col--12 pre'>
-                    <div :key='u.url' v-for='u in url'>
-                        <span v-text='u.url'/>
+                    <div
+                        v-for='u in url'
+                        :key='u.url'
+                    >
+                        <span v-text='u.url' />
                     </div>
                 </div>
                 <div class='col col--12 clearfix pt12'>
-                    <button @click='refresh' class='btn round btn--stroke fr btn--gray'>
-                        <svg class='fl icon' style='margin-top: 6px;'><use href='#icon-refresh'/></svg>Upload
+                    <button
+                        class='btn round btn--stroke fr btn--gray'
+                        @click='refresh'
+                    >
+                        <svg
+                            class='fl icon'
+                            style='margin-top: 6px;'
+                        ><use href='#icon-refresh' /></svg>Upload
                     </button>
                 </div>
             </div>

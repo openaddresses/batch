@@ -1,186 +1,335 @@
 <template>
-<div class='page-body'>
-    <div class='container-xl'>
-        <div class='row row-deck row-cards'>
-            <div class='col-12'>
-                <div class='card'>
-                    <div class='card-header'>
-                        <h3 class='card-title'>New Features</h3>
-                    </div>
-                    <div class='card-body row'>
-                        <div class='col-4 d-flex justify-content-center align-items-center'>
-                            <LayerIcon layer='buildings' size='32' stroke='1'/>
-                            Buildings
+    <div class='page-body'>
+        <div class='container-xl'>
+            <div class='row row-deck row-cards'>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h3 class='card-title'>
+                                New Features
+                            </h3>
                         </div>
-                        <div class='col-4 d-flex justify-content-center align-items-center'>
-                            <LayerIcon layer='addresses' size='32' stroke='1'/>
-                            Addresses
-                        </div>
-                        <div class='col-4 d-flex justify-content-center align-items-center'>
-                            <LayerIcon layer='parcels' size='32' stroke='1'/>
-                            Parcels
-                        </div>
-                        <div class='col-12'>
-                            <div class='text-center pt-3'>
-                                <div>After many months of work, we've expanded the project to include parcels and building polygons.</div>
-                                <div>Look for the symbols above in the data sources to download the new layers</div>
+                        <div class='card-body row'>
+                            <div class='col-4 d-flex justify-content-center align-items-center'>
+                                <LayerIcon
+                                    layer='buildings'
+                                    size='32'
+                                    stroke='1'
+                                />
+                                Buildings
+                            </div>
+                            <div class='col-4 d-flex justify-content-center align-items-center'>
+                                <LayerIcon
+                                    layer='addresses'
+                                    size='32'
+                                    stroke='1'
+                                />
+                                Addresses
+                            </div>
+                            <div class='col-4 d-flex justify-content-center align-items-center'>
+                                <LayerIcon
+                                    layer='parcels'
+                                    size='32'
+                                    stroke='1'
+                                />
+                                Parcels
+                            </div>
+                            <div class='col-12'>
+                                <div class='text-center pt-3'>
+                                    <div>After many months of work, we've expanded the project to include parcels and building polygons.</div>
+                                    <div>Look for the symbols above in the data sources to download the new layers</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class='col-12'>
-                <div class='card'>
-                    <div class='card-header'>
-                        <h2 class='card-title'>Data Collections</h2>
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h2 class='card-title'>
+                                Data Collections
+                            </h2>
 
-                        <div class='ms-auto btn-list'>
-                            <IconRefresh @click='fetchCollections' class='cursor-pointer' size='32' stroke='1'/>
-                        </div>
-                    </div>
-
-                    <TablerLoading v-if='loading.collections' desc='Loading Collections'/>
-                    <table v-else class="table table-hover table-vcenter card-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Updated</th>
-                                <th>Size</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr :key='c.id' v-for='c in collections'>
-                                <td v-text='c.human'></td>
-                                <td v-text='fmt(c.created)'></td>
-                                <td class='d-flex'>
-                                    <span v-text='size(c.size)'/>
-                                    <div class='ms-auto btn-list'>
-                                        <IconDownload v-on:click.stop.prevent='collectionpls(c)' class='cursor-pointer' size='32' stroke='1'/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class='col-12'>
-                <div class='card'>
-                    <div class='card-header'>
-                        <h2 class='card-title'>Individual Sources</h2>
-
-                        <div class='ms-auto btn-list'>
-                            <IconArrowsMaximize @click='fullscreen = true' v-if='!fullscreen' class='cursor-pointer' size='32' stroke='1'/>
-                            <IconArrowsMinimize @click='fullscreen = false' v-else class='cursor-pointer' size='32' stroke='1'/>
-
-                            <IconSearch @click='showFilter = !showFilter' v-if='!showFilter' class='cursor-pointer' size='32' stroke='1'/>
-                            <IconX  @click='showFilter = !showFilter' v-else class='cursor-pointer' size='32' stroke='1'/>
-
-                            <IconRefresh @click='fetchData' class='cursor-pointer' size='32' stroke='1'/>
-                        </div>
-                    </div>
-
-                    <template v-if='showFilter'>
-                        <div class='card-body row'>
-                            <div class='col col--9 px6'>
-                                <QuerySource
-                                    showValidated=true
-                                    @source='filter.source = $event'
-                                    @validated='filter.validated = $event'
+                            <div class='ms-auto btn-list'>
+                                <IconRefresh
+                                    class='cursor-pointer'
+                                    size='32'
+                                    stroke='1'
+                                    @click='fetchCollections'
                                 />
                             </div>
-                            <div class='col col--3 px6'>
-                                <QueryLayer @layer='filter.layer = $event'/>
-                            </div>
-                            <div class='col col--6 px6'>
-                                <TablerInput label='Before' type='date' v-model='filter.before'/>
-                                <TablerToggle label='Before Enabled' v-model='filter.switches.before'/>
-                            </div>
-                            <div class='col col--6 px6'>
-                                <TablerInput label='After' type='date' v-model='filter.after'/>
-                                <TablerToggle label='After Enabled' v-model='filter.switches.after'/>
-                            </div>
                         </div>
-                    </template>
 
-                    <TablerLoading v-if='loading.sources' desc='Loading Sources'/>
-                    <template v-else>
-                        <Coverage
-                            :fullscreen='fullscreen'
-                            @err='$emit("err", $event)'
-                            v-on:point='filter.point = $event'
-                            :layer='filter.layer'
+                        <TablerLoading
+                            v-if='loading.collections'
+                            desc='Loading Collections'
                         />
-
-                        <table class="table table-hover table-vcenter card-table">
+                        <table
+                            v-else
+                            class='table table-hover table-vcenter card-table'
+                        >
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Layers</th>
-                                    <th>Attributes</th>
+                                    <th>Updated</th>
+                                    <th>Size</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <template :key='d.source' v-for='d in datas'>
-                                    <tr>
-                                        <td @click='d._open = !d._open' v-text='d.source' class='cursor-pointer'></td>
-                                        <td @click='d._open = !d._open' class='cursor-pointer'>
-                                            <LayerIcon v-if='d.has.buildings' layer='buildings' size='32' stroke='1'/>
-                                            <LayerIcon v-if='d.has.addresses' layer='addresses' size='32' stroke='1'/>
-                                            <LayerIcon v-if='d.has.parcels' layer='parcels' size='32' stroke='1'/>
-                                        </td>
-                                        <td>
-                                            <div class='d-flex'>
-                                                <div class='ms-auto btn-list'>
-                                                    <IconMap v-if='d.map' @click='$router.push(`/location/${d.map}`)' class='cursor-pointer' size='32' stroke='1'/>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <template v-if='d._open' :key='job.id' v-for='job in d.sources'>
-                                        <tr><td colspan='3' class='cursor-pointer'>
-                                            <div class='row'>
-                                                <div @click='emitjob(job.job)' class='col-5 d-flex align-items-center'>
-                                                    <span v-text='job.layer'/>&nbsp;-&nbsp;<span v-text='job.name'/>
-
-                                                </div>
-                                                <div @click='emitjob(job.job)' class='col-2 d-flex align-items-center'>
-                                                    <span v-text='fmt(job.updated)'/>
-                                                </div>
-                                                <div class='col-5 d-flex'>
-                                                    <div class='ms-auto btn-list'>
-                                                        <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-
-                                                        <template v-if='auth && auth.access === "admin"'>
-                                                            <TablerDropdown>
-                                                                <slot>
-                                                                    <IconSettings class='cursor-pointer' size='32' stroke='1'/>
-                                                                </slot>
-                                                                <template #dropdown>
-                                                                    <TablerToggle @change='updateData(job)' v-model='job.fabric' label='Fabric'/>
-                                                                    <TablerDelete @delete='deleteData(job)'/>
-                                                                </template>
-                                                            </TablerDropdown>
-                                                        </template>
-
-                                                        <IconHistory @click='$router.push(`/data/${job.id}/history`)' class='cursor-pointer' size='32' stroke='1'/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td></tr>
-                                    </template>
-                                </template>
+                                <tr
+                                    v-for='c in collections'
+                                    :key='c.id'
+                                >
+                                    <td v-text='c.human' />
+                                    <td v-text='fmt(c.created)' />
+                                    <td class='d-flex'>
+                                        <span v-text='size(c.size)' />
+                                        <div class='ms-auto btn-list'>
+                                            <IconDownload
+                                                class='cursor-pointer'
+                                                size='32'
+                                                stroke='1'
+                                                @click.stop.prevent='collectionpls(c)'
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
-                    </template>
+                    </div>
+                </div>
+
+                <div class='col-12'>
+                    <div class='card'>
+                        <div class='card-header'>
+                            <h2 class='card-title'>
+                                Individual Sources
+                            </h2>
+
+                            <div class='ms-auto btn-list'>
+                                <IconArrowsMaximize
+                                    v-if='!fullscreen'
+                                    class='cursor-pointer'
+                                    size='32'
+                                    stroke='1'
+                                    @click='fullscreen = true'
+                                />
+                                <IconArrowsMinimize
+                                    v-else
+                                    class='cursor-pointer'
+                                    size='32'
+                                    stroke='1'
+                                    @click='fullscreen = false'
+                                />
+
+                                <IconSearch
+                                    v-if='!showFilter'
+                                    class='cursor-pointer'
+                                    size='32'
+                                    stroke='1'
+                                    @click='showFilter = !showFilter'
+                                />
+                                <IconX
+                                    v-else
+                                    class='cursor-pointer'
+                                    size='32'
+                                    stroke='1'
+                                    @click='showFilter = !showFilter'
+                                />
+
+                                <IconRefresh
+                                    class='cursor-pointer'
+                                    size='32'
+                                    stroke='1'
+                                    @click='fetchData'
+                                />
+                            </div>
+                        </div>
+
+                        <template v-if='showFilter'>
+                            <div class='card-body row'>
+                                <div class='col col--9 px6'>
+                                    <QuerySource
+                                        show-validated='true'
+                                        @source='filter.source = $event'
+                                        @validated='filter.validated = $event'
+                                    />
+                                </div>
+                                <div class='col col--3 px6'>
+                                    <QueryLayer @layer='filter.layer = $event' />
+                                </div>
+                                <div class='col col--6 px6'>
+                                    <TablerInput
+                                        v-model='filter.before'
+                                        label='Before'
+                                        type='date'
+                                    />
+                                    <TablerToggle
+                                        v-model='filter.switches.before'
+                                        label='Before Enabled'
+                                    />
+                                </div>
+                                <div class='col col--6 px6'>
+                                    <TablerInput
+                                        v-model='filter.after'
+                                        label='After'
+                                        type='date'
+                                    />
+                                    <TablerToggle
+                                        v-model='filter.switches.after'
+                                        label='After Enabled'
+                                    />
+                                </div>
+                            </div>
+                        </template>
+
+                        <TablerLoading
+                            v-if='loading.sources'
+                            desc='Loading Sources'
+                        />
+                        <template v-else>
+                            <Coverage
+                                :fullscreen='fullscreen'
+                                :layer='filter.layer'
+                                @err='$emit("err", $event)'
+                                @point='filter.point = $event'
+                            />
+
+                            <table class='table table-hover table-vcenter card-table'>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Layers</th>
+                                        <th>Attributes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template
+                                        v-for='d in datas'
+                                        :key='d.source'
+                                    >
+                                        <tr>
+                                            <td
+                                                class='cursor-pointer'
+                                                @click='d._open = !d._open'
+                                                v-text='d.source'
+                                            />
+                                            <td
+                                                class='cursor-pointer'
+                                                @click='d._open = !d._open'
+                                            >
+                                                <LayerIcon
+                                                    v-if='d.has.buildings'
+                                                    layer='buildings'
+                                                    size='32'
+                                                    stroke='1'
+                                                />
+                                                <LayerIcon
+                                                    v-if='d.has.addresses'
+                                                    layer='addresses'
+                                                    size='32'
+                                                    stroke='1'
+                                                />
+                                                <LayerIcon
+                                                    v-if='d.has.parcels'
+                                                    layer='parcels'
+                                                    size='32'
+                                                    stroke='1'
+                                                />
+                                            </td>
+                                            <td>
+                                                <div class='d-flex'>
+                                                    <div class='ms-auto btn-list'>
+                                                        <IconMap
+                                                            v-if='d.map'
+                                                            class='cursor-pointer'
+                                                            size='32'
+                                                            stroke='1'
+                                                            @click='$router.push(`/location/${d.map}`)'
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <template
+                                            v-for='job in d.sources'
+                                            v-if='d._open'
+                                            :key='job.id'
+                                        >
+                                            <tr>
+                                                <td
+                                                    colspan='3'
+                                                    class='cursor-pointer'
+                                                >
+                                                    <div class='row'>
+                                                        <div
+                                                            class='col-5 d-flex align-items-center'
+                                                            @click='emitjob(job.job)'
+                                                        >
+                                                            <span v-text='job.layer' />&nbsp;-&nbsp;<span v-text='job.name' />
+                                                        </div>
+                                                        <div
+                                                            class='col-2 d-flex align-items-center'
+                                                            @click='emitjob(job.job)'
+                                                        >
+                                                            <span v-text='fmt(job.updated)' />
+                                                        </div>
+                                                        <div class='col-5 d-flex'>
+                                                            <div class='ms-auto btn-list'>
+                                                                <Download
+                                                                    :auth='auth'
+                                                                    :job='job'
+                                                                    @login='$emit("login")'
+                                                                    @perk='$emit("perk", $event)'
+                                                                />
+
+                                                                <template v-if='auth && auth.access === "admin"'>
+                                                                    <TablerDropdown>
+                                                                        <slot>
+                                                                            <IconSettings
+                                                                                class='cursor-pointer'
+                                                                                size='32'
+                                                                                stroke='1'
+                                                                            />
+                                                                        </slot>
+                                                                        <template #dropdown>
+                                                                            <TablerToggle
+                                                                                v-model='job.fabric'
+                                                                                label='Fabric'
+                                                                                @change='updateData(job)'
+                                                                            />
+                                                                            <TablerDelete @delete='deleteData(job)' />
+                                                                        </template>
+                                                                    </TablerDropdown>
+                                                                </template>
+
+                                                                <IconHistory
+                                                                    class='cursor-pointer'
+                                                                    size='32'
+                                                                    stroke='1'
+                                                                    @click='$router.push(`/data/${job.id}/history`)'
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <MustLogin v-if='loginModal === true' @close='loginModal = false'/>
-</div>
+        <MustLogin
+            v-if='loginModal === true'
+            @close='loginModal = false'
+        />
+    </div>
 </template>
 
 <script>
@@ -212,6 +361,28 @@ import {
 
 export default {
     name: 'OAData',
+    components: {
+        MustLogin,
+        IconArrowsMaximize,
+        IconArrowsMinimize,
+        IconSettings,
+        IconDownload,
+        IconHistory,
+        IconRefresh,
+        IconSearch,
+        IconMap,
+        IconX,
+        Coverage,
+        QuerySource,
+        QueryLayer,
+        Download,
+        TablerLoading,
+        TablerInput,
+        TablerToggle,
+        TablerDropdown,
+        TablerDelete,
+        LayerIcon
+    },
     props: ['auth'],
     data: function() {
         return {
@@ -239,10 +410,6 @@ export default {
             collections: []
         };
     },
-    mounted: function() {
-        this.fetchCollections();
-        this.fetchData();
-    },
     watch: {
         showFilter: function() {
             this.filter.source = '';
@@ -254,6 +421,10 @@ export default {
                 await this.fetchData();
             }
         }
+    },
+    mounted: function() {
+        this.fetchCollections();
+        this.fetchData();
     },
     methods: {
         fmt: function(date) {
@@ -372,28 +543,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        MustLogin,
-        IconArrowsMaximize,
-        IconArrowsMinimize,
-        IconSettings,
-        IconDownload,
-        IconHistory,
-        IconRefresh,
-        IconSearch,
-        IconMap,
-        IconX,
-        Coverage,
-        QuerySource,
-        QueryLayer,
-        Download,
-        TablerLoading,
-        TablerInput,
-        TablerToggle,
-        TablerDropdown,
-        TablerDelete,
-        LayerIcon
     }
 }
 </script>

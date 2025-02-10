@@ -1,62 +1,90 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
-                        <TablerBreadCrumb/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class='page-body'>
-        <div class='container-xl'>
-            <div class='row row-deck row-cards'>
-                <div class='col-12'>
-                    <div class='card'>
-                        <div class='card-header'>
-                            <h3 class='card-title'>Source Runs</h3>
-
-                            <div class='ms-auto btn-list'>
-                                <IconRefresh @click='fetchRuns' class='cursor-pointer' size='32'/>
-                            </div>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <div class='card'>
+                            <div class='card-header'>
+                                <h3 class='card-title'>
+                                    Source Runs
+                                </h3>
 
-                        <TablerLoading v-if='loading' desc='Loading Runs'/>
-                        <table v-else class="table table-hover table-vcenter card-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Run ID</th>
-                                    <th>Created</th>
-                                    <th>Attributes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr @click='$router.push(`/run/${run.id}`);' :key='run.id' v-for='run in list.runs' class='cursor-pointer'>
-                                    <td><Status :status='run.status'/></td>
-                                    <td>Run <span v-text='run.id'/></td>
-                                    <td><span v-text='fmt(run.created)'/></td>
-                                    <td>
-                                        <div class='d-flex'>
-                                            <div class='ms-auto btn-list'>
-                                                <span v-if='run.live' class="badge bg-green text-white">Live</span>
-                                                <span v-if='run.github.sha' v-on:click.stop.prevent='github(run)' class="badge bg-blue text-white cursor-pointer">Github</span>
+                                <div class='ms-auto btn-list'>
+                                    <IconRefresh
+                                        class='cursor-pointer'
+                                        size='32'
+                                        @click='fetchRuns'
+                                    />
+                                </div>
+                            </div>
+
+                            <TablerLoading
+                                v-if='loading'
+                                desc='Loading Runs'
+                            />
+                            <table
+                                v-else
+                                class='table table-hover table-vcenter card-table'
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Run ID</th>
+                                        <th>Created</th>
+                                        <th>Attributes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for='run in list.runs'
+                                        :key='run.id'
+                                        class='cursor-pointer'
+                                        @click='$router.push(`/run/${run.id}`);'
+                                    >
+                                        <td><Status :status='run.status' /></td>
+                                        <td>Run <span v-text='run.id' /></td>
+                                        <td><span v-text='fmt(run.created)' /></td>
+                                        <td>
+                                            <div class='d-flex'>
+                                                <div class='ms-auto btn-list'>
+                                                    <span
+                                                        v-if='run.live'
+                                                        class='badge bg-green text-white'
+                                                    >Live</span>
+                                                    <span
+                                                        v-if='run.github.sha'
+                                                        class='badge bg-blue text-white cursor-pointer'
+                                                        @click.stop.prevent='github(run)'
+                                                    >Github</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <TableFooter
+                                :limit='paging.limit'
+                                :total='list.total'
+                                @page='paging.page = $event'
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -73,16 +101,12 @@ import {
 
 export default {
     name: 'Runs',
-    mounted: async function() {
-        await this.fetchRuns();
-    },
-    watch: {
-        paging: {
-            deep: true,
-            handler: async function() {
-                await this.fetchRuns();
-            }
-        }
+    components: {
+        Status,
+        IconRefresh,
+        TableFooter,
+        TablerLoading,
+        TablerBreadCrumb,
     },
     data: function() {
         return {
@@ -100,6 +124,17 @@ export default {
                 runs: []
             }
         };
+    },
+    watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchRuns();
+            }
+        }
+    },
+    mounted: async function() {
+        await this.fetchRuns();
     },
     methods: {
         fmt: function(date) {
@@ -124,13 +159,6 @@ export default {
 
                 this.loading = false;
         }
-    },
-    components: {
-        Status,
-        IconRefresh,
-        TableFooter,
-        TablerLoading,
-        TablerBreadCrumb,
     }
 }
 </script>

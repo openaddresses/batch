@@ -1,10 +1,18 @@
 <template>
-<div class='col-12'>
-    <TablerNone v-if='!job.bounds' label='Job Bounds' :create='false'/>
-    <template v-else>
-        <div id='map' class='w-100' style='height: 300px;'></div>
-    </template>
-</div>
+    <div class='col-12'>
+        <TablerNone
+            v-if='!job.bounds'
+            label='Job Bounds'
+            :create='false'
+        />
+        <template v-else>
+            <div
+                id='map'
+                class='w-100'
+                style='height: 300px;'
+            />
+        </template>
+    </div>
 </template>
 
 <script>
@@ -18,6 +26,9 @@ let map;
 
 export default {
     name: 'JobMap',
+    components: {
+        TablerNone
+    },
     props: ['job', 'delta'],
     mounted: function() {
         this.$nextTick(() => {
@@ -77,9 +88,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        TablerNone
     }
 }
 </script>

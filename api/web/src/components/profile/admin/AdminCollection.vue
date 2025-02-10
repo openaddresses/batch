@@ -1,32 +1,45 @@
 <template>
-<div class='card'>
-    <div class='card-header d-flex'>
-        <h2 class='card-title'>Collections</h2>
+    <div class='card'>
+        <div class='card-header d-flex'>
+            <h2 class='card-title'>
+                Collections
+            </h2>
 
-        <div class='ms-auto btn-list'>
-            <IconPlus @click='collections.splice(0, 0, {})' class='cursor-pointer' size='32'/>
-            <IconRefresh @click='refresh' class='cursor-pointer' size='32'/>
+            <div class='ms-auto btn-list'>
+                <IconPlus
+                    class='cursor-pointer'
+                    size='32'
+                    @click='collections.splice(0, 0, {})'
+                />
+                <IconRefresh
+                    class='cursor-pointer'
+                    size='32'
+                    @click='refresh'
+                />
+            </div>
         </div>
-    </div>
 
-    <TablerLoading v-if='loading'/>
-    <template v-else>
-        <table class="table table-vcenter card-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Code</th>
-                    <th>Attributes</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for='collection in collections'>
-                    <Collection @refresh='refresh' :collection='collection'/>
-                </template>
-            </tbody>
-        </table>
-    </template>
-</div>
+        <TablerLoading v-if='loading' />
+        <template v-else>
+            <table class='table table-vcenter card-table'>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Attributes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template v-for='collection in collections'>
+                        <Collection
+                            :collection='collection'
+                            @refresh='refresh'
+                        />
+                    </template>
+                </tbody>
+            </table>
+        </template>
+    </div>
 </template>
 
 <script>
@@ -42,6 +55,12 @@ import {
 
 export default {
     name: 'AdminCollections',
+    components: {
+        TablerLoading,
+        IconPlus,
+        IconRefresh,
+        Collection
+    },
     props: [ ],
     data: function() {
         return {
@@ -71,12 +90,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        TablerLoading,
-        IconPlus,
-        IconRefresh,
-        Collection
     }
 }
 </script>

@@ -1,7 +1,11 @@
 <template>
-<div class='col-12'>
-    <TablerEnum v-model='layer' label='Layer' :options='options'/>
-</div>
+    <div class='col-12'>
+        <TablerEnum
+            v-model='layer'
+            label='Layer'
+            :options='options'
+        />
+    </div>
 </template>
 
 <script>
@@ -11,6 +15,9 @@ import {
 
 export default {
     name: 'QueryLayer',
+    components: {
+        TablerEnum
+    },
     data: function() {
         return {
             layer: 'all',
@@ -26,9 +33,6 @@ export default {
         layer: function() {
             this.$emit('layer', this.layer);
         }
-    },
-    components: {
-        TablerEnum
     }
 }
 </script>

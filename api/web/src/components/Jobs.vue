@@ -1,86 +1,131 @@
 <template>
-<div>
-    <div class='page-wrapper'>
-        <div class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col d-flex">
-                        <TablerBreadCrumb/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class='page-body'>
-        <div class='container-xl'>
-            <div class='row row-deck row-cards'>
-                <div class='col-12'>
-                    <div class='card'>
-                        <div class='card-header'>
-                            <h3 class='card-title'>Jobs</h3>
-
-                            <div class='ms-auto btn-list'>
-                                <IconSearch @click='showFilter = !showFilter' class='cursor-pointer' size='32'/>
-                                <IconRefresh @click='fetchJobs' class='cursor-pointer' size='32'/>
-                            </div>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
                         </div>
-                        <template v-if='showFilter'>
-                            <div class='card-body row'>
-                                <div class='col-12 col-md-6'>
-                                    <QuerySource @source='paging.source = $event'/>
-                                </div>
-                                <div class='col-12 col-md-3'>
-                                    <QueryLayer @layer='paging.layer = $event' />
-                                </div>
-                                <div class='col-12 col-md-3'>
-                                    <QueryStatus @status='paging.status = $event'/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <div class='card'>
+                            <div class='card-header'>
+                                <h3 class='card-title'>
+                                    Jobs
+                                </h3>
+
+                                <div class='ms-auto btn-list'>
+                                    <IconSearch
+                                        class='cursor-pointer'
+                                        size='32'
+                                        @click='showFilter = !showFilter'
+                                    />
+                                    <IconRefresh
+                                        class='cursor-pointer'
+                                        size='32'
+                                        @click='fetchJobs'
+                                    />
                                 </div>
                             </div>
-                        </template>
+                            <template v-if='showFilter'>
+                                <div class='card-body row'>
+                                    <div class='col-12 col-md-6'>
+                                        <QuerySource @source='paging.source = $event' />
+                                    </div>
+                                    <div class='col-12 col-md-3'>
+                                        <QueryLayer @layer='paging.layer = $event' />
+                                    </div>
+                                    <div class='col-12 col-md-3'>
+                                        <QueryStatus @status='paging.status = $event' />
+                                    </div>
+                                </div>
+                            </template>
 
-                        <TablerLoading v-if='loading' desc='Loading Jobs'/>
-                        <table v-else class="table table-hover table-vcenter card-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Job ID</th>
-                                    <th>Created</th>
-                                    <th>Source</th>
-                                    <th>Attributes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr @click='$router.push(`/job/${job.id}`);' :key='job.id' v-for='job in list.jobs' class='cursor-pointer'>
-                                    <td><Status :status='job.status'/></td>
-                                    <td>
-                                        <LayerIcon class='mr-3' :layer='job.layer'/>
-                                        <span v-text='job.id'/>
-                                    </td>
-                                    <td><span v-text='fmt(job.created)'/></td>
-                                    <td>
-                                        <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`'/>
-                                    </td>
-                                    <td>
-                                        <div v-on:click.stop.prevent='' class='btn-list'>
-                                            <Download :auth='auth' :job='job' @login='$emit("login")' @perk='$emit("perk", $event)'/>
-                                            <span v-on:click.stop.prevent='external(job.source)'>
-                                                <IconBrandGithub class='cursor-pointer' size='32'/>
-                                            </span>
-                                            <span v-on:click.stop.prevent='$router.push(`/job/${job.id}/log`)' v-if='job.loglink'>
-                                                <IconNotes class='cursor-pointer' size='32'/>
-                                            </span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
+                            <TablerLoading
+                                v-if='loading'
+                                desc='Loading Jobs'
+                            />
+                            <table
+                                v-else
+                                class='table table-hover table-vcenter card-table'
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Job ID</th>
+                                        <th>Created</th>
+                                        <th>Source</th>
+                                        <th>Attributes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for='job in list.jobs'
+                                        :key='job.id'
+                                        class='cursor-pointer'
+                                        @click='$router.push(`/job/${job.id}`);'
+                                    >
+                                        <td><Status :status='job.status' /></td>
+                                        <td>
+                                            <LayerIcon
+                                                class='mr-3'
+                                                :layer='job.layer'
+                                            />
+                                            <span v-text='job.id' />
+                                        </td>
+                                        <td><span v-text='fmt(job.created)' /></td>
+                                        <td>
+                                            <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`' />
+                                        </td>
+                                        <td>
+                                            <div
+                                                class='btn-list'
+                                                @click.stop.prevent=''
+                                            >
+                                                <Download
+                                                    :auth='auth'
+                                                    :job='job'
+                                                    @login='$emit("login")'
+                                                    @perk='$emit("perk", $event)'
+                                                />
+                                                <span @click.stop.prevent='external(job.source)'>
+                                                    <IconBrandGithub
+                                                        class='cursor-pointer'
+                                                        size='32'
+                                                    />
+                                                </span>
+                                                <span
+                                                    v-if='job.loglink'
+                                                    @click.stop.prevent='$router.push(`/job/${job.id}/log`)'
+                                                >
+                                                    <IconNotes
+                                                        class='cursor-pointer'
+                                                        size='32'
+                                                    />
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <TableFooter
+                                :limit='paging.limit'
+                                :total='list.total'
+                                @page='paging.page = $event'
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -105,18 +150,22 @@ import {
 
 export default {
     name: 'Jobs',
+    components: {
+        IconSearch,
+        IconBrandGithub,
+        IconRefresh,
+        IconNotes,
+        Download,
+        Status,
+        TablerLoading,
+        TablerBreadCrumb,
+        TableFooter,
+        LayerIcon,
+        QueryStatus,
+        QuerySource,
+        QueryLayer
+    },
     props: [ 'auth' ],
-    mounted: function() {
-        this.fetchJobs();
-    },
-    watch: {
-        paging: {
-            deep: true,
-            handler: async function() {
-                await this.fetchJobs();
-            }
-        }
-    },
     data: function() {
         return {
             tz: moment.tz.guess(),
@@ -136,6 +185,17 @@ export default {
             },
             loading: false
         };
+    },
+    watch: {
+        paging: {
+            deep: true,
+            handler: async function() {
+                await this.fetchJobs();
+            }
+        }
+    },
+    mounted: function() {
+        this.fetchJobs();
     },
     methods: {
         external: function(url) {
@@ -166,21 +226,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        IconSearch,
-        IconBrandGithub,
-        IconRefresh,
-        IconNotes,
-        Download,
-        Status,
-        TablerLoading,
-        TablerBreadCrumb,
-        TableFooter,
-        LayerIcon,
-        QueryStatus,
-        QuerySource,
-        QueryLayer
     },
 }
 </script>

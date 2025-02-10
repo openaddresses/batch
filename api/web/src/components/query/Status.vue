@@ -1,7 +1,11 @@
 <template>
-<div class='col-12'>
-    <TablerEnum v-model='status' label='Status' :options='options'/>
-</div>
+    <div class='col-12'>
+        <TablerEnum
+            v-model='status'
+            label='Status'
+            :options='options'
+        />
+    </div>
 </template>
 
 <script>
@@ -11,6 +15,9 @@ import {
 
 export default {
     name: 'QueryStatus',
+    components: {
+        TablerEnum
+    },
     data: function() {
         return {
             status: 'All',
@@ -28,9 +35,6 @@ export default {
         status: function() {
             this.$emit('status', this.status);
         }
-    },
-    components: {
-        TablerEnum
     }
 }
 </script>

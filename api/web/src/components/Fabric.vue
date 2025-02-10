@@ -1,29 +1,43 @@
 <template>
     <div class='col col--12 h-full'>
         <div class='col col--12 relative h-full'>
-            <div id='map' class='w-full h-full'></div>
+            <div
+                id='map'
+                class='w-full h-full'
+            />
 
             <div class='absolute top right pt3'>
-                <button @click='filter.layers.buildings = !filter.layers.buildings' class='btn btn--stroke btn--s mx3 round color-gray' :class='{
-                    "color-gray": !filter.layers.buildings,
-                    "color-blue": filter.layers.buildings
-                }'>
-                    <IconBuildingCommunity size='24'/>
+                <button
+                    class='btn btn--stroke btn--s mx3 round color-gray'
+                    :class='{
+                        "color-gray": !filter.layers.buildings,
+                        "color-blue": filter.layers.buildings
+                    }'
+                    @click='filter.layers.buildings = !filter.layers.buildings'
+                >
+                    <IconBuildingCommunity size='24' />
                 </button>
-                <button @click='filter.layers.addresses = !filter.layers.addresses' class='btn btn--stroke btn--s mx3 round' :class='{
-                    "color-gray": !filter.layers.addresses,
-                    "color-blue": filter.layers.addresses
-                }'>
-                    <IconMapPin size='24'/>
+                <button
+                    class='btn btn--stroke btn--s mx3 round'
+                    :class='{
+                        "color-gray": !filter.layers.addresses,
+                        "color-blue": filter.layers.addresses
+                    }'
+                    @click='filter.layers.addresses = !filter.layers.addresses'
+                >
+                    <IconMapPin size='24' />
                 </button>
-                <button @click='filter.layers.parcels = !filter.layers.parcels' class='btn btn--stroke btn--s mx3 round' :class='{
-                    "color-gray": !filter.layers.parcels,
-                    "color-blue": filter.layers.parcels
-                }'>
-                    <IconShape size='24'/>
+                <button
+                    class='btn btn--stroke btn--s mx3 round'
+                    :class='{
+                        "color-gray": !filter.layers.parcels,
+                        "color-blue": filter.layers.parcels
+                    }'
+                    @click='filter.layers.parcels = !filter.layers.parcels'
+                >
+                    <IconShape size='24' />
                 </button>
             </div>
-
         </div>
     </div>
 </template>
@@ -39,6 +53,11 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default {
     name: 'Fabric',
+    components: {
+        IconShape,
+        IconMapPin,
+        IconBuildingCommunity
+    },
     data: function() {
         return {
             tilejson: {},
@@ -52,10 +71,6 @@ export default {
             map: ''
         }
     },
-    mounted: async function() {
-        await this.getTilejson();
-        this.init();
-    },
     watch: {
         'filter.layers.addresses': function() {
             this.layer('addresses', this.filter.layers.addresses);
@@ -66,6 +81,10 @@ export default {
         'filter.layers.parcels': function() {
             this.layer('parcels', this.filter.layers.parcels);
         }
+    },
+    mounted: async function() {
+        await this.getTilejson();
+        this.init();
     },
     methods: {
         getTilejson: async function() {
@@ -153,11 +172,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        IconShape,
-        IconMapPin,
-        IconBuildingCommunity
     }
 }
 </script>

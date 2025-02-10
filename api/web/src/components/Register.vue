@@ -1,55 +1,121 @@
 <template>
-<div class="page page-center">
-    <div class="container container-normal py-4">
-        <div class="row align-items-center g-4">
-            <div class="col-lg">
-                <div class="container-tight">
-                    <div class="card card-md">
-                        <TablerLoading v-if='loading.page' desc='Creating User'/>
-                        <div v-else-if='success' class='card-body'>
-                            <div class='text-center' style='margin-bottom: 24px;'>
-                                <img src='/logo.jpg' height='150'/>
+    <div class='page page-center'>
+        <div class='container container-normal py-4'>
+            <div class='row align-items-center g-4'>
+                <div class='col-lg'>
+                    <div class='container-tight'>
+                        <div class='card card-md'>
+                            <TablerLoading
+                                v-if='loading.page'
+                                desc='Creating User'
+                            />
+                            <div
+                                v-else-if='success'
+                                class='card-body'
+                            >
+                                <div
+                                    class='text-center'
+                                    style='margin-bottom: 24px;'
+                                >
+                                    <img
+                                        src='/logo.jpg'
+                                        height='150'
+                                    >
+                                </div>
+
+                                <h2 class='h2 text-center mb-4'>
+                                    Successfully Registered!
+                                </h2>
+                                <div class='text-center'>
+                                    <p class='txt-h4 py6'>
+                                        Please check your email for a verification link!
+                                    </p>
+                                </div>
+
+                                <TablerLoading
+                                    v-if='loading.resend'
+                                    desc='Sending Email'
+                                />
+                                <button
+                                    v-if='!loading.resend'
+                                    :disabled='resent'
+                                    class='btn w-full'
+                                    @click='resend'
+                                >
+                                    <template v-if='!resent'>
+                                        Resend Email
+                                    </template>
+                                    <template v-else-if='resent'>
+                                        Email Resent
+                                    </template>
+                                </button>
+
+                                <button
+                                    v-if='!loading.resend'
+                                    class='btn btn-primary w-full mt-4'
+                                    @click='$router.push("/login")'
+                                >
+                                    Login
+                                </button>
                             </div>
+                            <div
+                                v-else
+                                class='card-body'
+                            >
+                                <div
+                                    class='text-center'
+                                    style='margin-bottom: 24px;'
+                                >
+                                    <img
+                                        src='/logo.jpg'
+                                        height='150'
+                                    >
+                                </div>
 
-                            <h2 class="h2 text-center mb-4">Successfully Registered!</h2>
-                            <div class='text-center'>
-                                <p class='txt-h4 py6'>Please check your email for a verification link!</p>
+                                <h2 class='h2 text-center mb-4'>
+                                    Create An Account
+                                </h2>
+
+                                <TablerInput
+                                    v-model='body.username'
+                                    label='Username'
+                                    :error='errors.username'
+                                    class='my-2'
+                                />
+                                <TablerInput
+                                    v-model='body.email'
+                                    label='Email'
+                                    :error='errors.email'
+                                    class='my-2'
+                                />
+                                <TablerInput
+                                    v-model='body.password'
+                                    type='password'
+                                    label='Password'
+                                    :error='errors.password'
+                                    class='my-2'
+                                />
+
+                                <button
+                                    type='submit'
+                                    class='btn btn-primary w-100 mt-4'
+                                    @click='register'
+                                >
+                                    Register
+                                </button>
                             </div>
-
-                            <TablerLoading v-if='loading.resend' desc='Sending Email'/>
-                            <button v-if='!loading.resend' :disabled='resent' @click='resend' class='btn w-full'>
-                                <template v-if='!resent'>
-                                    Resend Email
-                                </template>
-                                <template v-else-if='resent'>
-                                    Email Resent
-                                </template>
-                            </button>
-
-                            <button v-if='!loading.resend' @click='$router.push("/login")' class='btn btn-primary w-full mt-4'>Login</button>
                         </div>
-                        <div v-else class="card-body">
-                            <div class='text-center' style='margin-bottom: 24px;'>
-                                <img src='/logo.jpg' height='150'/>
-                            </div>
-
-                            <h2 class="h2 text-center mb-4">Create An Account</h2>
-
-                            <TablerInput label='Username' v-model='body.username' :error='errors.username' class='my-2'/>
-                            <TablerInput label='Email' v-model='body.email' :error='errors.email' class='my-2'/>
-                            <TablerInput type='password' label='Password' v-model='body.password' :error='errors.password' class='my-2'/>
-
-                          <button @click='register' type="submit" class="btn btn-primary w-100 mt-4">Register</button>
+                        <div class='text-center text-muted mt-3'>
+                            Have an account already? <a
+                                class='cursor-pointer'
+                                @click='$router.push("/login")'
+                            >Login</a>
                         </div>
-                    </div>
-                    <div class="text-center text-muted mt-3">
-                        Have an account already? <a @click='$router.push("/login")' class='cursor-pointer'>Login</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -60,6 +126,10 @@ import {
 
 export default {
     name: 'Register',
+    components: {
+        TablerLoading,
+        TablerInput
+    },
     props: [],
     data: function() {
         return {
@@ -128,10 +198,6 @@ export default {
 
             this.loading.page = false;
         }
-    },
-    components: {
-        TablerLoading,
-        TablerInput
     }
 }
 </script>

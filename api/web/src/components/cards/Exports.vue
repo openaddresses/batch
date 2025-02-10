@@ -1,36 +1,64 @@
 <template>
-<div class='card'>
-    <div class='card-header'>
-        <h3 class='card-title'>Exports</h3>
-        <div class='d-flex ms-auto btn-list'>
-            <IconRefresh @click='fetchExports' class='cursor-pointer' size='32'/>
+    <div class='card'>
+        <div class='card-header'>
+            <h3 class='card-title'>
+                Exports
+            </h3>
+            <div class='d-flex ms-auto btn-list'>
+                <IconRefresh
+                    class='cursor-pointer'
+                    size='32'
+                    @click='fetchExports'
+                />
+            </div>
         </div>
-    </div>
-    <TablerLoading v-if='loading' desc='Loading Exports'/>
-    <TablerNone v-else-if='!list.total'/>
-    <template v-else>
-        <table class="table table-hover table-vcenter card-table">
-            <thead>
-                <tr>
-                    <th>Status</th>
-                    <th>Export ID</th>
-                    <th>Created</th>
-                    <th>Format</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr @click='$router.push(`/export/${exp.id}`);' :key='exp.id' v-for='exp in list.exports' class='cursor-pointer'>
-                    <td><Status :status='exp.status'/></td>
-                    <td><span class='pl6' v-text='"Export #" + exp.id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'/></td>
-                    <td><span v-text='fmt(exp.created)'/></td>
-                    <td><span class='fr pr12' v-text='exp.format'/></td>
-                </tr>
-            </tbody>
-        </table>
+        <TablerLoading
+            v-if='loading'
+            desc='Loading Exports'
+        />
+        <TablerNone v-else-if='!list.total' />
+        <template v-else>
+            <table class='table table-hover table-vcenter card-table'>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Export ID</th>
+                        <th>Created</th>
+                        <th>Format</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for='exp in list.exports'
+                        :key='exp.id'
+                        class='cursor-pointer'
+                        @click='$router.push(`/export/${exp.id}`);'
+                    >
+                        <td><Status :status='exp.status' /></td>
+                        <td>
+                            <span
+                                class='pl6'
+                                v-text='"Export #" + exp.id + " - " + exp.source_name + " - " + exp.layer + " - " + exp.name'
+                            />
+                        </td>
+                        <td><span v-text='fmt(exp.created)' /></td>
+                        <td>
+                            <span
+                                class='fr pr12'
+                                v-text='exp.format'
+                            />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
-    </template>
-</div>
+            <TableFooter
+                :limit='paging.limit'
+                :total='list.total'
+                @page='paging.page = $event'
+            />
+        </template>
+    </div>
 </template>
 
 <script>
@@ -47,6 +75,13 @@ import {
 
 export default {
     name: 'CardExports',
+    components: {
+        IconRefresh,
+        TableFooter,
+        TablerLoading,
+        TablerNone,
+        Status
+    },
     props: [ 'profile' ],
     data: function() {
         return {
@@ -64,9 +99,6 @@ export default {
             },
         };
     },
-    mounted: async function() {
-        await this.fetchExports();
-    },
     watch: {
         paging: {
             deep: true,
@@ -74,6 +106,9 @@ export default {
                 await this.fetchJobs();
             }
         }
+    },
+    mounted: async function() {
+        await this.fetchExports();
     },
     methods: {
         fmt: function(date) {
@@ -100,13 +135,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        IconRefresh,
-        TableFooter,
-        TablerLoading,
-        TablerNone,
-        Status
     }
 }
 </script>

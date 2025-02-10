@@ -2,41 +2,68 @@
     <div class='col col--12 grid pt12'>
         <template v-if='loading'>
             <div class='flex flex--center-main w-full py24'>
-                <div class='loading'></div>
+                <div class='loading' />
             </div>
         </template>
         <template v-if='reset'>
             <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6'>Reset Login</h3>
+                <h3 class='txt-h4 py6'>
+                    Reset Login
+                </h3>
             </div>
             <div class='col col--12 flex flex--center-main'>
-                <div class='py6'>Your password has been reset</div>
+                <div class='py6'>
+                    Your password has been reset
+                </div>
             </div>
             <div class='col col--12 flex flex--center-main'>
-                <button @click='$router.push({ path: "/data" })' class='btn btn--stroke round my12'>Login</button>
+                <button
+                    class='btn btn--stroke round my12'
+                    @click='$router.push({ path: "/data" })'
+                >
+                    Login
+                </button>
             </div>
         </template>
         <template v-else>
             <div class='col col--12 flex flex--center-main'>
-                <h3 class='txt-h4 py6'>Reset Login</h3>
+                <h3 class='txt-h4 py6'>
+                    Reset Login
+                </h3>
             </div>
 
             <div class='col col--12 flex flex--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12 w-full'>Reset Token</label>
-                    <input v-on:keyup.enter='forgot' :class='{
-                         "input--border-red": attempted && !token
-                    }' v-model='token' type='text' class='input'/>
+                    <input
+                        v-model='token'
+                        :class='{
+                            "input--border-red": attempted && !token
+                        }'
+                        type='text'
+                        class='input'
+                        @keyup.enter='forgot'
+                    >
 
                     <label class='mt12 w-full'>New Password</label>
-                    <input v-on:keyup.enter='forgot' :class='{
-                         "input--border-red": attempted && !password
-                    }' v-model='password' type='password' class='input'/>
+                    <input
+                        v-model='password'
+                        :class='{
+                            "input--border-red": attempted && !password
+                        }'
+                        type='password'
+                        class='input'
+                        @keyup.enter='forgot'
+                    >
 
-                    <button @click='forgot' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Reset</button>
+                    <button
+                        class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'
+                        @click='forgot'
+                    >
+                        Reset
+                    </button>
                 </div>
             </div>
-
         </template>
     </div>
 </template>

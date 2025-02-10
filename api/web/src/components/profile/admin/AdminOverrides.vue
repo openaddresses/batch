@@ -1,95 +1,151 @@
 <template>
-<div class='card'>
-    <div class='card-header d-flex'>
-        <h2 class='card-title'>Level Overrides</h2>
+    <div class='card'>
+        <div class='card-header d-flex'>
+            <h2 class='card-title'>
+                Level Overrides
+            </h2>
 
-        <div class='ms-auto btn-list'>
-            <IconSearch @click='showFilter = true' v-if='!showFilter' class='cursor-pointer' size='32'/>
-            <IconX @click='showFilter = false' v-else class='cursor-pointer' size='32'/>
+            <div class='ms-auto btn-list'>
+                <IconSearch
+                    v-if='!showFilter'
+                    class='cursor-pointer'
+                    size='32'
+                    @click='showFilter = true'
+                />
+                <IconX
+                    v-else
+                    class='cursor-pointer'
+                    size='32'
+                    @click='showFilter = false'
+                />
 
-            <IconPlus @click='addLevel' :disabled='add' class='cursor-pointer' size='32'/>
+                <IconPlus
+                    :disabled='add'
+                    class='cursor-pointer'
+                    size='32'
+                    @click='addLevel'
+                />
 
-            <IconRefresh @click='getLevels' class='cursor-pointer' size='32'/>
-        </div>
-    </div>
-
-    <template v-if='showFilter'>
-        <div class='card-body row'>
-            <div class='col-6'>
-                <TablerInput label='Username/Email Filter' v-model='paging.pattern'/>
+                <IconRefresh
+                    class='cursor-pointer'
+                    size='32'
+                    @click='getLevels'
+                />
             </div>
-            <div class='col-6'>
-                <TablerEnum label='Level' v-model='paging.level' :options='["all", "basic", "backer", "sponsor"]'/>
-            </div>
-        </div>
-    </template>
-
-    <div v-if='add' class='col col--12 grid border border--gray-light round px12 py12 my6 grid'>
-        <div class='col col--12 pb6'>
-            <h2 class='txt-bold fl'>New Level Override</h2>
-            <button @click='add = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                <svg class='icon'><use xlink:href='#icon-close'/></svg>
-            </button>
         </div>
 
-        <div class='col col--12 grid grid--gut12'>
-            <div class='col col--9'>
-                <label>Email RegExp Pattern </label>
-                <input class='input' v-model='newLevel.pattern'/>
-            </div>
-
-            <div class='col col--3'>
-                <label>Account Level</label>
-                <div class='w-full select-container'>
-                    <select v-model='newLevel.level' class='select select--stroke'>
-                        <option>basic</option>
-                        <option>backer</option>
-                        <option>sponsor</option>
-                    </select>
-                    <div class='select-arrow'></div>
+        <template v-if='showFilter'>
+            <div class='card-body row'>
+                <div class='col-6'>
+                    <TablerInput
+                        v-model='paging.pattern'
+                        label='Username/Email Filter'
+                    />
+                </div>
+                <div class='col-6'>
+                    <TablerEnum
+                        v-model='paging.level'
+                        label='Level'
+                        :options='["all", "basic", "backer", "sponsor"]'
+                    />
                 </div>
             </div>
+        </template>
 
-            <div class='col col--12 clearfix'>
-                <div class='col col--2 fr'>
-                    <button @click='createLevel' class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'>
-                        <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
-                    </button>
+        <div
+            v-if='add'
+            class='col col--12 grid border border--gray-light round px12 py12 my6 grid'
+        >
+            <div class='col col--12 pb6'>
+                <h2 class='txt-bold fl'>
+                    New Level Override
+                </h2>
+                <button
+                    class='fr btn round btn--s btn--stroke btn--gray'
+                    @click='add = false'
+                >
+                    <svg class='icon'><use xlink:href='#icon-close' /></svg>
+                </button>
+            </div>
+
+            <div class='col col--12 grid grid--gut12'>
+                <div class='col col--9'>
+                    <label>Email RegExp Pattern </label>
+                    <input
+                        v-model='newLevel.pattern'
+                        class='input'
+                    >
+                </div>
+
+                <div class='col col--3'>
+                    <label>Account Level</label>
+                    <div class='w-full select-container'>
+                        <select
+                            v-model='newLevel.level'
+                            class='select select--stroke'
+                        >
+                            <option>basic</option>
+                            <option>backer</option>
+                            <option>sponsor</option>
+                        </select>
+                        <div class='select-arrow' />
+                    </div>
+                </div>
+
+                <div class='col col--12 clearfix'>
+                    <div class='col col--2 fr'>
+                        <button
+                            class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'
+                            @click='createLevel'
+                        >
+                            <svg class='fl icon mt6'><use href='#icon-check' /></svg><span>Save</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <TablerLoading v-if='loading'/>
-    <TablerNone v-else-if='!list.total' :create='false'/>
-    <template v-else>
-        <table class="table table-vcenter card-table">
-            <thead>
-                <tr>
-                    <th>Pattern</th>
-                    <th>Level</th>
-                    <th>Attributes</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for='level in list.levels'>
+        <TablerLoading v-if='loading' />
+        <TablerNone
+            v-else-if='!list.total'
+            :create='false'
+        />
+        <template v-else>
+            <table class='table table-vcenter card-table'>
+                <thead>
                     <tr>
-                        <td v-text='level.pattern'></td>
-                        <td v-text='level.level'></td>
-                        <td>
-                            <div class='d-flex'>
-                                <div class='ms-auto btn-list'>
-                                    <IconTrash @click='deleteLevel(level)' class='cursor-pointer' size='32'/>
-                                </div>
-                            </div>
-                        </td>
+                        <th>Pattern</th>
+                        <th>Level</th>
+                        <th>Attributes</th>
                     </tr>
-                </template>
-            </tbody>
-        </table>
-        <TableFooter :limit='paging.limit' :total='list.total' @page='paging.page = $event'/>
-    </template>
-</div>
+                </thead>
+                <tbody>
+                    <template v-for='level in list.levels'>
+                        <tr>
+                            <td v-text='level.pattern' />
+                            <td v-text='level.level' />
+                            <td>
+                                <div class='d-flex'>
+                                    <div class='ms-auto btn-list'>
+                                        <IconTrash
+                                            class='cursor-pointer'
+                                            size='32'
+                                            @click='deleteLevel(level)'
+                                        />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <TableFooter
+                :limit='paging.limit'
+                :total='list.total'
+                @page='paging.page = $event'
+            />
+        </template>
+    </div>
 </template>
 
 <script>
@@ -111,6 +167,18 @@ import {
 
 export default {
     name: 'AdminOverrides',
+    components: {
+        IconSearch,
+        IconPlus,
+        IconRefresh,
+        IconTrash,
+        IconX,
+        TablerNone,
+        TablerInput,
+        TablerEnum,
+        TablerLoading,
+        TableFooter,
+    },
     props: [ ],
     data: function() {
         return {
@@ -135,9 +203,6 @@ export default {
             }
         };
     },
-    mounted: async function() {
-        await this.getLevels();
-    },
     watch:  {
         paging: {
             deep: true,
@@ -145,6 +210,9 @@ export default {
                 await this.getLevels();
             },
         }
+    },
+    mounted: async function() {
+        await this.getLevels();
     },
     methods: {
         addLevel: async function() {
@@ -190,18 +258,6 @@ export default {
 
             this.getLevels();
         },
-    },
-    components: {
-        IconSearch,
-        IconPlus,
-        IconRefresh,
-        IconTrash,
-        IconX,
-        TablerNone,
-        TablerInput,
-        TablerEnum,
-        TablerLoading,
-        TableFooter,
     }
 }
 </script>

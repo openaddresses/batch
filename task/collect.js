@@ -341,9 +341,12 @@ async function parquet_datas(tmp, datas, name) {
         // Read the file and parse it as linefeed-delimited JSON
         const data_stream = fs.createReadStream(resolved_data_filename);
         const data_lines = data_stream.pipe(split());
+
         for await (const line of data_lines) {
             const record = JSON.parse(line);
             const properties = record.properties;
+
+            // GeoParquet expects the geometry as a WKB
             const wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
 
             await writer.appendRow({
@@ -362,9 +365,8 @@ async function parquet_datas(tmp, datas, name) {
                 notes: properties.notes
             });
         }
-        data_lines.on('end', () => {
-            console.error(`ok - ${resolved_data_filename} processed and appended to parquet file`);
-        });
+
+        console.error(`ok - ${resolved_data_filename} processed and appended to parquet file`);
     }
 
     await writer.close();

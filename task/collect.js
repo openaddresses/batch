@@ -318,9 +318,9 @@ function zip_datas(tmp, datas, name) {
 }
 
 async function parquet_datas(tmp, datas, name) {
-    const schema = {
+    const schema = new parquet.ParquetSchema({
         source_name: { type: 'UTF8' },
-        geometry: { type: 'BINARY' },
+        geometry: { type: 'BYTE_ARRAY' },
         id: { type: 'UTF8' },
         pid: { type: 'UTF8' },
         number: { type: 'UTF8' },
@@ -332,7 +332,7 @@ async function parquet_datas(tmp, datas, name) {
         region: { type: 'UTF8' },
         addrtype: { type: 'UTF8' },
         notes: { type: 'UTF8' }
-    };
+    });
     const writer = await parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
 
     for (const data of datas) {

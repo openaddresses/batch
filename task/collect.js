@@ -317,58 +317,58 @@ function zip_datas(tmp, datas, name) {
     });
 }
 
-function parquet_datas(tmp, datas, name) {
-    return new Promise((resolve) => {
-        const schema = {
-            source_name: { type: 'UTF8' },
-            geometry: { type: 'BINARY' },
-            id: { type: 'UTF8' },
-            pid: { type: 'UTF8' },
-            number: { type: 'UTF8' },
-            street: { type: 'UTF8' },
-            unit: { type: 'UTF8' },
-            city: { type: 'UTF8' },
-            postcode: { type: 'UTF8' },
-            district: { type: 'UTF8' },
-            region: { type: 'UTF8' },
-            addrtype: { type: 'UTF8' },
-            notes: { type: 'UTF8' }
-        };
-        const writer = parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
+async function parquet_datas(tmp, datas, name) {
+    const schema = {
+        source_name: { type: 'UTF8' },
+        geometry: { type: 'BINARY' },
+        id: { type: 'UTF8' },
+        pid: { type: 'UTF8' },
+        number: { type: 'UTF8' },
+        street: { type: 'UTF8' },
+        unit: { type: 'UTF8' },
+        city: { type: 'UTF8' },
+        postcode: { type: 'UTF8' },
+        district: { type: 'UTF8' },
+        region: { type: 'UTF8' },
+        addrtype: { type: 'UTF8' },
+        notes: { type: 'UTF8' }
+    };
+    const writer = await parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
 
-        for (const data of datas) {
-            const resolved_data_filename = path.resolve(tmp, 'sources', data);
+    for (const data of datas) {
+        const resolved_data_filename = path.resolve(tmp, 'sources', data);
 
-            // Read the file and parse it as linefeed-delimited JSON
-            const data_stream = fs.createReadStream(resolved_data_filename);
-            const data_lines = data_stream.pipe(split());
-            data_lines.on('data', (line) => {
-                const record = JSON.parse(line);
-                const properties = record.properties;
-                const wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+        // Read the file and parse it as linefeed-delimited JSON
+        const data_stream = fs.createReadStream(resolved_data_filename);
+        const data_lines = data_stream.pipe(split());
 
-                writer.appendRow({
-                    source_name: data,
-                    geometry: wkbGeometry,
-                    id: properties.id,
-                    pid: properties.pid,
-                    number: properties.number,
-                    street: properties.street,
-                    unit: properties.unit,
-                    city: properties.city,
-                    postcode: properties.postcode,
-                    district: properties.district,
-                    region: properties.region,
-                    addrtype: properties.addrtype,
-                    notes: properties.notes
-                });
-            });
-            data_lines.on('end', () => {
-                console.error(`ok - ${resolved_data_filename} processed and appended to parquet file`);
+        for await (const line of data_lines) {
+            const record = JSON.parse(line);
+            const properties = record.properties;
+
+            // GeoParquet expects the geometry as a WKB
+            const wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+
+            await writer.appendRow({
+                source_name: data,
+                geometry: wkbGeometry,
+                id: properties.id,
+                pid: properties.pid,
+                number: properties.number,
+                street: properties.street,
+                unit: properties.unit,
+                city: properties.city,
+                postcode: properties.postcode,
+                district: properties.district,
+                region: properties.region,
+                addrtype: properties.addrtype,
+                notes: properties.notes
             });
         }
 
-        writer.close();
-        return resolve(path.resolve(tmp, `${name}.parquet`));
-    });
+        console.error(`ok - ${resolved_data_filename} processed and appended to parquet file`);
+    }
+
+    await writer.close();
+    return path.resolve(tmp, `${name}.parquet`);
 }

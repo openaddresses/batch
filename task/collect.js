@@ -347,7 +347,13 @@ async function parquet_datas(tmp, datas, name) {
             const properties = record.properties;
 
             // GeoParquet expects the geometry as a WKB
-            const wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+            let wkbGeometry = null;
+            if (record.geometry && record.geometry.type) {
+                wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+            } else {
+                console.error(`not ok - ${resolved_data_filename} line has no geometry: ${line}`);
+                continue;
+            }
 
             await writer.appendRow({
                 source_name: data,

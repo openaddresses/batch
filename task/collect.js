@@ -320,18 +320,18 @@ function zip_datas(tmp, datas, name) {
 async function parquet_datas(tmp, datas, name) {
     const schema = new parquet.ParquetSchema({
         source_name: { type: 'UTF8' },
-        geometry: { type: 'BYTE_ARRAY' },
-        id: { type: 'UTF8' },
-        pid: { type: 'UTF8' },
-        number: { type: 'UTF8' },
-        street: { type: 'UTF8' },
-        unit: { type: 'UTF8' },
-        city: { type: 'UTF8' },
-        postcode: { type: 'UTF8' },
-        district: { type: 'UTF8' },
-        region: { type: 'UTF8' },
-        addrtype: { type: 'UTF8' },
-        notes: { type: 'UTF8' }
+        geometry: { type: 'BYTE_ARRAY', optional: true },
+        id: { type: 'UTF8', optional: true },
+        pid: { type: 'UTF8', optional: true },
+        number: { type: 'UTF8', optional: true },
+        street: { type: 'UTF8', optional: true },
+        unit: { type: 'UTF8', optional: true },
+        city: { type: 'UTF8', optional: true },
+        postcode: { type: 'UTF8', optional: true },
+        district: { type: 'UTF8', optional: true },
+        region: { type: 'UTF8', optional: true },
+        addrtype: { type: 'UTF8', optional: true },
+        notes: { type: 'UTF8', optional: true }
     });
     const writer = await parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
 

@@ -334,7 +334,7 @@ async function parquet_datas(tmp, datas, name) {
         notes: { type: 'UTF8', optional: true }
     });
     const writer = await parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
-    writer.setRowGroupSize(16384);
+    writer.setRowGroupSize(8192);
 
     for (const data of datas) {
         const resolved_data_filename = path.resolve(tmp, 'sources', data);
@@ -342,8 +342,10 @@ async function parquet_datas(tmp, datas, name) {
         // Read the file and parse it as linefeed-delimited JSON
         const data_stream = fs.createReadStream(resolved_data_filename);
         const data_lines = data_stream.pipe(split());
+        let line_count = 0;
 
         for await (const line of data_lines) {
+            line_count++;
             const record = JSON.parse(line);
             const properties = record.properties;
 
@@ -352,7 +354,7 @@ async function parquet_datas(tmp, datas, name) {
             if (record.geometry && record.geometry.type) {
                 wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
             } else {
-                console.error(`not ok - ${resolved_data_filename} line has no geometry: ${line}`);
+                console.error(`not ok - ${resolved_data_filename} line ${line_count} has no geometry: ${line}`);
                 continue;
             }
 
@@ -373,7 +375,7 @@ async function parquet_datas(tmp, datas, name) {
             });
         }
 
-        console.error(`ok - ${resolved_data_filename} processed and appended to parquet file`);
+        console.error(`ok - ${resolved_data_filename} processed ${line_count} lines and appended to parquet file`);
     }
 
     await writer.close();

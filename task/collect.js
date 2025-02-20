@@ -334,7 +334,7 @@ async function parquet_datas(tmp, datas, name) {
         notes: { type: 'UTF8', optional: true }
     });
     const writer = await parquet.ParquetWriter.openFile(schema, path.resolve(tmp, `${name}.parquet`));
-    writer.setRowGroupSize(8192);
+    writer.setRowGroupSize(4096);
 
     for (const data of datas) {
         const resolved_data_filename = path.resolve(tmp, 'sources', data);

@@ -351,12 +351,12 @@ async function parquet_datas(tmp, datas, name) {
 
             // GeoParquet expects the geometry as a WKB
             let wkbGeometry = null;
-            if (record.geometry && record.geometry.type) {
-                wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
-            } else {
-                console.error(`not ok - ${resolved_data_filename} line ${line_count} has no geometry: ${line}`);
-                continue;
-            }
+            // if (record.geometry && record.geometry.type) {
+            //     wkbGeometry = wkx.Geometry.parseGeoJSON(record.geometry).toWkb();
+            // } else {
+            //     console.error(`not ok - ${resolved_data_filename} line ${line_count} has no geometry: ${line}`);
+            //     continue;
+            // }
 
             await writer.appendRow({
                 source_name: data,

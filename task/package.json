@@ -22,7 +22,7 @@
         "@aws-sdk/client-s3": "^3.405.0",
         "@aws-sdk/client-secrets-manager": "^3.363.0",
         "@aws-sdk/lib-storage": "^3.405.0",
-        "@dsnp/parquetjs": "^1.8.5",
+        "duckdb": "^1.2.0",
         "@openaddresses/lib": "^4.4.0",
         "@supercharge/promise-pool": "^3.0.0",
         "@turf/turf": "^6.3.0",

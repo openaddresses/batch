@@ -341,6 +341,26 @@ async function parquet_datas(tmp, datas, name) {
     `;
     await connection.run(createTableQuery);
 
+    const insertQuery = `
+        INSERT INTO data (
+            source_name,
+            geometry,
+            id,
+            pid,
+            number,
+            street,
+            unit,
+            city,
+            postcode,
+            district,
+            region,
+            addrtype,
+            notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+    const preparedStatement = await connection.prepare(insertQuery);
+
+
     for (const data of datas) {
         const resolved_data_filename = path.resolve(tmp, 'sources', data);
 
@@ -363,38 +383,21 @@ async function parquet_datas(tmp, datas, name) {
                 continue;
             }
 
-            const insertQuery = `
-                INSERT INTO data (
-                    source_name,
-                    geometry,
-                    id,
-                    pid,
-                    number,
-                    street,
-                    unit,
-                    city,
-                    postcode,
-                    district,
-                    region,
-                    addrtype,
-                    notes
-                ) VALUES (
-                    '${data}',
-                    x'${wkbGeometry.toString('hex')}',
-                    '${properties.id}',
-                    '${properties.pid}',
-                    '${properties.number}',
-                    '${properties.street}',
-                    '${properties.unit}',
-                    '${properties.city}',
-                    '${properties.postcode}',
-                    '${properties.district}',
-                    '${properties.region}',
-                    '${properties.addrtype}',
-                    '${properties.notes}'
-                );
-            `;
-            await connection.run(insertQuery);
+            await preparedStatement.run([
+                data,
+                wkbGeometry,
+                properties.id,
+                properties.pid,
+                properties.number,
+                properties.street,
+                properties.unit,
+                properties.city,
+                properties.postcode,
+                properties.district,
+                properties.region,
+                properties.addrtype,
+                properties.notes
+            ]);
         }
 
         console.error(`ok - ${resolved_data_filename} processed ${line_count} lines and appended to parquet file`);

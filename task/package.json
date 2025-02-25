@@ -22,7 +22,6 @@
         "@aws-sdk/client-s3": "^3.405.0",
         "@aws-sdk/client-secrets-manager": "^3.363.0",
         "@aws-sdk/lib-storage": "^3.405.0",
-        "@duckdb/node-api": "^1.2.0-alpha.15",
         "@openaddresses/lib": "^4.4.0",
         "@supercharge/promise-pool": "^3.0.0",
         "@turf/turf": "^6.3.0",
@@ -41,8 +40,7 @@
         "request": "^2.88.2",
         "split2": "^4.1.0",
         "tilebase": "^4.0.0",
-        "wellknown": "^0.5.0",
-        "wkx": "^0.5.0"
+        "wellknown": "^0.5.0"
     },
     "devDependencies": {
         "eslint": "^9.0.0",

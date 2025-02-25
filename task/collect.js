@@ -14,7 +14,7 @@ import { mkdirp } from 'mkdirp';
 import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
-import duckdb from 'duckdb';
+import { DuckDBInstance } from '@duckdb/node-api';
 import minimist from 'minimist';
 import { Transform } from 'node:stream';
 import wkx from 'wkx';
@@ -319,7 +319,7 @@ function zip_datas(tmp, datas, name) {
 
 async function parquet_datas(tmp, datas, name) {
     const dbFilePath = path.resolve(tmp, `${name}.duckdb`);
-    const db = new duckdb.Database(dbFilePath);
+    const db = await DuckDBInstance.create(dbFilePath);
     const connection = db.connect();
 
     const createTableQuery = `

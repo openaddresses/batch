@@ -54,7 +54,6 @@ export default class Data extends Generic {
             query.point = `POINT(${query.point.join(' ')})`;
         }
 
-        query.source = '%' + query.source + '%';
         query.layer = query.layer + '%';
         query.name = query.name + '%';
 

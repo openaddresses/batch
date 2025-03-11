@@ -54,10 +54,6 @@ export default class Token extends Generic {
             query.point = `POINT(${query.point.join(' ')})`;
         }
 
-        query.source = '%' + query.source + '%';
-        query.layer = query.layer + '%';
-        query.name = query.name + '%';
-
         try {
             const pgres = await pool.query(sql`
                 SELECT

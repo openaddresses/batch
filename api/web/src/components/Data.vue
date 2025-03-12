@@ -221,8 +221,21 @@
                                             <td
                                                 class='cursor-pointer'
                                                 @click='d._open = !d._open'
-                                                v-text='d.source'
-                                            />
+                                            >
+                                                <div class='d-flex align-items-center'>
+                                                    <IconChevronRight
+                                                        v-if='!d._open'
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <IconChevronDown
+                                                        v-else
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <div v-text='d.source'></div>
+                                                </div>
+                                            </td>
                                             <td
                                                 class='cursor-pointer'
                                                 @click='d._open = !d._open'
@@ -353,6 +366,8 @@ import moment from 'moment-timezone';
 import {
     IconArrowsMaximize,
     IconArrowsMinimize,
+    IconChevronRight,
+    IconChevronDown,
     IconSettings,
     IconDownload,
     IconHistory,
@@ -375,6 +390,8 @@ export default {
         MustLogin,
         IconArrowsMaximize,
         IconArrowsMinimize,
+        IconChevronRight,
+        IconChevronDown,
         IconSettings,
         IconDownload,
         IconHistory,

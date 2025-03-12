@@ -53,7 +53,6 @@ export default class Job extends Generic {
         Status.verify(query.status);
 
         query.source = '%' + query.source + '%';
-        query.layer = query.layer + '%';
 
         if (query.after) {
             try {
@@ -94,7 +93,7 @@ export default class Job extends Generic {
                         ON job.run = runs.id
                 WHERE
                     ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
-                    AND job.layer ilike ${query.layer}
+                    AND job.layer = ${query.layer}
                     AND job.source ilike ${query.source}
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
                     AND (${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP IS NULL OR job.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)

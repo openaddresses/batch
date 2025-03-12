@@ -83,7 +83,7 @@
                                 >
                                     <td v-text='c.human' />
                                     <td v-text='fmt(c.created)' />
-                                    <td class='d-flex'>
+                                    <td class='d-flex align-items-center'>
                                         <span v-text='size(c.size)' />
                                         <div class='ms-auto btn-list'>
                                             <IconDownload
@@ -265,12 +265,14 @@
                                             v-if='d._open'
                                             :key='job.id'
                                         >
-                                            <tr>
+                                            <tr
+                                                class='bg-gray-50'
+                                            >
                                                 <td
                                                     colspan='3'
                                                     class='cursor-pointer'
                                                 >
-                                                    <div class='row'>
+                                                    <div class='row mx-2'>
                                                         <div
                                                             class='col-5 d-flex align-items-center'
                                                             @click='emitjob(job.job)'

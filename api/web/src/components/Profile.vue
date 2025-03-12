@@ -37,23 +37,24 @@
                                         v-if='done.cache'
                                         class='cursor-pointer'
                                         @click='done.cache = false'
-                                    ><IconCheck size='32' />Cache Cleared</span>
+                                    ><IconCheck size='32' stroke='1' />Cache Cleared</span>
                                     <span
                                         v-if='done.collections'
                                         class='cursor-pointer'
                                         @click='done.cache = false'
-                                    ><IconCheck size='32' />Collection Refresh Submitted</span>
+                                    ><IconCheck size='32' stroke='1' />Collection Refresh Submitted</span>
                                     <span
                                         v-if='done.fabric'
                                         class='cursor-pointer'
                                         @click='done.cache = false'
-                                    ><IconCheck size='32' />Fabric Refresh Submitted</span>
+                                    ><IconCheck size='32' stroke='1' />Fabric Refresh Submitted</span>
 
                                     <TablerDropdown>
                                         <slot>
                                             <IconSettings
                                                 class='cursor-pointer mx-3'
                                                 size='32'
+                                                stroke='1'
                                             />
                                         </slot>
                                         <template #dropdown>

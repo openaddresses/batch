@@ -25,11 +25,13 @@
                                     <IconSearch
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='showFilter = !showFilter'
                                     />
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='fetchJobs'
                                     />
                                 </div>

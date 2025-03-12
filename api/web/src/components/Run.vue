@@ -28,7 +28,7 @@
                                     </div>
                                 </h3>
 
-                                <div class='ms-auto btn-list'>
+                                <div class='ms-auto btn-list align-items-center'>
                                     <span
                                         v-if='run.live'
                                         class='badge bg-green text-white'
@@ -43,6 +43,7 @@
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='fetchRun'
                                     />
                                 </div>
@@ -55,10 +56,13 @@
                             <div
                                 v-else
                                 class='card-body'
-                            >
-                                <div class='border round row py-3'>
+                            gray-50>
+                                <div class='border round row'>
                                     <div
-                                        class='col-3'
+                                        class='col-3 rounded py-3'
+                                        :class='{
+                                            "bg-gray-100": paging.status === "Pending"
+                                        }'
                                         @click='filterShortcut("Pending")'
                                     >
                                         <div
@@ -73,7 +77,10 @@
                                         </div>
                                     </div>
                                     <div
-                                        class='col-3'
+                                        class='col-3 rounded py-3'
+                                        :class='{
+                                            "bg-gray-100": paging.status === "Warn"
+                                        }'
                                         @click='filterShortcut("Warn")'
                                     >
                                         <div
@@ -88,7 +95,10 @@
                                         </div>
                                     </div>
                                     <div
-                                        class='col-3'
+                                        class='col-3 rounded py-3'
+                                        :class='{
+                                            "bg-gray-100": paging.status === "Fail"
+                                        }'
                                         @click='filterShortcut("Fail")'
                                     >
                                         <div
@@ -103,7 +113,10 @@
                                         </div>
                                     </div>
                                     <div
-                                        class='col-3'
+                                        class='col-3 rounded py-3'
+                                        :class='{
+                                            "bg-gray-100": paging.status === "Success"
+                                        }'
                                         @click='filterShortcut("Success")'
                                     >
                                         <div

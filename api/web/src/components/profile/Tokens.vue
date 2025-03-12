@@ -8,11 +8,13 @@
                 <IconPlus
                     class='cursor-pointer'
                     size='32'
+                    stroke='1'
                     @click='newToken.show = true'
                 />
                 <IconRefresh
                     class='cursor-pointer'
                     size='32'
+                    stroke='1'
                     @click='refresh'
                 />
             </div>

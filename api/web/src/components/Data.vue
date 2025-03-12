@@ -203,6 +203,15 @@
                                 desc='Loading Sources'
                             />
                         </div>
+                        <div
+                            v-else-if='!datas.length'
+                            class='card-body'
+                        >
+                            <TablerNone
+                                :create='false'
+                                label='Data Sources'
+                            />
+                        </div>
                         <template v-else>
                             <table class='table table-hover table-vcenter card-table'>
                                 <thead>
@@ -377,6 +386,7 @@ import {
     IconX,
 } from '@tabler/icons-vue';
 import {
+    TablerNone,
     TablerLoading,
     TablerDropdown,
     TablerToggle,
@@ -403,6 +413,7 @@ export default {
         QuerySource,
         QueryLayer,
         Download,
+        TablerNone,
         TablerLoading,
         TablerInput,
         TablerToggle,

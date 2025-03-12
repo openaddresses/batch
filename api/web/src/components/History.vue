@@ -27,6 +27,7 @@
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='refresh'
                                     />
                                 </div>
@@ -103,6 +104,7 @@
                                                             v-if='job.output.output'
                                                             class='cursor-pointer'
                                                             size='32'
+                                                            stroke='1'
                                                             @click.stop.prevent='datapls(job.id)'
                                                         />
                                                     </div>

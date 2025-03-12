@@ -34,7 +34,7 @@
                     v-if='mode === "base"'
                     class='col-12'
                 >
-                    <div class='col-12 d-flex px-2'>
+                    <div class='col-12 d-flex px-2 py-2'>
                         <span
                             class='cursor-pointer'
                             @click='datapls(job.job || job.id)'
@@ -51,7 +51,7 @@
                         </div>
                     </div>
 
-                    <div class='col-12 d-flex px-2'>
+                    <div class='col-12 d-flex px-2 py-2'>
                         <span
                             class='cursor-pointer'
                             @click='datapls(job.job || job.id, "shapefile")'
@@ -68,7 +68,7 @@
                         </div>
                     </div>
 
-                    <div class='col-12 d-flex px-2'>
+                    <div class='col-12 d-flex px-2 py-2'>
                         <span
                             class='cursor-pointer'
                             @click='datapls(job.job || job.id, "csv")'
@@ -87,13 +87,13 @@
                 </div>
                 <div
                     v-else-if='!job.output.validated'
-                    class='col col--12'
+                    class='col col-12'
                 >
-                    <div class='flex flex--center-main'>
-                        <svg
-                            class='align-center icon color-gray'
-                            style='height: 40px; width: 40px;'
-                        ><use href='#icon-alert' /></svg>
+                    <div class='col-12 d-flex align-items-center justify-content-center'>
+                        <IconInfoCircle
+                            size='32'
+                            stroke='1'
+                        />
                     </div>
                     <div class='align-center'>
                         No Validated Data
@@ -101,15 +101,15 @@
                 </div>
                 <div
                     v-else-if='auth.level !== "sponsor"'
-                    class='col col--12'
+                    class='col-12'
                 >
-                    <div class='flex flex--center-main'>
-                        <svg
-                            class='align-center icon color-gray'
-                            style='height: 40px; width: 40px;'
-                        ><use href='#icon-info' /></svg>
+                    <div class='d-flex align-items-center justify-content-center pt-1 pb-2'>
+                        <IconInfoCircle
+                            size='32'
+                            stroke='1'
+                        />
                     </div>
-                    <div class='align-center'>
+                    <div class='d-flex justify-content-center'>
                         Sponsor Benefit
                     </div>
                 </div>

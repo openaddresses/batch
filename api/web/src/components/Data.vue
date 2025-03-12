@@ -83,7 +83,7 @@
                                 >
                                     <td v-text='c.human' />
                                     <td v-text='fmt(c.created)' />
-                                    <td class='d-flex'>
+                                    <td class='d-flex align-items-center'>
                                         <span v-text='size(c.size)' />
                                         <div class='ms-auto btn-list'>
                                             <IconDownload
@@ -162,40 +162,57 @@
                                 <div class='col col--6 px6'>
                                     <TablerInput
                                         v-model='filter.before'
+                                        :disabled='!filter.switches.before'
                                         label='Before'
                                         type='date'
-                                    />
-                                    <TablerToggle
-                                        v-model='filter.switches.before'
-                                        label='Before Enabled'
-                                    />
+                                    >
+                                        <TablerToggle
+                                            v-model='filter.switches.before'
+                                            label='Before Enabled'
+                                        />
+                                    </TablerInput>
                                 </div>
                                 <div class='col col--6 px6'>
                                     <TablerInput
                                         v-model='filter.after'
+                                        :disabled='!filter.switches.after'
                                         label='After'
                                         type='date'
-                                    />
-                                    <TablerToggle
-                                        v-model='filter.switches.after'
-                                        label='After Enabled'
-                                    />
+                                    >
+                                        <TablerToggle
+                                            v-model='filter.switches.after'
+                                            label='After Enabled'
+                                        />
+                                    </TablerInput>
                                 </div>
                             </div>
                         </template>
 
-                        <TablerLoading
-                            v-if='loading.sources'
-                            desc='Loading Sources'
+                        <Coverage
+                            :fullscreen='fullscreen'
+                            :layer='filter.layer'
+                            @err='$emit("err", $event)'
+                            @point='filter.point = $event'
                         />
-                        <template v-else>
-                            <Coverage
-                                :fullscreen='fullscreen'
-                                :layer='filter.layer'
-                                @err='$emit("err", $event)'
-                                @point='filter.point = $event'
-                            />
 
+                        <div
+                            v-if='loading.sources'
+                            class='card-body'
+                        >
+                            <TablerLoading
+                                desc='Loading Sources'
+                            />
+                        </div>
+                        <div
+                            v-else-if='!datas.length'
+                            class='card-body'
+                        >
+                            <TablerNone
+                                :create='false'
+                                label='Data Sources'
+                            />
+                        </div>
+                        <template v-else>
                             <table class='table table-hover table-vcenter card-table'>
                                 <thead>
                                     <tr>
@@ -213,8 +230,21 @@
                                             <td
                                                 class='cursor-pointer'
                                                 @click='d._open = !d._open'
-                                                v-text='d.source'
-                                            />
+                                            >
+                                                <div class='d-flex align-items-center'>
+                                                    <IconChevronRight
+                                                        v-if='!d._open'
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <IconChevronDown
+                                                        v-else
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <div v-text='d.source'></div>
+                                                </div>
+                                            </td>
                                             <td
                                                 class='cursor-pointer'
                                                 @click='d._open = !d._open'
@@ -257,12 +287,14 @@
                                             v-if='d._open'
                                             :key='job.id'
                                         >
-                                            <tr>
+                                            <tr
+                                                class='bg-gray-50'
+                                            >
                                                 <td
                                                     colspan='3'
                                                     class='cursor-pointer'
                                                 >
-                                                    <div class='row'>
+                                                    <div class='row mx-2'>
                                                         <div
                                                             class='col-5 d-flex align-items-center'
                                                             @click='emitjob(job.job)'
@@ -343,6 +375,8 @@ import moment from 'moment-timezone';
 import {
     IconArrowsMaximize,
     IconArrowsMinimize,
+    IconChevronRight,
+    IconChevronDown,
     IconSettings,
     IconDownload,
     IconHistory,
@@ -352,6 +386,7 @@ import {
     IconX,
 } from '@tabler/icons-vue';
 import {
+    TablerNone,
     TablerLoading,
     TablerDropdown,
     TablerToggle,
@@ -365,6 +400,8 @@ export default {
         MustLogin,
         IconArrowsMaximize,
         IconArrowsMinimize,
+        IconChevronRight,
+        IconChevronDown,
         IconSettings,
         IconDownload,
         IconHistory,
@@ -376,6 +413,7 @@ export default {
         QuerySource,
         QueryLayer,
         Download,
+        TablerNone,
         TablerLoading,
         TablerInput,
         TablerToggle,

@@ -39,11 +39,16 @@
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='getJob'
                                     />
                                 </div>
                             </div>
                             <TablerLoading v-if='loading' />
+                            <TablerAlert
+                                v-else-if='error'
+                                :err='error'
+                            />
                             <Log
                                 v-else
                                 :id='$route.params.jobid'
@@ -65,13 +70,15 @@ import {
 } from '@tabler/icons-vue';
 import {
     TablerBreadCrumb,
-    TablerLoading
+    TablerLoading,
+    TablerAlert,
 } from '@tak-ps/vue-tabler'
 
 export default {
     name: 'JobLog',
     components: {
         IconRefresh,
+        TablerAlert,
         TablerLoading,
         TablerBreadCrumb,
         Status,
@@ -80,6 +87,7 @@ export default {
     data: function() {
         return {
             loading: true,
+            error: undefined,
             job: {}
         }
     },
@@ -89,11 +97,13 @@ export default {
     methods: {
         getJob: async function() {
             try {
+                this.error = undefined;
                 this.loading = true;
                 this.job = await window.std(`/api/job/${this.$route.params.jobid}`);
                 this.loading = false;
             } catch(err) {
-                this.$emit('err', err);
+                error = err;
+                this.loading = false;
             }
         },
     }

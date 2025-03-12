@@ -15,15 +15,17 @@
                     Showing <span v-text='limit * page + 1' /> to <span v-text='total < limit ? total : (page * limit + limit > total ? total : page * limit + limit)' /> of <span v-text='total' /> entries
                 </p>
             </div>
-            <div
-                v-if='total > limit'
-                class='col-sm-12 col-6 d-flex'
-            >
-                <TablerPager
-                    :total='total'
-                    :limit='limit'
-                    @page='page = $event'
-                />
+            <div class='col-sm-12 col-6 d-flex'>
+                <div
+                    v-if='total > limit'
+                    class='ms-auto'
+                >
+                    <TablerPager
+                        :total='total'
+                        :limit='limit'
+                        @page='page = $event'
+                    />
+                </div>
             </div>
         </div>
     </div>

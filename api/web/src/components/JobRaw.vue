@@ -10,16 +10,19 @@
                     <IconRefresh
                         class='cursor-pointer'
                         size='32'
+                        stroke='1'
                         @click='refresh'
                     />
                     <IconBrandGithub
                         class='cursor-pointer'
                         size='32'
+                        stroke='1'
                         @click='external(job.source)'
                     />
                     <IconLink
                         v-if='job.source'
                         size='32'
+                        stroke='1'
                         @click='external(raw.data)'
                     />
                 </div>

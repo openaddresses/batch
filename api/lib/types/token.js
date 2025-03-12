@@ -54,6 +54,9 @@ export default class Token extends Generic {
             query.point = `POINT(${query.point.join(' ')})`;
         }
 
+        query.source = '%' + query.source + '%';
+        query.name = query.name + '%';
+
         try {
             const pgres = await pool.query(sql`
                 SELECT
@@ -75,7 +78,7 @@ export default class Token extends Generic {
                             ON results.job = job.id
                 WHERE
                     results.source ilike ${query.source}
-                    AND results.layer ilike ${query.layer}
+                    AND results.layer = ${query.layer}
                     AND results.name ilike ${query.name}
                     AND (${query.before}::TIMESTAMP IS NULL OR updated < ${query.before}::TIMESTAMP)
                     AND (${query.after}::TIMESTAMP IS NULL OR updated > ${query.after}::TIMESTAMP)

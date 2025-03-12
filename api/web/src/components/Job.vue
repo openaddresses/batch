@@ -110,21 +110,25 @@
                                         v-if='job.license'
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                     />
                                     <IconCode
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='$router.push({ path: `/job/${$route.params.jobid}/raw` })'
                                     />
                                     <IconNotes
                                         v-if='job.loglink'
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='$router.push({ path: `/job/${$route.params.jobid}/log` })'
                                     />
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        stroke='1'
                                         @click='refresh'
                                     />
 
@@ -137,6 +141,7 @@
                                         >
                                             <IconDotsVertical
                                                 class='cursor-pointer'
+                                                stroke='1'
                                                 size='32'
                                             />
                                         </div>

@@ -76,6 +76,7 @@
                                                                     <slot>
                                                                         <IconSettings
                                                                             size='32'
+                                                                            stroke='1'
                                                                             class='cursor-pointer'
                                                                         />
                                                                     </slot>
@@ -91,6 +92,7 @@
 
                                                             <IconHistory
                                                                 size='32'
+                                                                stroke='1'
                                                                 class='cursor-pointer'
                                                                 @click.stop.prevent='emithistory(job.id)'
                                                             />

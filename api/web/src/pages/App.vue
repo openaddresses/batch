@@ -31,7 +31,7 @@
                             target='_blank'
                             rel='noreferrer'
                         >
-                            <IconHelp size='32' />
+                            <IconHelp size='32' stroke='1' />
                         </a>
                         <a
                             v-if='false'
@@ -40,7 +40,7 @@
                             target='_blank'
                             rel='noreferrer'
                         >
-                            <IconMap size='32' />
+                            <IconMap size='32' stroke='1' />
                         </a>
 
                         <div class='dropdown'>
@@ -51,7 +51,7 @@
                                 aria-expanded='false'
                                 class='btn btn-dark'
                             >
-                                <IconMenu size='32' />
+                                <IconMenu size='32' stroke='1' />
                             </div>
                             <ul
                                 class='dropdown-menu'
@@ -91,7 +91,7 @@
                                     data-bs-toggle='dropdown'
                                     aria-expanded='false'
                                 >
-                                    <IconUser size='32' />
+                                    <IconUser size='32' stroke='1' />
                                 </div>
                                 <ul
                                     class='dropdown-menu'
@@ -117,6 +117,7 @@
                             <IconLogin
                                 v-else
                                 size='32'
+                                stroke='1'
                                 @click='$router.push("/login")'
                             />
                         </a>

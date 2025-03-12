@@ -52,6 +52,9 @@ export default class Job extends Generic {
 
         Status.verify(query.status);
 
+        query.source = '%' + query.source + '%';
+        query.layer = query.layer + '%';
+
         if (query.after) {
             try {
                 query.after = moment(query.after);

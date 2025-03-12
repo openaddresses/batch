@@ -18,6 +18,8 @@ export default class JobError extends Generic {
         if (!query.status) query.status = Status.list();
 
         query.source = Params.string(query.source, { default: '' });
+        query.source = '%' + query.source + '%';
+        query.layer = query.layer + '%';
 
         Status.verify(query.status);
 

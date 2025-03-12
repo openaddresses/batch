@@ -3,17 +3,14 @@
         <TablerInput
             v-model='source'
             label='Source'
-        />
-
-        <label
-            v-if='showValidated'
-            class='w-full'
         >
             <TablerToggle
+                v-if='showValidated'
                 v-model='validated'
                 label='Validated Data'
             />
-        </label>
+        </TablerInput>
+
     </div>
 </template>
 

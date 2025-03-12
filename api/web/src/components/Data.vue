@@ -162,40 +162,48 @@
                                 <div class='col col--6 px6'>
                                     <TablerInput
                                         v-model='filter.before'
+                                        :disabled='!filter.switches.before'
                                         label='Before'
                                         type='date'
-                                    />
-                                    <TablerToggle
-                                        v-model='filter.switches.before'
-                                        label='Before Enabled'
-                                    />
+                                    >
+                                        <TablerToggle
+                                            v-model='filter.switches.before'
+                                            label='Before Enabled'
+                                        />
+                                    </TablerInput>
                                 </div>
                                 <div class='col col--6 px6'>
                                     <TablerInput
                                         v-model='filter.after'
+                                        :disabled='!filter.switches.after'
                                         label='After'
                                         type='date'
-                                    />
-                                    <TablerToggle
-                                        v-model='filter.switches.after'
-                                        label='After Enabled'
-                                    />
+                                    >
+                                        <TablerToggle
+                                            v-model='filter.switches.after'
+                                            label='After Enabled'
+                                        />
+                                    </TablerInput>
                                 </div>
                             </div>
                         </template>
 
-                        <TablerLoading
-                            v-if='loading.sources'
-                            desc='Loading Sources'
+                        <Coverage
+                            :fullscreen='fullscreen'
+                            :layer='filter.layer'
+                            @err='$emit("err", $event)'
+                            @point='filter.point = $event'
                         />
-                        <template v-else>
-                            <Coverage
-                                :fullscreen='fullscreen'
-                                :layer='filter.layer'
-                                @err='$emit("err", $event)'
-                                @point='filter.point = $event'
-                            />
 
+                        <div
+                            v-if='loading.sources'
+                            class='card-body'
+                        >
+                            <TablerLoading
+                                desc='Loading Sources'
+                            />
+                        </div>
+                        <template v-else>
                             <table class='table table-hover table-vcenter card-table'>
                                 <thead>
                                     <tr>

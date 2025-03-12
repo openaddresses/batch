@@ -64,7 +64,13 @@
                                         <th>Job ID</th>
                                         <th>Created</th>
                                         <th>Source</th>
-                                        <th>Attributes</th>
+                                        <th>
+                                            <div class='d-flex'>
+                                                <div class='ms-auto'>
+                                                    Attributes
+                                                </div>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -87,31 +93,35 @@
                                             <span v-text='`${job.source_name} - ${job.layer} - ${job.name}`' />
                                         </td>
                                         <td>
-                                            <div
-                                                class='btn-list'
-                                                @click.stop.prevent=''
-                                            >
-                                                <Download
-                                                    :auth='auth'
-                                                    :job='job'
-                                                    @login='$emit("login")'
-                                                    @perk='$emit("perk", $event)'
-                                                />
-                                                <span @click.stop.prevent='external(job.source)'>
-                                                    <IconBrandGithub
-                                                        class='cursor-pointer'
-                                                        size='32'
-                                                    />
-                                                </span>
-                                                <span
-                                                    v-if='job.loglink'
-                                                    @click.stop.prevent='$router.push(`/job/${job.id}/log`)'
+                                            <div class='d-flex'>
+                                                <div
+                                                    class='ms-auto btn-list'
+                                                    @click.stop.prevent=''
                                                 >
-                                                    <IconNotes
-                                                        class='cursor-pointer'
-                                                        size='32'
+                                                    <Download
+                                                        :auth='auth'
+                                                        :job='job'
+                                                        @login='$emit("login")'
+                                                        @perk='$emit("perk", $event)'
                                                     />
-                                                </span>
+                                                    <span @click.stop.prevent='external(job.source)'>
+                                                        <IconBrandGithub
+                                                            class='cursor-pointer'
+                                                            size='32'
+                                                            stroke='1'
+                                                        />
+                                                    </span>
+                                                    <span
+                                                        v-if='job.loglink'
+                                                        @click.stop.prevent='$router.push(`/job/${job.id}/log`)'
+                                                    >
+                                                        <IconNotes
+                                                            class='cursor-pointer'
+                                                            size='32'
+                                                            stroke='1'
+                                                        />
+                                                    </span>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>

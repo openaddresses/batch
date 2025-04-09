@@ -82,6 +82,7 @@
                                             <th>Status</th>
                                             <th>Job ID</th>
                                             <th>Updated</th>
+                                            <th>Count</th>
                                             <th>Attributes</th>
                                         </tr>
                                     </thead>
@@ -95,7 +96,10 @@
                                             </td>
                                             <td v-text='job.id' />
                                             <td>
-                                                <span v-text='fmt(job.created)' />
+                                                <span v-text='fmtDate(job.created)' />
+                                            </td>
+                                            <td>
+                                                <span v-text='fmtNumber(job.count)' />
                                             </td>
                                             <td>
                                                 <div class='d-flex'>
@@ -193,11 +197,11 @@ export default {
         this.refresh();
     },
     methods: {
-        fmt: function(date) {
+        fmtDate: function(date) {
             return moment(date).tz(this.tz).format('YYYY-MM-DD');
         },
-        emitjob: function(jobid) {
-            this.$router.push({ path: `/job/${jobid}`});
+        fmtNumber: function(num) {
+            return new Intl.NumberFormat().format(num);
         },
         refresh: async function() {
             await this.getData();

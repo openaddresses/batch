@@ -20,7 +20,7 @@ export default async function router(schema, config) {
 
         const payload = req.body.toString('utf8');
 
-        if (!await ghverify.verify(payload, req.headers['x-hub-signature'])) {
+        if (!ghverify.verify(payload, req.headers['x-hub-signature'])) {
             res.status(400).send('Invalid X-Hub-Signature');
         }
 

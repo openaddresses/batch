@@ -18,7 +18,7 @@ export default async function router(schema, config) {
             secret: process.env.GithubSecret
         });
 
-        if (!ghverify.verify(req.body, req.headers['x-hub-signature'])) {
+        if (!await ghverify.verify(req.body, req.headers['x-hub-signature'])) {
             res.status(400).send('Invalid X-Hub-Signature');
         }
 

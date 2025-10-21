@@ -30,7 +30,7 @@
         "decompress": "^4.2.1",
         "find": "^0.3.0",
         "glob": "^10.0.0",
-        "inquirer": "^9.0.0",
+        "inquirer": "^9.3.8",
         "minimist": "^1.2.5",
         "mkdirp": "^3.0.0",
         "npm": "^10.1.0",

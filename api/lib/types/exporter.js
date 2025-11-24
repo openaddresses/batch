@@ -4,7 +4,7 @@ import { Status } from '../util.js';
 import { trigger } from '../batch.js';
 import moment from 'moment';
 import CloudWatchLogs from '@aws-sdk/client-cloudwatch-logs';
-import S3 from '../s3.js';
+import R2 from '../r2.js';
 import { sql } from 'slonik';
 
 const cwl = new CloudWatchLogs.CloudWatchLogsClient({ region: process.env.AWS_DEFAULT_REGION });
@@ -126,12 +126,12 @@ export default class Exporter extends Generic {
         if (auth.access !== 'admin' && auth.uid !== exp.uid) throw new Err(401, null, 'Not Authorized to download');
         if (exp.status !== 'Success') throw new Err(400, null, 'Cannot download an unsuccessful export');
 
-        const s3 = new S3({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/export/${export_id}/export.zip`
+        const r2 = new R2({
+            Bucket: process.env.R2Bucket || 'openaddresses',
+            Key: `v2.openaddresses.io/${process.env.StackName}/export/${export_id}/export.zip`
         });
 
-        return await s3.stream(res, `export-${export_id}.zip`);
+        return res.redirect(await r2.url());
     }
 
     /**

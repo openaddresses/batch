@@ -2,6 +2,7 @@ import Err from '@openaddresses/batch-error';
 import readline from 'readline';
 import zlib from 'zlib';
 import S3 from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 
@@ -11,6 +12,11 @@ const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 export default class S3Helper {
     constructor(params) {
         this.params = params;
+    }
+
+    async url() {
+        const command = new S3.GetObjectCommand(this.params);
+        return await getSignedUrl(s3, command, { expiresIn: 3600 });
     }
 
     async stream(res, name) {

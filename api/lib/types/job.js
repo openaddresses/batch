@@ -9,10 +9,7 @@ import { sql } from 'slonik';
 import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 import { trigger } from '../batch.js';
-import request from 'request';
-import { promisify } from 'util';
 
-const prequest = promisify(request);
 const cwl = new CloudWatchLogs.CloudWatchLogsClient({ region: process.env.AWS_DEFAULT_REGION });
 const pkg  = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
 
@@ -131,12 +128,11 @@ export default class Job extends Generic {
 
     async get_raw() {
         if (!this.raw) {
-            const res = await prequest({
-                url: this.source,
-                json: true
-            });
+            const res = await fetch(this.source);
 
-            this.raw = res.body;
+            if (!res.ok) throw new Err(400, null, 'Failed to fetch source');
+
+            this.raw = await res.json();
         }
 
         return this.raw;

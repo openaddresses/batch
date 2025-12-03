@@ -27,25 +27,25 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-            - name: Docker Layer Caching
-              uses: satackey/action-docker-layer-caching@v0.0.11
-              continue-on-error: true
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
-            - name: Docker Build Task
-              run: docker build -t task task/
-
-            - name: Docker Tag Task
-              run: docker tag task ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }}
-
-            - name: Docker Push Task
-              run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Docker Build and Push Task
+              uses: docker/build-push-action@v6
+              with:
+                  context: task/
+                  push: true
+                  tags: ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+                  load: true
 
             - name: Docker Task Lint
-              run: docker run task npm run lint
+              run: docker run ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }} npm run lint
 
             - name: Docker Task Test
-              run: docker run -e AWS_ACCOUNT_ID=${{secrets.AWS_ACCOUNT_ID}} -e AWS_REGION=${{secrets.AWS_REGION}} -e AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} task npm test
+              run: docker run -e AWS_ACCOUNT_ID=${{secrets.AWS_ACCOUNT_ID}} -e AWS_REGION=${{secrets.AWS_REGION}} -e AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }} npm test

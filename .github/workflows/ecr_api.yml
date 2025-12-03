@@ -20,9 +20,6 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-            - name: Docker Build API
-              run: docker build -t api api/
-
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v4
               with:
@@ -30,12 +27,18 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: us-east-1
 
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
-            - name: Docker Tag API
-              run: docker tag api ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${{ github.event.pull_request.head.sha || github.sha }}
-
-            - name: Docker Push API
-              run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Docker Build and Push API
+              uses: docker/build-push-action@v6
+              with:
+                  context: api/
+                  push: true
+                  tags: ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${{ github.event.pull_request.head.sha || github.sha }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max

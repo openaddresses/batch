@@ -31,7 +31,7 @@
         "minimist": "^1.2.5",
         "mkdirp": "^3.0.0",
         "npm": "^11.6.3",
-        "oa": "github:openaddresses/openaddresses#v5.8.1",
+        "oa": "github:openaddresses/openaddresses#v5.9.0",
         "ogr2ogr": "^2.1.1",
         "prompts": "^2.4.0",
         "request": "^2.88.2",

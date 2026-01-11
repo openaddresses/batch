@@ -153,7 +153,8 @@ export default class Job extends Generic {
         const datas = await Data.list(pool, {
             source: compare.source_name,
             layer: compare.layer,
-            name: compare.name
+            name: compare.name,
+            exact: true
         });
 
         let master;

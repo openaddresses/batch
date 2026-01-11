@@ -18,6 +18,7 @@ export default class Data extends Generic {
      * @param {String} [query.source=Null] - Filter results by source
      * @param {String} [query.layer=Null] - Filter results by source layer
      * @param {String} [query.name=Null] - Filter results by source layer name
+     * @param {Boolean} [query.exact=false] - If true, treat source/layer/name as exact (no wildcard)
      * @param {String} [query.before=Null] - Filter results run before the given date
      * @param {String} [query.after=Null] - Filter results run after the given date
      * @param {String} [query.point=false] - Filter results by geographic point
@@ -54,9 +55,15 @@ export default class Data extends Generic {
             query.point = `POINT(${query.point.join(' ')})`;
         }
 
-        query.source = `%${query.source}%`;
-        query.layer = `${query.layer}%`;
-        query.name = `${query.name}%`;
+        let sourcePattern = query.source;
+        let layerPattern = query.layer;
+        let namePattern = query.name;
+
+        if (!query.exact) {
+            sourcePattern = `%${query.source}%`;
+            layerPattern = `${query.layer}%`;
+            namePattern = `${query.name}%`;
+        }
 
         try {
             const pgres = await pool.query(sql`
@@ -78,9 +85,9 @@ export default class Data extends Generic {
                                 ON job.map = map.id
                             ON results.job = job.id
                 WHERE
-                    results.source ilike ${query.source}
-                    AND results.layer ilike ${query.layer}
-                    AND results.name ilike ${query.name}
+                    results.source ilike ${sourcePattern}
+                    AND results.layer ilike ${layerPattern}
+                    AND results.name ilike ${namePattern}
                     AND (${query.before}::TIMESTAMP IS NULL OR updated < ${query.before}::TIMESTAMP)
                     AND (${query.after}::TIMESTAMP IS NULL OR updated > ${query.after}::TIMESTAMP)
                     AND (${query.map}::BIGINT IS NULL OR job.map = ${query.map})
@@ -198,7 +205,8 @@ export default class Data extends Generic {
             data = await Data.list(pool, {
                 source: job.source_name,
                 layer: job.layer,
-                name: job.name
+                name: job.name,
+                exact: true
             });
         } catch (err) {
             throw new Err(500, err, 'Failed to fetch data');

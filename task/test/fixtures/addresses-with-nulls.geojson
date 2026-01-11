@@ -1,0 +1,3 @@
+{"type":"Feature","properties":{"id":"","unit":null,"number":null,"street":null,"city":null,"district":null,"region":null,"postcode":null,"hash":"a"},"geometry":{"type":"Point","coordinates":[0,0]}}
+{"type":"Feature","properties":{"id":"","unit":"","number":"5","street":"Main St","city":"Town","district":"","region":"","postcode":"" ,"hash":"b"},"geometry":{"type":"Point","coordinates":[1,1]}}
+{"type":"Feature","properties":{"id":"","unit":" ","number":"","street":" ","city":null,"district":null,"region":null,"postcode":null,"hash":"c"},"geometry":{"type":"Point","coordinates":[2,2]}}

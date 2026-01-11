@@ -89,13 +89,13 @@ export default class Stats {
     }
 
     addresses(feat) {
-        if (feat.properties.unit.trim().length > 0) this.stats.addresses.counts.unit++;
-        if (feat.properties.number.trim().length > 0) this.stats.addresses.counts.number++;
-        if (feat.properties.street.trim().length > 0) this.stats.addresses.counts.street++;
-        if (feat.properties.city.trim().length > 0) this.stats.addresses.counts.city++;
-        if (feat.properties.district.trim().length > 0) this.stats.addresses.counts.district++;
-        if (feat.properties.region.trim().length > 0) this.stats.addresses.counts.region++;
-        if (feat.properties.postcode.trim().length > 0) this.stats.addresses.counts.postcode++;
+        if (feat.properties.unit && feat.properties.unit.trim().length > 0) this.stats.addresses.counts.unit++;
+        if (feat.properties.number && feat.properties.number.trim().length > 0) this.stats.addresses.counts.number++;
+        if (feat.properties.street && feat.properties.street.trim().length > 0) this.stats.addresses.counts.street++;
+        if (feat.properties.city && feat.properties.city.trim().length > 0) this.stats.addresses.counts.city++;
+        if (feat.properties.district && feat.properties.district.trim().length > 0) this.stats.addresses.counts.district++;
+        if (feat.properties.region && feat.properties.region.trim().length > 0) this.stats.addresses.counts.region++;
+        if (feat.properties.postcode && feat.properties.postcode.trim().length > 0) this.stats.addresses.counts.postcode++;
     }
 
     bounds(feat) {

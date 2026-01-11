@@ -198,7 +198,8 @@ export default class Token extends Generic {
             data = await Data.list(pool, {
                 source: job.source_name,
                 layer: job.layer,
-                name: job.name
+                name: job.name,
+                exact: true
             });
         } catch (err) {
             throw new Err(500, err, 'Failed to fetch data');

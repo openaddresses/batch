@@ -13,11 +13,11 @@
         "lint": "eslint *.js lib/ test/"
     },
     "dependencies": {
-        "@aws-sdk/client-auto-scaling": "^3.363.0",
-        "@aws-sdk/client-batch": "^3.365.0",
-        "@aws-sdk/client-ecs": "^3.364.0",
-        "@aws-sdk/client-s3": "^3.405.0",
-        "@aws-sdk/client-secrets-manager": "^3.363.0",
+        "@aws-sdk/client-auto-scaling": "^3.981.0",
+        "@aws-sdk/client-batch": "^3.981.0",
+        "@aws-sdk/client-ecs": "^3.981.0",
+        "@aws-sdk/client-s3": "^3.981.0",
+        "@aws-sdk/client-secrets-manager": "^3.981.0",
         "@aws-sdk/lib-storage": "^3.405.0",
         "@openaddresses/lib": "^4.4.0",
         "@supercharge/promise-pool": "^3.0.0",

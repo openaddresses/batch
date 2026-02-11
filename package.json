@@ -15,7 +15,7 @@
         "lint": "eslint cloudformation/"
     },
     "dependencies": {
-        "@aws-sdk/s3-request-presigner": "^3.939.0",
+        "@aws-sdk/s3-request-presigner": "^3.987.0",
         "@openaddresses/batch-alarms": "^4.0.0",
         "@openaddresses/cloudfriend": "^7.0.0"
     },

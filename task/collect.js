@@ -194,6 +194,7 @@ async function get_source(oa, tmp, data, stats) {
 async function upload_zip_collection(file, name) {
     const s3uploader = new Upload({
         client: s3,
+        partSize: 100 * 1024 * 1024,
         params: {
             ContentType: 'application/zip',
             Body: fs.createReadStream(file),
@@ -217,6 +218,7 @@ async function upload_zip_collection(file, name) {
 
     const r2uploader = new Upload({
         client: r2,
+        partSize: 100 * 1024 * 1024,
         params: {
             ContentType: 'application/zip',
             Body: fs.createReadStream(file),

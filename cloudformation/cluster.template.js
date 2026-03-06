@@ -87,6 +87,14 @@ export default {
             Properties: {
                 ImageId: 'ami-0914ebfbccd143a3f',
                 InstanceType: 't3.small',
+                BlockDeviceMappings: [{
+                    DeviceName: '/dev/xvda',
+                    Ebs: {
+                        Encrypted: true,
+                        VolumeSize: 500,
+                        VolumeType: 'gp3'
+                    }
+                }],
                 SecurityGroups: [cf.ref('T3ClusterInstanceSecurityGroup')],
                 IamInstanceProfile: cf.ref('T3ClusterInstanceProfile'),
                 UserData: { 'Fn::Base64' : { 'Fn::Join' : ['', [

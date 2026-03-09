@@ -45,7 +45,7 @@ export default async function router(schema, config) {
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
             const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await config.borders.tile(req.params.z, req.params.x, req.params.y);
+                return await Map.tile(config.pool, req.params.z, req.params.x, req.params.y);
             }, false);
 
             res.writeHead(200, {

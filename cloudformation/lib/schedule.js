@@ -93,7 +93,7 @@ export default function schedule(type, cron, desc) {
             Handler: 'index.handler',
             MemorySize: 128,
             Role: cf.getAtt(`${title}LambdaScheduleRole`, 'Arn'),
-            Runtime: 'nodejs12.x',
+            Runtime: 'nodejs22.x',
             Timeout: '25'
         }
     };

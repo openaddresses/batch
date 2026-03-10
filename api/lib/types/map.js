@@ -1,4 +1,6 @@
 import fs from 'fs';
+import zlib from 'zlib';
+import { promisify } from 'util';
 import { sql } from 'slonik';
 import hash from 'object-hash';
 import split from 'split';
@@ -6,6 +8,8 @@ import SM from '@mapbox/sphericalmercator';
 import { pipeline } from 'stream/promises';
 import transform from 'parallel-transform';
 import S3 from '@aws-sdk/client-s3';
+
+const gzip = promisify(zlib.gzip);
 
 import Generic from '@openaddresses/batch-generic';
 import Err from '@openaddresses/batch-error';
@@ -162,11 +166,11 @@ export default class Map extends Generic {
                     SELECT
                         n.id,
                         n.code,
-                        addresses,
-                        buildings,
-                        parcels,
+                        n.addresses,
+                        n.buildings,
+                        n.parcels,
                         ST_AsMVTGeom(
-                            ST_Transform(geom, 3857),
+                            ST_Transform(n.geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
                                 ST_MakePoint(${bbox[0]}, ${bbox[1]}),
                                 ST_MakePoint(${bbox[2]}, ${bbox[3]})
@@ -178,14 +182,26 @@ export default class Map extends Generic {
                     FROM (
                         SELECT
                             map.id,
-                            map.name,
                             map.code,
                             map.geom,
-                            job.layer = 'addresses' AS addresses,
-                            job.layer = 'buildings' AS buildings,
-                            job.layer = 'parcels' AS parcels
+                            cov.layer @> ARRAY['addresses'] AS addresses,
+                            cov.layer @> ARRAY['buildings'] AS buildings,
+                            cov.layer @> ARRAY['parcels'] AS parcels
                         FROM
-                            map INNER JOIN job ON map.id = job.map
+                            map
+                            INNER JOIN (
+                                SELECT
+                                    job.map,
+                                    ARRAY_AGG(job.layer) AS layer
+                                FROM
+                                    results,
+                                    job
+                                WHERE
+                                    results.job = job.id
+                                    AND job.map IS NOT NULL
+                                GROUP BY
+                                    job.map
+                            ) cov ON map.id = cov.map
                         WHERE
                             ST_Intersects(
                                 map.geom,
@@ -193,19 +209,12 @@ export default class Map extends Generic {
                                     ST_MakePoint(${bbox[0]}, ${bbox[1]}),
                                     ST_MakePoint(${bbox[2]}, ${bbox[3]})
                                 ), 3857), 4326)
-                        )
+                            )
                     ) n
-                    GROUP BY
-                        n.addresses,
-                        n.buildings,
-                        n.parcels,
-                        n.code,
-                        n.geom,
-                        n.id
                 ) q
             `);
 
-            return pgres.rows[0].mvt;
+            return gzip(pgres.rows[0].mvt);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate tile');
         }

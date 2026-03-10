@@ -60,40 +60,39 @@ export default function schedule(type, cron, desc) {
             },
             Code: {
                 ZipFile: `
-                    function handler() {
+                    exports.handler = function() {
                         const http = require('http');
 
-                        const req = http.request({
-                            hostname: new URL(process.env.OA_API).hostname,
-                            port: 80,
-                            path: '/api/schedule',
-                            method: 'POST',
-                            headers: {
-                                'shared-secret': process.env.SharedSecret,
-                                'content-type': 'application/json'
-                            },
-                        }, (res) => {
-                              console.log('ok - status: ' + res.statusCode)
+                        return new Promise((resolve, reject) => {
+                            const req = http.request({
+                                hostname: new URL(process.env.OA_API).hostname,
+                                port: 80,
+                                path: '/api/schedule',
+                                method: 'POST',
+                                headers: {
+                                    'shared-secret': process.env.SharedSecret,
+                                    'content-type': 'application/json'
+                                },
+                            }, (res) => {
+                                console.log('ok - status: ' + res.statusCode);
+                                resolve();
+                            });
+
+                            req.on('error', reject);
+
+                            req.write(JSON.stringify({
+                                type: '${type}'
+                            }));
+
+                            req.end();
                         });
-
-                        req.on('error', (err) => {
-                            throw err;
-                        });
-
-                        req.write(JSON.stringify({
-                            type: '${type}'
-                        }));
-
-                        req.end();
-                    }
-
-                    module.exports.handler = handler;
+                    };
                 `
             },
             Handler: 'index.handler',
             MemorySize: 128,
             Role: cf.getAtt(`${title}LambdaScheduleRole`, 'Arn'),
-            Runtime: 'nodejs12.x',
+            Runtime: 'nodejs22.x',
             Timeout: '25'
         }
     };

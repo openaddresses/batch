@@ -36,6 +36,57 @@ const stack = {
             Description: 'Github branch to schedule source runs from',
             Default: 'master'
         }
+    },
+    Resources: {
+        BatchFailureTopic: {
+            Type: 'AWS::SNS::Topic',
+            Properties: {
+                TopicName: cf.join('-', [cf.stackName, 'batch-failure']),
+                Subscription: [{
+                    Protocol: 'email',
+                    Endpoint: 'hello@openaddresses.io'
+                }]
+            }
+        },
+        BatchFailureTopicPolicy: {
+            Type: 'AWS::SNS::TopicPolicy',
+            Properties: {
+                Topics: [cf.ref('BatchFailureTopic')],
+                PolicyDocument: {
+                    Statement: [{
+                        Effect: 'Allow',
+                        Principal: { Service: 'events.amazonaws.com' },
+                        Action: 'sns:Publish',
+                        Resource: cf.ref('BatchFailureTopic')
+                    }]
+                }
+            }
+        },
+        BatchFailureRule: {
+            Type: 'AWS::Events::Rule',
+            Properties: {
+                Description: 'Notify on scheduled batch job failures',
+                EventPattern: {
+                    source: ['aws.batch'],
+                    'detail-type': ['Batch Job State Change'],
+                    detail: {
+                        status: ['FAILED'],
+                        jobName: [{
+                            prefix: 'OA_Collect'
+                        }, {
+                            prefix: 'OA_Fabric'
+                        }, {
+                            prefix: 'OA_Sources'
+                        }]
+                    }
+                },
+                State: 'ENABLED',
+                Targets: [{
+                    Id: 'BatchFailureSNS',
+                    Arn: cf.ref('BatchFailureTopic')
+                }]
+            }
+        }
     }
 };
 

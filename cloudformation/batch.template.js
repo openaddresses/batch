@@ -65,6 +65,7 @@ export default cf.merge(
     schedule('scale',   'cron(0/5 * * * ? *)', 'Scale T3 Batch Cluster'),
     schedule('sources', 'cron(0 12 ? * fri *)', 'Full Source Rebuild'),
     schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
+    schedule('fabric',  'cron(0 18 ? * sun *)', 'Rebuild Border & Fabric Tiles'),
     schedule('level',   'cron(0 10 * * ? *)', 'Ensure all accounts have proper levels'),
     schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs')
 );

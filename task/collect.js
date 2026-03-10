@@ -108,6 +108,8 @@ async function collect(tmp, collection, oa) {
     console.error(`ok - zip created: ${zip}`);
     await upload_zip_collection(zip, collection.name);
     console.error('ok - archive uploaded');
+    fs.unlinkSync(zip);
+    console.error(`ok - deleted ${zip}`);
 
     await oa.cmd('collection', 'update', {
         ':collection': collection.id,

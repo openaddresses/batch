@@ -1,18 +1,20 @@
 <template>
     <div class='btn-list'>
         <template v-if='error.status === "Warn"'>
-            <button
-                class='btn'
-                @click.stop.prevent='mod(error.job || error.id, true)'
-            >
-                Confirm
-            </button>
-            <button
-                class='btn btn-danger'
-                @click.stop.prevent='mod(error.job || error.id, false)'
-            >
-                Reject
-            </button>
+            <template v-if='canModerate'>
+                <button
+                    class='btn'
+                    @click.stop.prevent='mod(error.job || error.id, true)'
+                >
+                    Confirm
+                </button>
+                <button
+                    class='btn btn-danger'
+                    @click.stop.prevent='mod(error.job || error.id, false)'
+                >
+                    Reject
+                </button>
+            </template>
             <button
                 class='btn'
                 @click.stop.prevent='$router.push({ path: `/job/${error.job || error.id}/log` })'
@@ -27,18 +29,20 @@
             >
                 Logs
             </button>
-            <button
-                class='btn btn-secondary'
-                @click.stop.prevent='createRerun(error.job || error.id)'
-            >
-                Rerun
-            </button>
-            <button
-                class='btn btn-primary'
-                @click.stop.prevent='mod(error.job || error.id, false)'
-            >
-                Suppress
-            </button>
+            <template v-if='canModerate'>
+                <button
+                    class='btn btn-secondary'
+                    @click.stop.prevent='createRerun(error.job || error.id)'
+                >
+                    Rerun
+                </button>
+                <button
+                    class='btn btn-primary'
+                    @click.stop.prevent='mod(error.job || error.id, false)'
+                >
+                    Suppress
+                </button>
+            </template>
         </template>
     </div>
 </template>
@@ -46,9 +50,11 @@
 <script>
 export default {
     name: 'ErrorsModerate',
-    props: [ 'error' ],
-    data: function() {
-        return {};
+    props: [ 'error', 'auth' ],
+    computed: {
+        canModerate: function() {
+            return this.auth && (this.auth.access === 'admin' || (this.auth.flags && this.auth.flags.moderator));
+        }
     },
     methods: {
         mod: async function(job_id, confirm) {

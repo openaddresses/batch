@@ -68,6 +68,7 @@
                                 <ErrorsModerate
                                     class='py12'
                                     :error='job'
+                                    :auth='auth'
                                     @moderated='joberror = false'
                                 />
                             </div>

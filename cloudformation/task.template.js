@@ -109,7 +109,7 @@ export default {
                             VolumeType: 'gp3'
                         }
                     }]
-                },
+                }
             }
         },
         BatchMegaLaunchTemplate: {

@@ -86,6 +86,7 @@
                                                     <div class='ms-auto btn-list'>
                                                         <ErrorsModerate
                                                             :error='error'
+                                                            :auth='auth'
                                                             @moderated='list.errors.splice(i, 1)'
                                                         />
                                                     </div>
@@ -150,7 +151,7 @@ export default {
         TablerNone,
         TableFooter
     },
-    props: [ ],
+    props: [ 'auth' ],
     data: function() {
         return {
             loading: true,

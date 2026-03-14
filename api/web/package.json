@@ -21,6 +21,7 @@
         "imask": "^7.6.1",
         "maplibre-gl": "^5.0.0",
         "moment-timezone": "^0.5.33",
+        "pmtiles": "^4.4.0",
         "sass": "^1.32.12",
         "sass-loader": "^16.0.0",
         "vue": "^3.2.31",

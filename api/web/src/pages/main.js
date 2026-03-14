@@ -1,10 +1,10 @@
 import { createApp } from 'vue';
 import * as VueRouter from 'vue-router';
 
-import 'floating-vue/dist/style.css'
+import 'floating-vue/dist/style.css';
 import FloatingVue from 'floating-vue';
 
-import App from './App.vue'
+import App from './App.vue';
 import std from '../std.js';
 std();
 
@@ -36,7 +36,7 @@ const router = new VueRouter.createRouter({
         { path: '/data/:dataid/history', component: () => import('../components/History.vue'), props: true },
 
         { path: '/logout', component: () => import('../components/Logout.vue') },
-        
+
         { path: '/login', component: () => import('../components/Login.vue') },
         { path: '/login/verify', component: () => import('../components/Verify.vue') },
         { path: '/login/forgot', component: () => import('../components/Forgot.vue') },
@@ -58,6 +58,8 @@ const router = new VueRouter.createRouter({
 
         { path: '/register', component: () => import('../components/Register.vue') },
 
+        { path: '/map', component: () => import('../components/Map.vue') },
+
         { path: '/upload', component: () => import('../components/Upload.vue') },
 
         { path: '/:catchAll(.*)', component: () => import('../components/NotFound.vue') }
@@ -65,7 +67,7 @@ const router = new VueRouter.createRouter({
 });
 
 const app = createApp(App);
-app.config.devtools = true
+app.config.devtools = true;
 app.use(router);
 app.use(FloatingVue);
 app.mount('#app');

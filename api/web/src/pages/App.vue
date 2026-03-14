@@ -71,6 +71,10 @@
                                 >Errors</a>
                                 <a
                                     class='dropdown-item cursor-pointer'
+                                    @click='$router.push("/map")'
+                                >Map</a>
+                                <a
+                                    class='dropdown-item cursor-pointer'
                                     @click='$router.push("/upload")'
                                 > Contribute</a>
                             </ul>

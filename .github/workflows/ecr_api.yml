@@ -4,21 +4,12 @@ on:
     push:
         branches:
             - master
-    pull_request:
-        types:
-            - opened
-            - synchronize
-            - reopened
-            - ready_for_review
 
 jobs:
-    build:
+    build-and-push:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.draft == false
         steps:
             - uses: actions/checkout@v4
-              with:
-                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v4
@@ -39,6 +30,6 @@ jobs:
               with:
                   context: api/
                   push: true
-                  tags: ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${{ github.event.pull_request.head.sha || github.sha }}
+                  tags: ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:api-${{ github.sha }}
                   cache-from: type=gha
                   cache-to: type=gha,mode=max

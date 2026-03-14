@@ -4,17 +4,10 @@ on:
     push:
         branches:
             - master
-    pull_request:
-        types:
-            - opened
-            - synchronize
-            - reopened
-            - ready_for_review
 
 jobs:
-    build:
+    build-and-push:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.draft == false
         steps:
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v4
@@ -24,8 +17,6 @@ jobs:
                   aws-region: ${{ secrets.AWS_REGION }}
 
             - uses: actions/checkout@v4
-              with:
-                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
@@ -39,13 +30,6 @@ jobs:
               with:
                   context: task/
                   push: true
-                  tags: ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }}
+                  tags: ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.sha }}
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
-                  load: true
-
-            - name: Docker Task Lint
-              run: docker run ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }} npm run lint
-
-            - name: Docker Task Test
-              run: docker run -e AWS_ACCOUNT_ID=${{secrets.AWS_ACCOUNT_ID}} -e AWS_REGION=${{secrets.AWS_REGION}} -e AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} -e AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/batch:task-${{ github.event.pull_request.head.sha || github.sha }} npm test

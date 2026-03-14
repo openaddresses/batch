@@ -32,9 +32,55 @@ export async function scale(desired) {
 }
 
 /**
+ * Clear scale-in protection from ASG instances that are protected
+ * but no longer running any Batch jobs. This handles cases where a
+ * task process crashed (OOM, SIGKILL) without calling protection(false).
+ */
+async function clear_stale_protection() {
+    const desc = (await asg.send(new ASG.DescribeAutoScalingGroupsCommand({
+        AutoScalingGroupNames: [process.env.T3_CLUSTER_ASG]
+    }))).AutoScalingGroups[0];
+
+    const protectedIds = desc.Instances
+        .filter((i) => i.ProtectedFromScaleIn)
+        .map((i) => i.InstanceId);
+
+    if (protectedIds.length === 0) return;
+
+    // Count RUNNING and STARTING jobs across t3 queues
+    let activeJobs = 0;
+    for (const queue of [t3_queue, t3_priority_queue]) {
+        for (const status of ['STARTING', 'RUNNING']) {
+            const res = await batch.send(new Batch.ListJobsCommand({
+                jobQueue: queue,
+                jobStatus: status
+            }));
+            activeJobs += res.jobSummaryList.length;
+        }
+    }
+
+    // If no jobs are active, all protection is stale
+    if (activeJobs === 0) {
+        console.error(`ok - clearing stale scale-in protection from ${protectedIds.length} instances: ${protectedIds.join(', ')}`);
+        await asg.send(new ASG.SetInstanceProtectionCommand({
+            AutoScalingGroupName: process.env.T3_CLUSTER_ASG,
+            InstanceIds: protectedIds,
+            ProtectedFromScaleIn: false
+        }));
+    }
+}
+
+/**
  * Scale Batch T3 ASG Cluster down based on job queue size
  */
 export async function scale_in() {
+    // Clear stale protection before scaling so the ASG can actually terminate idle instances
+    try {
+        await clear_stale_protection();
+    } catch (err) {
+        console.error('not ok - Failed to clear stale protection:', err);
+    }
+
     let queued = 0;
 
     // Number of EC2 instances in ASG (1 instance = 1 task currently)

@@ -158,9 +158,9 @@ export default class Job extends Generic {
         });
 
         let master;
-        if (datas.length > 1) {
+        if (datas.total > 1) {
             throw new Err(400, null, 'Job matches multiple live jobs');
-        } else if (datas.length === 0) {
+        } else if (datas.total === 0) {
             throw new Err(400, null, 'Job does not match a live job');
         } else {
             master = await Job.from(pool, datas.results[0].job);

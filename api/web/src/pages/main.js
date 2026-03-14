@@ -32,6 +32,7 @@ const router = new VueRouter.createRouter({
         { path: '/location/:locid', component: () => import('../components/Location.vue'), props: true },
 
         { path: '/data', component: () => import('../components/Data.vue') },
+        { path: '/data/:dataid', redirect: (to) => `/data/${to.params.dataid}/history` },
         { path: '/data/:dataid/history', component: () => import('../components/History.vue'), props: true },
 
         { path: '/logout', component: () => import('../components/Logout.vue') },

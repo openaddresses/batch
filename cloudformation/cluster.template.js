@@ -26,19 +26,12 @@ export default {
                 LaunchConfigurationName : cf.ref('T3ClusterInstances'),
                 MinSize : 0,
                 MaxSize : 100,
-                DesiredCapacity : 1
-            },
-            CreationPolicy : {
-                ResourceSignal : {
-                    Timeout : 'PT15M'
-                }
+                DesiredCapacity : 0
             },
             UpdatePolicy: {
                 AutoScalingRollingUpdate: {
                     MinInstancesInService: 0,
-                    MaxBatchSize: 1,
-                    PauseTime : 'PT15M',
-                    WaitOnResourceSignals: 'true'
+                    MaxBatchSize: 1
                 }
             }
         },

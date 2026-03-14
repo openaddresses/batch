@@ -135,9 +135,7 @@ async function cli() {
 
         if (args.fabric || (!args.border && !args.fabric)) {
             // Build Data Fabric
-            const datas = await oa.cmd('data', 'list', {
-                fabric: true
-            });
+            const datas = await oa.cmd('data', 'list');
 
             const layers = ['addresses', 'buildings', 'parcels'];
 

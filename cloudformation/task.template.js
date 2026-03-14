@@ -112,7 +112,6 @@ export default {
                         }
                     }]
                 },
-                LaunchTemplateName: 'large'
             }
         },
         BatchMegaLaunchTemplate: {
@@ -127,8 +126,7 @@ export default {
                             VolumeType: 'gp3'
                         }
                     }]
-                },
-                LaunchTemplateName: 'mega'
+                }
             }
         },
         BatchSecurityGroup: {

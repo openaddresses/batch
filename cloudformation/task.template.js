@@ -112,7 +112,7 @@ export default {
                         }
                     }]
                 },
-                LaunchTemplateName: 'mega'
+                LaunchTemplateName: 'large'
             }
         },
         BatchMegaLaunchTemplate: {

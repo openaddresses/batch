@@ -141,15 +141,14 @@ async function cli() {
 
             const layers = ['addresses', 'buildings', 'parcels'];
 
-            console.error(`ok - tw
-            tching ${datas.length} sources`);
+            console.error(`ok - fetching ${datas.length} sources`);
             for (const data of datas) {
                 if (!layers.includes(data.layer)) {
-                    console.error(`ok - skipping ${JSON.stringify(data)} due to unsuppoted layer type`);
+                    console.error(`ok - skipping ${JSON.stringify(data)} due to unsupported layer type`);
                     continue; // Ignore unsupported sources
                 }
 
-                await get_source(layers[data.layer], data);
+                await get_source(data);
             }
             console.error('ok - completed fetch');
 
@@ -205,13 +204,17 @@ async function cli() {
             }
         }
     } catch (err) {
-        await meta.protection(false);
+        try {
+            await meta.protection(false);
+        } catch (protectionErr) {
+            console.error('ok - failed to clear instance protection:', protectionErr.message);
+        }
         console.error(err);
         throw err;
     }
 }
 
-async function get_source(out, data) {
+async function get_source(data) {
     console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
 
     await pipeline(

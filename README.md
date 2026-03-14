@@ -17,6 +17,20 @@ Or update to the latest GitSha or CloudFormation template via
 deploy update prod
 ```
 
+### Additional Stacks
+
+The main `deploy update prod` command only deploys `cloudformation/batch.template.js`. There are two
+additional CloudFormation stacks that must be deployed separately when their templates change:
+
+| Stack | Template | Command |
+| ----- | -------- | ------- |
+| `batch-cluster-prod` | `cloudformation/cluster.template.js` | `deploy update --template cloudformation/cluster.template.js prod` |
+| `batch-task-prod` | `cloudformation/task.template.js` | `deploy update --template cloudformation/task.template.js prod` |
+
+The **cluster** stack manages the T3 auto-scaling group and its launch configuration (instance type, EBS
+volume size, security groups). The **task** stack manages the Batch compute environments, job definitions,
+and job queues.
+
 ### Parameters
 
 Whenever you deploy, you will be prompted for the following parameters

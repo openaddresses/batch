@@ -17,6 +17,15 @@ import { Upload } from '@aws-sdk/lib-storage';
 
 const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
 
+const r2 = new S3.S3Client({
+    region: 'auto',
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+    },
+    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+});
+
 const zooms = {
     addresses: 15,
     parcels: 8,
@@ -107,6 +116,19 @@ async function cli() {
 
             await upload.done();
 
+            const r2BordersUpload = new Upload({
+                client: r2,
+                params: {
+                    ContentType: 'application/octet-stream',
+                    Bucket: process.env.R2Bucket,
+                    Key: `v2.openaddresses.io/fabric/borders.pmtiles`,
+                    Body: fs.createReadStream(path.resolve(DRIVE, 'borders.pmtiles'))
+                }
+            });
+
+            await r2BordersUpload.done();
+            console.error('ok - uploaded borders.pmtiles to R2');
+
             await fsp.unlink(path.resolve(DRIVE, 'borders.geojson'));
             await fsp.unlink(path.resolve(DRIVE, 'borders.pmtiles'));
         }
@@ -153,30 +175,34 @@ async function cli() {
                         }
                     }
                 );
+
+                // Upload individual layer PMTiles to S3
+                const s3Upload = new Upload({
+                    client: s3,
+                    params: {
+                        ContentType: 'application/octet-stream',
+                        Bucket: process.env.Bucket,
+                        Key: `${process.env.StackName}/fabric/${l}.pmtiles`,
+                        Body: fs.createReadStream(path.resolve(DRIVE, `${l}.pmtiles`))
+                    }
+                });
+
+                await s3Upload.done();
+
+                // Upload individual layer PMTiles to R2
+                const r2Upload = new Upload({
+                    client: r2,
+                    params: {
+                        ContentType: 'application/octet-stream',
+                        Bucket: process.env.R2Bucket,
+                        Key: `v2.openaddresses.io/fabric/${l}.pmtiles`,
+                        Body: fs.createReadStream(path.resolve(DRIVE, `${l}.pmtiles`))
+                    }
+                });
+
+                await r2Upload.done();
+                console.error(`ok - uploaded ${l}.pmtiles to S3 and R2`);
             }
-
-            await tippecanoe.join(path.resolve(DRIVE, 'fabric.pmtiles'), layers.map((l) => {
-                return path.resolve(DRIVE, `${l}.pmtiles`);
-            }), {
-                std: true,
-                force: true,
-                limit: {
-                    features: false,
-                    size: false
-                }
-            });
-
-            const upload = new Upload({
-                client: s3,
-                params: {
-                    ContentType: 'application/octet-stream',
-                    Bucket: process.env.Bucket,
-                    Key: `${process.env.StackName}/fabric.pmtiles`,
-                    Body: fs.createReadStream(path.resolve(DRIVE, 'fabric.pmtiles'))
-                }
-            });
-
-            await upload.done();
         }
     } catch (err) {
         await meta.protection(false);

@@ -211,6 +211,7 @@ export default async function server(config) {
         }
     );
 
+    schema.docs.base.servers = [{ url: '/api' }];
     app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
     app.use('/*', express.static('web/dist'));
 

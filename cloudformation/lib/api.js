@@ -162,7 +162,8 @@ export default {
                             Effect: 'Allow',
                             Action: [
                                 'autoscaling:DescribeAutoScalingGroups',
-                                'autoscaling:SetDesiredCapacity'
+                                'autoscaling:SetDesiredCapacity',
+                                'autoscaling:SetInstanceProtection'
                             ],
                             'Resource': '*'
                         }]

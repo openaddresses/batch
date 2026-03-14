@@ -18,7 +18,6 @@ export default {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: 'mega',
                 ComputeResources: {
                     ImageId: 'ami-0914ebfbccd143a3f',
                     MaxvCpus: 16,
@@ -49,7 +48,6 @@ export default {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: 'mega',
                 ComputeResources: {
                     ImageId: 'ami-0914ebfbccd143a3f',
                     MaxvCpus: 16,

@@ -178,7 +178,16 @@ export default {
                         'source-layer': 'data',
                         filter: ['==', ['geometry-type'], 'Polygon'],
                         paint: {
-                            'fill-color': '#0b6623',
+                            'fill-color': [
+                                'case',
+                                ['any',
+                                    ['coalesce', ['get', 'addresses'], false],
+                                    ['coalesce', ['get', 'buildings'], false],
+                                    ['coalesce', ['get', 'parcels'], false]
+                                ],
+                                '#0b6623',
+                                '#cccccc'
+                            ],
                             'fill-opacity': 0.3
                         }
                     });
@@ -190,7 +199,16 @@ export default {
                         'source-layer': 'data',
                         filter: ['==', ['geometry-type'], 'Polygon'],
                         paint: {
-                            'line-color': '#0b6623',
+                            'line-color': [
+                                'case',
+                                ['any',
+                                    ['coalesce', ['get', 'addresses'], false],
+                                    ['coalesce', ['get', 'buildings'], false],
+                                    ['coalesce', ['get', 'parcels'], false]
+                                ],
+                                '#0b6623',
+                                '#999999'
+                            ],
                             'line-opacity': 0.5,
                             'line-width': 1
                         }

@@ -121,7 +121,7 @@ async function cli() {
                 params: {
                     ContentType: 'application/octet-stream',
                     Bucket: process.env.R2Bucket,
-                    Key: `v2.openaddresses.io/fabric/borders.pmtiles`,
+                    Key: 'v2.openaddresses.io/fabric/borders.pmtiles',
                     Body: fs.createReadStream(path.resolve(DRIVE, 'borders.pmtiles'))
                 }
             });

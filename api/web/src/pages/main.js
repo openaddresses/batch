@@ -58,6 +58,8 @@ const router = new VueRouter.createRouter({
 
         { path: '/register', component: () => import('../components/Register.vue') },
 
+        { path: '/map', component: () => import('../components/Map.vue') },
+
         { path: '/upload', component: () => import('../components/Upload.vue') },
 
         { path: '/:catchAll(.*)', component: () => import('../components/NotFound.vue') }

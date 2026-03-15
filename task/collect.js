@@ -60,7 +60,7 @@ async function cli() {
     });
 
     try {
-        fs.stat(DRIVE);
+        fs.statSync(DRIVE);
 
         tmp = path.resolve(DRIVE, Math.random().toString(36).substring(2, 15));
     } catch (err) {
@@ -106,6 +106,7 @@ async function collect(tmp, collection, oa) {
     const zip = await zip_datas(tmp, collection_data, collection.name);
 
     console.error(`ok - zip created: ${zip}`);
+    const zipSize = fs.statSync(zip).size;
     await upload_zip_collection(zip, collection.name);
     console.error('ok - archive uploaded');
     fs.unlinkSync(zip);
@@ -113,7 +114,7 @@ async function collect(tmp, collection, oa) {
 
     await oa.cmd('collection', 'update', {
         ':collection': collection.id,
-        size: fs.statSync(zip).size
+        size: zipSize
     });
 }
 
@@ -136,6 +137,11 @@ async function sources(oa, tmp, datas) {
                     ++attempt;
                     done = await get_source(oa, tmp, data, stats);
                 } catch (err) {
+                    if (err.name === 'NoSuchKey') {
+                        console.error(`ok - skipping job ${data.job}: source.geojson.gz not found`);
+                        done = true;
+                        break;
+                    }
                     console.error(`Attempt ${attempt}: ${err}`);
                     error = err;
                 }

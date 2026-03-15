@@ -64,7 +64,7 @@ export default {
     },
     data: function() {
         return {
-            layers: ['addresses', 'parcels', 'buildings'],
+            layers: ['addresses', 'parcels', 'buildings', 'centerlines'],
             fullscreen: false,
             point: false,
         }
@@ -172,6 +172,7 @@ export default {
                                 ["==", ['get', 'addresses'], true],
                                 ["==", ['get', 'buildings'], true],
                                 ["==", ['get', 'parcels'], true],
+                                ["==", ['get', 'centerlines'], true],
                             ]
                         ],
                         paint: {

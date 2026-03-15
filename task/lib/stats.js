@@ -50,6 +50,11 @@ export default class Stats {
                 counts: {},
                 validity: this.validator.stats
             };
+        } else if (this.layer === 'centerlines') {
+            this.stats.centerlines = {
+                counts: {},
+                validity: this.validator.stats
+            };
         } else {
             this.stats[this.layer] = {
                 counts: {},

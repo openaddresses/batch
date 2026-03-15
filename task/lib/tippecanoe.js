@@ -59,6 +59,7 @@ export default class Tippecanoe {
             if (options.zoom.min) base = base.concat(['--minimum-zoom', options.zoom.min]);
             if (options.limit.features === false) base = base.concat(['--no-feature-limit']);
             if (options.limit.size === false) base = base.concat(['--no-tile-size-limit']);
+            if (options.drop) base = base.concat(['--drop-densest-as-needed']);
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env

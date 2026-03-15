@@ -159,6 +159,7 @@ async function cli() {
                         layer: l,
                         std: true,
                         force: true,
+                        drop: true,
                         name: `OpenAddresses ${l} fabric`,
                         attribution: 'OpenAddresses',
                         description: `OpenAddresses ${l} fabric`,
@@ -199,6 +200,10 @@ async function cli() {
 
                 await r2Upload.done();
                 console.error(`ok - uploaded ${l}.pmtiles to S3 and R2`);
+
+                await fsp.unlink(path.resolve(DRIVE, `${l}.geojson`));
+                await fsp.unlink(path.resolve(DRIVE, `${l}.pmtiles`));
+                console.error(`ok - cleaned up ${l} temp files`);
             }
         }
     } catch (err) {

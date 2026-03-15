@@ -213,14 +213,23 @@ async function cli() {
 }
 
 async function get_source(data) {
-    console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
+    const key = `${process.env.StackName}/job/${data.job}/source.geojson.gz`;
+    console.error(`ok - fetching ${process.env.Bucket}/${key}`);
 
-    await pipeline(
-        (await s3.send(new S3.GetObjectCommand({
-            Bucket: process.env.Bucket,
-            Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-        }))).Body,
-        new Unzip(),
-        fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
-    );
+    try {
+        await pipeline(
+            (await s3.send(new S3.GetObjectCommand({
+                Bucket: process.env.Bucket,
+                Key: key
+            }))).Body,
+            new Unzip(),
+            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+        );
+    } catch (err) {
+        if (err.name === 'NoSuchKey') {
+            console.error(`ok - skipping job ${data.job}: source.geojson.gz not found`);
+        } else {
+            throw err;
+        }
+    }
 }

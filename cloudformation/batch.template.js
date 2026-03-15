@@ -35,42 +35,23 @@ const stack = {
             Type: 'String',
             Description: 'Github branch to schedule source runs from',
             Default: 'master'
+        },
+        SlackWebhookUrl: {
+            Type: 'String',
+            Description: '[secure] Slack Incoming Webhook URL for batch job notifications',
+            NoEcho: true
         }
     },
     Resources: {
-        BatchFailureTopic: {
-            Type: 'AWS::SNS::Topic',
-            Properties: {
-                TopicName: cf.join('-', [cf.stackName, 'batch-failure']),
-                Subscription: [{
-                    Protocol: 'email',
-                    Endpoint: 'hello@openaddresses.io'
-                }]
-            }
-        },
-        BatchFailureTopicPolicy: {
-            Type: 'AWS::SNS::TopicPolicy',
-            Properties: {
-                Topics: [cf.ref('BatchFailureTopic')],
-                PolicyDocument: {
-                    Statement: [{
-                        Effect: 'Allow',
-                        Principal: { Service: 'events.amazonaws.com' },
-                        Action: 'sns:Publish',
-                        Resource: cf.ref('BatchFailureTopic')
-                    }]
-                }
-            }
-        },
-        BatchFailureRule: {
+        BatchNotifyRule: {
             Type: 'AWS::Events::Rule',
             Properties: {
-                Description: 'Notify on scheduled batch job failures',
+                Description: 'Notify Slack on scheduled batch job success/failure',
                 EventPattern: {
                     source: ['aws.batch'],
                     'detail-type': ['Batch Job State Change'],
                     detail: {
-                        status: ['FAILED'],
+                        status: ['SUCCEEDED', 'FAILED'],
                         jobName: [{
                             prefix: 'OA_Collect'
                         }, {
@@ -82,9 +63,146 @@ const stack = {
                 },
                 State: 'ENABLED',
                 Targets: [{
-                    Id: 'BatchFailureSNS',
-                    Arn: cf.ref('BatchFailureTopic')
+                    Id: 'BatchNotifyLambda',
+                    Arn: cf.getAtt('BatchNotifyFunction', 'Arn')
                 }]
+            }
+        },
+        BatchNotifyPermission: {
+            Type: 'AWS::Lambda::Permission',
+            Properties: {
+                Action: 'lambda:InvokeFunction',
+                FunctionName: cf.getAtt('BatchNotifyFunction', 'Arn'),
+                Principal: 'events.amazonaws.com',
+                SourceArn: cf.getAtt('BatchNotifyRule', 'Arn')
+            }
+        },
+        BatchNotifyRole: {
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [{
+                        Effect: 'Allow',
+                        Principal: { Service: 'lambda.amazonaws.com' },
+                        Action: 'sts:AssumeRole'
+                    }]
+                },
+                ManagedPolicyArns: [
+                    'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+                ],
+                Policies: [{
+                    PolicyName: 'BatchNotifyLogs',
+                    PolicyDocument: {
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: ['logs:GetLogEvents'],
+                            Resource: ['arn:aws:logs:*:*:log-group:/aws/batch/job:*']
+                        }]
+                    }
+                }]
+            }
+        },
+        BatchNotifyFunction: {
+            Type: 'AWS::Lambda::Function',
+            Properties: {
+                Description: 'Send Slack notifications for batch job state changes',
+                Environment: {
+                    Variables: {
+                        SLACK_WEBHOOK_URL: cf.ref('SlackWebhookUrl')
+                    }
+                },
+                Code: {
+                    ZipFile: `
+const https = require('https');
+const { CloudWatchLogsClient, GetLogEventsCommand } = require('@aws-sdk/client-cloudwatch-logs');
+const cwl = new CloudWatchLogsClient();
+
+exports.handler = async function(event) {
+    const detail = event.detail;
+    const jobName = detail.jobName;
+    const status = detail.status;
+    const jobId = detail.jobId;
+    const reason = detail.statusReason || '';
+    const logStream = (detail.container && detail.container.logStreamName) || '';
+    const region = event.region || 'us-east-1';
+
+    const emoji = status === 'SUCCEEDED' ? ':white_check_mark:' : ':x:';
+    const color = status === 'SUCCEEDED' ? '#2eb886' : '#dc3545';
+
+    const blocks = [];
+    blocks.push({
+        type: 'section',
+        text: {
+            type: 'mrkdwn',
+            text: emoji + ' *' + jobName + '* ' + status.toLowerCase() + (reason ? '\\n>' + reason : '')
+        }
+    });
+
+    if (status === 'FAILED' && logStream) {
+        try {
+            const resp = await cwl.send(new GetLogEventsCommand({
+                logGroupName: '/aws/batch/job',
+                logStreamName: logStream,
+                limit: 30,
+                startFromHead: false
+            }));
+
+            const lines = (resp.events || [])
+                .map(function(e) { return e.message.trim(); })
+                .filter(function(l) { return l.length > 0 && l.length < 200; })
+                .slice(-15);
+
+            if (lines.length > 0) {
+                blocks.push({
+                    type: 'section',
+                    text: {
+                        type: 'mrkdwn',
+                        text: '*Last log lines:*\\n\\\`\\\`\\\`\\n' + lines.join('\\n') + '\\n\\\`\\\`\\\`'
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Failed to fetch logs:', err);
+        }
+
+        const cwUrl = 'https://' + region + '.console.aws.amazon.com/cloudwatch/home?region=' + region
+            + '#logsV2:log-groups/log-group/$252Faws$252Fbatch$252Fjob/log-events/' + encodeURIComponent(logStream).replace(/%/g, '$25');
+
+        blocks.push({
+            type: 'context',
+            elements: [{
+                type: 'mrkdwn',
+                text: '<' + cwUrl + '|View logs in CloudWatch>'
+            }]
+        });
+    }
+
+    const payload = JSON.stringify({ blocks: blocks });
+
+    return new Promise(function(resolve, reject) {
+        const url = new URL(process.env.SLACK_WEBHOOK_URL);
+        const req = https.request({
+            hostname: url.hostname,
+            path: url.pathname,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, function(res) {
+            console.log('Slack response:', res.statusCode);
+            resolve();
+        });
+        req.on('error', reject);
+        req.write(payload);
+        req.end();
+    });
+};
+                    `
+                },
+                Handler: 'index.handler',
+                MemorySize: 128,
+                Role: cf.getAtt('BatchNotifyRole', 'Arn'),
+                Runtime: 'nodejs22.x',
+                Timeout: '30'
             }
         }
     }

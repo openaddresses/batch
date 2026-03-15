@@ -38,8 +38,7 @@ const stack = {
         },
         SlackWebhookUrl: {
             Type: 'String',
-            Description: '[secure] Slack Incoming Webhook URL for batch job notifications',
-            NoEcho: true
+            Description: 'Slack Incoming Webhook URL for batch job notifications'
         }
     },
     Resources: {

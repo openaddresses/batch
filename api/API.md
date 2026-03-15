@@ -63,7 +63,7 @@ of a file on S3 is not guaranteed. The API will always return the most up-to-dat
 
 Validated data improves upon the authoritative data provided and curated by government entities.
 
-We currently only generate validated data for `address` sources
+We currently only generate validated data for `address` sources. Other layer types (`parcels`, `buildings`, `centerlines`) do not have validated output.
 
 - Remove data with no geometry/incorrect geometries
 - Remove data with no/invalid street numbers

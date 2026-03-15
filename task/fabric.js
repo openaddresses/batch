@@ -29,7 +29,8 @@ const r2 = new S3.S3Client({
 const zooms = {
     addresses: 15,
     parcels: 8,
-    buildings: 15
+    buildings: 15,
+    centerlines: 12
 };
 
 const args = minimist(process.argv, {
@@ -137,7 +138,7 @@ async function cli() {
             // Build Data Fabric
             const datas = await oa.cmd('data', 'list');
 
-            const layers = ['addresses', 'buildings', 'parcels'];
+            const layers = ['addresses', 'buildings', 'parcels', 'centerlines'];
 
             console.error(`ok - fetching ${datas.length} sources`);
             for (const data of datas) {

@@ -38,6 +38,15 @@ export default class Validator {
                     geometry: 0
                 }
             };
+        } else if (layer === 'centerlines') {
+            this.validate = false;
+
+            this.stats = {
+                valid: 0,
+                failures: {
+                    geometry: 0
+                }
+            };
         } else {
             this.validate = false;
 

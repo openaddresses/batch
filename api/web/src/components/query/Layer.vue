@@ -25,6 +25,7 @@ export default {
                 'all',
                 'addresses',
                 'buildings',
+                'centerlines',
                 'parcels'
             ]
         };

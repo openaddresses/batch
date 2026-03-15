@@ -15,6 +15,11 @@
             size='32'
             stroke='1'
         />
+        <IconRoad
+            v-else-if='layer === "centerlines"'
+            size='32'
+            stroke='1'
+        />
     </span>
 </template>
 
@@ -22,6 +27,7 @@
 import {
     IconBuildingCommunity,
     IconMapPin,
+    IconRoad,
     IconShape,
 } from '@tabler/icons-vue';
 
@@ -30,6 +36,7 @@ export default {
     components: {
         IconBuildingCommunity,
         IconMapPin,
+        IconRoad,
         IconShape,
     },
     props: {

@@ -46,12 +46,12 @@ const stack = {
         BatchNotifyRule: {
             Type: 'AWS::Events::Rule',
             Properties: {
-                Description: 'Notify Slack on scheduled batch job success/failure',
+                Description: 'Notify Slack on scheduled batch job state changes',
                 EventPattern: {
                     source: ['aws.batch'],
                     'detail-type': ['Batch Job State Change'],
                     detail: {
-                        status: ['SUCCEEDED', 'FAILED'],
+                        status: ['RUNNING', 'SUCCEEDED', 'FAILED'],
                         jobName: [{
                             prefix: 'OA_Collect'
                         }, {
@@ -127,8 +127,7 @@ exports.handler = async function(event) {
     const logStream = (detail.container && detail.container.logStreamName) || '';
     const region = event.region || 'us-east-1';
 
-    const emoji = status === 'SUCCEEDED' ? ':white_check_mark:' : ':x:';
-    const color = status === 'SUCCEEDED' ? '#2eb886' : '#dc3545';
+    const emoji = status === 'SUCCEEDED' ? ':white_check_mark:' : status === 'RUNNING' ? ':arrow_forward:' : ':x:';
 
     const blocks = [];
     blocks.push({

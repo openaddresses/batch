@@ -125,10 +125,10 @@ export default {
         toggle: function(layer) {
             this.layers[layer] = !this.layers[layer];
             if (layer === 'borders') {
-                map.setLayoutProperty('borders-fill', 'visibility', this.layers.borders ? 'visible' : 'none');
-                map.setLayoutProperty('borders-line', 'visibility', this.layers.borders ? 'visible' : 'none');
+                map.setLayoutProperty('oa-borders-fill', 'visibility', this.layers.borders ? 'visible' : 'none');
+                map.setLayoutProperty('oa-borders-line', 'visibility', this.layers.borders ? 'visible' : 'none');
             } else {
-                map.setLayoutProperty(layer, 'visibility', this.layers[layer] ? 'visible' : 'none');
+                map.setLayoutProperty(`oa-${layer}`, 'visibility', this.layers[layer] ? 'visible' : 'none');
             }
         },
         init: async function() {
@@ -172,7 +172,7 @@ export default {
                     });
 
                     map.addLayer({
-                        id: 'borders-fill',
+                        id: 'oa-borders-fill',
                         type: 'fill',
                         source: 'borders',
                         'source-layer': 'data',
@@ -193,7 +193,7 @@ export default {
                     });
 
                     map.addLayer({
-                        id: 'borders-line',
+                        id: 'oa-borders-line',
                         type: 'line',
                         source: 'borders',
                         'source-layer': 'data',
@@ -215,7 +215,7 @@ export default {
                     });
 
                     map.addLayer({
-                        id: 'parcels',
+                        id: 'oa-parcels',
                         type: 'line',
                         source: 'parcels',
                         'source-layer': 'parcels',
@@ -230,7 +230,7 @@ export default {
                     });
 
                     map.addLayer({
-                        id: 'buildings',
+                        id: 'oa-buildings',
                         type: 'fill',
                         source: 'buildings',
                         'source-layer': 'buildings',
@@ -245,7 +245,7 @@ export default {
                     });
 
                     map.addLayer({
-                        id: 'addresses',
+                        id: 'oa-addresses',
                         type: 'circle',
                         source: 'addresses',
                         'source-layer': 'addresses',
@@ -263,13 +263,13 @@ export default {
 
                     map.on('click', (e) => {
                         const features = map.queryRenderedFeatures(e.point, {
-                            layers: ['addresses', 'buildings', 'parcels', 'borders-fill']
+                            layers: ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-borders-fill']
                         });
 
                         if (features.length > 0) {
                             const f = features[0];
                             this.inspect = {
-                                layer: f.layer.id === 'borders-fill' ? 'borders' : f.layer.id,
+                                layer: f.layer.id.replace(/^oa-/, '').replace(/-fill$/, ''),
                                 properties: f.properties
                             };
                         } else {
@@ -277,14 +277,10 @@ export default {
                         }
                     });
 
-                    map.on('mouseenter', 'addresses', () => { map.getCanvas().style.cursor = 'pointer'; });
-                    map.on('mouseleave', 'addresses', () => { map.getCanvas().style.cursor = ''; });
-                    map.on('mouseenter', 'buildings', () => { map.getCanvas().style.cursor = 'pointer'; });
-                    map.on('mouseleave', 'buildings', () => { map.getCanvas().style.cursor = ''; });
-                    map.on('mouseenter', 'parcels', () => { map.getCanvas().style.cursor = 'pointer'; });
-                    map.on('mouseleave', 'parcels', () => { map.getCanvas().style.cursor = ''; });
-                    map.on('mouseenter', 'borders-fill', () => { map.getCanvas().style.cursor = 'pointer'; });
-                    map.on('mouseleave', 'borders-fill', () => { map.getCanvas().style.cursor = ''; });
+                    for (const id of ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-borders-fill']) {
+                        map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
+                        map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
+                    }
                 });
             } catch (err) {
                 this.$emit('err', err);

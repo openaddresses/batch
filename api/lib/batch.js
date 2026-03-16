@@ -99,17 +99,18 @@ export async function scale_in() {
         }
     }
 
-    if (queued > instances) {
-        console.error(`ok - queued > instances (${queued} > ${instances})`);
-        return; // We've still got lots of work to do
+    if (queued >= instances) {
+        console.error(`ok - queued >= instances (${queued} >= ${instances}), not scaling in`);
+        return;
     }
-    const diff = instances - queued;
 
-    let desired = instances;
+    // Scale down excess instances, but never below the number of queued jobs
+    const diff = instances - queued;
+    let desired;
     if (diff <= 5) {
-        desired = 0;
+        desired = queued;
     } else {
-        desired = Math.floor(diff / 2);
+        desired = instances - Math.floor(diff / 2);
     }
 
     await scale(desired);

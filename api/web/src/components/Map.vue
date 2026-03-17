@@ -11,6 +11,7 @@
                             <button
                                 class='btn btn-sm'
                                 :class='layers.borders ? "btn-primary" : "btn-outline-secondary"'
+                                title='Toggle source coverage boundaries'
                                 @click='toggle("borders")'
                             >
                                 Coverage
@@ -18,6 +19,7 @@
                             <button
                                 class='btn btn-sm'
                                 :class='layers.addresses ? "btn-primary" : "btn-outline-secondary"'
+                                title='Toggle address points'
                                 @click='toggle("addresses")'
                             >
                                 Addresses
@@ -25,6 +27,7 @@
                             <button
                                 class='btn btn-sm'
                                 :class='layers.buildings ? "btn-primary" : "btn-outline-secondary"'
+                                title='Toggle building footprints'
                                 @click='toggle("buildings")'
                             >
                                 Buildings
@@ -32,9 +35,18 @@
                             <button
                                 class='btn btn-sm'
                                 :class='layers.parcels ? "btn-primary" : "btn-outline-secondary"'
+                                title='Toggle parcel boundaries'
                                 @click='toggle("parcels")'
                             >
                                 Parcels
+                            </button>
+                            <button
+                                class='btn btn-sm'
+                                :class='layers.centerlines ? "btn-primary" : "btn-outline-secondary"'
+                                title='Toggle road centerlines'
+                                @click='toggle("centerlines")'
+                            >
+                                Centerlines
                             </button>
                         </div>
                     </div>
@@ -105,7 +117,8 @@ export default {
                 borders: true,
                 addresses: true,
                 buildings: false,
-                parcels: false
+                parcels: false,
+                centerlines: false
             },
             inspect: null
         };
@@ -171,6 +184,11 @@ export default {
                         url: `pmtiles://${TILES_BASE}/parcels.pmtiles`
                     });
 
+                    map.addSource('centerlines', {
+                        type: 'vector',
+                        url: `pmtiles://${TILES_BASE}/centerlines.pmtiles`
+                    });
+
                     map.addLayer({
                         id: 'oa-borders-fill',
                         type: 'fill',
@@ -183,7 +201,8 @@ export default {
                                 ['any',
                                     ['coalesce', ['get', 'addresses'], false],
                                     ['coalesce', ['get', 'buildings'], false],
-                                    ['coalesce', ['get', 'parcels'], false]
+                                    ['coalesce', ['get', 'parcels'], false],
+                                    ['coalesce', ['get', 'centerlines'], false]
                                 ],
                                 '#0b6623',
                                 '#cccccc'
@@ -204,7 +223,8 @@ export default {
                                 ['any',
                                     ['coalesce', ['get', 'addresses'], false],
                                     ['coalesce', ['get', 'buildings'], false],
-                                    ['coalesce', ['get', 'parcels'], false]
+                                    ['coalesce', ['get', 'parcels'], false],
+                                    ['coalesce', ['get', 'centerlines'], false]
                                 ],
                                 '#0b6623',
                                 '#999999'
@@ -245,6 +265,21 @@ export default {
                     });
 
                     map.addLayer({
+                        id: 'oa-centerlines',
+                        type: 'line',
+                        source: 'centerlines',
+                        'source-layer': 'centerlines',
+                        layout: {
+                            visibility: this.layers.centerlines ? 'visible' : 'none'
+                        },
+                        paint: {
+                            'line-color': '#c0392b',
+                            'line-width': 1,
+                            'line-opacity': 0.6
+                        }
+                    });
+
+                    map.addLayer({
                         id: 'oa-addresses',
                         type: 'circle',
                         source: 'addresses',
@@ -263,7 +298,7 @@ export default {
 
                     map.on('click', (e) => {
                         const features = map.queryRenderedFeatures(e.point, {
-                            layers: ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-borders-fill']
+                            layers: ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-centerlines', 'oa-borders-fill']
                         });
 
                         if (features.length > 0) {
@@ -277,7 +312,7 @@ export default {
                         }
                     });
 
-                    for (const id of ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-borders-fill']) {
+                    for (const id of ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-centerlines', 'oa-borders-fill']) {
                         map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
                         map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
                     }

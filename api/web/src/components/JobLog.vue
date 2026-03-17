@@ -40,6 +40,7 @@
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='Refresh log'
                                         @click='getJob'
                                     />
                                 </div>

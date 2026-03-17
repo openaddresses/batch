@@ -26,12 +26,14 @@
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='Toggle filters'
                                         @click='showFilter = !showFilter'
                                     />
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='Refresh jobs'
                                         @click='fetchJobs'
                                     />
                                 </div>
@@ -104,7 +106,7 @@
                                                         @login='$emit("login")'
                                                         @perk='$emit("perk", $event)'
                                                     />
-                                                    <span @click.stop.prevent='external(job.source)'>
+                                                    <span @click.stop.prevent='external(job.source)' title='View source on GitHub'>
                                                         <IconBrandGithub
                                                             class='cursor-pointer'
                                                             size='32'
@@ -113,6 +115,7 @@
                                                     </span>
                                                     <span
                                                         v-if='job.loglink'
+                                                        title='View job log'
                                                         @click.stop.prevent='$router.push(`/job/${job.id}/log`)'
                                                     >
                                                         <IconNotes

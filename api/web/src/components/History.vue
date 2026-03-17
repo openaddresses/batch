@@ -28,6 +28,7 @@
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='Refresh history'
                                         @click='refresh'
                                     />
                                 </div>
@@ -109,6 +110,7 @@
                                                             class='cursor-pointer'
                                                             size='32'
                                                             stroke='1'
+                                                            title='Download output'
                                                             @click.stop.prevent='datapls(job.id)'
                                                         />
                                                     </div>

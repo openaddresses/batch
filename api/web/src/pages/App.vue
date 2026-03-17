@@ -11,6 +11,8 @@
                         height='40'
                         width='40'
                         src='/logo.jpg'
+                        alt='OpenAddresses'
+                        title='Home'
                         @click='$router.push("/")'
                     >
                 </div>
@@ -30,6 +32,7 @@
                             class='btn btn-dark'
                             target='_blank'
                             rel='noreferrer'
+                            title='API documentation'
                         >
                             <IconHelp size='32' stroke='1' />
                         </a>
@@ -51,7 +54,7 @@
                                 aria-expanded='false'
                                 class='btn btn-dark'
                             >
-                                <IconMenu size='32' stroke='1' />
+                                <IconMenu size='32' stroke='1' title='Navigation menu' />
                             </div>
                             <ul
                                 class='dropdown-menu'
@@ -95,7 +98,7 @@
                                     data-bs-toggle='dropdown'
                                     aria-expanded='false'
                                 >
-                                    <IconUser size='32' stroke='1' />
+                                    <IconUser size='32' stroke='1' title='Account' />
                                 </div>
                                 <ul
                                     class='dropdown-menu'
@@ -122,6 +125,7 @@
                                 v-else
                                 size='32'
                                 stroke='1'
+                                title='Sign in'
                                 @click='$router.push("/login")'
                             />
                         </a>

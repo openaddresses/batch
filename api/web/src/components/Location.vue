@@ -78,6 +78,7 @@
                                                                             size='32'
                                                                             stroke='1'
                                                                             class='cursor-pointer'
+                                                                            title='Admin settings'
                                                                         />
                                                                     </slot>
                                                                     <template #dropdown>
@@ -94,6 +95,7 @@
                                                                 size='32'
                                                                 stroke='1'
                                                                 class='cursor-pointer'
+                                                                title='View history'
                                                                 @click.stop.prevent='emithistory(job.id)'
                                                             />
                                                         </div>

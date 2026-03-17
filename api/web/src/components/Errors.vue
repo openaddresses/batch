@@ -25,11 +25,13 @@
                                     <IconSearch
                                         class='cursor-pointer'
                                         size='32'
+                                        title='Toggle filters'
                                         @click='showFilter = !showFilter'
                                     />
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        title='Refresh errors'
                                         @click='fetchProblems'
                                     />
                                 </div>

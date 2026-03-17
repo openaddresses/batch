@@ -6,19 +6,11 @@
                     <div class='card'>
                         <div class='card-header'>
                             <h3 class='card-title'>
-                                New Features
+                                Supported Layers
                             </h3>
                         </div>
                         <div class='card-body row'>
-                            <div class='col-4 d-flex justify-content-center align-items-center'>
-                                <LayerIcon
-                                    layer='buildings'
-                                    size='32'
-                                    stroke='1'
-                                />
-                                Buildings
-                            </div>
-                            <div class='col-4 d-flex justify-content-center align-items-center'>
+                            <div class='col-3 d-flex justify-content-center align-items-center'>
                                 <LayerIcon
                                     layer='addresses'
                                     size='32'
@@ -26,7 +18,15 @@
                                 />
                                 Addresses
                             </div>
-                            <div class='col-4 d-flex justify-content-center align-items-center'>
+                            <div class='col-3 d-flex justify-content-center align-items-center'>
+                                <LayerIcon
+                                    layer='buildings'
+                                    size='32'
+                                    stroke='1'
+                                />
+                                Buildings
+                            </div>
+                            <div class='col-3 d-flex justify-content-center align-items-center'>
                                 <LayerIcon
                                     layer='parcels'
                                     size='32'
@@ -34,10 +34,18 @@
                                 />
                                 Parcels
                             </div>
+                            <div class='col-3 d-flex justify-content-center align-items-center'>
+                                <LayerIcon
+                                    layer='centerlines'
+                                    size='32'
+                                    stroke='1'
+                                />
+                                Centerlines
+                            </div>
                             <div class='col-12'>
                                 <div class='text-center pt-3'>
-                                    <div>After many months of work, we've expanded the project to include parcels and building polygons.</div>
-                                    <div>Look for the symbols above in the data sources to download the new layers</div>
+                                    <div>OpenAddresses collects addresses, building footprints, parcel boundaries, and road centerlines from authoritative sources worldwide.</div>
+                                    <div>Look for the symbols above in the data sources to download each layer</div>
                                 </div>
                             </div>
                         </div>
@@ -271,6 +279,12 @@
                                                 <LayerIcon
                                                     v-if='d.has.parcels'
                                                     layer='parcels'
+                                                    size='32'
+                                                    stroke='1'
+                                                />
+                                                <LayerIcon
+                                                    v-if='d.has.centerlines'
+                                                    layer='centerlines'
                                                     size='32'
                                                     stroke='1'
                                                 />
@@ -569,7 +583,8 @@ export default {
                         has: {
                             addresses: false,
                             buildings: false,
-                            parcels: false
+                            parcels: false,
+                            centerlines: false
                         },
                         sources: []
                     };

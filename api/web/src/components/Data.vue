@@ -56,6 +56,7 @@
                                     class='cursor-pointer'
                                     size='32'
                                     stroke='1'
+                                    title='Refresh collections'
                                     @click='fetchCollections'
                                 />
                             </div>
@@ -90,6 +91,7 @@
                                                 class='cursor-pointer'
                                                 size='32'
                                                 stroke='1'
+                                                title='Download collection'
                                                 @click.stop.prevent='collectionpls(c)'
                                             />
                                         </div>
@@ -113,6 +115,7 @@
                                     class='cursor-pointer'
                                     size='32'
                                     stroke='1'
+                                    title='Expand map'
                                     @click='fullscreen = true'
                                 />
                                 <IconArrowsMinimize
@@ -120,6 +123,7 @@
                                     class='cursor-pointer'
                                     size='32'
                                     stroke='1'
+                                    title='Collapse map'
                                     @click='fullscreen = false'
                                 />
 
@@ -128,6 +132,7 @@
                                     class='cursor-pointer'
                                     size='32'
                                     stroke='1'
+                                    title='Show filters'
                                     @click='showFilter = !showFilter'
                                 />
                                 <IconX
@@ -135,6 +140,7 @@
                                     class='cursor-pointer'
                                     size='32'
                                     stroke='1'
+                                    title='Hide filters'
                                     @click='showFilter = !showFilter'
                                 />
 
@@ -142,6 +148,7 @@
                                     class='cursor-pointer'
                                     size='32'
                                     stroke='1'
+                                    title='Refresh sources'
                                     @click='fetchData'
                                 />
                             </div>
@@ -276,6 +283,7 @@
                                                             class='cursor-pointer'
                                                             size='32'
                                                             stroke='1'
+                                                            title='View on map'
                                                             @click='$router.push(`/location/${d.map}`)'
                                                         />
                                                     </div>
@@ -323,6 +331,7 @@
                                                                                 class='cursor-pointer'
                                                                                 size='32'
                                                                                 stroke='1'
+                                                                                title='Admin settings'
                                                                             />
                                                                         </slot>
                                                                         <template #dropdown>
@@ -340,6 +349,7 @@
                                                                     class='cursor-pointer'
                                                                     size='32'
                                                                     stroke='1'
+                                                                    title='View history'
                                                                     @click='$router.push(`/data/${job.id}/history`)'
                                                                 />
                                                             </div>

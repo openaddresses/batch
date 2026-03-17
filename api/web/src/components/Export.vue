@@ -44,6 +44,7 @@
                                             <IconDotsVertical
                                                 class='cursor-pointer'
                                                 size='32'
+                                                title='More actions'
                                             />
                                         </slot>
                                         <template #dropdown>
@@ -59,6 +60,7 @@
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        title='Refresh'
                                         @click='refresh'
                                     />
                                 </div>

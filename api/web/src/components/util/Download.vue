@@ -8,6 +8,7 @@
                 size='32'
                 class='cursor-pointer'
                 stroke='1'
+                title='Download data'
             />
         </slot>
 
@@ -46,6 +47,7 @@
                                 class='fr color-blue-on-hover cursor-pointer mt3'
                                 size='16'
                                 stroke='1'
+                                title='About GeoJSON+LD format'
                                 @click='external("https://stevage.github.io/ndgeojson/")'
                             />
                         </div>
@@ -63,6 +65,7 @@
                                 class='fr color-blue-on-hover cursor-pointer mt3'
                                 size='16'
                                 stroke='1'
+                                title='About Shapefile format'
                                 @click='external("https://en.wikipedia.org/wiki/Shapefile")'
                             />
                         </div>
@@ -80,6 +83,7 @@
                                 class='fr cursor-pointer color-blue-on-hover mt3'
                                 size='16'
                                 stroke='1'
+                                title='About CSV format'
                                 @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")'
                             />
                         </div>
@@ -128,6 +132,7 @@
                             class='fr color-blue-on-hover cursor-pointer mt3'
                             size='16'
                             stroke='1'
+                            title='About GeoJSON+LD format'
                             @click='external("https://stevage.github.io/ndgeojson/")'
                         />
                     </div>

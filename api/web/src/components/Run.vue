@@ -38,12 +38,14 @@
                                         v-if='run.github.sha'
                                         style='height: 20px;'
                                         class='badge bg-blue text-white cursor-pointer'
+                                        title='View commit on GitHub'
                                         @click.stop.prevent='github(run)'
                                     >Github</span>
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='Refresh'
                                         @click='fetchRun'
                                     />
                                 </div>

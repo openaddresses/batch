@@ -25,6 +25,7 @@
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
+                                        title='Refresh runs'
                                         @click='fetchRuns'
                                     />
                                 </div>
@@ -66,6 +67,7 @@
                                                     <span
                                                         v-if='run.github.sha'
                                                         class='badge bg-blue text-white cursor-pointer'
+                                                        title='View commit on GitHub'
                                                         @click.stop.prevent='github(run)'
                                                     >Github</span>
                                                 </div>

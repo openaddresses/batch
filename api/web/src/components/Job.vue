@@ -112,11 +112,13 @@
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='View license'
                                     />
                                     <IconCode
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='View raw job data'
                                         @click='$router.push({ path: `/job/${$route.params.jobid}/raw` })'
                                     />
                                     <IconNotes
@@ -124,12 +126,14 @@
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='View job log'
                                         @click='$router.push({ path: `/job/${$route.params.jobid}/log` })'
                                     />
                                     <IconRefresh
                                         class='cursor-pointer'
                                         size='32'
                                         stroke='1'
+                                        title='Refresh'
                                         @click='refresh'
                                     />
 
@@ -144,6 +148,7 @@
                                                 class='cursor-pointer'
                                                 stroke='1'
                                                 size='32'
+                                                title='More actions'
                                             />
                                         </div>
                                         <ul

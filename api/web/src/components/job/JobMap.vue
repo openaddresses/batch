@@ -7,7 +7,7 @@
         />
         <template v-else>
             <div
-                id='map'
+                ref='jobMap'
                 class='w-100'
                 style='height: 300px;'
             />
@@ -44,7 +44,7 @@ export default {
 
                 const bounds = this.job.bounds.coordinates;
                 const tmpmap = new mapgl.Map({
-                    container: this.$refs.map,
+                    container: this.$refs.jobMap,
                     hash: "map",
                     zoom: 1,
                     bounds: [

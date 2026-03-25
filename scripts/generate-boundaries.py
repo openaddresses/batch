@@ -6,6 +6,7 @@
 #     "pyogrio",
 #     "requests",
 #     "boto3",
+#     "psycopg2-binary",
 # ]
 # ///
 """Generate boundary GeoJSON files for OpenAddresses map coverage.
@@ -237,6 +238,51 @@ def upload(output_dir):
         print(f"  Done", file=sys.stderr)
 
 
+def populate_db(output_dir, db_uri):
+    """Load generated boundaries into the map table.
+
+    For each code, deletes any existing row then inserts the new one.
+    Custom geometries added by Map.match() (hash-based codes) are preserved.
+    """
+    import psycopg2
+
+    conn = psycopg2.connect(db_uri)
+    cur = conn.cursor()
+
+    for filename in ["country.geojson", "region.geojson", "district.geojson"]:
+        local_path = os.path.join(output_dir, filename)
+        print(f"Populating database from {filename}...", file=sys.stderr)
+
+        count = 0
+        with open(local_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                feat = json.loads(line)
+                name = feat["properties"]["name"]
+                code = feat["properties"]["code"]
+                geom = json.dumps(feat["geometry"])
+
+                # Delete existing row with this code (if any), then insert
+                cur.execute("DELETE FROM map WHERE code = %s", (code,))
+                cur.execute(
+                    """
+                    INSERT INTO map (name, code, geom)
+                    VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
+                    """,
+                    (name, code, geom),
+                )
+                count += 1
+
+        print(f"  Loaded {count} features", file=sys.stderr)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("Done", file=sys.stderr)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -254,6 +300,11 @@ def main():
         action="store_true",
         help="Compare output against existing S3 files",
     )
+    parser.add_argument(
+        "--db",
+        metavar="URI",
+        help="Postgres URI — upsert boundaries into the map table",
+    )
     args = parser.parse_args()
 
     output_dir = args.output_dir
@@ -269,6 +320,9 @@ def main():
 
     if args.upload:
         upload(output_dir)
+
+    if args.db:
+        populate_db(output_dir, args.db)
 
 
 if __name__ == "__main__":

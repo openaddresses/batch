@@ -150,9 +150,13 @@ export default class CI {
         for (const job of jobs) {
             if (!['Warn', 'Success'].includes(job.status)) continue;
 
+            const countStr = job.count
+                ? ` | ${Number(job.count).toLocaleString('en-US')} features`
+                : '';
+
             issue = issue + '\n'
                 + `### [${job.source_name}-${job.layer}-${job.name}](https://batch.openaddresses.io/job/${job.id})\n`
-                + `[![Preview Image](https://batch.openaddresses.io/api/job/${job.id}/output/source.png)](https://batch.openaddresses.io/job/${job.id})\n`;
+                + `[View Map](https://batch.openaddresses.io/job/${job.id})${countStr}\n`;
         }
 
         return issue.trim();

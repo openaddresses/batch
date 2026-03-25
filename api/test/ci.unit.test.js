@@ -1,4 +1,5 @@
 import CI from '../lib/ci.js';
+import Run from '../lib/types/run.js';
 import test from 'node:test';
 import assert from 'assert';
 import { MockAgent, setGlobalDispatcher } from 'undici';
@@ -84,4 +85,37 @@ test('CI#internaldiff - Internal Diff', async () => {
         layer: 'parcels',
         name: 'state'
     }]);
+});
+
+test('CI#format_issue - formats with count', async (t) => {
+    const ci = new CI({ octo: {} });
+    const origJobs = Run.jobs;
+    t.after(() => { Run.jobs = origJobs; });
+
+    Run.jobs = async () => [
+        { id: 1, status: 'Success', source_name: 'us/ca/alameda', layer: 'addresses', name: 'county', count: 12345 },
+        { id: 2, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 },
+        { id: 3, status: 'Warn', source_name: 'us/ca/la', layer: 'parcels', name: 'county', count: null }
+    ];
+
+    const issue = await ci.format_issue(null, { id: 99 });
+
+    assert.ok(issue.includes('[View Map](https://batch.openaddresses.io/job/1)'));
+    assert.ok(issue.includes('12,345 features'));
+    assert.ok(!issue.includes('job/2'), 'Failed jobs should not appear');
+    assert.ok(issue.includes('[View Map](https://batch.openaddresses.io/job/3)'));
+    assert.ok(!issue.includes('null'), 'Null count should not appear');
+});
+
+test('CI#format_issue - empty run returns empty string', async (t) => {
+    const ci = new CI({ octo: {} });
+    const origJobs = Run.jobs;
+    t.after(() => { Run.jobs = origJobs; });
+
+    Run.jobs = async () => [
+        { id: 1, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 }
+    ];
+
+    const issue = await ci.format_issue(null, { id: 99 });
+    assert.strictEqual(issue, '');
 });

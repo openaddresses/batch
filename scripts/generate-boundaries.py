@@ -168,11 +168,11 @@ def generate_districts(tmpdir, output_dir):
     return count
 
 
-def verify(output_dir):
+def verify(output_dir, aws_profile=None):
     """Compare generated files against existing S3 files."""
     import boto3
 
-    session = boto3.Session(profile_name="openaddresses")
+    session = boto3.Session(profile_name=aws_profile)
     s3 = session.client("s3")
 
     for filename in ["country.geojson", "region.geojson", "district.geojson"]:
@@ -219,11 +219,11 @@ def verify(output_dir):
             print("  No code differences", file=sys.stderr)
 
 
-def upload(output_dir):
+def upload(output_dir, aws_profile=None):
     """Upload generated files to S3."""
     import boto3
 
-    session = boto3.Session(profile_name="openaddresses")
+    session = boto3.Session(profile_name=aws_profile)
     s3 = session.client("s3")
 
     for filename in ["country.geojson", "region.geojson", "district.geojson"]:
@@ -305,6 +305,11 @@ def main():
         metavar="URI",
         help="Postgres URI — upsert boundaries into the map table",
     )
+    parser.add_argument(
+        "--aws-profile",
+        metavar="PROFILE",
+        help="AWS profile name for S3 access (used by --upload and --verify)",
+    )
     args = parser.parse_args()
 
     output_dir = args.output_dir
@@ -316,10 +321,10 @@ def main():
         generate_districts(tmpdir, output_dir)
 
     if args.verify:
-        verify(output_dir)
+        verify(output_dir, aws_profile=args.aws_profile)
 
     if args.upload:
-        upload(output_dir)
+        upload(output_dir, aws_profile=args.aws_profile)
 
     if args.db:
         populate_db(output_dir, args.db)

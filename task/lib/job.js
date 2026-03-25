@@ -47,7 +47,8 @@ export default class Job {
             cache: false,
             output: false,
             preview: false,
-            validated: false
+            validated: false,
+            pmtiles: false
         };
     }
 
@@ -311,6 +312,38 @@ export default class Job {
 
             console.error('ok - source.png uploaded');
             this.assets.preview = true;
+        }
+
+        const pmtiles = await Job.find('source.pmtiles', this.tmp);
+        if (pmtiles.length === 1) {
+            console.error('ok - found pmtiles', pmtiles[0]);
+
+            const s3uploader = new Upload({
+                client: s3,
+                params: {
+                    ContentType: 'application/x-protomaps+pmtiles',
+                    Bucket: process.env.Bucket,
+                    Key: `${process.env.StackName}/job/${this.job}/source.pmtiles`,
+                    Body: fs.createReadStream(pmtiles[0])
+                }
+            });
+
+            await s3uploader.done();
+
+            const r2uploader = new Upload({
+                client: r2,
+                params: {
+                    ContentType: 'application/x-protomaps+pmtiles',
+                    Bucket: process.env.R2Bucket,
+                    Key: `v2.openaddresses.io/${process.env.StackName}/job/${this.job}/source.pmtiles`,
+                    Body: fs.createReadStream(pmtiles[0])
+                }
+            });
+
+            await r2uploader.done();
+
+            console.error('ok - source.pmtiles uploaded');
+            this.assets.pmtiles = true;
         }
 
         this.status = 'uploaded';

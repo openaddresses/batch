@@ -5,6 +5,7 @@ import path from 'node:path';
 import CP from 'child_process';
 import fs from 'node:fs';
 import Meta from './lib/meta.js';
+import Tippecanoe from './lib/tippecanoe.js';
 import minimist from 'minimist';
 
 const config = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
@@ -92,6 +93,22 @@ async function flow(job) {
         const output = await Job.find('out.geojson', job.tmp);
         if (output.length !== 1) throw new Error('out.geojson not found');
         fs.renameSync(output[0], path.resolve(job.tmp, 'out.geojson'));
+
+        try {
+            const tc = new Tippecanoe();
+            const geojsonPath = path.resolve(job.tmp, 'out.geojson');
+            const pmtilesPath = path.resolve(job.tmp, 'source.pmtiles');
+            await tc.tile(fs.createReadStream(geojsonPath), pmtilesPath, {
+                layer: 'data',
+                force: true,
+                drop: true,
+                zoom: { min: 0, max: 14 },
+                std: true
+            });
+            console.error('ok - source.pmtiles generated');
+        } catch (err) {
+            console.error('warn - pmtiles generation failed:', err.message);
+        }
 
         await job.validate();
         await job.compress();

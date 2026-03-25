@@ -1,6 +1,24 @@
 <template>
     <div class='col-12'>
-        <template v-if='job.output.preview'>
+        <template v-if='job.pmtiles_url'>
+            <div
+                ref='sampleMap'
+                class='w-100 round'
+                style='height: 400px;'
+            />
+            <div
+                v-if='job.output.preview'
+                class='text-center mt-1 mb-2'
+            >
+                <a
+                    :href='local ? `http://localhost:4999/api/job/${job.id}/output/source.png` : `/api/job/${job.id}/output/source.png`'
+                    target='_blank'
+                >
+                    View static preview image
+                </a>
+            </div>
+        </template>
+        <template v-else-if='job.output.preview'>
             <img
                 class='round w-full'
                 :src='local ? `http://localhost:4999/api/job/${job.id}/output/source.png` : `/api/job/${job.id}/output/source.png`'
@@ -91,6 +109,12 @@ import {
     TablerLoading,
     TablerNone
 } from '@tak-ps/vue-tabler';
+import mapgl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { Protocol, PMTiles } from 'pmtiles';
+
+let map = null;
+let protocol = null;
 
 export default {
     name: 'JobSample',
@@ -111,8 +135,136 @@ export default {
     },
     mounted: function() {
         this.getSample();
+        if (this.job.pmtiles_url) {
+            this.$nextTick(() => {
+                this.initMap();
+            });
+        }
+    },
+    unmounted: function() {
+        if (map) {
+            map.remove();
+            map = null;
+        }
     },
     methods: {
+        initMap: async function() {
+            try {
+                const res = await window.std('/api/map');
+
+                if (!protocol) {
+                    protocol = new Protocol();
+                    mapgl.addProtocol('pmtiles', protocol.tile);
+                }
+
+                const pmtilesUrl = this.job.pmtiles_url;
+
+                // Read bounds from PMTiles header
+                const p = new PMTiles(pmtilesUrl);
+                const header = await p.getHeader();
+
+                map = new mapgl.Map({
+                    container: this.$refs.sampleMap,
+                    bounds: [[header.minLon, header.minLat], [header.maxLon, header.maxLat]],
+                    fitBoundsOptions: { padding: 20 },
+                    style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key
+                });
+
+                map.addControl(new mapgl.NavigationControl(), 'bottom-right');
+
+                map.once('load', () => {
+                    map.addSource('job-data', {
+                        type: 'vector',
+                        url: `pmtiles://${pmtilesUrl}`
+                    });
+
+                    // Points (addresses)
+                    map.addLayer({
+                        id: 'job-data-circle',
+                        type: 'circle',
+                        source: 'job-data',
+                        'source-layer': 'data',
+                        filter: ['==', ['geometry-type'], 'Point'],
+                        paint: {
+                            'circle-radius': 3,
+                            'circle-color': '#0b6623',
+                            'circle-opacity': 0.6
+                        }
+                    });
+
+                    // Polygons fill (parcels/buildings)
+                    map.addLayer({
+                        id: 'job-data-fill',
+                        type: 'fill',
+                        source: 'job-data',
+                        'source-layer': 'data',
+                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        paint: {
+                            'fill-color': '#0b6623',
+                            'fill-opacity': 0.3
+                        }
+                    });
+
+                    // Polygons outline
+                    map.addLayer({
+                        id: 'job-data-line-poly',
+                        type: 'line',
+                        source: 'job-data',
+                        'source-layer': 'data',
+                        filter: ['==', ['geometry-type'], 'Polygon'],
+                        paint: {
+                            'line-color': '#0b6623',
+                            'line-opacity': 0.6,
+                            'line-width': 1
+                        }
+                    });
+
+                    // Lines (centerlines)
+                    map.addLayer({
+                        id: 'job-data-line',
+                        type: 'line',
+                        source: 'job-data',
+                        'source-layer': 'data',
+                        filter: ['==', ['geometry-type'], 'LineString'],
+                        paint: {
+                            'line-color': '#0b6623',
+                            'line-opacity': 0.6,
+                            'line-width': 2
+                        }
+                    });
+
+                    // Click to inspect
+                    const layerIds = ['job-data-circle', 'job-data-fill', 'job-data-line-poly', 'job-data-line'];
+
+                    map.on('click', (e) => {
+                        const features = map.queryRenderedFeatures(e.point, { layers: layerIds });
+
+                        if (features.length > 0) {
+                            const f = features[0];
+                            const props = f.properties;
+
+                            let html = '<table style="font-size: 12px; border-collapse: collapse;">';
+                            for (const [key, value] of Object.entries(props)) {
+                                html += `<tr><td style="padding: 2px 6px; font-weight: bold; color: #666;">${key}</td><td style="padding: 2px 6px;">${value}</td></tr>`;
+                            }
+                            html += '</table>';
+
+                            new mapgl.Popup({ maxWidth: '400px' })
+                                .setLngLat(e.lngLat)
+                                .setHTML(html)
+                                .addTo(map);
+                        }
+                    });
+
+                    for (const id of layerIds) {
+                        map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
+                        map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
+                    }
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
         getSample: async function() {
             try {
                 this.loading = true;

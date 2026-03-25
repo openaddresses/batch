@@ -120,6 +120,10 @@ export default class Job extends Generic {
                 job.s3_validated = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/validated.geojson.gz`;
             }
 
+            if (job.output && job.output.pmtiles) {
+                job.pmtiles_url = `https://v2.openaddresses.io/${process.env.StackName}/job/${job.id}/source.pmtiles`;
+            }
+
             return job;
         });
 
@@ -243,6 +247,10 @@ export default class Job extends Generic {
 
         if (job.output && job.output.validated) {
             job.s3_validated = `s3://${process.env.Bucket}/${process.env.StackName}/job/${job.id}/validated.geojson.gz`;
+        }
+
+        if (job.output && job.output.pmtiles) {
+            job.pmtiles_url = `https://v2.openaddresses.io/${process.env.StackName}/job/${job.id}/source.pmtiles`;
         }
 
         return job;

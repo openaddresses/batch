@@ -82,6 +82,9 @@
         },
         "size": {
             "$ref": "./util/size.json"
+        },
+        "pmtiles_url": {
+            "type": ["null", "string"]
         }
     }
 }

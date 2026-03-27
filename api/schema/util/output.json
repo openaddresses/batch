@@ -19,6 +19,9 @@
         },
         "validated": {
             "type": "boolean"
+        },
+        "pmtiles": {
+            "type": "boolean"
         }
     }
 }

@@ -184,7 +184,9 @@ export async function trigger(event) {
             jobName: 'OA_Collect',
             containerOverrides: {
                 command: ['node', 'collect.js'],
-                environment: []
+                environment: [],
+                vcpus: 4,
+                memory: 15000
             }
         };
     } else if (event.type === 'fabric') {
@@ -194,7 +196,9 @@ export async function trigger(event) {
             jobName: 'OA_Fabric',
             containerOverrides: {
                 command: ['node', 'fabric.js'],
-                environment: []
+                environment: [],
+                vcpus: 4,
+                memory: 15000
             }
         };
     } else if (event.type === 'sources') {

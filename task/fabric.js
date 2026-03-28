@@ -27,10 +27,10 @@ const r2 = new S3.S3Client({
 });
 
 const zooms = {
-    addresses: 15,
-    parcels: 8,
-    buildings: 15,
-    centerlines: 12
+    addresses: 0,
+    parcels: 0,
+    buildings: 0,
+    centerlines: 0
 };
 
 const args = minimist(process.argv, {

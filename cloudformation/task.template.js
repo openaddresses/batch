@@ -120,7 +120,7 @@ export default {
                         DeviceName: '/dev/xvda',
                         Ebs: {
                             Encrypted: true,
-                            VolumeSize: 1000,
+                            VolumeSize: 250,
                             VolumeType: 'gp3'
                         }
                     }]

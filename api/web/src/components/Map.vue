@@ -10,14 +10,6 @@
                         <div class='ms-auto btn-list'>
                             <button
                                 class='btn btn-sm'
-                                :class='layers.borders ? "btn-primary" : "btn-outline-secondary"'
-                                title='Toggle source coverage boundaries'
-                                @click='toggle("borders")'
-                            >
-                                Coverage
-                            </button>
-                            <button
-                                class='btn btn-sm'
                                 :class='layers.addresses ? "btn-primary" : "btn-outline-secondary"'
                                 title='Toggle address points'
                                 @click='toggle("addresses")'
@@ -114,7 +106,6 @@ export default {
     data: function() {
         return {
             layers: {
-                borders: true,
                 addresses: true,
                 buildings: false,
                 parcels: false,
@@ -137,12 +128,10 @@ export default {
     methods: {
         toggle: function(layer) {
             this.layers[layer] = !this.layers[layer];
-            if (layer === 'borders') {
-                map.setLayoutProperty('oa-borders-fill', 'visibility', this.layers.borders ? 'visible' : 'none');
-                map.setLayoutProperty('oa-borders-line', 'visibility', this.layers.borders ? 'visible' : 'none');
-            } else {
-                map.setLayoutProperty(`oa-${layer}`, 'visibility', this.layers[layer] ? 'visible' : 'none');
-            }
+            const vis = this.layers[layer] ? 'visible' : 'none';
+            map.setLayoutProperty(`oa-${layer}`, 'visibility', vis);
+            map.setLayoutProperty(`oa-${layer}-borders-fill`, 'visibility', vis);
+            map.setLayoutProperty(`oa-${layer}-borders-line`, 'visibility', vis);
         },
         init: async function() {
             try {
@@ -189,50 +178,51 @@ export default {
                         url: `pmtiles://${TILES_BASE}/centerlines.pmtiles`
                     });
 
-                    map.addLayer({
-                        id: 'oa-borders-fill',
-                        type: 'fill',
-                        source: 'borders',
-                        'source-layer': 'data',
-                        filter: ['==', ['geometry-type'], 'Polygon'],
-                        paint: {
-                            'fill-color': [
-                                'case',
-                                ['any',
-                                    ['coalesce', ['get', 'addresses'], false],
-                                    ['coalesce', ['get', 'buildings'], false],
-                                    ['coalesce', ['get', 'parcels'], false],
-                                    ['coalesce', ['get', 'centerlines'], false]
-                                ],
-                                '#0b6623',
-                                '#cccccc'
-                            ],
-                            'fill-opacity': 0.3
-                        }
-                    });
+                    const borderColors = {
+                        addresses: '#2980b9',
+                        buildings: '#8e44ad',
+                        parcels: '#e67e22',
+                        centerlines: '#c0392b'
+                    };
 
-                    map.addLayer({
-                        id: 'oa-borders-line',
-                        type: 'line',
-                        source: 'borders',
-                        'source-layer': 'data',
-                        filter: ['==', ['geometry-type'], 'Polygon'],
-                        paint: {
-                            'line-color': [
-                                'case',
-                                ['any',
-                                    ['coalesce', ['get', 'addresses'], false],
-                                    ['coalesce', ['get', 'buildings'], false],
-                                    ['coalesce', ['get', 'parcels'], false],
-                                    ['coalesce', ['get', 'centerlines'], false]
-                                ],
-                                '#0b6623',
-                                '#999999'
+                    for (const [layer, color] of Object.entries(borderColors)) {
+                        map.addLayer({
+                            id: `oa-${layer}-borders-fill`,
+                            type: 'fill',
+                            source: 'borders',
+                            'source-layer': 'data',
+                            filter: ['all',
+                                ['==', ['geometry-type'], 'Polygon'],
+                                ['coalesce', ['get', layer], false]
                             ],
-                            'line-opacity': 0.5,
-                            'line-width': 1
-                        }
-                    });
+                            layout: {
+                                visibility: this.layers[layer] ? 'visible' : 'none'
+                            },
+                            paint: {
+                                'fill-color': color,
+                                'fill-opacity': 0.15
+                            }
+                        });
+
+                        map.addLayer({
+                            id: `oa-${layer}-borders-line`,
+                            type: 'line',
+                            source: 'borders',
+                            'source-layer': 'data',
+                            filter: ['all',
+                                ['==', ['geometry-type'], 'Polygon'],
+                                ['coalesce', ['get', layer], false]
+                            ],
+                            layout: {
+                                visibility: this.layers[layer] ? 'visible' : 'none'
+                            },
+                            paint: {
+                                'line-color': color,
+                                'line-opacity': 0.4,
+                                'line-width': 1
+                            }
+                        });
+                    }
 
                     map.addLayer({
                         id: 'oa-parcels',
@@ -296,15 +286,21 @@ export default {
                         }
                     });
 
+                    const interactiveLayers = [
+                        'oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-centerlines',
+                        'oa-addresses-borders-fill', 'oa-buildings-borders-fill',
+                        'oa-parcels-borders-fill', 'oa-centerlines-borders-fill'
+                    ];
+
                     map.on('click', (e) => {
                         const features = map.queryRenderedFeatures(e.point, {
-                            layers: ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-centerlines', 'oa-borders-fill']
+                            layers: interactiveLayers
                         });
 
                         if (features.length > 0) {
                             const f = features[0];
                             this.inspect = {
-                                layer: f.layer.id.replace(/^oa-/, '').replace(/-fill$/, ''),
+                                layer: f.layer.id.replace(/^oa-/, '').replace(/-borders-fill$/, ''),
                                 properties: f.properties
                             };
                         } else {
@@ -312,7 +308,7 @@ export default {
                         }
                     });
 
-                    for (const id of ['oa-addresses', 'oa-buildings', 'oa-parcels', 'oa-centerlines', 'oa-borders-fill']) {
+                    for (const id of interactiveLayers) {
                         map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
                         map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
                     }

@@ -38,7 +38,7 @@ export default {
                     ],
                     Type : 'EC2',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    InstanceTypes : ['m5.large', 'c5.large']
+                    InstanceTypes : ['m5.xlarge']
                 },
                 State: 'ENABLED'
             }

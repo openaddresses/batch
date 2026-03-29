@@ -102,16 +102,13 @@ async function pruneByRetention(oa, s3, r2, dryRun, stats) {
  * Retention policy:
  * - Always keep the active job (referenced by results.job)
  * - Keep all jobs from the last 3 months
- * - Keep 1 job per month for 3-12 months
- * - Keep 1 job per year beyond 12 months
+ * - Keep 1 job per month beyond 3 months
  * - Remove duplicates: same count + size as newer neighbor
  */
 export function selectJobsToPrune(jobs, activeJobId) {
     const now = new Date();
     const threeMonthsAgo = new Date(now);
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-    const twelveMonthsAgo = new Date(now);
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
 
     // First pass: mark duplicates (same count + size as newer neighbor)
     const duplicates = new Set();
@@ -123,11 +120,12 @@ export function selectJobsToPrune(jobs, activeJobId) {
     }
 
     // Second pass: time-based retention on non-duplicates
+    // - Keep all jobs from last 3 months
+    // - Keep 1 job per month beyond 3 months
     const kept = new Set();
     kept.add(activeJobId);
 
     const monthlyKept = new Map();
-    const yearlyKept = new Map();
 
     for (const job of jobs) {
         if (job.id === activeJobId) { kept.add(job.id); continue; }
@@ -137,16 +135,10 @@ export function selectJobsToPrune(jobs, activeJobId) {
 
         if (created >= threeMonthsAgo) {
             kept.add(job.id);
-        } else if (created >= twelveMonthsAgo) {
+        } else {
             const bucket = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, '0')}`;
             if (!monthlyKept.has(bucket)) {
                 monthlyKept.set(bucket, job.id);
-                kept.add(job.id);
-            }
-        } else {
-            const bucket = `${created.getFullYear()}`;
-            if (!yearlyKept.has(bucket)) {
-                yearlyKept.set(bucket, job.id);
                 kept.add(job.id);
             }
         }

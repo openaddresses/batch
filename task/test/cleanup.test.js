@@ -51,18 +51,36 @@ test('selectJobsToPrune - keeps one per month for 3-12 months', (t) => {
     t.end();
 });
 
-test('selectJobsToPrune - keeps one per year beyond 12 months', (t) => {
-    // Two jobs from ~18 months ago (same year)
+test('selectJobsToPrune - keeps one per month even beyond 12 months', (t) => {
+    // Two jobs from different months ~18 months ago
     const jobs = [
         makeJob(1, 1),                          // recent, active
         makeJob(2, 540, { count: 10 }),          // ~18 months ago
-        makeJob(3, 570, { count: 20 })           // ~19 months ago, same year
+        makeJob(3, 570, { count: 20 })           // ~19 months ago, different month
     ];
 
     const pruned = selectJobsToPrune(jobs, 1);
 
-    t.equals(pruned.length, 1, 'one of two same-year jobs pruned');
-    t.equals(pruned[0].id, 3, 'older same-year job is pruned');
+    t.equals(pruned.length, 0, 'both old jobs kept (different months)');
+    t.end();
+});
+
+test('selectJobsToPrune - prunes second job in same old month', (t) => {
+    // Two jobs with explicit dates in the same month, well beyond 3 months ago
+    const makeOldJob = (id, dateStr, count) => ({
+        id, created: dateStr, count, size: count * 100, output: { output: true }
+    });
+
+    const jobs = [
+        makeJob(1, 1),                                          // recent, active
+        makeOldJob(2, '2024-06-05T00:00:00Z', 10),             // Jun 2024
+        makeOldJob(3, '2024-06-20T00:00:00Z', 20)              // Jun 2024, same month
+    ];
+
+    const pruned = selectJobsToPrune(jobs, 1);
+
+    t.equals(pruned.length, 1, 'one of two same-month old jobs pruned');
+    t.equals(pruned[0].id, 3, 'later-listed same-month job is pruned');
     t.end();
 });
 

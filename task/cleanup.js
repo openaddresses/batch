@@ -349,7 +349,7 @@ async function deleteJobsBatch(oa, s3, r2, jobs, dryRun, stats) {
                 }
             }
         } catch (err) {
-            console.error(`not ok - r2 batch delete failed: ${err.message}`);
+            console.error(`not ok - r2 batch delete failed: ${err.message} (bucket=${process.env.R2Bucket}, endpoint=https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com)`);
             for (const key of batch) {
                 const match = key.Key.match(/job\/(\d+)\//);
                 if (match) r2Failed.add(parseInt(match[1]));

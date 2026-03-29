@@ -107,6 +107,20 @@ test('selectJobsToPrune - different size is not a duplicate', (t) => {
     t.end();
 });
 
+test('selectJobsToPrune - zero size is not treated as duplicate', (t) => {
+    const jobs = [
+        makeJob(1, 1, { count: 100, size: 0 }),
+        makeJob(2, 30, { count: 100, size: 0 })  // both size=0, but that means size wasn't tracked
+    ];
+
+    const pruned = selectJobsToPrune(jobs, 1);
+    const prunedIds = pruned.map((j) => j.id);
+
+    t.ok(!prunedIds.includes(2) || pruned.find((j) => j.id === 2)?._reason !== 'duplicate',
+        'size=0 jobs are not marked as duplicates');
+    t.end();
+});
+
 test('selectJobsToPrune - empty job list', (t) => {
     const pruned = selectJobsToPrune([], 1);
 

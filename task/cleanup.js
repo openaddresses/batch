@@ -106,7 +106,7 @@ async function pruneByRetention(oa, s3, r2, dryRun, stats) {
  * - Keep 1 job per year beyond 12 months
  * - Remove duplicates: same count + size as newer neighbor
  */
-function selectJobsToPrune(jobs, activeJobId) {
+export function selectJobsToPrune(jobs, activeJobId) {
     const now = new Date();
     const threeMonthsAgo = new Date(now);
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);

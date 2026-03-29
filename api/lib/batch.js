@@ -201,6 +201,18 @@ export async function trigger(event) {
                 memory: 15000
             }
         };
+    } else if (event.type === 'cleanup') {
+        params = {
+            jobDefinition: jobDefinition,
+            jobQueue: mega_queue,
+            jobName: 'OA_Cleanup',
+            containerOverrides: {
+                command: ['node', 'cleanup.js'],
+                environment: [],
+                vcpus: 4,
+                memory: 15000
+            }
+        };
     } else if (event.type === 'sources') {
         params = {
             jobDefinition: jobDefinition,

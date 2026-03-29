@@ -86,8 +86,19 @@ export default class Meta {
 
         const asg = new AutoScaling.AutoScalingClient({ region: process.env.AWS_DEFAULT_REGION });
 
+        // Find which ASG this instance actually belongs to
+        const desc = await asg.send(new AutoScaling.DescribeAutoScalingInstancesCommand({
+            InstanceIds: [this.instance]
+        }));
+
+        const asgName = desc.AutoScalingInstances?.[0]?.AutoScalingGroupName;
+        if (!asgName) {
+            console.error(`ok - skipping meta#protection: instance ${this.instance} not in any ASG`);
+            return;
+        }
+
         await asg.send(new AutoScaling.SetInstanceProtectionCommand({
-            AutoScalingGroupName: this.asg,
+            AutoScalingGroupName: asgName,
             InstanceIds: [this.instance],
             ProtectedFromScaleIn: protect
         }));

@@ -140,4 +140,31 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.delete('/run/:run', {
+        name: 'Delete Run',
+        group: 'Run',
+        auth: 'admin',
+        description: 'Delete a run. The run must have no remaining jobs.',
+        ':run': 'integer',
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await Auth.is_admin(req);
+
+            const jobs = await Run.jobs(config.pool, req.params.run);
+            if (jobs.length > 0) {
+                throw new Err(400, null, 'Run still has jobs — delete them first');
+            }
+
+            await Run.delete(config.pool, req.params.run);
+
+            return res.json({
+                status: 200,
+                message: 'Run Deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
 }

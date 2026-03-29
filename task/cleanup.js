@@ -35,6 +35,7 @@ async function cli() {
     const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
     const r2 = new S3.S3Client({
         region: 'auto',
+        forcePathStyle: true,
         credentials: {
             accessKeyId: process.env.R2_ACCESS_KEY_ID,
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY

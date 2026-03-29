@@ -1,5 +1,6 @@
 import CP from 'child_process';
 import stream from 'stream';
+import split from 'split2';
 
 /**
  * Create a new Tippecanoe instance
@@ -73,7 +74,6 @@ export default class Tippecanoe {
             if (options.std) {
                 tippecanoe.stdout.pipe(process.stdout);
 
-                const split = (await import('split2')).default;
                 tippecanoe.stderr
                     .pipe(split())
                     .on('data', (line) => {

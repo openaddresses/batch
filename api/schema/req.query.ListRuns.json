@@ -40,6 +40,10 @@
         "after": {
             "type": "string",
             "description": "Only show runs after the given date"
+        },
+        "live": {
+            "type": "boolean",
+            "description": "Filter runs by live status"
         }
     }
 }

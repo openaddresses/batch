@@ -83,6 +83,7 @@ export default class Run extends Generic {
         Status.verify(query.status);
 
         if (!query.run) query.run = null;
+        if (query.live === undefined || query.live === null) query.live = null;
 
         if (query.after) {
             try {
@@ -122,6 +123,7 @@ export default class Run extends Generic {
                     AND (${query.run}::BIGINT IS NULL OR run = ${query.run})
                     AND (${query.after}::TIMESTAMP IS NULL OR runs.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
                     AND (${query.before}::TIMESTAMP IS NULL OR runs.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 GROUP BY
                     runs.id,
                     runs.live,

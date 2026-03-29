@@ -79,7 +79,6 @@ export default class Tippecanoe {
                     .on('data', (line) => {
                         if (/^\s*\d+\.\d+%\s/.test(line)) return;
                         if (/^Reordering geometry:\s*\d+/.test(line)) return;
-                        if (/^Sorting\.\.\.\s*\d+/.test(line)) return;
                         process.stderr.write(line + '\n');
                     });
             }

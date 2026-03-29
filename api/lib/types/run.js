@@ -83,7 +83,9 @@ export default class Run extends Generic {
         Status.verify(query.status);
 
         if (!query.run) query.run = null;
-        if (query.live === undefined || query.live === null) query.live = null;
+        if (!query.live || query.live === 'all') query.live = null;
+        else if (query.live === 'true') query.live = true;
+        else if (query.live === 'false') query.live = false;
 
         if (query.after) {
             try {

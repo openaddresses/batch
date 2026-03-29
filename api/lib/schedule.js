@@ -12,7 +12,7 @@ import { sql } from 'slonik';
  */
 export default class Schedule {
     static async event(pool, event) {
-        if (['fabric', 'collect', 'sources'].includes(event.type)) {
+        if (['fabric', 'collect', 'sources', 'cleanup'].includes(event.type)) {
             await Schedule.batch(event.type, pool);
         } else if (event.type === 'close') {
             await Schedule.close(pool);

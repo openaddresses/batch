@@ -8,11 +8,12 @@
         "type": {
             "type": "string",
             "enum": [
+                "cleanup",
                 "close",
-                "fabric",
-                "scale",
-                "level",
                 "collect",
+                "fabric",
+                "level",
+                "scale",
                 "sources"
             ]
         }

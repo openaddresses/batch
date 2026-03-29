@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "required": ["before"],
+    "additionalProperties": false,
+    "properties": {
+        "before": {
+            "type": "string",
+            "description": "Only return orphaned jobs created before this date"
+        },
+        "limit": {
+            "type": "integer",
+            "default": 100,
+            "maximum": 100,
+            "description": "Limit number of returned jobs"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        }
+    }
+}

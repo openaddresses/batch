@@ -204,13 +204,11 @@ export async function trigger(event) {
     } else if (event.type === 'cleanup') {
         params = {
             jobDefinition: jobDefinition,
-            jobQueue: mega_queue,
+            jobQueue: t3_queue,
             jobName: 'OA_Cleanup',
             containerOverrides: {
                 command: ['node', 'cleanup.js'],
-                environment: [],
-                vcpus: 4,
-                memory: 15000
+                environment: []
             }
         };
     } else if (event.type === 'sources') {

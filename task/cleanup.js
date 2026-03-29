@@ -117,7 +117,7 @@ export function selectJobsToPrune(jobs, activeJobId) {
     const duplicates = new Set();
     for (let i = 1; i < jobs.length; i++) {
         if (jobs[i].id === activeJobId) continue;
-        if (jobs[i].count === jobs[i - 1].count && jobs[i].size === jobs[i - 1].size) {
+        if (jobs[i].count === jobs[i - 1].count && jobs[i].size === jobs[i - 1].size && jobs[i].size > 0) {
             duplicates.add(jobs[i].id);
         }
     }

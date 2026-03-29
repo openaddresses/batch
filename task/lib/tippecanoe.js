@@ -1,5 +1,6 @@
 import CP from 'child_process';
 import stream from 'stream';
+import split from 'split2';
 
 /**
  * Create a new Tippecanoe instance
@@ -72,7 +73,15 @@ export default class Tippecanoe {
 
             if (options.std) {
                 tippecanoe.stdout.pipe(process.stdout);
-                tippecanoe.stderr.pipe(process.stderr);
+
+                tippecanoe.stderr
+                    .pipe(split())
+                    .on('data', (line) => {
+                        if (/^\s*\d+\.\d+%\s/.test(line)) return;
+                        if (/^Reordering geometry:\s*\d+/.test(line)) return;
+                        if (/^Read \d+\.\d+ million features/.test(line)) return;
+                        process.stderr.write(line + '\n');
+                    });
             }
 
             stream.pipeline(

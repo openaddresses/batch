@@ -72,7 +72,16 @@ export default class Tippecanoe {
 
             if (options.std) {
                 tippecanoe.stdout.pipe(process.stdout);
-                tippecanoe.stderr.pipe(process.stderr);
+
+                const split = (await import('split2')).default;
+                tippecanoe.stderr
+                    .pipe(split())
+                    .on('data', (line) => {
+                        if (/^\s*\d+\.\d+%\s/.test(line)) return;
+                        if (/^Reordering geometry:\s*\d+/.test(line)) return;
+                        if (/^Sorting\.\.\.\s*\d+/.test(line)) return;
+                        process.stderr.write(line + '\n');
+                    });
             }
 
             stream.pipeline(

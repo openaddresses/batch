@@ -34,6 +34,25 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.get('/job/orphaned', {
+        name: 'List Orphaned Jobs',
+        group: 'Job',
+        auth: 'admin',
+        description: 'Return jobs that have no matching entry in the results table',
+        query: 'req.query.ListOrphanedJobs.json',
+        res: 'res.ListJobs.json'
+    }, async (req, res) => {
+        try {
+            await Auth.is_admin(req);
+
+            const list = await Job.orphaned(config.pool, req.query);
+
+            return res.json(list);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     await schema.get('/job/:job', {
         name: 'Get Job',
         group: 'Job',

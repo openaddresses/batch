@@ -130,6 +130,66 @@ export default class Job extends Generic {
         return list;
     }
 
+    /**
+     * Find jobs that have no matching entry in the results table
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} query - Query object
+     * @param {String} query.before - Only return orphaned jobs created before this date
+     * @param {Number} [query.limit=100] - Max results per page
+     * @param {Number} [query.page=0] - Page number
+     */
+    static async orphaned(pool, query = {}) {
+        query.limit = Params.integer(query.limit, { default: 100 });
+        query.page = Params.integer(query.page, { default: 0 });
+
+        if (!query.before) throw new Err(400, null, 'before parameter required');
+
+        let before;
+        try {
+            before = moment(query.before);
+        } catch (err) {
+            throw new Err(400, err, 'before param is not recognized as a valid date');
+        }
+
+        try {
+            const pgres = await pool.query(sql`
+                SELECT
+                    count(*) OVER() AS count,
+                    job.id,
+                    job.run,
+                    job.created,
+                    job.source_name,
+                    job.layer,
+                    job.name,
+                    job.output,
+                    job.status,
+                    job.size,
+                    job.count
+                FROM
+                    job
+                WHERE
+                    job.created < ${before.toDate().toISOString()}::TIMESTAMP
+                    AND NOT EXISTS (
+                        SELECT 1 FROM results
+                        WHERE results.source = job.source_name
+                        AND results.layer = job.layer
+                        AND results.name = job.name
+                    )
+                ORDER BY
+                    job.created DESC
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.limit * query.page}
+            `);
+
+            return this.deserialize_list(pgres, 'jobs');
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load orphaned jobs');
+        }
+    }
+
     async get_raw() {
         if (!this.raw) {
             const res = await fetch(this.source);

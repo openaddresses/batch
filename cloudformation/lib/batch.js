@@ -34,7 +34,7 @@ export default {
                             Resource: ['*']
                         },{
                             Effect: 'Allow' ,
-                            Action: ['autoscaling:SetInstanceProtection'],
+                            Action: ['autoscaling:SetInstanceProtection', 'autoscaling:DescribeAutoScalingInstances'],
                             Resource: ['*']
                         }]
                     }

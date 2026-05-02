@@ -35,11 +35,12 @@ test('selectJobsToPrune - keeps all jobs within 3 months', (t) => {
 });
 
 test('selectJobsToPrune - keeps one per month for 3-12 months', (t) => {
-    // Two jobs in the same month, ~5 months ago
+    // Two jobs in the same month, ~5 months ago — use absolute dates so the
+    // test doesn't become flaky when relative offsets straddle a month boundary
     const jobs = [
-        makeJob(1, 1),                          // recent, active
-        makeJob(2, 150, { count: 50 }),          // ~5 months ago
-        makeJob(3, 155, { count: 60 })           // same month, ~5 months ago
+        makeJob(1, 1),
+        { id: 2, created: '2025-10-05T00:00:00Z', count: 50, size: 5000, output: { output: true } },
+        { id: 3, created: '2025-10-20T00:00:00Z', count: 60, size: 6000, output: { output: true } }
     ];
 
     const pruned = selectJobsToPrune(jobs, 1);

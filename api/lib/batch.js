@@ -197,8 +197,11 @@ export async function trigger(event) {
             containerOverrides: {
                 command: ['node', 'fabric.js'],
                 environment: [],
-                vcpus: 4,
-                memory: 15000
+                vcpus: 8,
+                memory: 58000
+            },
+            timeout: {
+                attemptDurationSeconds: 60 * 60 * 24  // 24 hour hard cap
             }
         };
     } else if (event.type === 'cleanup') {

@@ -251,6 +251,10 @@ async function get_source(data) {
     const key = `${process.env.StackName}/job/${data.job}/source.geojson.gz`;
     console.error(`ok - fetching ${process.env.Bucket}/${key}`);
 
+    // Write to a per-job temp file so parallel downloads don't interleave
+    // bytes into the shared layer file
+    const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
+
     try {
         await pipeline(
             (await s3.send(new S3.GetObjectCommand({
@@ -258,7 +262,7 @@ async function get_source(data) {
                 Key: key
             }))).Body,
             new Unzip(),
-            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+            fs.createWriteStream(tmp)
         );
     } catch (err) {
         if (err.name === 'NoSuchKey') {

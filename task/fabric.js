@@ -33,6 +33,9 @@ const zooms = {
     centerlines: 8
 };
 
+// Max concurrent S3 downloads
+const DOWNLOAD_CONCURRENCY = 50;
+
 const args = minimist(process.argv, {
     boolean: ['interactive', 'fabric', 'border'],
     alias: {
@@ -140,15 +143,40 @@ async function cli() {
 
             const layers = ['addresses', 'buildings', 'parcels', 'centerlines'];
 
-            console.error(`ok - fetching ${datas.length} sources`);
-            for (const data of datas) {
+            const supported = datas.filter((data) => {
                 if (!layers.includes(data.layer)) {
                     console.error(`ok - skipping ${JSON.stringify(data)} due to unsupported layer type`);
-                    continue; // Ignore unsupported sources
+                    return false;
+                }
+                return true;
+            });
+
+            console.error(`ok - fetching ${supported.length} sources (${DOWNLOAD_CONCURRENCY} concurrent)`);
+
+            // Download each source to its own temp file in parallel (writing
+            // concurrent streams to a shared file would interleave bytes and
+            // corrupt the newline-delimited GeoJSON). Concat and delete each
+            // chunk's temp files before fetching the next chunk so peak disk
+            // usage stays at ~1x total uncompressed size rather than ~2x.
+            let completed = 0;
+            for (let i = 0; i < supported.length; i += DOWNLOAD_CONCURRENCY) {
+                const chunk = supported.slice(i, i + DOWNLOAD_CONCURRENCY);
+                await Promise.all(chunk.map((data) => get_source(data)));
+
+                for (const data of chunk) {
+                    const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
+                    if (!fs.existsSync(tmp)) continue;
+                    await pipeline(
+                        fs.createReadStream(tmp),
+                        fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+                    );
+                    await fsp.unlink(tmp);
                 }
 
-                await get_source(data);
+                completed += chunk.length;
+                console.error(`ok - fetched ${completed}/${supported.length} sources`);
             }
+
             console.error('ok - completed fetch');
 
             for (const l of layers) {

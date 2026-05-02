@@ -27,10 +27,10 @@ const r2 = new S3.S3Client({
 });
 
 const zooms = {
-    addresses: 0,
-    parcels: 0,
-    buildings: 0,
-    centerlines: 0
+    addresses: 10,  // address points are only meaningful at street level
+    parcels: 8,
+    buildings: 10,
+    centerlines: 8
 };
 
 const args = minimist(process.argv, {

@@ -189,6 +189,7 @@ async function cli() {
                         std: true,
                         force: true,
                         drop: true,
+                        parallel: true,
                         name: `OpenAddresses ${l} fabric`,
                         attribution: 'OpenAddresses',
                         description: `OpenAddresses ${l} fabric`,

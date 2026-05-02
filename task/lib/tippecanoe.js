@@ -31,6 +31,7 @@ export default class Tippecanoe {
      * @param {Object} options.zoom Zoom Options
      * @param {Number} options.zoom.max Max zoom of tiles
      * @param {Number} options.zoom.min Min zoom of tiles
+     * @param {Boolean} [options.parallel=false] Use multiple CPUs for tiling (-P flag)
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
      * @param {Object} options.limit Limit Options
      * @param {Boolean} [options.limit.features=true] Limit tiles to 200,000 features
@@ -61,6 +62,7 @@ export default class Tippecanoe {
             if (options.limit.features === false) base = base.concat(['--no-feature-limit']);
             if (options.limit.size === false) base = base.concat(['--no-tile-size-limit']);
             if (options.drop) base = base.concat(['--drop-densest-as-needed']);
+            if (options.parallel) base = base.concat(['-P']);
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
                 env: process.env

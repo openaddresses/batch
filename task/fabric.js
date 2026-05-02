@@ -27,11 +27,14 @@ const r2 = new S3.S3Client({
 });
 
 const zooms = {
-    addresses: 0,
-    parcels: 0,
-    buildings: 0,
-    centerlines: 0
+    addresses: 10,  // address points are only meaningful at street level
+    parcels: 8,
+    buildings: 10,
+    centerlines: 8
 };
+
+// Max concurrent S3 downloads
+const DOWNLOAD_CONCURRENCY = 50;
 
 const args = minimist(process.argv, {
     boolean: ['interactive', 'fabric', 'border'],
@@ -140,15 +143,40 @@ async function cli() {
 
             const layers = ['addresses', 'buildings', 'parcels', 'centerlines'];
 
-            console.error(`ok - fetching ${datas.length} sources`);
-            for (const data of datas) {
+            const supported = datas.filter((data) => {
                 if (!layers.includes(data.layer)) {
                     console.error(`ok - skipping ${JSON.stringify(data)} due to unsupported layer type`);
-                    continue; // Ignore unsupported sources
+                    return false;
+                }
+                return true;
+            });
+
+            console.error(`ok - fetching ${supported.length} sources (${DOWNLOAD_CONCURRENCY} concurrent)`);
+
+            // Download each source to its own temp file in parallel (writing
+            // concurrent streams to a shared file would interleave bytes and
+            // corrupt the newline-delimited GeoJSON). Concat and delete each
+            // chunk's temp files before fetching the next chunk so peak disk
+            // usage stays at ~1x total uncompressed size rather than ~2x.
+            let completed = 0;
+            for (let i = 0; i < supported.length; i += DOWNLOAD_CONCURRENCY) {
+                const chunk = supported.slice(i, i + DOWNLOAD_CONCURRENCY);
+                await Promise.all(chunk.map((data) => get_source(data)));
+
+                for (const data of chunk) {
+                    const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
+                    if (!fs.existsSync(tmp)) continue;
+                    await pipeline(
+                        fs.createReadStream(tmp),
+                        fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+                    );
+                    await fsp.unlink(tmp);
                 }
 
-                await get_source(data);
+                completed += chunk.length;
+                console.error(`ok - fetched ${completed}/${supported.length} sources`);
             }
+
             console.error('ok - completed fetch');
 
             for (const l of layers) {
@@ -161,6 +189,7 @@ async function cli() {
                         std: true,
                         force: true,
                         drop: true,
+                        parallel: true,
                         name: `OpenAddresses ${l} fabric`,
                         attribution: 'OpenAddresses',
                         description: `OpenAddresses ${l} fabric`,
@@ -222,6 +251,10 @@ async function get_source(data) {
     const key = `${process.env.StackName}/job/${data.job}/source.geojson.gz`;
     console.error(`ok - fetching ${process.env.Bucket}/${key}`);
 
+    // Write to a per-job temp file so parallel downloads don't interleave
+    // bytes into the shared layer file
+    const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
+
     try {
         await pipeline(
             (await s3.send(new S3.GetObjectCommand({
@@ -229,7 +262,7 @@ async function get_source(data) {
                 Key: key
             }))).Body,
             new Unzip(),
-            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+            fs.createWriteStream(tmp)
         );
     } catch (err) {
         if (err.name === 'NoSuchKey') {

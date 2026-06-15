@@ -123,7 +123,23 @@ export default {
                             VolumeSize: 500,
                             VolumeType: 'gp3'
                         }
-                    }]
+                    }],
+                    // Grow the root partition and filesystem to use the full 500 GB EBS volume.
+                    // Without this, the OS boots with the AMI's default ~30 GB partition layout
+                    // even though the underlying volume is 500 GB.
+                    UserData: cf.base64([
+                        'MIME-Version: 1.0\n',
+                        'Content-Type: multipart/mixed; boundary="==BOUNDARY=="\n',
+                        '\n',
+                        '--==BOUNDARY==\n',
+                        'Content-Type: text/x-shellscript; charset="us-ascii"\n',
+                        '\n',
+                        '#!/bin/bash\n',
+                        'growpart /dev/xvda 1\n',
+                        'xfs_growfs /\n',
+                        '\n',
+                        '--==BOUNDARY==--'
+                    ].join(''))
                 }
             }
         },

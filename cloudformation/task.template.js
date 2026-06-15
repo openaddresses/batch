@@ -120,13 +120,13 @@ export default {
                         DeviceName: '/dev/xvda',
                         Ebs: {
                             Encrypted: true,
-                            VolumeSize: 500,
+                            VolumeSize: 2000,
                             VolumeType: 'gp3'
                         }
                     }],
-                    // Grow the root partition and filesystem to use the full 500 GB EBS volume.
+                    // Grow the root partition and filesystem to use the full EBS volume.
                     // Without this, the OS boots with the AMI's default ~30 GB partition layout
-                    // even though the underlying volume is 500 GB.
+                    // even though the underlying volume is larger.
                     UserData: cf.base64([
                         'MIME-Version: 1.0\n',
                         'Content-Type: multipart/mixed; boundary="==BOUNDARY=="\n',

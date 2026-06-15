@@ -120,10 +120,8 @@ export default {
                         DeviceName: '/dev/xvda',
                         Ebs: {
                             Encrypted: true,
-                            VolumeSize: 1000,
-                            VolumeType: 'gp3',
-                            Throughput: 1000,  // MB/s (max for gp3)
-                            Iops: 16000        // max for gp3
+                            VolumeSize: 500,
+                            VolumeType: 'gp3'
                         }
                     }]
                 }

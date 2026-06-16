@@ -271,12 +271,12 @@ async function cli() {
 }
 
 /**
- * Recursively strip Z (3rd element) from GeoJSON coordinate arrays
+ * Recursively strip any dimensions beyond 2 (lon/lat) from GeoJSON coordinate arrays
  */
-function stripZ(coords) {
+function strip2D(coords) {
     if (!Array.isArray(coords)) return coords;
     if (typeof coords[0] === 'number') return coords.slice(0, 2);
-    return coords.map(stripZ);
+    return coords.map(strip2D);
 }
 
 async function get_source(data) {
@@ -298,11 +298,11 @@ async function get_source(data) {
             new Transform({
                 objectMode: true,
                 transform(line, _enc, cb) {
-                    // Strip Z coordinates to avoid tippecanoe EPIPE on 3D geometries
+                    // Strip extra dimensions to avoid tippecanoe EPIPE on 3D/4D geometries
                     try {
                         const feat = JSON.parse(line);
                         if (feat.geometry && feat.geometry.coordinates) {
-                            feat.geometry.coordinates = stripZ(feat.geometry.coordinates);
+                            feat.geometry.coordinates = strip2D(feat.geometry.coordinates);
                         }
                         cb(null, JSON.stringify(feat) + '\n');
                     } catch {

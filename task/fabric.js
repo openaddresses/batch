@@ -7,15 +7,25 @@ const DRIVE = '/tmp';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import { pipeline } from 'stream/promises';
+import { Transform } from 'stream';
 import path from 'path';
 import Tippecanoe from './lib/tippecanoe.js';
 import Meta from './lib/meta.js';
 import { Unzip } from 'zlib';
+import split2 from 'split2';
 import minimist from 'minimist';
 import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { Agent } from 'https';
 
-const s3 = new S3.S3Client({ region: process.env.AWS_DEFAULT_REGION });
+// Reuse TCP connections across requests and increase socket pool to match
+// download concurrency, significantly reducing per-request overhead.
+const keepAliveAgent = new Agent({ keepAlive: true, maxSockets: 500 });
+const s3 = new S3.S3Client({
+    region: process.env.AWS_DEFAULT_REGION,
+    requestHandler: new NodeHttpHandler({ httpsAgent: keepAliveAgent })
+});
 
 const r2 = new S3.S3Client({
     region: 'auto',
@@ -33,8 +43,11 @@ const zooms = {
     centerlines: 8
 };
 
-// Max concurrent S3 downloads
-const DOWNLOAD_CONCURRENCY = 50;
+// Max concurrent S3 downloads. Higher concurrency hides the latency variance
+// between small and large sources — a slow 100MB download no longer stalls
+// an entire batch of 50. Disk I/O and network (10Gbit on r5.2xlarge) are
+// the practical limits, not Node.js event loop.
+const DOWNLOAD_CONCURRENCY = 200;
 
 const args = minimist(process.argv, {
     boolean: ['interactive', 'fabric', 'border'],
@@ -155,27 +168,38 @@ async function cli() {
 
             // Download each source to its own temp file in parallel (writing
             // concurrent streams to a shared file would interleave bytes and
-            // corrupt the newline-delimited GeoJSON). Concat and delete each
-            // chunk's temp files before fetching the next chunk so peak disk
-            // usage stays at ~1x total uncompressed size rather than ~2x.
+            // corrupt the newline-delimited GeoJSON). Overlap the concat/delete
+            // step with the next chunk's downloads so disk I/O and network
+            // don't stall each other. Peak disk usage is ~1x total uncompressed
+            // size (temp files are deleted as soon as they're appended).
             let completed = 0;
+            let concatPromise = Promise.resolve();
+
             for (let i = 0; i < supported.length; i += DOWNLOAD_CONCURRENCY) {
                 const chunk = supported.slice(i, i + DOWNLOAD_CONCURRENCY);
+
+                // Wait for the previous chunk's concat to finish before starting
+                // a new download batch — keeps peak disk usage bounded.
+                await concatPromise;
                 await Promise.all(chunk.map((data) => get_source(data)));
 
-                for (const data of chunk) {
-                    const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
-                    if (!fs.existsSync(tmp)) continue;
-                    await pipeline(
-                        fs.createReadStream(tmp),
-                        fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
-                    );
-                    await fsp.unlink(tmp);
-                }
-
-                completed += chunk.length;
-                console.error(`ok - fetched ${completed}/${supported.length} sources`);
+                concatPromise = (async () => {
+                    for (const data of chunk) {
+                        const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
+                        if (!fs.existsSync(tmp)) continue;
+                        await pipeline(
+                            fs.createReadStream(tmp),
+                            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+                        );
+                        await fsp.unlink(tmp);
+                    }
+                    completed += chunk.length;
+                    console.error(`ok - fetched ${completed}/${supported.length} sources`);
+                })();
             }
+
+            // Wait for the final chunk's concat to complete
+            await concatPromise;
 
             console.error('ok - completed fetch');
 
@@ -246,6 +270,15 @@ async function cli() {
     }
 }
 
+/**
+ * Recursively strip any dimensions beyond 2 (lon/lat) from GeoJSON coordinate arrays
+ */
+function strip2D(coords) {
+    if (!Array.isArray(coords)) return coords;
+    if (typeof coords[0] === 'number') return coords.slice(0, 2);
+    return coords.map(strip2D);
+}
+
 async function get_source(data) {
     const key = `${process.env.StackName}/job/${data.job}/source.geojson.gz`;
     console.error(`ok - fetching ${process.env.Bucket}/${key}`);
@@ -261,6 +294,22 @@ async function get_source(data) {
                 Key: key
             }))).Body,
             new Unzip(),
+            split2(),
+            new Transform({
+                objectMode: true,
+                transform(line, _enc, cb) {
+                    // Strip extra dimensions to avoid tippecanoe EPIPE on 3D/4D geometries
+                    try {
+                        const feat = JSON.parse(line);
+                        if (feat.geometry && feat.geometry.coordinates) {
+                            feat.geometry.coordinates = strip2D(feat.geometry.coordinates);
+                        }
+                        cb(null, JSON.stringify(feat) + '\n');
+                    } catch {
+                        cb(null, line + '\n');
+                    }
+                }
+            }),
             fs.createWriteStream(tmp)
         );
     } catch (err) {

@@ -279,44 +279,61 @@ function strip2D(coords) {
     return coords.map(strip2D);
 }
 
+const TRANSIENT_ERRORS = new Set(['ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'aborted']);
+const MAX_RETRIES = 3;
+
 async function get_source(data) {
     const key = `${process.env.StackName}/job/${data.job}/source.geojson.gz`;
-    console.error(`ok - fetching ${process.env.Bucket}/${key}`);
 
     // Write to a per-job temp file so parallel downloads don't interleave
     // bytes into the shared layer file
     const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
 
-    try {
-        await pipeline(
-            (await s3.send(new S3.GetObjectCommand({
-                Bucket: process.env.Bucket,
-                Key: key
-            }))).Body,
-            new Unzip(),
-            split2(),
-            new Transform({
-                objectMode: true,
-                transform(line, _enc, cb) {
-                    // Strip extra dimensions to avoid tippecanoe EPIPE on 3D/4D geometries
-                    try {
-                        const feat = JSON.parse(line);
-                        if (feat.geometry && feat.geometry.coordinates) {
-                            feat.geometry.coordinates = strip2D(feat.geometry.coordinates);
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        console.error(`ok - fetching ${process.env.Bucket}/${key}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
+        try {
+            await pipeline(
+                (await s3.send(new S3.GetObjectCommand({
+                    Bucket: process.env.Bucket,
+                    Key: key
+                }))).Body,
+                new Unzip(),
+                split2(),
+                new Transform({
+                    objectMode: true,
+                    transform(line, _enc, cb) {
+                        // Strip extra dimensions to avoid tippecanoe EPIPE on 3D/4D geometries
+                        try {
+                            const feat = JSON.parse(line);
+                            if (feat.geometry && feat.geometry.coordinates) {
+                                feat.geometry.coordinates = strip2D(feat.geometry.coordinates);
+                            }
+                            cb(null, JSON.stringify(feat) + '\n');
+                        } catch {
+                            cb(null, line + '\n');
                         }
-                        cb(null, JSON.stringify(feat) + '\n');
-                    } catch {
-                        cb(null, line + '\n');
                     }
+                }),
+                fs.createWriteStream(tmp)
+            );
+            return; // success
+        } catch (err) {
+            if (err.name === 'NoSuchKey') {
+                console.error(`ok - skipping job ${data.job}: source.geojson.gz not found`);
+                return;
+            } else if (TRANSIENT_ERRORS.has(err.code) || TRANSIENT_ERRORS.has(err.message)) {
+                if (attempt < MAX_RETRIES) {
+                    const delay = attempt * 2000;
+                    console.error(`warn - transient error fetching job ${data.job} (${err.code || err.message}), retrying in ${delay}ms...`);
+                    await new Promise((resolve) => setTimeout(resolve, delay));
+                    // Remove partial file before retrying
+                    await fsp.unlink(tmp).catch(() => {});
+                } else {
+                    console.error(`warn - failed to fetch job ${data.job} after ${MAX_RETRIES} attempts (${err.code || err.message}), skipping`);
                 }
-            }),
-            fs.createWriteStream(tmp)
-        );
-    } catch (err) {
-        if (err.name === 'NoSuchKey') {
-            console.error(`ok - skipping job ${data.job}: source.geojson.gz not found`);
-        } else {
-            throw err;
+            } else {
+                throw err;
+            }
         }
     }
 }

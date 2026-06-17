@@ -9,7 +9,6 @@ export default {
             Properties: {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
-                ComputeEnvironmentName: 't3',
                 ComputeResources: {
                     ImageId: 'ami-074bb5e3c681b0735',
                     MaxvCpus: 200,

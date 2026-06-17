@@ -29,10 +29,10 @@
         "vue-router": "^4.0.14"
     },
     "devDependencies": {
-        "@vitejs/plugin-vue": "^5.0.0",
+        "@vitejs/plugin-vue": "^6.0.7",
         "eslint": "^9.0.0",
         "eslint-plugin-vue": "^10.0.0",
         "typescript-eslint": "^8.23.0",
-        "vite": "^6.4.2"
+        "vite": "^8.0.16"
     }
 }

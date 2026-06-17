@@ -300,7 +300,8 @@ async function get_source(data) {
                 new Unzip(),
                 split2(),
                 new Transform({
-                    objectMode: true,
+                    readableObjectMode: false,
+                    writableObjectMode: true,
                     transform(line, _enc, cb) {
                         // Strip extra dimensions to avoid tippecanoe EPIPE on 3D/4D geometries
                         try {

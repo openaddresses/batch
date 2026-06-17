@@ -7,9 +7,29 @@ export default {
         BatchT3ComputeEnvironment: {
             Type: 'AWS::Batch::ComputeEnvironment',
             Properties: {
-                Type: 'UNMANAGED',
+                Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeEnvironmentName: 't3',
+                ComputeResources: {
+                    ImageId: 'ami-074bb5e3c681b0735',
+                    MaxvCpus: 200,
+                    MinvCpus: 0,
+                    SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    Subnets: [
+                        'subnet-de35c1f5',
+                        'subnet-e67dc7ea',
+                        'subnet-38b72502',
+                        'subnet-76ae3713',
+                        'subnet-35d87242',
+                        'subnet-b978ade0'
+                    ],
+                    Type: 'SPOT',
+                    BidPercentage: 100,
+                    SpotIamFleetRole: cf.getAtt('BatchSpotFleetRole', 'Arn'),
+                    InstanceRole: cf.getAtt('BatchInstanceProfile', 'Arn'),
+                    InstanceTypes: ['c6a.large'],
+                    AllocationStrategy: 'SPOT_CAPACITY_OPTIMIZED'
+                },
                 State: 'ENABLED'
             }
         },
@@ -19,7 +39,7 @@ export default {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeResources: {
-                    ImageId: 'ami-0914ebfbccd143a3f',
+                    ImageId: 'ami-074bb5e3c681b0735',
                     MaxvCpus: 16,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
@@ -49,7 +69,7 @@ export default {
                 Type: 'MANAGED',
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeResources: {
-                    ImageId: 'ami-0914ebfbccd143a3f',
+                    ImageId: 'ami-074bb5e3c681b0735',
                     MaxvCpus: 16,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
@@ -149,6 +169,23 @@ export default {
                 VpcId: 'vpc-3f2aa15a',
                 GroupDescription: 'Batch Security Group',
                 SecurityGroupIngress: []
+            }
+        },
+        BatchSpotFleetRole: {
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [{
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: 'spotfleet.amazonaws.com'
+                        },
+                        Action: 'sts:AssumeRole'
+                    }]
+                },
+                ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole'],
+                Path: '/'
             }
         },
         BatchServiceRole: {

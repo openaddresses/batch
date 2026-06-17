@@ -78,8 +78,9 @@ export default {
                 }
             },
             Properties: {
-                ImageId: 'ami-0914ebfbccd143a3f',
-                InstanceType: 't3.small',
+                ImageId: 'ami-074bb5e3c681b0735',
+                InstanceType: 'c6a.large',
+                SpotPrice: '0.0765',  // on-demand price as ceiling; pay actual spot rate
                 BlockDeviceMappings: [{
                     DeviceName: '/dev/xvda',
                     Ebs: {

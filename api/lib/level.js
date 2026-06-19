@@ -1,3 +1,4 @@
+import Err from '@openaddresses/batch-error';
 import moment from 'moment';
 import User from './user.js';
 import Override from './types/level-override.js';
@@ -84,6 +85,10 @@ export default class Level {
         });
 
         const body = await res.json();
+
+        if (!res.ok || !body.data || !body.data.account) {
+            throw new Err(500, new Error(JSON.stringify(body.errors || body)), 'OpenCollective API Error');
+        }
 
         const usrs = body.data.account.members.nodes.filter((node) => {
             return node.account.email === email;

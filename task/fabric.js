@@ -221,7 +221,7 @@ async function cli() {
                             size: false
                         },
                         zoom: {
-                            max: 15,
+                            max: 14,
                             min: zooms[l]
                         }
                     }

@@ -201,7 +201,7 @@ export async function trigger(event) {
                 memory: 58000
             },
             timeout: {
-                attemptDurationSeconds: 60 * 60 * 24  // 24 hour hard cap
+                attemptDurationSeconds: 60 * 60 * 24 * 3  // 3 day hard cap
             }
         };
     } else if (event.type === 'cleanup') {

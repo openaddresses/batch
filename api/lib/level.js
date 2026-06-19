@@ -91,7 +91,7 @@ export default class Level {
         }
 
         const usrs = body.data.account.members.nodes.filter((node) => {
-            return node.account.email === email;
+            return node.account && node.account.email === email;
         });
 
         if (!usrs.length) return;
@@ -162,9 +162,11 @@ export default class Level {
         if (!usrs.length) return;
 
         for (const usr of usrs) {
+            // Skip nodes where account is null (OC can return null accounts for deleted users)
+            if (!usr.account) continue;
             // The user has never made a transaction
-            if (!usr.account.transactions.nodes.length) return;
-            if (!usr.account.email) return;
+            if (!usr.account.transactions.nodes.length) continue;
+            if (!usr.account.email) continue;
 
             for (const override of (await Override.list(this.pool)).level_override) {
                 if (usr.account.email.match(override.pattern)) {

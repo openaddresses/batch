@@ -34,7 +34,13 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         if (req.auth && req.auth.username) {
             try {
-                if (req.query.level) await level.single(req.auth.email);
+                if (req.query.level) {
+                    try {
+                        await level.single(req.auth.email);
+                    } catch (err) {
+                        console.error('Failed to refresh level from OpenCollective (non-fatal):', err);
+                    }
+                }
                 res.json(await user.user(req.auth.uid));
             } catch (err) {
                 return Err.respond(err, res);

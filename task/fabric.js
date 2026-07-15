@@ -154,7 +154,10 @@ async function cli() {
             // Build Data Fabric
             const datas = await oa.cmd('data', 'list');
 
-            const layers = ['addresses', 'buildings', 'parcels', 'centerlines'];
+            // Smallest/fastest layers first: addresses is ~92GB uncompressed and can
+            // eat the whole 3-day attempt timeout on its own. Tiling it last means a
+            // timeout there still ships the other three layers instead of nothing.
+            const layers = ['centerlines', 'parcels', 'buildings', 'addresses'];
 
             const supported = datas.filter((data) => {
                 if (!layers.includes(data.layer)) {

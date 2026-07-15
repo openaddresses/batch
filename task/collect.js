@@ -156,6 +156,11 @@ async function sources(oa, tmp, datas) {
     return stats;
 }
 
+// Hard cap on a single source fetch. Without this, a stalled S3 connection
+// (no data, no error) blocks its PromisePool slot forever and the job never
+// finishes or times out - it just silently burns compute until manually killed.
+const GET_SOURCE_TIMEOUT_MS = 5 * 60 * 1000;
+
 async function get_source(oa, tmp, data, stats) {
     const dir = path.parse(data.source).dir;
     const source = `${path.parse(data.source).name}-${data.layer}-${data.name}.geojson`;
@@ -171,12 +176,15 @@ async function get_source(oa, tmp, data, stats) {
 
     console.error(`ok - fetching ${process.env.Bucket}/${process.env.StackName}/job/${data.job}/source.geojson.gz`);
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(new Error('get_source timed out')), GET_SOURCE_TIMEOUT_MS);
+
     try {
         await pipeline(
             (await s3.send(new S3.GetObjectCommand({
                 Bucket: process.env.Bucket,
                 Key: `${process.env.StackName}/job/${data.job}/source.geojson.gz`
-            }))).Body,
+            }), { abortSignal: controller.signal })).Body,
             new Unzip(),
             split(),
             new Transform({
@@ -192,6 +200,8 @@ async function get_source(oa, tmp, data, stats) {
         console.error(err);
         console.error('not ok - ' + path.resolve(tmp, 'sources', dir, source));
         throw err;
+    } finally {
+        clearTimeout(timeout);
     }
 
     console.error('ok - ' + path.resolve(tmp, 'sources',  dir, source));

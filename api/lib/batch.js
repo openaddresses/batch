@@ -187,6 +187,9 @@ export async function trigger(event) {
                 environment: [],
                 vcpus: 4,
                 memory: 15000
+            },
+            timeout: {
+                attemptDurationSeconds: 60 * 60 * 24  // 24 hour backstop; per-source fetches self-timeout well before this
             }
         };
     } else if (event.type === 'fabric') {

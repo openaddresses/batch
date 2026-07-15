@@ -97,14 +97,18 @@ export default class Tippecanoe {
     /**
      * Join multiple MBTiles into a single MBTiles
      *
+     * Note: unlike tippecanoe itself, tile-join has no flag to disable its own
+     * tile size/feature cap - passing --no-feature-limit/--no-tile-size-limit
+     * to it fails with "unrecognized option". Inputs that overlap in the same
+     * tile (e.g. from geographically-overlapping shards) will get silently
+     * capped on merge, so callers must ensure inputs don't share tiles for the
+     * same layer.
+     *
      * @param {String} output_path Path to input MBTiles
      * @param {String[]} inputs Array of paths to input MBTiles
      * @param {Object} options Optional Options
      * @param {boolean} options.std Don't squelch tippecanoe stderr/stdout [default: false]
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
-     * @param {Object} options.limit Limit Options
-     * @param {Boolean} [options.limit.features=true] Limit tiles to 200,000 features
-     * @param {Boolean} [options.limit.size=true] Limit tiles to 500K bytes
      *
      * @returns {Promise}
      */
@@ -118,8 +122,6 @@ export default class Tippecanoe {
             ].concat(inputs);
 
             if (options.force) base = base.concat(['-f']);
-            if (options.limit.features === false) base = base.concat(['--no-feature-limit']);
-            if (options.limit.size === false) base = base.concat(['--no-tile-size-limit']);
 
             const tilejoin = CP.spawn('tile-join', base, {
                 env: process.env

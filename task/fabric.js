@@ -51,6 +51,7 @@ const DOWNLOAD_CONCURRENCY = 200;
 
 const args = minimist(process.argv, {
     boolean: ['interactive', 'fabric', 'border'],
+    string: ['layer'],
     alias: {
         interactive: 'i'
     }
@@ -154,7 +155,13 @@ async function cli() {
             // Build Data Fabric
             const datas = await oa.cmd('data', 'list');
 
-            const layers = ['addresses', 'buildings', 'parcels', 'centerlines'];
+            // Each layer is submitted as its own Batch job (see api/lib/batch.js)
+            // so a slow layer can't eat the other layers' timeout budget. --layer
+            // restricts this run to a single layer; with no --layer, all four run
+            // in this one process (used for local/manual runs).
+            const ALL_LAYERS = ['addresses', 'buildings', 'parcels', 'centerlines'];
+            const layers = args.layer ? ALL_LAYERS.filter((l) => l === args.layer) : ALL_LAYERS;
+            if (args.layer && layers.length === 0) throw new Error(`unknown --layer: ${args.layer}`);
 
             const supported = datas.filter((data) => {
                 if (!layers.includes(data.layer)) {

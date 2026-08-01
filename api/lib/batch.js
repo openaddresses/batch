@@ -9,6 +9,24 @@ const t3_queue = process.env.T3_QUEUE;
 const t3_priority_queue = process.env.T3_PRIORITY_QUEUE;
 const mega_queue = process.env.MEGA_QUEUE;
 
+const FABRIC_LAYERS = ['addresses', 'buildings', 'parcels', 'centerlines'];
+
+async function submit(params) {
+    const res = await batch.send(new Batch.SubmitJobCommand(params));
+    console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
+    return res;
+}
+
+async function afterSubmit() {
+    try {
+        // Scaling should never block the Queue
+        await scale_out();
+    } catch (err) {
+        console.error(err);
+        console.error('not ok - Failed to scale out ASG');
+    }
+}
+
 /**
  * Scale Batch T3 ASG Cluster up to MaxSize as needed
  */
@@ -190,20 +208,36 @@ export async function trigger(event) {
             }
         };
     } else if (event.type === 'fabric') {
-        params = {
-            jobDefinition: jobDefinition,
-            jobQueue: mega_queue,
-            jobName: 'OA_Fabric',
-            containerOverrides: {
-                command: ['node', 'fabric.js'],
-                environment: [],
-                vcpus: 8,
-                memory: 58000
-            },
-            timeout: {
-                attemptDurationSeconds: 60 * 60 * 24 * 3  // 3 day hard cap
-            }
-        };
+        // Each layer (plus borders) is submitted as its own job with its own
+        // 3-day budget, so a slow/stuck layer (e.g. addresses, by far the
+        // largest) can't starve the others out of the week entirely - they
+        // used to all share one job and one timeout, processed sequentially.
+        const fabricJobs = [
+            { name: 'Border', args: ['--border'] },
+            ...FABRIC_LAYERS.map((layer) => ({
+                name: layer.charAt(0).toUpperCase() + layer.slice(1),
+                args: ['--fabric', '--layer', layer]
+            }))
+        ];
+
+        for (const job of fabricJobs) {
+            await submit({
+                jobDefinition: jobDefinition,
+                jobQueue: mega_queue,
+                jobName: `OA_Fabric_${job.name}`,
+                containerOverrides: {
+                    command: ['node', 'fabric.js', ...job.args],
+                    environment: [],
+                    vcpus: 8,
+                    memory: 58000
+                },
+                timeout: {
+                    attemptDurationSeconds: 60 * 60 * 24 * 3  // 3 day hard cap, per layer
+                }
+            });
+        }
+
+        return await afterSubmit();
     } else if (event.type === 'cleanup') {
         params = {
             jobDefinition: jobDefinition,
@@ -228,15 +262,7 @@ export async function trigger(event) {
         throw new Error('Unknown event type: ' + event.type);
     }
 
-    const res = await batch.send(new Batch.SubmitJobCommand(params));
+    await submit(params);
 
-    console.log(`Job ${res.jobName} launched with id ${res.jobId}`);
-
-    try {
-        // Scaling should never block the Queue
-        await scale_out();
-    } catch (err) {
-        console.error(err);
-        console.error('not ok - Failed to scale out ASG');
-    }
+    return await afterSubmit();
 }

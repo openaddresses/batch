@@ -14,6 +14,10 @@ export default {
                     MaxvCpus: 200,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
+                    LaunchTemplate: {
+                        LaunchTemplateId: cf.ref('BatchT3LaunchTemplate'),
+                        Version: cf.getAtt('BatchT3LaunchTemplate', 'LatestVersionNumber')
+                    },
                     Subnets: [
                         'subnet-de35c1f5',
                         'subnet-e67dc7ea',
@@ -114,6 +118,37 @@ export default {
             Properties: {
                 Roles: [cf.ref('BatchInstanceRole')],
                 Path: '/'
+            }
+        },
+        BatchT3LaunchTemplate: {
+            Type: 'AWS::EC2::LaunchTemplate',
+            Properties: {
+                LaunchTemplateData: {
+                    BlockDeviceMappings: [{
+                        DeviceName: '/dev/xvda',
+                        Ebs: {
+                            Encrypted: true,
+                            VolumeSize: 100,
+                            VolumeType: 'gp3'
+                        }
+                    }],
+                    // Grow the root partition and filesystem to use the full EBS volume.
+                    // Without this, the OS boots with the AMI's default ~30 GB partition layout
+                    // even though the underlying volume is larger.
+                    UserData: cf.base64([
+                        'MIME-Version: 1.0\n',
+                        'Content-Type: multipart/mixed; boundary="==BOUNDARY=="\n',
+                        '\n',
+                        '--==BOUNDARY==\n',
+                        'Content-Type: text/x-shellscript; charset="us-ascii"\n',
+                        '\n',
+                        '#!/bin/bash\n',
+                        'growpart /dev/xvda 1\n',
+                        'xfs_growfs /\n',
+                        '\n',
+                        '--==BOUNDARY==--'
+                    ].join(''))
+                }
             }
         },
         BatchLargeLaunchTemplate: {

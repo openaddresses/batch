@@ -234,5 +234,6 @@ export default cf.merge(
     schedule('collect', 'cron(0 12 ? * sun *)', 'Collection Rebuild'),
     schedule('fabric',  'cron(0 18 ? * sun *)', 'Rebuild Border & Fabric Tiles'),
     schedule('level',   'cron(0 10 * * ? *)', 'Ensure all accounts have proper levels'),
-    schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs')
+    schedule('close',   'cron(0 11 * * ? *)', 'Close Expired Jobs'),
+    schedule('cleanup', 'cron(0 12 ? * wed *)', 'Cleanup Old Runs')
 );

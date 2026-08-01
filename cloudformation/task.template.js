@@ -124,11 +124,16 @@ export default {
             Type: 'AWS::EC2::LaunchTemplate',
             Properties: {
                 LaunchTemplateData: {
+                    // Most single-source jobs need well under 1GB (see #613/#615
+                    // discussion) - this is modest headroom over the AMI's bare
+                    // ~30GB default, not sized for outliers. Sources that need
+                    // more should be tagged conform.size:"large" and routed to
+                    // the `large` queue (#615) instead of bumping this for everyone.
                     BlockDeviceMappings: [{
                         DeviceName: '/dev/xvda',
                         Ebs: {
                             Encrypted: true,
-                            VolumeSize: 100,
+                            VolumeSize: 40,
                             VolumeType: 'gp3'
                         }
                     }],

@@ -14,7 +14,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     if (args.interactive) {
         await interactive();
     }
-    cli();
+    cli().catch((err) => {
+        console.error(err);
+        // eslint-disable-next-line n/no-process-exit
+        process.exit(1);
+    });
 }
 
 async function cli() {
@@ -46,26 +50,38 @@ async function cli() {
 
     const stats = { kept: 0, pruned: 0, errors: 0, deduped: 0, orphaned: 0, failed: 0 };
 
-    try {
-        await pruneByRetention(oa, s3, r2, dryRun, stats);
-        await pruneOrphanedJobs(oa, s3, r2, dryRun, stats);
-        await pruneFailedJobs(oa, s3, r2, dryRun, stats);
-        await pruneNonLiveRuns(oa, s3, r2, dryRun, stats);
-        await sweepEmptyRuns(oa, dryRun, stats);
+    // Each phase runs independently - this job makes thousands of sequential
+    // API calls (@openaddresses/lib fetches a schema per query-param call, on
+    // top of the real request), and at that volume a single transient failure
+    // (network blip, an occasional API 500) is expected, not exceptional.
+    // Phases are individually idempotent, so letting one fail shouldn't cost
+    // the others their weekly chance to run.
+    const phases = [
+        ['pruneByRetention', () => pruneByRetention(oa, s3, r2, dryRun, stats)],
+        ['pruneOrphanedJobs', () => pruneOrphanedJobs(oa, s3, r2, dryRun, stats)],
+        ['pruneFailedJobs', () => pruneFailedJobs(oa, s3, r2, dryRun, stats)],
+        ['pruneNonLiveRuns', () => pruneNonLiveRuns(oa, s3, r2, dryRun, stats)],
+        ['sweepEmptyRuns', () => sweepEmptyRuns(oa, dryRun, stats)]
+    ];
 
-        console.error([
-            'ok - cleanup complete:',
-            `kept=${stats.kept}`,
-            `pruned=${stats.pruned}`,
-            `deduped=${stats.deduped}`,
-            `orphaned=${stats.orphaned}`,
-            `failed=${stats.failed}`,
-            `errors=${stats.errors}`
-        ].join(' '));
-    } catch (err) {
-        console.error(err);
-        throw err;
+    for (const [name, phase] of phases) {
+        try {
+            await phase();
+        } catch (err) {
+            console.error(`not ok - ${name} failed, continuing to next phase:`, err);
+            stats.errors++;
+        }
     }
+
+    console.error([
+        'ok - cleanup complete:',
+        `kept=${stats.kept}`,
+        `pruned=${stats.pruned}`,
+        `deduped=${stats.deduped}`,
+        `orphaned=${stats.orphaned}`,
+        `failed=${stats.failed}`,
+        `errors=${stats.errors}`
+    ].join(' '));
 }
 
 // ---- Retention-based pruning of live successful jobs ----

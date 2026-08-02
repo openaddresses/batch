@@ -167,7 +167,23 @@ export default {
                             VolumeSize: 250,
                             VolumeType: 'gp3'
                         }
-                    }]
+                    }],
+                    // Grow the root partition and filesystem to use the full EBS volume.
+                    // Without this, the OS boots with the AMI's default ~30 GB partition layout
+                    // even though the underlying volume is larger.
+                    UserData: cf.base64([
+                        'MIME-Version: 1.0\n',
+                        'Content-Type: multipart/mixed; boundary="==BOUNDARY=="\n',
+                        '\n',
+                        '--==BOUNDARY==\n',
+                        'Content-Type: text/x-shellscript; charset="us-ascii"\n',
+                        '\n',
+                        '#!/bin/bash\n',
+                        'growpart /dev/xvda 1\n',
+                        'xfs_growfs /\n',
+                        '\n',
+                        '--==BOUNDARY==--'
+                    ].join(''))
                 }
             }
         },
@@ -279,6 +295,18 @@ export default {
                 Priority: 2,
                 JobQueueName: 't3-priority'
             }
+        },
+        BatchLargeJobQueue: {
+            Type: 'AWS::Batch::JobQueue',
+            Properties: {
+                ComputeEnvironmentOrder: [{
+                    Order: 1,
+                    ComputeEnvironment: cf.ref('BatchLargeComputeEnvironment')
+                }],
+                State: 'ENABLED',
+                Priority: 1,
+                JobQueueName: 'large'
+            }
         }
     },
     Outputs: {
@@ -301,6 +329,13 @@ export default {
             Value: cf.ref('BatchMegaJobQueue'),
             Export: {
                 Name: 'mega-queue'
+            }
+        },
+        LargeQueue: {
+            Description: 'Large Queue',
+            Value: cf.ref('BatchLargeJobQueue'),
+            Export: {
+                Name: 'large-queue'
             }
         }
     }

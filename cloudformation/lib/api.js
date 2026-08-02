@@ -233,6 +233,7 @@ export default {
                         { Name: 'T3_PRIORITY_QUEUE', Value:  cf.importValue('t3-priority-queue') },
                         { Name: 'T3_CLUSTER_ASG', Value: cf.importValue('t3-cluster-asg') },
                         { Name: 'MEGA_QUEUE', Value: cf.importValue('mega-queue') },
+                        { Name: 'LARGE_QUEUE', Value: cf.importValue('large-queue') },
                         { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
                         { Name: 'PROTOMAPS_KEY', Value: cf.ref('ProtomapsKey') },
                         { Name: 'OPENCOLLECTIVE_API_KEY', Value: cf.ref('OpenCollective') },

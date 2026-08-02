@@ -8,6 +8,31 @@ const jobDefinition = process.env.JOB_DEFINITION;
 const t3_queue = process.env.T3_QUEUE;
 const t3_priority_queue = process.env.T3_PRIORITY_QUEUE;
 const mega_queue = process.env.MEGA_QUEUE;
+const large_queue = process.env.LARGE_QUEUE;
+
+/**
+ * Look up a source's conform.size tag (see CONTRIBUTING.md in the sources
+ * repo) to decide whether a job needs the large-disk queue. Fails open to
+ * 'standard' - a source we can't check should behave like every source did
+ * before this existed, not block submission.
+ *
+ * @param {Object} event Same event passed to trigger()
+ */
+async function sourceSizeTier(event) {
+    try {
+        const res = await fetch(event.source);
+        if (!res.ok) return 'standard';
+
+        const src = await res.json();
+        const entries = (src.layers && src.layers[event.layer]) || [];
+        const entry = entries.find((e) => e.name === event.name);
+
+        return entry?.conform?.size === 'large' ? 'large' : 'standard';
+    } catch (err) {
+        console.error('not ok - failed to check source size tier, defaulting to standard:', err.message);
+        return 'standard';
+    }
+}
 
 const FABRIC_LAYERS = ['addresses', 'buildings', 'parcels', 'centerlines'];
 
@@ -164,9 +189,15 @@ export async function trigger(event) {
         if (!event.layer) throw new Error('Layer of source required');
         if (!event.name) throw new Error('Name of source layer required');
 
+        // A source tagged conform.size:"large" (e.g. NAD) always goes to the
+        // large-disk queue, regardless of job vs job-ci - correctness over
+        // the job-ci fast lane for this rare case.
+        const tier = await sourceSizeTier(event);
+        const queue = tier === 'large' ? large_queue : (event.type === 'job' ? t3_queue : t3_priority_queue);
+
         params = {
             jobDefinition: jobDefinition,
-            jobQueue: event.type === 'job' ? t3_queue : t3_priority_queue,
+            jobQueue: queue,
             jobName: `OA_Job_${event.job}`,
             containerOverrides: {
                 command: ['node', 'task.js'],

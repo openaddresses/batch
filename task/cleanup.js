@@ -163,9 +163,11 @@ async function pruneOrphanedJobs(oa, s3, r2, dryRun, stats) {
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
     const before = threeMonthsAgo.toISOString().split('T')[0];
 
-    let page = 0;
+    let cursor;
     while (true) {
-        const result = await oa.cmd('job', 'orphaned', { before, limit: 100, page });
+        const params = { before, limit: 100, count: false };
+        if (cursor !== undefined) params.cursor = cursor;
+        const result = await oa.cmd('job', 'orphaned', params);
         const jobs = result.jobs || [];
         if (jobs.length === 0) break;
 
@@ -173,8 +175,8 @@ async function pruneOrphanedJobs(oa, s3, r2, dryRun, stats) {
         stats.orphaned += toDelete.length;
         await deleteJobsBatch(oa, s3, r2, toDelete, dryRun, stats);
 
+        cursor = jobs[jobs.length - 1].id;
         if (jobs.length < 100) break;
-        page++;
     }
 }
 
@@ -187,9 +189,11 @@ async function pruneFailedJobs(oa, s3, r2, dryRun, stats) {
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
     const before = threeMonthsAgo.toISOString().split('T')[0];
 
-    let page = 0;
+    let cursor;
     while (true) {
-        const result = await oa.cmd('job', 'list', { status: 'Fail', before, live: true, limit: 100, page });
+        const params = { status: 'Fail', before, live: true, limit: 100, count: false };
+        if (cursor !== undefined) params.cursor = cursor;
+        const result = await oa.cmd('job', 'list', params);
         const jobs = result.jobs || [];
         if (jobs.length === 0) break;
 
@@ -197,8 +201,8 @@ async function pruneFailedJobs(oa, s3, r2, dryRun, stats) {
         stats.failed += toDelete.length;
         await deleteJobsBatch(oa, s3, r2, toDelete, dryRun, stats);
 
+        cursor = jobs[jobs.length - 1].id;
         if (jobs.length < 100) break;
-        page++;
     }
 }
 
@@ -211,9 +215,11 @@ async function pruneNonLiveRuns(oa, s3, r2, dryRun, stats) {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const before = sevenDaysAgo.toISOString().split('T')[0];
 
-    let page = 0;
+    let cursor;
     while (true) {
-        const result = await oa.cmd('run', 'list', { live: false, before, limit: 100, page });
+        const params = { live: false, before, limit: 100, count: false };
+        if (cursor !== undefined) params.cursor = cursor;
+        const result = await oa.cmd('run', 'list', params);
         const runs = result.runs || [];
         if (runs.length === 0) break;
 
@@ -233,8 +239,8 @@ async function pruneNonLiveRuns(oa, s3, r2, dryRun, stats) {
             }
         }
 
+        cursor = runs[runs.length - 1].id;
         if (runs.length < 100) break;
-        page++;
     }
 }
 
@@ -243,10 +249,12 @@ async function pruneNonLiveRuns(oa, s3, r2, dryRun, stats) {
 async function sweepEmptyRuns(oa, dryRun, stats) {
     console.error('ok - sweeping empty runs');
 
-    let page = 0;
+    let cursor;
     let swept = 0;
     while (true) {
-        const result = await oa.cmd('run', 'list', { limit: 100, page });
+        const params = { limit: 100, count: false };
+        if (cursor !== undefined) params.cursor = cursor;
+        const result = await oa.cmd('run', 'list', params);
         const runs = result.runs || [];
         if (runs.length === 0) break;
 
@@ -267,8 +275,8 @@ async function sweepEmptyRuns(oa, dryRun, stats) {
             }
         }
 
+        cursor = runs[runs.length - 1].id;
         if (runs.length < 100) break;
-        page++;
     }
 
     console.error(`ok - swept ${swept} empty runs`);

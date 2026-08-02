@@ -25,6 +25,15 @@
         "page": {
             "$ref": "./util/page.json"
         },
+        "count": {
+            "type": "boolean",
+            "default": true,
+            "description": "Compute the exact total match count (count(*) OVER()). Set to false to skip this on callers that don't use the `total` response field and only sweep pages sequentially - it's otherwise recomputed on every page."
+        },
+        "cursor": {
+            "type": "integer",
+            "description": "Keyset-paginate: only return jobs with id greater than this value, ordered by id ascending (overrides sort/order/page). Cheaper than page/limit for sweeping the full result set."
+        },
         "sort": {
             "type": "string",
             "default": "id",

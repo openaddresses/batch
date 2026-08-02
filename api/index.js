@@ -109,7 +109,8 @@ export default async function server(config) {
 
     const schema = new Schema(express.Router(), {
         schemas: new URL('./schema', import.meta.url),
-        openapi: true
+        openapi: true,
+        limit: 50
     });
 
     app.disable('x-powered-by');

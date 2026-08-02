@@ -31,6 +31,13 @@ export default class Job extends Generic {
      * @param {String} [query.after=undefined] - Only show jobs after the given date
      * @param {String} [query.source=Null] - Filter results by source
      * @param {String[]} [query.status=["Success", "Fail", "Pending", "Warn"]] - Only show jobs with given status
+     * @param {Boolean} [query.count=true] - Compute the exact total match count (count(*) OVER()).
+     *   Callers that only sweep pages sequentially (eg cleanup.js) don't use `total` and can set this to
+     *   false to skip the extra work of computing an exact count on every page.
+     * @param {Number} [query.cursor=undefined] - If set, keyset-paginate: only return jobs with
+     *   `id > cursor`, ordered by id ascending (overriding `sort`/`order`/`page`). Cheaper than
+     *   `page`/OFFSET for callers sweeping the full result set page by page, and - unlike OFFSET -
+     *   isn't thrown off by rows being deleted between page fetches.
      */
     static async list(pool, query = {}) {
         query.limit = Params.integer(query.limit, { default: 100 });
@@ -39,6 +46,8 @@ export default class Job extends Generic {
         query.run = Params.integer(query.run);
         query.sort = Params.string(query.sort, { default: 'id' });
         query.order = Params.order(query.order);
+        query.count = Params.boolean(query.count, { default: true });
+        query.cursor = Params.integer(query.cursor);
 
         if (!query.layer || query.layer === 'all') query.layer = '';
         if (!query.live || query.live === 'all') query.live = null;
@@ -46,6 +55,13 @@ export default class Job extends Generic {
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
+
+        // Keyset pagination overrides page-number/OFFSET pagination: always walks
+        // id ascending so a cursor of "last id seen" is well defined.
+        if (query.cursor !== null) {
+            query.sort = 'id';
+            query.order = sql`asc`;
+        }
 
         Status.verify(query.status);
 
@@ -73,7 +89,7 @@ export default class Job extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    count(*) OVER() AS count,
+                    ${query.count ? sql`count(*) OVER() AS count,` : sql``}
                     job.id,
                     job.run,
                     job.map,
@@ -90,7 +106,7 @@ export default class Job extends Generic {
                     job INNER JOIN runs
                         ON job.run = runs.id
                 WHERE
-                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    job.status = ANY(${sql.array(query.status, sql`TEXT[]`)})
                     AND job.layer ilike ${query.layer}
                     AND job.source ilike ${query.source}
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
@@ -98,12 +114,13 @@ export default class Job extends Generic {
                     AND (${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP IS NULL OR job.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                     AND (${query.run}::BIGINT IS NULL OR job.run = ${query.run})
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
+                    AND (${query.cursor}::BIGINT IS NULL OR job.id > ${query.cursor})
                 ORDER BY
                     ${sql.identifier([this._table, query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.limit * query.page}
+                    ${query.cursor !== null ? 0 : query.limit * query.page}
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to load jobs');
@@ -138,10 +155,18 @@ export default class Job extends Generic {
      * @param {String} query.before - Only return orphaned jobs created before this date
      * @param {Number} [query.limit=100] - Max results per page
      * @param {Number} [query.page=0] - Page number
+     * @param {Boolean} [query.count=true] - Compute the exact total match count (count(*) OVER()).
+     *   Set to false to skip this when sweeping pages sequentially and `total` isn't used.
+     * @param {Number} [query.cursor=undefined] - If set, keyset-paginate: only return jobs with
+     *   `id > cursor` (overriding `page`/OFFSET). Cheaper for callers sweeping the full result set,
+     *   and immune to OFFSET drift when rows are deleted between page fetches (as this endpoint's
+     *   only caller, cleanup.js, does).
      */
     static async orphaned(pool, query = {}) {
         query.limit = Params.integer(query.limit, { default: 100 });
         query.page = Params.integer(query.page, { default: 0 });
+        query.count = Params.boolean(query.count, { default: true });
+        query.cursor = Params.integer(query.cursor);
 
         if (!query.before) throw new Err(400, null, 'before parameter required');
 
@@ -155,7 +180,7 @@ export default class Job extends Generic {
         try {
             const pgres = await pool.query(sql`
                 SELECT
-                    count(*) OVER() AS count,
+                    ${query.count ? sql`count(*) OVER() AS count,` : sql``}
                     job.id,
                     job.run,
                     job.created,
@@ -170,6 +195,7 @@ export default class Job extends Generic {
                     job
                 WHERE
                     job.created < ${before.toDate().toISOString()}::TIMESTAMP
+                    AND (${query.cursor}::BIGINT IS NULL OR job.id > ${query.cursor})
                     AND NOT EXISTS (
                         SELECT 1 FROM results
                         WHERE results.source = job.source_name
@@ -177,11 +203,11 @@ export default class Job extends Generic {
                         AND results.name = job.name
                     )
                 ORDER BY
-                    job.created DESC
+                    job.id ASC
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.limit * query.page}
+                    ${query.cursor !== null ? 0 : query.limit * query.page}
             `);
 
             return this.deserialize_list(pgres, 'jobs');

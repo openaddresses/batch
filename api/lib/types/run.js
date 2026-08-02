@@ -67,6 +67,13 @@ export default class Run extends Generic {
      * @param {String} [query.before=undefined] - Only show runs before the given date
      * @param {String} [query.after=undefined] - Only show jobs after the given date
      * @param {Number} [query.status=["Success", "Fail", "Running", "Pending", "Warn"]] - Only show runs with a given status
+     * @param {Boolean} [query.count=true] - Compute the exact total match count (count(*) OVER()).
+     *   Callers that only sweep pages sequentially (eg cleanup.js) don't use `total` and can set this
+     *   to false to skip the extra work of computing an exact count on every page.
+     * @param {Number} [query.cursor=undefined] - If set, keyset-paginate: only return runs with
+     *   `id > cursor`, ordered by id ascending (overriding `sort`/`order`/`page`). Cheaper than
+     *   `page`/OFFSET for callers sweeping the full result set, and immune to OFFSET drift when
+     *   rows are deleted between page fetches (as cleanup.js does).
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -76,9 +83,18 @@ export default class Run extends Generic {
         query.limit = Params.integer(query.limit, { default: 100 });
         query.sort = Params.string(query.sort, { default: 'id' });
         query.order = Params.order(query.order);
+        query.count = Params.boolean(query.count, { default: true });
+        query.cursor = Params.integer(query.cursor);
 
         if (!query.after) query.after = null;
         if (!query.before) query.before = null;
+
+        // Keyset pagination overrides page-number/OFFSET pagination: always walks
+        // id ascending so a cursor of "last id seen" is well defined.
+        if (query.cursor !== null) {
+            query.sort = 'id';
+            query.order = sql`asc`;
+        }
 
         Status.verify(query.status);
 
@@ -114,7 +130,7 @@ export default class Run extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    count(*) OVER() AS count,
+                    ${query.count ? sql`count(*) OVER() AS count,` : sql``}
                     runs.id,
                     runs.live,
                     runs.created,
@@ -127,11 +143,12 @@ export default class Run extends Generic {
                         LEFT JOIN job
                         ON job.run = runs.id
                 WHERE
-                    ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
+                    job.status = ANY(${sql.array(query.status, sql`TEXT[]`)})
                     AND (${query.run}::BIGINT IS NULL OR run = ${query.run})
                     AND (${after}::TIMESTAMP IS NULL OR runs.created > ${after}::TIMESTAMP)
                     AND (${before}::TIMESTAMP IS NULL OR runs.created < ${before}::TIMESTAMP)
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
+                    AND (${query.cursor}::BIGINT IS NULL OR runs.id > ${query.cursor})
                 GROUP BY
                     runs.id,
                     runs.live,
@@ -143,7 +160,7 @@ export default class Run extends Generic {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.limit * query.page}
+                    ${query.cursor !== null ? 0 : query.limit * query.page}
             `);
 
             const list = this.deserialize_list(pgres, 'runs');

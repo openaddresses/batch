@@ -83,9 +83,10 @@ export default class Run extends Generic {
         Status.verify(query.status);
 
         if (!query.run) query.run = null;
-        if (!query.live || query.live === 'all') query.live = null;
-        else if (query.live === 'true') query.live = true;
-        else if (query.live === 'false') query.live = false;
+        if (query.live === undefined || query.live === null || query.live === 'all') query.live = null;
+        else if (query.live === true || query.live === 'true') query.live = true;
+        else if (query.live === false || query.live === 'false') query.live = false;
+        else query.live = null;
 
         if (query.after) {
             try {
@@ -103,6 +104,11 @@ export default class Run extends Generic {
             }
         }
 
+        // slonik's sql tag only accepts primitives or SQL tokens - a raw Moment
+        // instance interpolated directly throws "Expected token to include
+        // 'type' property", so convert to an ISO string (or null) up front.
+        const after = query.after ? query.after.toDate().toISOString() : null;
+        const before = query.before ? query.before.toDate().toISOString() : null;
 
         let pgres;
         try {
@@ -123,8 +129,8 @@ export default class Run extends Generic {
                 WHERE
                     ${sql.array(query.status, sql`TEXT[]`)} @> ARRAY[job.status]
                     AND (${query.run}::BIGINT IS NULL OR run = ${query.run})
-                    AND (${query.after}::TIMESTAMP IS NULL OR runs.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
-                    AND (${query.before}::TIMESTAMP IS NULL OR runs.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${after}::TIMESTAMP IS NULL OR runs.created > ${after}::TIMESTAMP)
+                    AND (${before}::TIMESTAMP IS NULL OR runs.created < ${before}::TIMESTAMP)
                     AND (${query.live}::BOOLEAN IS NULL OR runs.live = ${query.live})
                 GROUP BY
                     runs.id,

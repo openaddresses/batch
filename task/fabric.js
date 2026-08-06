@@ -6,6 +6,7 @@ const DRIVE = '/tmp';
 
 import fs from 'fs';
 import fsp from 'fs/promises';
+import os from 'os';
 import { pipeline } from 'stream/promises';
 import { Transform } from 'stream';
 import path from 'path';
@@ -173,6 +174,67 @@ async function cli() {
 
             console.error(`ok - fetching ${supported.length} sources (${DOWNLOAD_CONCURRENCY} concurrent)`);
 
+            // Tippecanoe's -P flag only parallelizes reading input, not the tiling/
+            // indexing pass itself - a single tippecanoe process only ever uses one
+            // core no matter how big the box is. To actually use the rest of the
+            // vCPUs, split each layer's sources across SHARD_COUNT files, tile them
+            // as separate tippecanoe processes running concurrently, then merge the
+            // resulting tilesets with tile-join.
+            //
+            // Shards MUST be geographic, not just size-balanced: tile-join has no
+            // flag to disable its own tile size/feature cap (confirmed empirically -
+            // it rejects --no-feature-limit/--no-tile-size-limit outright as unknown
+            // options), so if two shards both have data in the same dense tile (e.g.
+            // a city split across shards by pure byte-size balancing), tile-join
+            // silently truncates the merged tile to its default cap. In testing, two
+            // shards with ~250k features each in the same tile joined down to just
+            // ~80k - an 84% loss with no error or warning.
+            //
+            // Grouping by each source's path prefix (e.g. "us/tx", "mx") and
+            // bin-packing whole groups across shards means no two shards ever hold
+            // data for the same country/state, so tile-join only ever concatenates
+            // disjoint tilesets - its actual intended use case. The prefix doesn't
+            // always exactly match a source's real geographic extent, but it
+            // eliminates the failure mode that matters: dense city-center clusters,
+            // which live within a single source's prefix. Remaining cross-shard
+            // overlap is limited to sparse, low-density cross-border slivers.
+            const SHARD_COUNT = os.cpus().length;
+
+            function assignShards(sources) {
+                const groups = new Map();
+                for (const data of sources) {
+                    const key = path.parse(data.source).dir || data.source;
+                    if (!groups.has(key)) groups.set(key, { size: 0, jobs: [] });
+                    const group = groups.get(key);
+                    group.size += data.size || 0;
+                    group.jobs.push(data.job);
+                }
+
+                // Greedily bin-pack groups (largest first) onto whichever shard
+                // currently has the least total size. Every assignment bumps the
+                // chosen shard's tracked size by at least 1 so groups with unknown
+                // (null) size still round-robin instead of piling onto shard 0.
+                const sorted = [...groups.values()].sort((a, b) => b.size - a.size);
+                const shardSizes = new Array(SHARD_COUNT).fill(0);
+                const jobShard = new Map();
+                for (const group of sorted) {
+                    let idx = 0;
+                    for (let i = 1; i < shardSizes.length; i++) {
+                        if (shardSizes[i] < shardSizes[idx]) idx = i;
+                    }
+                    shardSizes[idx] += Math.max(group.size, 1);
+                    for (const job of group.jobs) jobShard.set(job, idx);
+                }
+                return jobShard;
+            }
+
+            const jobShard = new Map();
+            for (const l of layers) {
+                for (const [job, shard] of assignShards(supported.filter((data) => data.layer === l))) {
+                    jobShard.set(job, shard);
+                }
+            }
+
             // Download each source to its own temp file in parallel (writing
             // concurrent streams to a shared file would interleave bytes and
             // corrupt the newline-delimited GeoJSON). Overlap the concat/delete
@@ -194,9 +256,10 @@ async function cli() {
                     for (const data of chunk) {
                         const tmp = path.resolve(DRIVE, `${data.layer}.${data.job}.geojson`);
                         if (!fs.existsSync(tmp)) continue;
+                        const shard = jobShard.get(data.job);
                         await pipeline(
                             fs.createReadStream(tmp),
-                            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.geojson`), { flags: 'a' })
+                            fs.createWriteStream(path.resolve(DRIVE, `${data.layer}.shard${shard}.geojson`), { flags: 'a' })
                         );
                         await fsp.unlink(tmp);
                     }
@@ -211,28 +274,57 @@ async function cli() {
             console.error('ok - completed fetch');
 
             for (const l of layers) {
-                console.error(`ok - generating ${l} tiles`);
-                await tippecanoe.tile(
-                    fs.createReadStream(path.resolve(DRIVE, `${l}.geojson`)),
-                    path.resolve(DRIVE, `${l}.pmtiles`),
-                    {
-                        layer: l,
-                        std: true,
-                        force: true,
-                        drop: true,
-                        name: `OpenAddresses ${l} fabric`,
-                        attribution: 'OpenAddresses',
-                        description: `OpenAddresses ${l} fabric`,
-                        limit: {
-                            features: false,
-                            size: false
-                        },
-                        zoom: {
-                            max: 14,
-                            min: zooms[l]
-                        }
+                const shardInputs = [];
+                for (let i = 0; i < SHARD_COUNT; i++) {
+                    const shardInput = path.resolve(DRIVE, `${l}.shard${i}.geojson`);
+                    if (fs.existsSync(shardInput)) shardInputs.push({ index: i, file: shardInput });
+                }
+
+                if (!shardInputs.length) throw new Error(`no sources found for layer ${l}`);
+
+                console.error(`ok - generating ${l} tiles (${shardInputs.length} shard${shardInputs.length === 1 ? '' : 's'})`);
+
+                const tileOptions = {
+                    layer: l,
+                    std: true,
+                    force: true,
+                    drop: true,
+                    name: `OpenAddresses ${l} fabric`,
+                    attribution: 'OpenAddresses',
+                    description: `OpenAddresses ${l} fabric`,
+                    limit: {
+                        features: false,
+                        size: false
+                    },
+                    zoom: {
+                        max: 14,
+                        min: zooms[l]
                     }
-                );
+                };
+
+                // Tile each shard concurrently - this is what actually uses the
+                // box's other vCPUs, since a single tippecanoe process can't.
+                await Promise.all(shardInputs.map(({ index, file }) =>
+                    tippecanoe.tile(
+                        fs.createReadStream(file),
+                        path.resolve(DRIVE, `${l}.shard${index}.pmtiles`),
+                        tileOptions
+                    )
+                ));
+
+                const shardOutputs = shardInputs.map(({ index }) => path.resolve(DRIVE, `${l}.shard${index}.pmtiles`));
+
+                if (shardOutputs.length === 1) {
+                    await fsp.rename(shardOutputs[0], path.resolve(DRIVE, `${l}.pmtiles`));
+                } else {
+                    console.error(`ok - joining ${shardOutputs.length} ${l} shards`);
+                    await tippecanoe.join(
+                        path.resolve(DRIVE, `${l}.pmtiles`),
+                        shardOutputs,
+                        { force: true, std: true }
+                    );
+                    await Promise.all(shardOutputs.map((p) => fsp.unlink(p)));
+                }
 
                 // Upload individual layer PMTiles to S3
                 const s3Upload = new Upload({
@@ -261,7 +353,7 @@ async function cli() {
                 await r2Upload.done();
                 console.error(`ok - uploaded ${l}.pmtiles to S3 and R2`);
 
-                await fsp.unlink(path.resolve(DRIVE, `${l}.geojson`));
+                await Promise.all(shardInputs.map(({ file }) => fsp.unlink(file)));
                 await fsp.unlink(path.resolve(DRIVE, `${l}.pmtiles`));
                 console.error(`ok - cleaned up ${l} temp files`);
             }

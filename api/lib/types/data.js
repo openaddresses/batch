@@ -65,8 +65,50 @@ export default class Data extends Generic {
             namePattern = `${query.name}%`;
         }
 
+        // Only the batch dashboard's listing view opts into "failing" rows (via
+        // ?failing=true) - task/collect.js and task/fabric.js call this with no
+        // query params to build the downloadable collections/fabric tiles, and
+        // must keep seeing exactly the sources with real output they had before.
+        // Data.update()/Job.delta() use exact:true as a "does a real results row
+        // exist" lookup and must never see a synthetic failing row as a match.
+        const includeFailing = !!query.failing && !query.exact;
+
         try {
+            // "failing" covers source/layer/name combos with no row in `results` -
+            // i.e. the layer has never had a successful live-run job - so a
+            // contributor has a way to discover and debug it. Restricted to
+            // job.status = 'Fail' so a first job that's merely Pending/Running
+            // doesn't get flagged as broken before it's had a chance to run.
             const pgres = await pool.query(sql`
+                WITH failing AS (
+                    SELECT DISTINCT ON (job.source_name, job.layer, job.name)
+                        job.id,
+                        job.source_name AS source,
+                        job.layer,
+                        job.name,
+                        job.output,
+                        job.size,
+                        job.map
+                    FROM
+                        job
+                            INNER JOIN runs ON job.run = runs.id
+                    WHERE
+                        runs.live = true
+                        AND job.status = 'Fail'
+                        AND ${includeFailing} = true
+                        AND NOT EXISTS (
+                            SELECT 1 FROM results
+                            WHERE
+                                results.source = job.source_name
+                                AND results.layer = job.layer
+                                AND results.name = job.name
+                        )
+                    ORDER BY
+                        job.source_name,
+                        job.layer,
+                        job.name,
+                        job.created DESC
+                )
                 SELECT
                     results.id,
                     results.fabric,
@@ -97,10 +139,41 @@ export default class Data extends Generic {
                     )
                     AND (${query.fabric}::BOOLEAN IS NULL OR results.fabric = ${!!query.fabric})
                     AND (${query.validated}::BOOLEAN IS NULL OR (job.output->'validated')::BOOLEAN = ${!!query.validated})
+
+                UNION ALL
+
+                SELECT
+                    (-1 * failing.id) AS id,
+                    false AS fabric,
+                    failing.source,
+                    NULL::TIMESTAMP AS updated,
+                    failing.layer,
+                    failing.name,
+                    failing.id AS job,
+                    failing.output,
+                    failing.size,
+                    failing.map
+                FROM
+                    failing
+                        LEFT JOIN map ON failing.map = map.id
+                WHERE
+                    failing.source ilike ${sourcePattern}
+                    AND failing.layer ilike ${layerPattern}
+                    AND failing.name ilike ${namePattern}
+                    AND ${query.before}::TIMESTAMP IS NULL
+                    AND ${query.after}::TIMESTAMP IS NULL
+                    AND (${query.map}::BIGINT IS NULL OR failing.map = ${query.map})
+                    AND (
+                        char_length(${query.point}) = 0
+                        OR ST_DWithin(ST_SetSRID(ST_PointFromText(${query.point}), 4326), map.geom, 1.0)
+                    )
+                    AND (${query.fabric}::BOOLEAN IS NULL OR ${!!query.fabric} = false)
+                    AND (${query.validated}::BOOLEAN IS NULL OR (failing.output->'validated')::BOOLEAN = ${!!query.validated})
+
                 ORDER BY
-                    results.source,
-                    results.layer,
-                    results.name
+                    source,
+                    layer,
+                    name
             `);
 
             pgres.rows.map((res) => {

@@ -37,6 +37,10 @@
         "map": {
             "type": "integer",
             "description": "Filter by associated MapID"
+        },
+        "failing": {
+            "type": "boolean",
+            "description": "Also include source/layer/names with no successful live-run job, so they can be discovered and debugged"
         }
     }
 }

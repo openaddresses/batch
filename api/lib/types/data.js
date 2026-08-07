@@ -65,6 +65,14 @@ export default class Data extends Generic {
             namePattern = `${query.name}%`;
         }
 
+        // Only the batch dashboard's listing view opts into "failing" rows (via
+        // ?failing=true) - task/collect.js and task/fabric.js call this with no
+        // query params to build the downloadable collections/fabric tiles, and
+        // must keep seeing exactly the sources with real output they had before.
+        // Data.update()/Job.delta() use exact:true as a "does a real results row
+        // exist" lookup and must never see a synthetic failing row as a match.
+        const includeFailing = !!query.failing && !query.exact;
+
         try {
             // "failing" covers source/layer/name combos with no row in `results` -
             // i.e. the layer has never had a successful live-run job - so a
@@ -87,6 +95,7 @@ export default class Data extends Generic {
                     WHERE
                         runs.live = true
                         AND job.status = 'Fail'
+                        AND ${includeFailing} = true
                         AND NOT EXISTS (
                             SELECT 1 FROM results
                             WHERE

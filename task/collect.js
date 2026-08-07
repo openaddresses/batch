@@ -119,6 +119,14 @@ async function collect(tmp, collection, oa) {
 }
 
 async function sources(oa, tmp, datas) {
+    datas = datas.filter((data) => {
+        if (!data.output.output) {
+            console.error(`ok - skipping ${JSON.stringify(data)} - no successful output to fetch`);
+            return false;
+        }
+        return true;
+    });
+
     const stats = {
         count: 0,
         sources: datas.length

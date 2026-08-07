@@ -168,6 +168,9 @@ async function cli() {
                 if (!layers.includes(data.layer)) {
                     console.error(`ok - skipping ${JSON.stringify(data)} due to unsupported layer type`);
                     return false;
+                } else if (!data.output.output) {
+                    console.error(`ok - skipping ${JSON.stringify(data)} - no successful output to fetch`);
+                    return false;
                 }
                 return true;
             });

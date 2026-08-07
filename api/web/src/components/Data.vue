@@ -327,7 +327,14 @@
                                                             class='col-2 d-flex align-items-center'
                                                             @click='emitjob(job.job)'
                                                         >
-                                                            <span v-text='fmt(job.updated)' />
+                                                            <span
+                                                                v-if='job.updated'
+                                                                v-text='fmt(job.updated)'
+                                                            />
+                                                            <span
+                                                                v-else
+                                                                class='text-red'
+                                                            >No successful run</span>
                                                         </div>
                                                         <div class='col-5 d-flex'>
                                                             <div class='ms-auto btn-list'>
@@ -338,34 +345,36 @@
                                                                     @perk='$emit("perk", $event)'
                                                                 />
 
-                                                                <template v-if='auth && auth.access === "admin"'>
-                                                                    <TablerDropdown>
-                                                                        <slot>
-                                                                            <IconSettings
-                                                                                class='cursor-pointer'
-                                                                                size='32'
-                                                                                stroke='1'
-                                                                                title='Admin settings'
-                                                                            />
-                                                                        </slot>
-                                                                        <template #dropdown>
-                                                                            <TablerToggle
-                                                                                v-model='job.fabric'
-                                                                                label='Fabric'
-                                                                                @change='updateData(job)'
-                                                                            />
-                                                                            <TablerDelete @delete='deleteData(job)' />
-                                                                        </template>
-                                                                    </TablerDropdown>
-                                                                </template>
+                                                                <template v-if='job.id > 0'>
+                                                                    <template v-if='auth && auth.access === "admin"'>
+                                                                        <TablerDropdown>
+                                                                            <slot>
+                                                                                <IconSettings
+                                                                                    class='cursor-pointer'
+                                                                                    size='32'
+                                                                                    stroke='1'
+                                                                                    title='Admin settings'
+                                                                                />
+                                                                            </slot>
+                                                                            <template #dropdown>
+                                                                                <TablerToggle
+                                                                                    v-model='job.fabric'
+                                                                                    label='Fabric'
+                                                                                    @change='updateData(job)'
+                                                                                />
+                                                                                <TablerDelete @delete='deleteData(job)' />
+                                                                            </template>
+                                                                        </TablerDropdown>
+                                                                    </template>
 
-                                                                <IconHistory
-                                                                    class='cursor-pointer'
-                                                                    size='32'
-                                                                    stroke='1'
-                                                                    title='View history'
-                                                                    @click='$router.push(`/data/${job.id}/history`)'
-                                                                />
+                                                                    <IconHistory
+                                                                        class='cursor-pointer'
+                                                                        size='32'
+                                                                        stroke='1'
+                                                                        title='View history'
+                                                                        @click='$router.push(`/data/${job.id}/history`)'
+                                                                    />
+                                                                </template>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -137,6 +137,14 @@ export default async function server(config) {
         }
     });
 
+    // API responses are dynamic and should never be cached by the browser or a CDN edge.
+    // Routes that stream immutable content (eg map/fabric tiles) set their own Cache-Control
+    // header, which takes precedence over this default.
+    app.use('/api', (req, res, next) => {
+        res.set('Cache-Control', 'no-store');
+        next();
+    });
+
     app.use('/api', schema.router);
 
     // Unified Auth

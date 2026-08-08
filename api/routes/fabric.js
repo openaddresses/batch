@@ -40,7 +40,7 @@ export default async function router(schema, config) {
         res.writeHead(200, {
             'Content-Type': 'application/vnd.mapbox-vector-tile',
             'Content-Encoding': 'gzip',
-            'cache-control': 'no-transform'
+            'cache-control': 'public, max-age=3600, no-transform'
         });
         res.end(tile);
     });

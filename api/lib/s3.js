@@ -33,7 +33,11 @@ export default class S3Helper {
         res.writeHead(200, {
             'Content-Disposition': `inline; filename="${name}"`,
             'Content-Length': s3headers.ContentLength,
-            'Content-Type': s3headers.ContentType
+            'Content-Type': s3headers.ContentType,
+            // Job output objects are never overwritten once written, so it's safe to cache
+            // the success response indefinitely. The 404 thrown above (object not yet
+            // generated) is unaffected and stays subject to the API's default no-store.
+            'Cache-Control': 'public, max-age=31536000, immutable'
         });
 
         s3request.Body.pipe(res);

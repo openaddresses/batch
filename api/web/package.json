@@ -6,7 +6,8 @@
     "scripts": {
         "serve": "vite serve --port 5430",
         "build": "vite build",
-        "lint": "eslint src/"
+        "lint": "eslint src/",
+        "test": "node --test src/util/*.test.js"
     },
     "dependencies": {
         "@tabler/core": "^1.0.0-beta17",

@@ -252,6 +252,13 @@ export async function trigger(event) {
         ];
 
         for (const job of fabricJobs) {
+            // addresses is by far the largest layer - tile-join's peak memory
+            // when merging its shards scales with total merged tile volume and
+            // empirically exceeds 58GB at national scale (confirmed by a real
+            // OOM here, and by local scaling tests up to 51GB of real source
+            // data). Give it a bigger box; the other layers/border fit
+            // comfortably within the default r5.2xlarge-sized job.
+            const big = job.name === 'Addresses';
             await submit({
                 jobDefinition: jobDefinition,
                 jobQueue: mega_queue,
@@ -259,8 +266,8 @@ export async function trigger(event) {
                 containerOverrides: {
                     command: ['node', 'fabric.js', ...job.args],
                     environment: [],
-                    vcpus: 8,
-                    memory: 58000
+                    vcpus: big ? 16 : 8,
+                    memory: big ? 110000 : 58000
                 },
                 timeout: {
                     attemptDurationSeconds: 60 * 60 * 24 * 3  // 3 day hard cap, per layer

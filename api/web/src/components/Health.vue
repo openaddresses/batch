@@ -48,6 +48,23 @@
                                         placeholder='Filter by source name'
                                     />
                                 </div>
+                                <div class='col-12 col-md-4'>
+                                    <label class='form-label'>Sort by</label>
+                                    <select
+                                        v-model='sortBy'
+                                        class='form-select'
+                                    >
+                                        <option value='status'>
+                                            Status (broken first)
+                                        </option>
+                                        <option value='oldest'>
+                                            Oldest first
+                                        </option>
+                                        <option value='affected'>
+                                            Most layers affected
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
 
                             <TablerLoading
@@ -75,78 +92,42 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <template
+                                    <tr
                                         v-for='s in filtered'
                                         :key='s.source'
                                     >
-                                        <tr
-                                            class='cursor-pointer'
-                                            @click='s._open = !s._open'
+                                        <td v-text='s.source' />
+                                        <td
+                                            v-for='layer in layers'
+                                            :key='layer'
+                                            class='text-center'
                                         >
-                                            <td>
-                                                <div class='d-flex align-items-center'>
-                                                    <IconChevronRight
-                                                        v-if='!s._open'
-                                                        size='20'
-                                                        stroke='1'
-                                                    />
-                                                    <IconChevronDown
-                                                        v-else
-                                                        size='20'
-                                                        stroke='1'
-                                                    />
-                                                    <span v-text='s.source' />
-                                                </div>
-                                            </td>
-                                            <td
-                                                v-for='layer in layers'
-                                                :key='layer'
-                                                class='text-center'
-                                            >
-                                                <IconCheck
-                                                    v-if='s.layers[layer] && s.layers[layer].state === "healthy"'
-                                                    class='text-green'
-                                                    size='24'
-                                                    stroke='2'
-                                                />
-                                                <IconAlertTriangle
-                                                    v-else-if='s.layers[layer] && s.layers[layer].state === "stale"'
-                                                    class='text-yellow'
-                                                    size='24'
-                                                    stroke='2'
-                                                />
-                                                <IconX
-                                                    v-else-if='s.layers[layer] && s.layers[layer].state === "never"'
-                                                    class='text-red'
-                                                    size='24'
-                                                    stroke='2'
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr v-if='s._open'>
-                                            <td :colspan='layers.length + 1'>
-                                                <div
-                                                    v-for='entry in entries(s)'
-                                                    :key='`${entry.layer}-${entry.name}`'
-                                                    class='row mx-2 cursor-pointer'
-                                                    @click='emitjob(entry.job)'
-                                                >
-                                                    <div
-                                                        class='col-5'
-                                                        v-text='`${entry.layer} - ${entry.name}`'
-                                                    />
-                                                    <div
-                                                        class='col-3'
-                                                        v-text='fmt(entry.updated)'
-                                                    />
-                                                    <div
-                                                        class='col-4 text-capitalize'
-                                                        v-text='entry.state'
-                                                    />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </template>
+                                            <IconCheck
+                                                v-if='s.layers[layer] && s.layers[layer].state === "healthy"'
+                                                v-tooltip='cellTooltip(s, layer)'
+                                                class='text-green cursor-pointer'
+                                                size='24'
+                                                stroke='2'
+                                                @click='emitjob(cellJob(s, layer))'
+                                            />
+                                            <IconAlertTriangle
+                                                v-else-if='s.layers[layer] && s.layers[layer].state === "stale"'
+                                                v-tooltip='cellTooltip(s, layer)'
+                                                class='text-yellow cursor-pointer'
+                                                size='24'
+                                                stroke='2'
+                                                @click='emitjob(cellJob(s, layer))'
+                                            />
+                                            <IconX
+                                                v-else-if='s.layers[layer] && s.layers[layer].state === "never"'
+                                                v-tooltip='cellTooltip(s, layer)'
+                                                class='text-red cursor-pointer'
+                                                size='24'
+                                                stroke='2'
+                                                @click='emitjob(cellJob(s, layer))'
+                                            />
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -161,8 +142,6 @@
 import moment from 'moment-timezone';
 import {
     IconRefresh,
-    IconChevronRight,
-    IconChevronDown,
     IconCheck,
     IconAlertTriangle,
     IconX
@@ -177,13 +156,12 @@ import {
 import { LAYERS, groupBySource } from '../util/health.js';
 
 const STATE_ORDER = { never: 0, stale: 1, healthy: 2 };
+const STATE_LABELS = { healthy: 'Healthy', stale: 'Stale', never: 'Never succeeded' };
 
 export default {
     name: 'Health',
     components: {
         IconRefresh,
-        IconChevronRight,
-        IconChevronDown,
         IconCheck,
         IconAlertTriangle,
         IconX,
@@ -199,6 +177,7 @@ export default {
             loading: true,
             showAll: false,
             search: '',
+            sortBy: 'status',
             layers: LAYERS,
             sources: []
         };
@@ -214,13 +193,7 @@ export default {
             if (!this.showAll) list = list.filter((s) => s.worst !== 'healthy');
             if (term) list = list.filter((s) => s.source.toLowerCase().includes(term));
 
-            return [...list].sort((a, b) => {
-                if (!this.showAll && STATE_ORDER[a.worst] !== STATE_ORDER[b.worst]) {
-                    return STATE_ORDER[a.worst] - STATE_ORDER[b.worst];
-                }
-
-                return a.source.localeCompare(b.source);
-            });
+            return [...list].sort((a, b) => this.compare(a, b));
         }
     },
     mounted: async function() {
@@ -230,8 +203,54 @@ export default {
         fmt: function(date) {
             return date ? moment(date).format('YYYY-MM-DD') : 'Never';
         },
-        entries: function(source) {
-            return Object.values(source.layers).flatMap((l) => l.entries);
+        entryTooltip: function(entry) {
+            const label = STATE_LABELS[entry.state];
+            return entry.updated
+                ? `${entry.name}: ${label} — updated ${this.fmt(entry.updated)}`
+                : `${entry.name}: ${label}`;
+        },
+        cellTooltip: function(source, layer) {
+            const cell = source.layers[layer];
+            if (!cell) return '';
+            return cell.entries.map((entry) => this.entryTooltip(entry)).join(' | ');
+        },
+        cellJob: function(source, layer) {
+            const cell = source.layers[layer];
+            if (!cell) return null;
+            const worst = cell.entries.find((entry) => entry.state === cell.state);
+            return (worst || cell.entries[0]).job;
+        },
+        affectedCount: function(source) {
+            return Object.values(source.layers).filter((l) => l.state !== 'healthy').length;
+        },
+        oldestAgeDays: function(source) {
+            // A finite sentinel (not Infinity) so two "never succeeded" sources
+            // subtract to a real number in compare(), not NaN.
+            const NEVER_AGE_DAYS = 1e6;
+            const now = Date.now();
+            let max = 0;
+
+            for (const layer of Object.values(source.layers)) {
+                for (const entry of layer.entries) {
+                    const age = entry.updated ? (now - new Date(entry.updated).getTime()) / 86400000 : NEVER_AGE_DAYS;
+                    if (age > max) max = age;
+                }
+            }
+
+            return max;
+        },
+        compare: function(a, b) {
+            if (this.sortBy === 'oldest') {
+                const diff = this.oldestAgeDays(b) - this.oldestAgeDays(a);
+                if (diff !== 0) return diff;
+            } else if (this.sortBy === 'affected') {
+                const diff = this.affectedCount(b) - this.affectedCount(a);
+                if (diff !== 0) return diff;
+            } else if (STATE_ORDER[a.worst] !== STATE_ORDER[b.worst]) {
+                return STATE_ORDER[a.worst] - STATE_ORDER[b.worst];
+            }
+
+            return a.source.localeCompare(b.source);
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });
@@ -245,7 +264,7 @@ export default {
 
                 const res = await window.std(url);
 
-                this.sources = groupBySource(res).map((s) => ({ ...s, _open: false }));
+                this.sources = groupBySource(res);
 
                 this.loading = false;
             } catch (err) {

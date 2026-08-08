@@ -28,6 +28,12 @@ test('classifyEntry treats exactly STALE_DAYS old as still healthy', () => {
     assert.equal(classifyEntry({ updated }, now), 'healthy');
 });
 
+test('classifyEntry accepts updated as an epoch-ms integer (the real API shape)', () => {
+    const now = new Date('2026-08-08T00:00:00Z');
+    const updatedMs = now.getTime() - 90 * 24 * 60 * 60 * 1000;
+    assert.equal(classifyEntry({ updated: updatedMs }, now), 'stale');
+});
+
 test('worstState prioritizes never over stale over healthy', () => {
     assert.equal(worstState(['healthy', 'stale', 'never']), 'never');
     assert.equal(worstState(['healthy', 'stale']), 'stale');

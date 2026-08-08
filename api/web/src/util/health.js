@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export const STALE_DAYS = 30;
 export const LAYERS = ['addresses', 'buildings', 'parcels', 'centerlines'];

@@ -70,6 +70,10 @@
                                 >Jobs</a>
                                 <a
                                     class='dropdown-item cursor-pointer'
+                                    @click='$router.push("/health")'
+                                >Health</a>
+                                <a
+                                    class='dropdown-item cursor-pointer'
                                     @click='$router.push("/error")'
                                 >Errors</a>
                                 <a

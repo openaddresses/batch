@@ -97,18 +97,21 @@ export default class Tippecanoe {
     /**
      * Join multiple MBTiles into a single MBTiles
      *
-     * Note: unlike tippecanoe itself, tile-join has no flag to disable its own
-     * tile size/feature cap - passing --no-feature-limit/--no-tile-size-limit
-     * to it fails with "unrecognized option". Inputs that overlap in the same
-     * tile (e.g. from geographically-overlapping shards) will get silently
-     * capped on merge, so callers must ensure inputs don't share tiles for the
-     * same layer.
+     * Note: tile-join has no flag to disable its own feature-count cap -
+     * passing --no-feature-limit to it fails with "unrecognized option".
+     * --no-tile-size-limit *is* supported, though (confirmed empirically -
+     * an earlier version of this comment claimed otherwise). Without it,
+     * any merged tile over 500K - including one entirely within a single,
+     * non-overlapping shard, not just tiles where shards collide - is
+     * silently dropped from the output.
      *
      * @param {String} output_path Path to input MBTiles
      * @param {String[]} inputs Array of paths to input MBTiles
      * @param {Object} options Optional Options
      * @param {boolean} options.std Don't squelch tippecanoe stderr/stdout [default: false]
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
+     * @param {Object} options.limit Limit Options
+     * @param {Boolean} [options.limit.size=true] Limit tiles to 500K bytes
      *
      * @returns {Promise}
      */
@@ -117,11 +120,14 @@ export default class Tippecanoe {
             if (!output_path) return reject(new Error('output_path required'));
             if (!inputs || !inputs.length) return reject(new Error('inputs required'));
 
+            if (!options.limit) options.limit = {};
+
             let base = [
                 '-o', output_path
             ].concat(inputs);
 
             if (options.force) base = base.concat(['-f']);
+            if (options.limit.size === false) base = base.concat(['--no-tile-size-limit']);
 
             const tilejoin = CP.spawn('tile-join', base, {
                 env: process.env

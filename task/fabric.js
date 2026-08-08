@@ -324,7 +324,7 @@ async function cli() {
                     await tippecanoe.join(
                         path.resolve(DRIVE, `${l}.pmtiles`),
                         shardOutputs,
-                        { force: true, std: true }
+                        { force: true, std: true, limit: { size: false } }
                     );
                     await Promise.all(shardOutputs.map((p) => fsp.unlink(p)));
                 }

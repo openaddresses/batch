@@ -43,7 +43,10 @@ export default {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeResources: {
                     ImageId: 'ami-074bb5e3c681b0735',
-                    MaxvCpus: 16,
+                    // 32 (rather than 16) so an r5.4xlarge addresses job (16
+                    // vCPUs) can run alongside the other fabric jobs
+                    // (r5.2xlarge, 8 vCPUs each) instead of serializing them.
+                    MaxvCpus: 32,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
@@ -61,7 +64,13 @@ export default {
                     ],
                     Type : 'EC2',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    InstanceTypes : ['r5.2xlarge']
+                    // r5.4xlarge (16 vCPU / 128GB) added for the addresses
+                    // fabric job specifically - see api/lib/batch.js's fabric
+                    // submission, which requests 110GB for that job alone.
+                    // Batch places each job on whichever allowed type fits its
+                    // requested resources, so the other (lighter) fabric jobs
+                    // still land on r5.2xlarge.
+                    InstanceTypes : ['r5.2xlarge', 'r5.4xlarge']
                 },
                 State: 'ENABLED'
             }

@@ -230,7 +230,12 @@ export default async function router(schema, config) {
                 Key: `${process.env.StackName}/job/${req.params.job}/source.geojson.gz`
             });
 
-            res.json(await s3.sample());
+            const sample = await s3.sample();
+
+            // Job output objects are never overwritten once written, so it's safe to cache
+            // the success response indefinitely.
+            res.set('Cache-Control', 'public, max-age=31536000, immutable');
+            res.json(sample);
         } catch (err) {
             return Err.respond(err, res);
         }

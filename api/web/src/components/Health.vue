@@ -63,6 +63,9 @@
                                         <option value='affected'>
                                             Most layers affected
                                         </option>
+                                        <option value='name'>
+                                            Name (A-Z)
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -240,7 +243,9 @@ export default {
             return max;
         },
         compare: function(a, b) {
-            if (this.sortBy === 'oldest') {
+            if (this.sortBy === 'name') {
+                return a.source.localeCompare(b.source);
+            } else if (this.sortBy === 'oldest') {
                 const diff = this.oldestAgeDays(b) - this.oldestAgeDays(a);
                 if (diff !== 0) return diff;
             } else if (this.sortBy === 'affected') {

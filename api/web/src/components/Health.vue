@@ -79,60 +79,66 @@
                                 label='Sources'
                                 :create='false'
                             />
-                            <table
+                            <div
                                 v-else
-                                class='table table-hover table-vcenter card-table'
+                                v-bind='containerProps'
+                                class='health-scroll'
                             >
-                                <thead>
-                                    <tr>
-                                        <th>Source</th>
-                                        <th
-                                            v-for='layer in layers'
-                                            :key='layer'
-                                            class='text-center text-capitalize'
-                                            v-text='layer'
-                                        />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr
-                                        v-for='s in filtered'
-                                        :key='s.source'
-                                    >
-                                        <td v-text='s.source' />
-                                        <td
-                                            v-for='layer in layers'
-                                            :key='layer'
-                                            class='text-center'
-                                        >
-                                            <IconCheck
-                                                v-if='s.layers[layer] && s.layers[layer].state === "healthy"'
-                                                v-tooltip='cellTooltip(s, layer)'
-                                                class='text-green cursor-pointer'
-                                                size='24'
-                                                stroke='2'
-                                                @click='emitjob(cellJob(s, layer))'
-                                            />
-                                            <IconAlertTriangle
-                                                v-else-if='s.layers[layer] && s.layers[layer].state === "stale"'
-                                                v-tooltip='cellTooltip(s, layer)'
-                                                class='text-yellow cursor-pointer'
-                                                size='24'
-                                                stroke='2'
-                                                @click='emitjob(cellJob(s, layer))'
-                                            />
-                                            <IconX
-                                                v-else-if='s.layers[layer] && s.layers[layer].state === "never"'
-                                                v-tooltip='cellTooltip(s, layer)'
-                                                class='text-red cursor-pointer'
-                                                size='24'
-                                                stroke='2'
-                                                @click='emitjob(cellJob(s, layer))'
-                                            />
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                <div v-bind='wrapperProps'>
+                                    <table class='table table-hover table-vcenter card-table'>
+                                        <thead>
+                                            <tr>
+                                                <th>Source</th>
+                                                <th
+                                                    v-for='layer in layers'
+                                                    :key='layer'
+                                                    class='text-center text-capitalize'
+                                                    v-text='layer'
+                                                />
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                v-for='{ data: s } in list'
+                                                :key='s.source'
+                                                class='health-row'
+                                            >
+                                                <td v-text='s.source' />
+                                                <td
+                                                    v-for='layer in layers'
+                                                    :key='layer'
+                                                    class='text-center'
+                                                >
+                                                    <IconCheck
+                                                        v-if='s.layers[layer] && s.layers[layer].state === "healthy"'
+                                                        v-tooltip='cellTooltip(s, layer)'
+                                                        class='text-green cursor-pointer'
+                                                        size='24'
+                                                        stroke='2'
+                                                        @click='emitjob(cellJob(s, layer))'
+                                                    />
+                                                    <IconAlertTriangle
+                                                        v-else-if='s.layers[layer] && s.layers[layer].state === "stale"'
+                                                        v-tooltip='cellTooltip(s, layer)'
+                                                        class='text-yellow cursor-pointer'
+                                                        size='24'
+                                                        stroke='2'
+                                                        @click='emitjob(cellJob(s, layer))'
+                                                    />
+                                                    <IconX
+                                                        v-else-if='s.layers[layer] && s.layers[layer].state === "never"'
+                                                        v-tooltip='cellTooltip(s, layer)'
+                                                        class='text-red cursor-pointer'
+                                                        size='24'
+                                                        stroke='2'
+                                                        @click='emitjob(cellJob(s, layer))'
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -143,6 +149,8 @@
 
 <script>
 import moment from 'moment-timezone';
+import { computed, ref } from 'vue';
+import { useVirtualList } from '@vueuse/core';
 import {
     IconRefresh,
     IconCheck,
@@ -160,6 +168,7 @@ import { LAYERS, groupBySource } from '../util/health.js';
 
 const STATE_ORDER = { never: 0, stale: 1, healthy: 2 };
 const STATE_LABELS = { healthy: 'Healthy', stale: 'Stale', never: 'Never succeeded' };
+const ROW_HEIGHT = 57;
 
 export default {
     name: 'Health',
@@ -175,29 +184,86 @@ export default {
         TablerToggle
     },
     props: [ 'auth' ],
-    data: function() {
-        return {
-            loading: true,
-            showAll: false,
-            search: '',
-            sortBy: 'status',
-            layers: LAYERS,
-            sources: []
-        };
-    },
-    computed: {
-        needsAttentionCount: function() {
-            return this.sources.filter((s) => s.worst !== 'healthy').length;
-        },
-        filtered: function() {
-            const term = this.search.trim().toLowerCase();
-            let list = this.sources;
+    setup: function() {
+        const loading = ref(true);
+        const showAll = ref(false);
+        const search = ref('');
+        const sortBy = ref('status');
+        const sources = ref([]);
 
-            if (!this.showAll) list = list.filter((s) => s.worst !== 'healthy');
+        const needsAttentionCount = computed(() => {
+            return sources.value.filter((s) => s.worst !== 'healthy').length;
+        });
+
+        const affectedCount = function(source) {
+            return Object.values(source.layers).filter((l) => l.state !== 'healthy').length;
+        };
+
+        const oldestAgeDays = function(source) {
+            // A finite sentinel (not Infinity) so two "never succeeded" sources
+            // subtract to a real number in compare(), not NaN.
+            const NEVER_AGE_DAYS = 1e6;
+            const now = Date.now();
+            let max = 0;
+
+            for (const layer of Object.values(source.layers)) {
+                for (const entry of layer.entries) {
+                    const age = entry.updated ? (now - new Date(entry.updated).getTime()) / 86400000 : NEVER_AGE_DAYS;
+                    if (age > max) max = age;
+                }
+            }
+
+            return max;
+        };
+
+        const compare = function(a, b) {
+            if (sortBy.value === 'name') {
+                return a.source.localeCompare(b.source);
+            } else if (sortBy.value === 'oldest') {
+                const diff = oldestAgeDays(b) - oldestAgeDays(a);
+                if (diff !== 0) return diff;
+            } else if (sortBy.value === 'affected') {
+                const diff = affectedCount(b) - affectedCount(a);
+                if (diff !== 0) return diff;
+            } else if (STATE_ORDER[a.worst] !== STATE_ORDER[b.worst]) {
+                return STATE_ORDER[a.worst] - STATE_ORDER[b.worst];
+            }
+
+            return a.source.localeCompare(b.source);
+        };
+
+        const filtered = computed(() => {
+            const term = search.value.trim().toLowerCase();
+            let list = sources.value;
+
+            if (!showAll.value) list = list.filter((s) => s.worst !== 'healthy');
             if (term) list = list.filter((s) => s.source.toLowerCase().includes(term));
 
-            return [...list].sort((a, b) => this.compare(a, b));
-        }
+            return [...list].sort(compare);
+        });
+
+        const { list, containerProps, wrapperProps } = useVirtualList(filtered, {
+            itemHeight: ROW_HEIGHT,
+            overscan: 10
+        });
+
+        return {
+            loading,
+            showAll,
+            search,
+            sortBy,
+            sources,
+            needsAttentionCount,
+            filtered,
+            list,
+            containerProps,
+            wrapperProps
+        };
+    },
+    data: function() {
+        return {
+            layers: LAYERS
+        };
     },
     mounted: async function() {
         await this.fetchHealth();
@@ -223,40 +289,6 @@ export default {
             const worst = cell.entries.find((entry) => entry.state === cell.state);
             return (worst || cell.entries[0]).job;
         },
-        affectedCount: function(source) {
-            return Object.values(source.layers).filter((l) => l.state !== 'healthy').length;
-        },
-        oldestAgeDays: function(source) {
-            // A finite sentinel (not Infinity) so two "never succeeded" sources
-            // subtract to a real number in compare(), not NaN.
-            const NEVER_AGE_DAYS = 1e6;
-            const now = Date.now();
-            let max = 0;
-
-            for (const layer of Object.values(source.layers)) {
-                for (const entry of layer.entries) {
-                    const age = entry.updated ? (now - new Date(entry.updated).getTime()) / 86400000 : NEVER_AGE_DAYS;
-                    if (age > max) max = age;
-                }
-            }
-
-            return max;
-        },
-        compare: function(a, b) {
-            if (this.sortBy === 'name') {
-                return a.source.localeCompare(b.source);
-            } else if (this.sortBy === 'oldest') {
-                const diff = this.oldestAgeDays(b) - this.oldestAgeDays(a);
-                if (diff !== 0) return diff;
-            } else if (this.sortBy === 'affected') {
-                const diff = this.affectedCount(b) - this.affectedCount(a);
-                if (diff !== 0) return diff;
-            } else if (STATE_ORDER[a.worst] !== STATE_ORDER[b.worst]) {
-                return STATE_ORDER[a.worst] - STATE_ORDER[b.worst];
-            }
-
-            return a.source.localeCompare(b.source);
-        },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });
         },
@@ -279,3 +311,19 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.health-scroll {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.health-scroll thead th {
+    position: sticky;
+    top: 0;
+    background: var(--tblr-card-bg, #fff);
+    z-index: 1;
+}
+.health-row {
+    height: 57px;
+}
+</style>

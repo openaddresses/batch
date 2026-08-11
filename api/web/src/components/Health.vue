@@ -79,64 +79,82 @@
                                 label='Sources'
                                 :create='false'
                             />
-                            <div
-                                v-else
-                                v-bind='containerProps'
-                                class='health-scroll'
-                            >
-                                <div v-bind='wrapperProps'>
-                                    <table class='table table-hover table-vcenter card-table'>
-                                        <thead>
-                                            <tr>
-                                                <th>Source</th>
-                                                <th
+                            <div v-else>
+                                <table class='table table-hover table-vcenter card-table health-header-table'>
+                                    <colgroup>
+                                        <col class='health-source-col'>
+                                        <col
+                                            v-for='layer in layers'
+                                            :key='layer'
+                                        >
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>Source</th>
+                                            <th
+                                                v-for='layer in layers'
+                                                :key='layer'
+                                                class='text-center text-capitalize'
+                                                v-text='layer'
+                                            />
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <div
+                                    v-bind='containerProps'
+                                    class='health-scroll'
+                                    :style='needsScroll ? undefined : { overflowY: "visible", maxHeight: "none" }'
+                                >
+                                    <div v-bind='wrapperProps'>
+                                        <table class='table table-hover table-vcenter card-table health-body-table'>
+                                            <colgroup>
+                                                <col class='health-source-col'>
+                                                <col
                                                     v-for='layer in layers'
                                                     :key='layer'
-                                                    class='text-center text-capitalize'
-                                                    v-text='layer'
-                                                />
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr
-                                                v-for='{ data: s } in list'
-                                                :key='s.source'
-                                                class='health-row'
-                                            >
-                                                <td v-text='s.source' />
-                                                <td
-                                                    v-for='layer in layers'
-                                                    :key='layer'
-                                                    class='text-center'
                                                 >
-                                                    <IconCheck
-                                                        v-if='s.layers[layer] && s.layers[layer].state === "healthy"'
-                                                        v-tooltip='cellTooltip(s, layer)'
-                                                        class='text-green cursor-pointer'
-                                                        size='24'
-                                                        stroke='2'
-                                                        @click='emitjob(cellJob(s, layer))'
-                                                    />
-                                                    <IconAlertTriangle
-                                                        v-else-if='s.layers[layer] && s.layers[layer].state === "stale"'
-                                                        v-tooltip='cellTooltip(s, layer)'
-                                                        class='text-yellow cursor-pointer'
-                                                        size='24'
-                                                        stroke='2'
-                                                        @click='emitjob(cellJob(s, layer))'
-                                                    />
-                                                    <IconX
-                                                        v-else-if='s.layers[layer] && s.layers[layer].state === "never"'
-                                                        v-tooltip='cellTooltip(s, layer)'
-                                                        class='text-red cursor-pointer'
-                                                        size='24'
-                                                        stroke='2'
-                                                        @click='emitjob(cellJob(s, layer))'
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                            </colgroup>
+                                            <tbody>
+                                                <tr
+                                                    v-for='{ data: s } in list'
+                                                    :key='s.source'
+                                                    class='health-row'
+                                                >
+                                                    <td v-text='s.source' />
+                                                    <td
+                                                        v-for='layer in layers'
+                                                        :key='layer'
+                                                        class='text-center'
+                                                    >
+                                                        <IconCheck
+                                                            v-if='s.layers[layer] && s.layers[layer].state === "healthy"'
+                                                            v-tooltip='cellTooltip(s, layer)'
+                                                            class='text-green cursor-pointer'
+                                                            size='24'
+                                                            stroke='2'
+                                                            @click='emitjob(cellJob(s, layer))'
+                                                        />
+                                                        <IconAlertTriangle
+                                                            v-else-if='s.layers[layer] && s.layers[layer].state === "stale"'
+                                                            v-tooltip='cellTooltip(s, layer)'
+                                                            class='text-yellow cursor-pointer'
+                                                            size='24'
+                                                            stroke='2'
+                                                            @click='emitjob(cellJob(s, layer))'
+                                                        />
+                                                        <IconX
+                                                            v-else-if='s.layers[layer] && s.layers[layer].state === "never"'
+                                                            v-tooltip='cellTooltip(s, layer)'
+                                                            class='text-red cursor-pointer'
+                                                            size='24'
+                                                            stroke='2'
+                                                            @click='emitjob(cellJob(s, layer))'
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -169,6 +187,7 @@ import { LAYERS, groupBySource } from '../util/health.js';
 const STATE_ORDER = { never: 0, stale: 1, healthy: 2 };
 const STATE_LABELS = { healthy: 'Healthy', stale: 'Stale', never: 'Never succeeded' };
 const ROW_HEIGHT = 57;
+const MAX_SCROLL_HEIGHT = 640;
 
 export default {
     name: 'Health',
@@ -242,6 +261,8 @@ export default {
             return [...list].sort(compare);
         });
 
+        const needsScroll = computed(() => filtered.value.length * ROW_HEIGHT > MAX_SCROLL_HEIGHT);
+
         const { list, containerProps, wrapperProps } = useVirtualList(filtered, {
             itemHeight: ROW_HEIGHT,
             overscan: 10
@@ -255,6 +276,7 @@ export default {
             sources,
             needsAttentionCount,
             filtered,
+            needsScroll,
             list,
             containerProps,
             wrapperProps
@@ -313,15 +335,20 @@ export default {
 </script>
 
 <style scoped>
+.health-header-table,
+.health-body-table {
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+.health-header-table {
+    margin-bottom: -1px;
+}
+.health-source-col {
+    width: 40%;
+}
 .health-scroll {
     max-height: 70vh;
     overflow-y: auto;
-}
-.health-scroll thead th {
-    position: sticky;
-    top: 0;
-    background: var(--tblr-card-bg, #fff);
-    z-index: 1;
 }
 .health-row {
     height: 57px;

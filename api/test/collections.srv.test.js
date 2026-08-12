@@ -111,6 +111,41 @@ test('PATCH: /api/collection/1', async () => {
     }
 });
 
+test('PATCH: /api/collection/1 sets processed_size', async () => {
+    try {
+        const res = await flight.fetch('/api/collections/1', {
+            method: 'PATCH',
+            headers: {
+                'shared-secret': '123'
+            },
+            body: {
+                processed_size: 456
+            }
+        }, true);
+
+        assert.equal(res.body.id, 1);
+        assert.equal(res.body.processed_size, 456);
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
+});
+
+test('GET: /api/collection/1/processed - redirects to the processed zip', async () => {
+    try {
+        const res = await flight.fetch('/api/collections/1/processed', {
+            headers: {
+                'shared-secret': '123'
+            },
+            redirect: 'manual'
+        }, { verify: false, json: false });
+
+        assert.equal(res.status, 302);
+        assert.equal(res.headers.get('location'), 'https://v2.openaddresses.io/test/collection-global-processed.zip');
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
+});
+
 test('DELETE: /api/collection/2 - doesn\'t exist', async () => {
     try {
         const res = await flight.fetch('/api/collections/2', {

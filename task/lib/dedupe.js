@@ -19,6 +19,21 @@ function neighborKeys(lon, lat) {
     return keys;
 }
 
+/**
+ * Minimal unit normalization - just enough for a case-insensitive,
+ * whitespace-collapsed comparison. Deliberately not a full street-style
+ * normalization: "Apt 2" vs "#2" are left as distinct values because
+ * wrongly treating them as equal deletes a real address.
+ *
+ * A blank/missing unit normalizes to '' and therefore only matches another
+ * blank unit - a single-family record is never a duplicate of a specific
+ * apartment in the same building.
+ */
+function normalizeUnit(unit) {
+    if (unit === undefined || unit === null) return '';
+    return String(unit).toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
 function hasPostcode(feature) {
     const value = feature.properties && feature.properties.postcode;
     return !!(value && String(value).trim());
@@ -28,7 +43,9 @@ function hasPostcode(feature) {
  * Bucket features into a coordinate grid, union matching records (same/
  * adjacent cell + matching normalized number/street) into groups, and pick
  * one surviving record per group: prefer a populated postcode, then the
- * highest (most local) source priority.
+ * highest (most local) source priority. Records match on normalized
+ * number + street + unit, so the many units of a multi-unit building
+ * geocoded to a single rooftop point are all preserved.
  */
 export function dedupeFeatures(records) {
     const grid = new Map();
@@ -58,6 +75,7 @@ export function dedupeFeatures(records) {
     records.forEach((record, idx) => {
         const number = normalizeNumber(record.feature.properties.number);
         const street = normalizeStreet(record.feature.properties.street);
+        const unit = normalizeUnit(record.feature.properties.unit);
         if (!number || !street) return;
 
         const [lon, lat] = record.feature.geometry.coordinates;
@@ -70,6 +88,7 @@ export function dedupeFeatures(records) {
                 const other = records[otherIdx];
                 if (normalizeNumber(other.feature.properties.number) !== number) continue;
                 if (normalizeStreet(other.feature.properties.street) !== street) continue;
+                if (normalizeUnit(other.feature.properties.unit) !== unit) continue;
                 union(idx, otherIdx);
             }
         }

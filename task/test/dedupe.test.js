@@ -62,6 +62,57 @@ test('dedupeFeatures ignores records missing number or street', (t) => {
     t.end();
 });
 
+test('dedupeFeatures keeps distinct units of a multi-unit building', (t) => {
+    // A multi-unit building geocoded to one rooftop point: identical number
+    // and street, same coordinates, different units. Collapsing these would
+    // silently delete every unit but one.
+    const records = [
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St', unit: 'Apt 1' }), sourcePath: 'a.json', priority: 3 },
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St', unit: 'Apt 2' }), sourcePath: 'a.json', priority: 3 },
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St', unit: 'Apt 3' }), sourcePath: 'a.json', priority: 3 }
+    ];
+
+    const survivors = dedupeFeatures(records);
+
+    t.equals(survivors.length, 3, 'each distinct unit survives');
+    t.deepEquals(
+        survivors.map((s) => s.feature.properties.unit).sort(),
+        ['Apt 1', 'Apt 2', 'Apt 3'],
+        'no unit is discarded'
+    );
+    t.end();
+});
+
+test('dedupeFeatures dedupes records that agree on number, street and unit', (t) => {
+    const records = [
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main Street', unit: 'apt 4', city: '' }), sourcePath: 'us/ca/statewide.json', priority: 1 },
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St', unit: 'APT  4', city: 'Oakland' }), sourcePath: 'us/ca/oakland.json', priority: 3 }
+    ];
+
+    const survivors = dedupeFeatures(records);
+
+    t.equals(survivors.length, 1, 'matching unit values (case/whitespace insensitive) still dedupe');
+    t.equals(survivors[0].feature.properties.city, 'Oakland', 'the higher-priority source wins');
+    t.end();
+});
+
+test('dedupeFeatures does not treat a blank unit as matching a populated one', (t) => {
+    const records = [
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St' }), sourcePath: 'a.json', priority: 3 },
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St', unit: '' }), sourcePath: 'b.json', priority: 2 },
+        { feature: feature(-122.27, 37.80, { number: '100', street: 'Main St', unit: 'Ste 200' }), sourcePath: 'c.json', priority: 1 }
+    ];
+
+    const survivors = dedupeFeatures(records);
+
+    t.equals(survivors.length, 2, 'the two blank-unit records collapse, the suite stays separate');
+    t.ok(
+        survivors.some((s) => s.feature.properties.unit === 'Ste 200'),
+        'the record with a unit is not absorbed into the blank-unit group'
+    );
+    t.end();
+});
+
 test('dedupeFeatures matches near-duplicates that fall in an adjacent grid cell', (t) => {
     // 0.00005deg offset (~5.5m) - close enough to land one cell over, well
     // within the 3x3 neighborhood search, but not in the exact same cell.

@@ -62,7 +62,10 @@ export default {
                         'subnet-35d87242',
                         'subnet-b978ade0'
                     ],
-                    Type : 'EC2',
+                    Type: 'SPOT',
+                    BidPercentage: 100,
+                    SpotIamFleetRole: cf.getAtt('BatchSpotFleetRole', 'Arn'),
+                    AllocationStrategy: 'SPOT_CAPACITY_OPTIMIZED',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
                     // r5.4xlarge (16 vCPU / 128GB) added for the addresses
                     // fabric job specifically - see api/lib/batch.js's fabric
@@ -98,7 +101,10 @@ export default {
                         'subnet-35d87242',
                         'subnet-b978ade0'
                     ],
-                    Type : 'EC2',
+                    Type: 'SPOT',
+                    BidPercentage: 100,
+                    SpotIamFleetRole: cf.getAtt('BatchSpotFleetRole', 'Arn'),
+                    AllocationStrategy: 'SPOT_CAPACITY_OPTIMIZED',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
                     InstanceTypes : ['m5.large', 'c5.large']
                 },

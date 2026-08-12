@@ -31,6 +31,12 @@
             "s3": {
                 "type": "string"
             },
+            "processed_s3": {
+                "type": "string"
+            },
+            "processed_size": {
+                "$ref": "./util/size.json"
+            },
             "sources": {
             }
         }

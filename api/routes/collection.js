@@ -20,6 +20,7 @@ export default async function router(schema, config) {
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 for (const c of collections) {
                     delete c.s3;
+                    delete c.processed_s3;
                 }
             }
 

@@ -1,8 +1,10 @@
 import Batch from '@aws-sdk/client-batch';
 import ASG from '@aws-sdk/client-auto-scaling';
+import ECS from '@aws-sdk/client-ecs';
 
 const batch = new Batch.BatchClient({ region: process.env.AWS_DEFAULT_REGION });
 const asg = new ASG.AutoScalingClient({ region: process.env.AWS_DEFAULT_REGION });
+const ecs = new ECS.ECSClient({ region: process.env.AWS_DEFAULT_REGION });
 
 const jobDefinition = process.env.JOB_DEFINITION;
 const t3_queue = process.env.T3_QUEUE;
@@ -75,9 +77,65 @@ export async function scale(desired) {
 }
 
 /**
+ * EC2 instance IDs that are actually backing a RUNNING/STARTING job attempt
+ * on the given queues, resolved via Batch's ECS container instance for each
+ * job attempt. Instances not in this set have nothing running on them,
+ * regardless of what else is queued elsewhere.
+ */
+async function instancesRunningJobs(queues) {
+    const jobIds = [];
+    for (const queue of queues) {
+        for (const status of ['STARTING', 'RUNNING']) {
+            const res = await batch.send(new Batch.ListJobsCommand({
+                jobQueue: queue,
+                jobStatus: status
+            }));
+            jobIds.push(...res.jobSummaryList.map((j) => j.jobId));
+        }
+    }
+
+    const containerInstanceArns = new Set();
+    for (let i = 0; i < jobIds.length; i += 100) {
+        const res = await batch.send(new Batch.DescribeJobsCommand({
+            jobs: jobIds.slice(i, i + 100)
+        }));
+
+        for (const job of res.jobs) {
+            if (job.container?.containerInstanceArn) {
+                containerInstanceArns.add(job.container.containerInstanceArn);
+            }
+        }
+    }
+
+    // A container instance ARN is arn:aws:ecs:region:account:container-instance/cluster-name/id
+    const arnsByCluster = new Map();
+    for (const arn of containerInstanceArns) {
+        const cluster = arn.split('/')[1];
+        if (!arnsByCluster.has(cluster)) arnsByCluster.set(cluster, []);
+        arnsByCluster.get(cluster).push(arn);
+    }
+
+    const instanceIds = new Set();
+    for (const [cluster, arns] of arnsByCluster) {
+        const res = await ecs.send(new ECS.DescribeContainerInstancesCommand({
+            cluster,
+            containerInstances: arns
+        }));
+
+        for (const ci of res.containerInstances) {
+            if (ci.ec2InstanceId) instanceIds.add(ci.ec2InstanceId);
+        }
+    }
+
+    return instanceIds;
+}
+
+/**
  * Clear scale-in protection from ASG instances that are protected
- * but no longer running any Batch jobs. This handles cases where a
- * task process crashed (OOM, SIGKILL) without calling protection(false).
+ * but not actually backing any RUNNING/STARTING Batch job. This handles
+ * cases where a task process crashed (OOM, SIGKILL) without calling
+ * protection(false) - checked per-instance so one straggler job elsewhere
+ * in the queue can't keep every other crashed instance protected.
  */
 async function clear_stale_protection() {
     const desc = (await asg.send(new ASG.DescribeAutoScalingGroupsCommand({
@@ -90,24 +148,14 @@ async function clear_stale_protection() {
 
     if (protectedIds.length === 0) return;
 
-    // Count RUNNING and STARTING jobs across t3 queues
-    let activeJobs = 0;
-    for (const queue of [t3_queue, t3_priority_queue]) {
-        for (const status of ['STARTING', 'RUNNING']) {
-            const res = await batch.send(new Batch.ListJobsCommand({
-                jobQueue: queue,
-                jobStatus: status
-            }));
-            activeJobs += res.jobSummaryList.length;
-        }
-    }
+    const busyIds = await instancesRunningJobs([t3_queue, t3_priority_queue]);
+    const staleIds = protectedIds.filter((id) => !busyIds.has(id));
 
-    // If no jobs are active, all protection is stale
-    if (activeJobs === 0) {
-        console.error(`ok - clearing stale scale-in protection from ${protectedIds.length} instances: ${protectedIds.join(', ')}`);
+    if (staleIds.length > 0) {
+        console.error(`ok - clearing stale scale-in protection from ${staleIds.length} instances: ${staleIds.join(', ')}`);
         await asg.send(new ASG.SetInstanceProtectionCommand({
             AutoScalingGroupName: process.env.T3_CLUSTER_ASG,
-            InstanceIds: protectedIds,
+            InstanceIds: staleIds,
             ProtectedFromScaleIn: false
         }));
     }

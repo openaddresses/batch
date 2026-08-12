@@ -166,6 +166,12 @@ export default {
                                 'autoscaling:SetInstanceProtection'
                             ],
                             'Resource': '*'
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'ecs:DescribeContainerInstances'
+                            ],
+                            'Resource': '*'
                         }]
                     }
                 }]

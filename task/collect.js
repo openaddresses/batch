@@ -15,7 +15,8 @@ import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
 import minimist from 'minimist';
-import { Transform } from 'node:stream';
+import readline from 'node:readline';
+import { Readable, Transform } from 'node:stream';
 import { loadBoundaries } from './lib/boundaries.js';
 import { buildProcessedFeatures } from './lib/process-collection.js';
 
@@ -83,7 +84,10 @@ async function cli() {
 
         let boundaries = { region: [], district: [] };
         try {
-            boundaries = await loadBoundaries(await oa.cmd('map', 'features', {}, { stream: true }));
+            // oa.cmd(..., { stream: true }) returns the global fetch()'s
+            // res.body - a WHATWG ReadableStream, not a Node Readable.
+            // readline (inside loadBoundaries) requires a Node stream.
+            boundaries = await loadBoundaries(Readable.fromWeb(await oa.cmd('map', 'features', {}, { stream: true })));
             console.error(`ok - loaded ${boundaries.region.length} region and ${boundaries.district.length} district boundaries`);
         } catch (err) {
             console.error(`not ok - failed to load map boundaries, region/district backfill will be skipped: ${err.message}`);
@@ -130,6 +134,8 @@ async function collect(tmp, collection, oa, boundaries) {
     try {
         const processedSize = await process_collection(tmp, collection, collection_data, boundaries);
 
+        if (processedSize === null) return;
+
         await oa.cmd('collection', 'update', {
             ':collection': collection.id,
             processed_size: processedSize
@@ -140,28 +146,125 @@ async function collect(tmp, collection, oa, boundaries) {
     }
 }
 
-async function process_collection(tmp, collection, collection_data, boundaries) {
-    const sourceRecords = collection_data.map((relPath) => {
-        const lines = fs.readFileSync(path.resolve(tmp, 'sources', relPath), 'utf8').split('\n');
-        const features = [];
+// Dedupe genuinely needs every feature in the collection resident at once
+// (cross-source matching can't be done incrementally without a geographic
+// sharding pass, which is a larger redesign - see the follow-up note on
+// process_collection below). This constant is the guard that keeps that
+// tradeoff from taking down the whole job.
+//
+// Sizing: the collect job runs with 15GB of container memory but Node's
+// default old-space cap is ~4GB. Retaining one parsed GeoJSON address costs
+// roughly 1-1.5KB in V8 - the Feature object, its properties object with
+// ~8 unshared string values, the geometry object and coordinate array, the
+// per-record wrapper built by process-collection.js, plus dedupe's grid
+// buckets, union-find array and survivor/discarded structures over the same
+// data. At ~1.5KB, 4GB is ~2.8M features, so 2M leaves headroom for the
+// spikier sources and for the boundary set loaded alongside.
+//
+// Collections above this (notably `Global`, which globs every source) are
+// skipped rather than attempted: a V8 heap OOM is not catchable and would
+// abort the process mid-loop, costing every *later* collection its RAW zip
+// rebuild too.
+export const MAX_PROCESSED_FEATURES = 2000000;
 
-        for (const line of lines) {
+/**
+ * Read one source's line-delimited GeoJSON into an array of features.
+ *
+ * Streamed line-by-line (rather than readFileSync().split('\n')) so a
+ * single >512MB source file can't blow the V8 max string length, and so
+ * the raw file text never has to be resident alongside the parsed objects.
+ *
+ * `budget` caps how many features will be read; reading stops as soon as it
+ * is exceeded so an oversized collection is detected without allocating its
+ * way to an OOM first.
+ */
+export async function readSourceFeatures(file, relPath, budget = Infinity) {
+    const features = [];
+
+    const rl = readline.createInterface({
+        input: fs.createReadStream(file),
+        crlfDelay: Infinity
+    });
+
+    try {
+        for await (const line of rl) {
             if (!line.trim()) continue;
+
             try {
                 features.push(JSON.parse(line));
             } catch (err) {
                 console.error(`not ok - skipping malformed feature in ${relPath}: ${err.message}`);
+                continue;
             }
-        }
 
-        return { path: relPath, features };
-    });
+            if (features.length > budget) break;
+        }
+    } finally {
+        rl.close();
+    }
+
+    return features;
+}
+
+/**
+ * Write features to a stream honouring backpressure - firing write() in a
+ * tight loop buffers the entire output in memory when the disk can't keep
+ * up, which is exactly the memory we're trying not to spend here.
+ */
+export async function writeFeatures(out, features) {
+    for (const feature of features) {
+        if (out.write(JSON.stringify(feature) + '\n')) continue;
+
+        await new Promise((resolve, reject) => {
+            function onDrain() {
+                out.removeListener('error', onError);
+                resolve();
+            }
+
+            function onError(err) {
+                out.removeListener('drain', onDrain);
+                reject(err);
+            }
+
+            out.once('drain', onDrain);
+            out.once('error', onError);
+        });
+    }
+}
+
+// TODO (follow-up): this holds the whole collection in memory at once, which
+// is why MAX_PROCESSED_FEATURES exists. The real fix is to shard the collection
+// geographically (e.g. by boundary or by coarse grid tile), dedupe each shard
+// independently and concatenate the outputs - duplicates only ever match within
+// a ~11m radius, so a sharded pass with a small overlap buffer is equivalent.
+// That is a design change, tracked separately from this safety valve.
+async function process_collection(tmp, collection, collection_data, boundaries) {
+    const sourceRecords = [];
+    let total = 0;
+
+    for (const relPath of collection_data) {
+        const features = await readSourceFeatures(
+            path.resolve(tmp, 'sources', relPath),
+            relPath,
+            MAX_PROCESSED_FEATURES - total
+        );
+
+        total += features.length;
+        sourceRecords.push({ path: relPath, features });
+
+        if (total > MAX_PROCESSED_FEATURES) break;
+    }
+
+    if (total > MAX_PROCESSED_FEATURES) {
+        console.error(`not ok - skipping processed build for ${collection.name}: ${total}+ features exceeds the ${MAX_PROCESSED_FEATURES}-feature safety limit`);
+        return null;
+    }
 
     const processed = buildProcessedFeatures(sourceRecords, boundaries);
 
     const geojsonPath = path.resolve(tmp, `${collection.name}-processed.geojson`);
     const out = fs.createWriteStream(geojsonPath);
-    for (const feature of processed) out.write(JSON.stringify(feature) + '\n');
+    await writeFeatures(out, processed);
     await new Promise((resolve, reject) => {
         out.end((err) => {
             if (err) return reject(err);

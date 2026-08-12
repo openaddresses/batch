@@ -280,7 +280,14 @@ export async function trigger(event) {
             jobQueue: mega_queue,
             jobName: 'OA_Collect',
             containerOverrides: {
-                command: ['node', 'collect.js'],
+                // Container gets 15000MB; Node's default old-space cap (~4GB)
+                // would leave most of that unused and force collect.js's
+                // MAX_PROCESSED_FEATURES safety valve to skip most real
+                // collections. 10000MB raises the heap ceiling while leaving
+                // ~5000MB headroom for the OS, container runtime overhead,
+                // non-heap V8 memory (array buffers, external allocations),
+                // and the process's own baseline footprint.
+                command: ['node', '--max-old-space-size=10000', 'collect.js'],
                 environment: [],
                 vcpus: 4,
                 memory: 15000

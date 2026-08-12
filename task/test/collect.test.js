@@ -88,7 +88,10 @@ test('readSourceFeatures reads a file whose total size exceeds the V8 max string
 
 test('MAX_PROCESSED_FEATURES is a defined, conservative safety limit', (t) => {
     t.equals(typeof MAX_PROCESSED_FEATURES, 'number');
-    t.ok(MAX_PROCESSED_FEATURES > 0 && MAX_PROCESSED_FEATURES <= 5000000, 'limit is set within the batch worker\'s ~4GB default V8 heap');
+    // api/lib/batch.js runs the collect job with --max-old-space-size=10000;
+    // at ~1.5KB/feature that heap ceiling is ~6.8M features, so the limit
+    // should sit comfortably under that with headroom to spare.
+    t.ok(MAX_PROCESSED_FEATURES > 0 && MAX_PROCESSED_FEATURES <= 6800000, 'limit is set within the batch worker\'s 10000MB old-space heap ceiling');
     t.end();
 });
 

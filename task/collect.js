@@ -152,20 +152,23 @@ async function collect(tmp, collection, oa, boundaries) {
 // process_collection below). This constant is the guard that keeps that
 // tradeoff from taking down the whole job.
 //
-// Sizing: the collect job runs with 15GB of container memory but Node's
-// default old-space cap is ~4GB. Retaining one parsed GeoJSON address costs
-// roughly 1-1.5KB in V8 - the Feature object, its properties object with
-// ~8 unshared string values, the geometry object and coordinate array, the
-// per-record wrapper built by process-collection.js, plus dedupe's grid
-// buckets, union-find array and survivor/discarded structures over the same
-// data. At ~1.5KB, 4GB is ~2.8M features, so 2M leaves headroom for the
-// spikier sources and for the boundary set loaded alongside.
+// Sizing: the collect job runs with 15000MB of container memory, and
+// api/lib/batch.js launches it with --max-old-space-size=10000 so Node
+// actually uses most of that (the remaining ~5000MB is left for the OS,
+// container overhead, and non-heap memory). Retaining one parsed GeoJSON
+// address costs roughly 1-1.5KB in V8 - the Feature object, its properties
+// object with ~8 unshared string values, the geometry object and coordinate
+// array, the per-record wrapper built by process-collection.js, plus
+// dedupe's grid buckets, union-find array and survivor/discarded structures
+// over the same data. At ~1.5KB, a 10000MB heap is ~6.8M features, so 5M
+// leaves headroom for the spikier sources and for the boundary set loaded
+// alongside.
 //
 // Collections above this (notably `Global`, which globs every source) are
 // skipped rather than attempted: a V8 heap OOM is not catchable and would
 // abort the process mid-loop, costing every *later* collection its RAW zip
 // rebuild too.
-export const MAX_PROCESSED_FEATURES = 2000000;
+export const MAX_PROCESSED_FEATURES = 5000000;
 
 /**
  * Read one source's line-delimited GeoJSON into an array of features.

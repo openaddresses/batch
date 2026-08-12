@@ -16,6 +16,8 @@ import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
 import minimist from 'minimist';
 import { Transform } from 'node:stream';
+import { loadBoundaries } from './lib/boundaries.js';
+import { buildProcessedFeatures } from './lib/process-collection.js';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
@@ -79,9 +81,17 @@ async function cli() {
         await sources(oa, tmp, datas);
         console.error('ok - all sources fetched');
 
+        let boundaries = { region: [], district: [] };
+        try {
+            boundaries = await loadBoundaries(await oa.cmd('map', 'features', {}, { stream: true }));
+            console.error(`ok - loaded ${boundaries.region.length} region and ${boundaries.district.length} district boundaries`);
+        } catch (err) {
+            console.error(`not ok - failed to load map boundaries, region/district backfill will be skipped: ${err.message}`);
+        }
+
         for (const collection of collections) {
             console.error(`# ${collection.name}`);
-            await collect(tmp, collection, oa);
+            await collect(tmp, collection, oa, boundaries);
         }
     } catch (err) {
         console.error(err);
@@ -89,7 +99,7 @@ async function cli() {
     }
 }
 
-async function collect(tmp, collection, oa) {
+async function collect(tmp, collection, oa, boundaries) {
     let collection_data = [];
 
     for (const source of collection.sources) {
@@ -116,6 +126,56 @@ async function collect(tmp, collection, oa) {
         ':collection': collection.id,
         size: zipSize
     });
+
+    try {
+        const processedSize = await process_collection(tmp, collection, collection_data, boundaries);
+
+        await oa.cmd('collection', 'update', {
+            ':collection': collection.id,
+            processed_size: processedSize
+        });
+        console.error('ok - processed archive uploaded');
+    } catch (err) {
+        console.error(`not ok - failed to build processed collection for ${collection.name}: ${err.message}`);
+    }
+}
+
+async function process_collection(tmp, collection, collection_data, boundaries) {
+    const sourceRecords = collection_data.map((relPath) => {
+        const lines = fs.readFileSync(path.resolve(tmp, 'sources', relPath), 'utf8').split('\n');
+        const features = [];
+
+        for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+                features.push(JSON.parse(line));
+            } catch (err) {
+                console.error(`not ok - skipping malformed feature in ${relPath}: ${err.message}`);
+            }
+        }
+
+        return { path: relPath, features };
+    });
+
+    const processed = buildProcessedFeatures(sourceRecords, boundaries);
+
+    const geojsonPath = path.resolve(tmp, `${collection.name}-processed.geojson`);
+    const out = fs.createWriteStream(geojsonPath);
+    for (const feature of processed) out.write(JSON.stringify(feature) + '\n');
+    await new Promise((resolve, reject) => {
+        out.end((err) => {
+            if (err) return reject(err);
+            return resolve();
+        });
+    });
+
+    const zip = await zip_processed(tmp, geojsonPath, collection.name);
+    const zipSize = fs.statSync(zip).size;
+    await upload_zip_processed(zip, collection.name);
+    fs.unlinkSync(zip);
+    fs.unlinkSync(geojsonPath);
+
+    return zipSize;
 }
 
 async function sources(oa, tmp, datas) {
@@ -256,6 +316,72 @@ async function upload_zip_collection(file, name) {
     await r2uploader.done();
 
     console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`);
+}
+
+function zip_processed(tmp, geojsonPath, name) {
+    return new Promise((resolve, reject) => {
+        const output = fs.createWriteStream(path.resolve(tmp, `${name}-processed.zip`))
+            .on('error', (err) => {
+                console.error('not ok - ' + err.message);
+                return reject(err);
+            }).on('close', () => {
+                return resolve(path.resolve(tmp, `${name}-processed.zip`));
+            });
+
+        const archive = archiver('zip', {
+            zlib: { level: 9 }
+        }).on('warning', (err) => {
+            console.error('not ok - WARN: ' + err);
+        }).on('error', (err) => {
+            console.error('not ok - ' + err.message);
+            return reject(err);
+        });
+
+        archive.pipe(output);
+        archive.file(geojsonPath, { name: `${name}.geojson` });
+        archive.finalize();
+    });
+}
+
+async function upload_zip_processed(file, name) {
+    const s3uploader = new Upload({
+        client: s3,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: 'application/zip',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/collection-${name}-processed.zip`
+        }
+    });
+
+    await s3uploader.done();
+
+    console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}-processed.zip`);
+
+    const r2 = new S3.S3Client({
+        region: 'auto',
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+        },
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    });
+
+    const r2uploader = new Upload({
+        client: r2,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: 'application/zip',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/collection-${name}-processed.zip`
+        }
+    });
+
+    await r2uploader.done();
+
+    console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}-processed.zip`);
 }
 
 function zip_datas(tmp, datas, name) {

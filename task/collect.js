@@ -184,8 +184,9 @@ export const MAX_PROCESSED_FEATURES = 5000000;
 export async function readSourceFeatures(file, relPath, budget = Infinity) {
     const features = [];
 
+    const input = fs.createReadStream(file);
     const rl = readline.createInterface({
-        input: fs.createReadStream(file),
+        input,
         crlfDelay: Infinity
     });
 
@@ -203,7 +204,12 @@ export async function readSourceFeatures(file, relPath, budget = Infinity) {
             if (features.length > budget) break;
         }
     } finally {
+        // Breaking out of the loop early (budget exceeded) leaves the
+        // underlying read stream open - rl.close() alone doesn't destroy
+        // it, so without this an oversized collection leaks a file
+        // descriptor per source it doesn't finish reading.
         rl.close();
+        input.destroy();
     }
 
     return features;

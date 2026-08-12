@@ -183,3 +183,21 @@ test('loadBoundaries indexes a boundary spanning many cells into all of them', a
     t.equals(lookup(boundaries, 'region', -93.5, 38.5), 'Texas', 'and one in its last cell');
     t.end();
 });
+
+test('loadBoundaries puts a boundary whose bbox spans too many cells in the overflow list, and lookup still finds it', async (t) => {
+    // MAX_CELLS_PER_BOUNDARY is 4096 with a 1deg index cell size, i.e. a
+    // 64x64 grid of cells. A 70deg-wide square bbox occupies 71x71 = 5041
+    // cells - comfortably over the threshold - so this boundary must be
+    // routed to index.overflow instead of being bucketed per-cell.
+    const boundaries = await loadBoundaries(ndjsonStream([
+        { type: 'Feature', properties: { code: 'zz-huge', name: 'Huge Region' }, geometry: square(-40, -40, 70) }
+    ]));
+
+    t.equals(boundaries.region.length, 1, 'the oversized boundary is still loaded');
+    t.equals(boundaries.index.region.overflow.length, 1, 'the oversized boundary is routed to the overflow list');
+    t.equals(boundaries.index.region.cells.size, 0, 'it is not bucketed into any per-cell entries');
+
+    t.equals(lookup(boundaries, 'region', -5, -5), 'Huge Region', 'lookup consults the overflow list and finds a point inside the oversized polygon');
+    t.equals(lookup(boundaries, 'region', 50, 50), null, 'a point outside the oversized polygon (and its cell empty) still returns null');
+    t.end();
+});

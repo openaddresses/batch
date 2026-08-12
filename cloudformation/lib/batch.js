@@ -18,7 +18,7 @@ export default {
                     PolicyDocument: {
                         Statement: [{
                             Effect: 'Allow',
-                            Action: ['s3:PutObject', 's3:GetObject'],
+                            Action: ['s3:PutObject', 's3:GetObject', 's3:DeleteObject'],
                             Resource: [cf.join(['arn:aws:s3:::', cf.ref('Bucket'), '/*'])]
                         },{
                             Effect: 'Allow',

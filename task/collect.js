@@ -15,7 +15,10 @@ import S3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import archiver from 'archiver';
 import minimist from 'minimist';
-import { Transform } from 'node:stream';
+import readline from 'node:readline';
+import { Readable, Transform } from 'node:stream';
+import { loadBoundaries } from './lib/boundaries.js';
+import { buildProcessedFeatures } from './lib/process-collection.js';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
@@ -79,9 +82,20 @@ async function cli() {
         await sources(oa, tmp, datas);
         console.error('ok - all sources fetched');
 
+        let boundaries = { region: [], district: [] };
+        try {
+            // oa.cmd(..., { stream: true }) returns the global fetch()'s
+            // res.body - a WHATWG ReadableStream, not a Node Readable.
+            // readline (inside loadBoundaries) requires a Node stream.
+            boundaries = await loadBoundaries(Readable.fromWeb(await oa.cmd('map', 'features', {}, { stream: true })));
+            console.error(`ok - loaded ${boundaries.region.length} region and ${boundaries.district.length} district boundaries`);
+        } catch (err) {
+            console.error(`not ok - failed to load map boundaries, region/district backfill will be skipped: ${err.message}`);
+        }
+
         for (const collection of collections) {
             console.error(`# ${collection.name}`);
-            await collect(tmp, collection, oa);
+            await collect(tmp, collection, oa, boundaries);
         }
     } catch (err) {
         console.error(err);
@@ -89,7 +103,7 @@ async function cli() {
     }
 }
 
-async function collect(tmp, collection, oa) {
+async function collect(tmp, collection, oa, boundaries) {
     let collection_data = [];
 
     for (const source of collection.sources) {
@@ -116,6 +130,164 @@ async function collect(tmp, collection, oa) {
         ':collection': collection.id,
         size: zipSize
     });
+
+    try {
+        const processedSize = await process_collection(tmp, collection, collection_data, boundaries);
+
+        if (processedSize === null) return;
+
+        await oa.cmd('collection', 'update', {
+            ':collection': collection.id,
+            processed_size: processedSize
+        });
+        console.error('ok - processed archive uploaded');
+    } catch (err) {
+        console.error(`not ok - failed to build processed collection for ${collection.name}: ${err.message}`);
+    }
+}
+
+// Dedupe genuinely needs every feature in the collection resident at once
+// (cross-source matching can't be done incrementally without a geographic
+// sharding pass, which is a larger redesign - see the follow-up note on
+// process_collection below). This constant is the guard that keeps that
+// tradeoff from taking down the whole job.
+//
+// Sizing: the collect job runs with 15000MB of container memory, and
+// api/lib/batch.js launches it with --max-old-space-size=10000 so Node
+// actually uses most of that (the remaining ~5000MB is left for the OS,
+// container overhead, and non-heap memory). Retaining one parsed GeoJSON
+// address costs roughly 1-1.5KB in V8 - the Feature object, its properties
+// object with ~8 unshared string values, the geometry object and coordinate
+// array, the per-record wrapper built by process-collection.js, plus
+// dedupe's grid buckets, union-find array and survivor/discarded structures
+// over the same data. At ~1.5KB, a 10000MB heap is ~6.8M features, so 5M
+// leaves headroom for the spikier sources and for the boundary set loaded
+// alongside.
+//
+// Collections above this (notably `Global`, which globs every source) are
+// skipped rather than attempted: a V8 heap OOM is not catchable and would
+// abort the process mid-loop, costing every *later* collection its RAW zip
+// rebuild too.
+export const MAX_PROCESSED_FEATURES = 5000000;
+
+/**
+ * Read one source's line-delimited GeoJSON into an array of features.
+ *
+ * Streamed line-by-line (rather than readFileSync().split('\n')) so a
+ * single >512MB source file can't blow the V8 max string length, and so
+ * the raw file text never has to be resident alongside the parsed objects.
+ *
+ * `budget` caps how many features will be read; reading stops as soon as it
+ * is exceeded so an oversized collection is detected without allocating its
+ * way to an OOM first.
+ */
+export async function readSourceFeatures(file, relPath, budget = Infinity) {
+    const features = [];
+
+    const input = fs.createReadStream(file);
+    const rl = readline.createInterface({
+        input,
+        crlfDelay: Infinity
+    });
+
+    try {
+        for await (const line of rl) {
+            if (!line.trim()) continue;
+
+            try {
+                features.push(JSON.parse(line));
+            } catch (err) {
+                console.error(`not ok - skipping malformed feature in ${relPath}: ${err.message}`);
+                continue;
+            }
+
+            if (features.length > budget) break;
+        }
+    } finally {
+        // Breaking out of the loop early (budget exceeded) leaves the
+        // underlying read stream open - rl.close() alone doesn't destroy
+        // it, so without this an oversized collection leaks a file
+        // descriptor per source it doesn't finish reading.
+        rl.close();
+        input.destroy();
+    }
+
+    return features;
+}
+
+/**
+ * Write features to a stream honouring backpressure - firing write() in a
+ * tight loop buffers the entire output in memory when the disk can't keep
+ * up, which is exactly the memory we're trying not to spend here.
+ */
+export async function writeFeatures(out, features) {
+    for (const feature of features) {
+        if (out.write(JSON.stringify(feature) + '\n')) continue;
+
+        await new Promise((resolve, reject) => {
+            function onDrain() {
+                out.removeListener('error', onError);
+                resolve();
+            }
+
+            function onError(err) {
+                out.removeListener('drain', onDrain);
+                reject(err);
+            }
+
+            out.once('drain', onDrain);
+            out.once('error', onError);
+        });
+    }
+}
+
+// TODO (follow-up): this holds the whole collection in memory at once, which
+// is why MAX_PROCESSED_FEATURES exists. The real fix is to shard the collection
+// geographically (e.g. by boundary or by coarse grid tile), dedupe each shard
+// independently and concatenate the outputs - duplicates only ever match within
+// a ~11m radius, so a sharded pass with a small overlap buffer is equivalent.
+// That is a design change, tracked separately from this safety valve.
+async function process_collection(tmp, collection, collection_data, boundaries) {
+    const sourceRecords = [];
+    let total = 0;
+
+    for (const relPath of collection_data) {
+        const features = await readSourceFeatures(
+            path.resolve(tmp, 'sources', relPath),
+            relPath,
+            MAX_PROCESSED_FEATURES - total
+        );
+
+        total += features.length;
+        sourceRecords.push({ path: relPath, features });
+
+        if (total > MAX_PROCESSED_FEATURES) break;
+    }
+
+    if (total > MAX_PROCESSED_FEATURES) {
+        console.error(`not ok - skipping processed build for ${collection.name}: ${total}+ features exceeds the ${MAX_PROCESSED_FEATURES}-feature safety limit`);
+        return null;
+    }
+
+    const processed = buildProcessedFeatures(sourceRecords, boundaries);
+
+    const geojsonPath = path.resolve(tmp, `${collection.name}-processed.geojson`);
+    const out = fs.createWriteStream(geojsonPath);
+    await writeFeatures(out, processed);
+    await new Promise((resolve, reject) => {
+        out.end((err) => {
+            if (err) return reject(err);
+            return resolve();
+        });
+    });
+
+    const zip = await zip_processed(tmp, geojsonPath, collection.name);
+    const zipSize = fs.statSync(zip).size;
+    await upload_zip_processed(zip, collection.name);
+    fs.unlinkSync(zip);
+    fs.unlinkSync(geojsonPath);
+
+    return zipSize;
 }
 
 async function sources(oa, tmp, datas) {
@@ -256,6 +428,72 @@ async function upload_zip_collection(file, name) {
     await r2uploader.done();
 
     console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`);
+}
+
+function zip_processed(tmp, geojsonPath, name) {
+    return new Promise((resolve, reject) => {
+        const output = fs.createWriteStream(path.resolve(tmp, `${name}-processed.zip`))
+            .on('error', (err) => {
+                console.error('not ok - ' + err.message);
+                return reject(err);
+            }).on('close', () => {
+                return resolve(path.resolve(tmp, `${name}-processed.zip`));
+            });
+
+        const archive = archiver('zip', {
+            zlib: { level: 9 }
+        }).on('warning', (err) => {
+            console.error('not ok - WARN: ' + err);
+        }).on('error', (err) => {
+            console.error('not ok - ' + err.message);
+            return reject(err);
+        });
+
+        archive.pipe(output);
+        archive.file(geojsonPath, { name: `${name}.geojson` });
+        archive.finalize();
+    });
+}
+
+async function upload_zip_processed(file, name) {
+    const s3uploader = new Upload({
+        client: s3,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: 'application/zip',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/collection-${name}-processed.zip`
+        }
+    });
+
+    await s3uploader.done();
+
+    console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/collection-${name}-processed.zip`);
+
+    const r2 = new S3.S3Client({
+        region: 'auto',
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+        },
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    });
+
+    const r2uploader = new Upload({
+        client: r2,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: 'application/zip',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/collection-${name}-processed.zip`
+        }
+    });
+
+    await r2uploader.done();
+
+    console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}-processed.zip`);
 }
 
 function zip_datas(tmp, datas, name) {

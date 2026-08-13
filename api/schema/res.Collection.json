@@ -31,6 +31,13 @@
             "type": "string",
             "description": "Sponsors have access to the direct S3 bucket"
         },
+        "processed_s3": {
+            "type": "string",
+            "description": "Sponsors have access to the direct S3 bucket for the deduped/backfilled processed dataset"
+        },
+        "processed_size": {
+            "$ref": "./util/size.json"
+        },
         "created": {
             "$ref": "./util/created.json"
         },

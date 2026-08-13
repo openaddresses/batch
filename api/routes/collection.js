@@ -20,6 +20,7 @@ export default async function router(schema, config) {
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 for (const c of collections) {
                     delete c.s3;
+                    delete c.processed_s3;
                 }
             }
 
@@ -52,6 +53,34 @@ export default async function router(schema, config) {
 
             const collection = await Collection.from(config.pool, req.params.collection);
             return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.get('/collections/:collection/processed', {
+        name: 'Collection Processed Data',
+        group: 'Collections',
+        auth: 'user',
+        description: `
+            Download a given collection's deduped, backfilled processed dataset.
+
+            Note: the user must be authenticated to perform a download. One of our largest costs is
+            S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
+
+            Faster Downloads? Have AWS? The Jobs, Data, & Collections API all return a "processed_s3" property which links
+            to a requester pays object on S3. For those that are able, this is the best way to download data.
+
+            OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
+            Please consider donating if you are able https://opencollective.com/openaddresses
+        `,
+        ':collection': 'integer'
+    }, async (req, res) => {
+        try {
+            await Auth.is_auth(req, true);
+
+            const collection = await Collection.from(config.pool, req.params.collection);
+            return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}-processed.zip`);
         } catch (err) {
             return Err.respond(err, res);
         }

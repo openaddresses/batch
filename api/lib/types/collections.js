@@ -27,12 +27,14 @@ export default class Collection extends Generic {
 
         return pgres.rows.map((res) => {
             res.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}.zip`;
+            res.processed_s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${res.name}-processed.zip`;
             return res;
         });
     }
 
     _s3() {
         this.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${this.name}.zip`;
+        this.processed_s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${this.name}-processed.zip`;
     }
 
 }

@@ -131,6 +131,7 @@ test('GET: api/data', async () => {
             layer: 'addresses',
             name: 'dcgis',
             job: 1,
+            latest_job: 1,
             size: null,
             output: {
                 cache: false,

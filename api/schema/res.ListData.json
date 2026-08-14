@@ -11,6 +11,7 @@
             "layer",
             "name",
             "job",
+            "latest_job",
             "size",
             "output"
         ],
@@ -40,6 +41,10 @@
             },
             "job": {
                 "type": "integer"
+            },
+            "latest_job": {
+                "type": "integer",
+                "description": "The most recent job for this source/layer/name, regardless of status - may differ from job if the last run failed"
             },
             "s3": {
                 "type": "string"

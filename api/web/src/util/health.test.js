@@ -71,3 +71,15 @@ test('groupBySource marks a source healthy overall when every layer is healthy',
 
     assert.equal(source.worst, 'healthy');
 });
+
+test('groupBySource carries latest_job through as latestJob on each entry', () => {
+    const now = new Date('2026-08-08T00:00:00Z');
+    const rows = [
+        { source: 'us/il/mchenry', layer: 'parcels', name: '', updated: new Date('2026-01-01T00:00:00Z').toISOString(), job: 100, latest_job: 999 }
+    ];
+
+    const [source] = groupBySource(rows, now);
+
+    assert.equal(source.layers.parcels.entries[0].job, 100);
+    assert.equal(source.layers.parcels.entries[0].latestJob, 999);
+});

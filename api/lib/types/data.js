@@ -189,12 +189,13 @@ export default class Data extends Generic {
 
     /**
      * Return a complete job history for a given data source
-     * (jobs part of live run & in success status)
+     * (jobs part of live run, defaulting to only Success status)
      *
      * @param {Pool} pool - Postgres Pool Instance
      * @param {Numeric} data_id - ID of data row
+     * @param {String} [status=Success] - 'Success' (default) or 'all' to include every job status
      */
-    static async history(pool, data_id) {
+    static async history(pool, data_id, status = 'Success') {
         try {
             const pgres = await pool.query(sql`
                 SELECT
@@ -203,7 +204,7 @@ export default class Data extends Generic {
                     job.status,
                     job.output,
                     job.run,
-                    job.count,
+                    COALESCE(job.count, 0) AS count,
                     job.stats,
                     job.map
                 FROM
@@ -217,7 +218,7 @@ export default class Data extends Generic {
                 WHERE
                     runs.live = true
                     AND results.id = ${data_id}
-                    AND job.status = 'Success'
+                    AND (${status === 'all'} = true OR job.status = 'Success')
                 ORDER BY
                     created DESC
             `);

@@ -218,7 +218,7 @@ export default {
         getHistory: async function() {
             try {
                 this.loading.history = true;
-                this.history = await window.std(`/api/data/${this.dataid}/history`);
+                this.history = await window.std(`/api/data/${this.dataid}/history?status=all`);
 
                 this.chart = {
                     datasets: [{
@@ -226,7 +226,7 @@ export default {
                         fill: false,
                         borderColor: this.colours.pop(),
                         data: this.history.jobs.map((ele) => {
-                            return { x: ele.created, y: ele.count }
+                            return { x: ele.created, y: ele.status === 'Success' ? ele.count : null }
                         })
                     }]
                 };
@@ -237,7 +237,7 @@ export default {
                         fill: false,
                         borderColor: this.colours.pop(),
                         data: this.history.jobs.map((ele) => {
-                            return { x: ele.created, y: ele.stats.counts.number }
+                            return { x: ele.created, y: ele.stats?.counts?.number ?? null }
                         })
                     });
 
@@ -246,7 +246,7 @@ export default {
                         fill: false,
                         borderColor: this.colours.pop(),
                         data: this.history.jobs.map((ele) => {
-                            return { x: ele.created, y: ele.stats.counts.street }
+                            return { x: ele.created, y: ele.stats?.counts?.street ?? null }
                         })
                     });
 
@@ -255,7 +255,7 @@ export default {
                         fill: false,
                         borderColor: this.colours.pop(),
                         data: this.history.jobs.map((ele) => {
-                            return { x: ele.created, y: ele.stats.counts.city }
+                            return { x: ele.created, y: ele.stats?.counts?.city ?? null }
                         })
                     });
 
@@ -264,7 +264,7 @@ export default {
                         fill: false,
                         borderColor: this.colours.pop(),
                         data: this.history.jobs.map((ele) => {
-                            return { x: ele.created, y: ele.stats.counts.postcode }
+                            return { x: ele.created, y: ele.stats?.counts?.postcode ?? null }
                         })
                     });
                 }

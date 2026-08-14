@@ -45,6 +45,12 @@
                     },
                     "stats": {
                         "type": "object"
+                    },
+                    "run": {
+                        "type": "integer"
+                    },
+                    "map": {
+                        "type": ["null", "integer"]
                     }
                 }
             }

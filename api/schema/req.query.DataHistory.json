@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "status": {
+            "type": "string",
+            "default": "Success",
+            "enum": [
+                "Success",
+                "all"
+            ],
+            "description": "By default only Success jobs are returned. Set to 'all' to include every job status (Pending, Running, Fail, Warn) so failed runs are visible"
+        }
+    }
+}

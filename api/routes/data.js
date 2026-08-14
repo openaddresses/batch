@@ -101,10 +101,11 @@ export default async function router(schema, config) {
         auth: 'public',
         description: 'Return the job history for a given data component',
         ':data': 'integer',
+        query: 'req.query.DataHistory.json',
         res: 'res.DataHistory.json'
     }, async (req, res) => {
         try {
-            const history = await Data.history(config.pool, req.params.data);
+            const history = await Data.history(config.pool, req.params.data, req.query.status);
 
             return res.json(history);
         } catch (err) {

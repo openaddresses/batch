@@ -45,7 +45,8 @@ export function groupBySource(rows, now = new Date()) {
             name: row.name,
             state,
             updated: row.updated,
-            job: row.job
+            job: row.job,
+            latestJob: row.latest_job
         });
 
         source.layers[row.layer].state = worstState([

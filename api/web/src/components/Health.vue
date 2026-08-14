@@ -309,7 +309,8 @@ export default {
             const cell = source.layers[layer];
             if (!cell) return null;
             const worst = cell.entries.find((entry) => entry.state === cell.state);
-            return (worst || cell.entries[0]).job;
+            const entry = worst || cell.entries[0];
+            return entry.latestJob || entry.job;
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` });

@@ -117,6 +117,18 @@ export default class Data extends Generic {
                     results.layer,
                     results.name,
                     results.job,
+                    (
+                        SELECT latest.id
+                        FROM job latest INNER JOIN runs latest_runs
+                            ON latest.run = latest_runs.id
+                        WHERE
+                            latest_runs.live = true
+                            AND latest.source_name = results.source
+                            AND latest.layer = results.layer
+                            AND latest.name = results.name
+                        ORDER BY latest.created DESC
+                        LIMIT 1
+                    ) AS latest_job,
                     job.output,
                     job.size,
                     job.map
@@ -150,6 +162,7 @@ export default class Data extends Generic {
                     failing.layer,
                     failing.name,
                     failing.id AS job,
+                    failing.id AS latest_job,
                     failing.output,
                     failing.size,
                     failing.map

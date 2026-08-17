@@ -329,6 +329,19 @@ export async function trigger(event) {
                 },
                 timeout: {
                     attemptDurationSeconds: 60 * 60 * 24 * 3  // 3 day hard cap, per layer
+                },
+                // Mega compute environment is SPOT (task.template.js), so a
+                // multi-hour fabric run can lose its host mid-tiling with no
+                // app-level error - Batch reports statusReason "Host EC2 (...)
+                // terminated." and no exitCode. Auto-retry only that case;
+                // any other failure (real bug, non-zero exit) still fails
+                // immediately instead of burning another multi-hour attempt.
+                retryStrategy: {
+                    attempts: 2,
+                    evaluateOnExit: [
+                        { action: 'RETRY', onStatusReason: 'Host EC2*' },
+                        { action: 'EXIT', onReason: '*' }
+                    ]
                 }
             });
         }

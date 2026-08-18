@@ -45,7 +45,7 @@ export default class License {
 
             if (!license || typeof license !== 'object') continue;
 
-            const attribution = license['attribution name'] || null;
+            const attribution = license['attribution name'] || license['attribution'] || null;
             const text = license.text || null;
             const website = license.website || null;
             const key = JSON.stringify([attribution, text]);

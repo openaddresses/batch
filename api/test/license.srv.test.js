@@ -67,6 +67,29 @@ test('setup mock for GitHub API', () => {
             }
         })
         .persist();
+
+    // 154 real sources use the older `attribution` key rather than
+    // `attribution name` - they must not be dropped
+    mockPool
+        .intercept({
+            path: '/openaddresses/openaddresses/testshaC/sources/us/vt/statewide.json',
+            method: 'GET'
+        })
+        .reply(200, {
+            schema: 2,
+            coverage: { country: 'us' },
+            layers: {
+                addresses: [{
+                    name: 'state',
+                    website: 'https://vcgi.vermont.gov',
+                    license: {
+                        attribution: 'Vermont Center for Geographic Information',
+                        text: 'Public Domain'
+                    }
+                }]
+            }
+        })
+        .persist();
 });
 
 test('POST /api/run', async () => {
@@ -86,16 +109,17 @@ test('POST /api/run/1/jobs', async () => {
         body: {
             jobs: [
                 'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaA/sources/ca/mb/brandon.json',
-                'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaB/sources/us/ca/sacramento.json'
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaB/sources/us/ca/sacramento.json',
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaC/sources/us/vt/statewide.json'
             ]
         }
     }, true);
 
-    assert.deepEqual(res.body, { run: 1, jobs: [1, 2, 3, 4], errors: [] }, 'Run 1 populated with 4 jobs');
+    assert.deepEqual(res.body, { run: 1, jobs: [1, 2, 3, 4, 5], errors: [] }, 'Run 1 populated with 5 jobs');
 });
 
 test('mark all jobs Success', async () => {
-    for (const id of [1, 2, 3, 4]) {
+    for (const id of [1, 2, 3, 4, 5]) {
         const res = await flight.fetch(`/api/job/${id}`, {
             method: 'PATCH',
             headers: { 'shared-secret': '123' },
@@ -126,9 +150,16 @@ test('GET /api/licenses groups by attribution + license text', async () => {
                 sources: [
                     ['us/ca/sacramento.json', 'https://data.cityofsacramento.org']
                 ]
+            },
+            {
+                attribution: 'Vermont Center for Geographic Information',
+                license: 'Public Domain',
+                sources: [
+                    ['us/vt/statewide.json', 'https://vcgi.vermont.gov']
+                ]
             }
         ]
-    }, 'grouped by attribution/license text, deduped by source, unlicensed job excluded');
+    }, 'grouped by attribution/license text, deduped by source, unlicensed job excluded, legacy `attribution` key honoured');
 });
 
 flight.landing();

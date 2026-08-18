@@ -38,3 +38,19 @@ uv run scripts/generate-boundaries.py --db "postgresql://user:pass@host:5432/dbn
 2. `Map.populate()` loads them into the `map` table on API startup (with `--populate` flag)
 3. When jobs run, `Map.match()` links each job to a map boundary based on its source's `coverage` field — it can also add custom geometries for sources that define their own coverage polygons
 4. The fabric job reads all map features from the database and generates `borders.pmtiles` for the frontend coverage map
+
+## backfill-license.py
+
+One-off backfill for `job.license` on jobs referenced by current `results` rows, needed because `explode()`/`Run.populate()` only started writing `license` going forward (see `docs/superpowers/specs/2026-08-18-license-endpoint-design.md`). Re-fetches each job's source JSON and re-derives the license the same way `explode()` does.
+
+### Usage
+
+Requires [uv](https://docs.astral.sh/uv/).
+
+```bash
+# Preview what would change
+uv run scripts/backfill-license.py "postgresql://user:pass@host:5432/dbname" --dry-run
+
+# Apply
+uv run scripts/backfill-license.py "postgresql://user:pass@host:5432/dbname"
+```

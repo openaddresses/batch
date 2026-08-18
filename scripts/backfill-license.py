@@ -31,7 +31,7 @@ def derive_license(source_json, layer, name):
     for entry in layers.get(layer, []):
         if entry.get('name') == name:
             license_obj = entry.get('license')
-            if not license_obj:
+            if license_obj is None:
                 return None
             return {**license_obj, 'website': entry.get('website')}
     return None

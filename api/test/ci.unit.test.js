@@ -14,7 +14,14 @@ test('CI#internaldiff - No File On Master', async () => {
     }).reply(200, {
         schema: 2,
         layers: {
-            addresses: [{ name: 'state' }]
+            addresses: [{
+                name: 'state',
+                website: 'https://msl.mt.gov/geoinfo',
+                license: {
+                    'attribution name': 'Montana State Library',
+                    text: 'Public Domain'
+                }
+            }]
         }
     }, {
         headers: { 'content-type': 'application/json' }
@@ -36,7 +43,12 @@ test('CI#internaldiff - No File On Master', async () => {
     assert.deepEqual(jobs, [{
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json',
         layer: 'addresses',
-        name: 'state'
+        name: 'state',
+        license: {
+            'attribution name': 'Montana State Library',
+            text: 'Public Domain',
+            website: 'https://msl.mt.gov/geoinfo'
+        }
     }]);
 });
 
@@ -50,7 +62,18 @@ test('CI#internaldiff - Internal Diff', async () => {
     }).reply(200, {
         schema: 2,
         layers: {
-            addresses: [{ name: 'state' }, { name: 'state-other' }, { name: 'no-diff' }],
+            addresses: [
+                {
+                    name: 'state',
+                    website: 'https://msl.mt.gov/geoinfo',
+                    license: {
+                        'attribution name': 'Montana State Library',
+                        text: 'Public Domain'
+                    }
+                },
+                { name: 'state-other', license: 'https://msl.mt.gov/terms' },
+                { name: 'no-diff' }
+            ],
             parcels: [{ name: 'state' }]
         }
     }, {
@@ -75,15 +98,24 @@ test('CI#internaldiff - Internal Diff', async () => {
     assert.deepEqual(jobs, [{
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json',
         layer: 'addresses',
-        name: 'state'
+        name: 'state',
+        license: {
+            'attribution name': 'Montana State Library',
+            text: 'Public Domain',
+            website: 'https://msl.mt.gov/geoinfo'
+        }
     },{
+        // A string-valued license is not a license object - it must not be
+        // spread into character-indexed junk
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json',
         layer: 'addresses',
-        name: 'state-other'
+        name: 'state-other',
+        license: undefined
     },{
         source: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/sources/us/mt/statewide.json',
         layer: 'parcels',
-        name: 'state'
+        name: 'state',
+        license: undefined
     }]);
 });
 

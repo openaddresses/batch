@@ -20,6 +20,9 @@
                     },
                     "name": {
                         "type": "string"
+                    },
+                    "license": {
+                        "type": ["object", "null"]
                     }
                 }
             }

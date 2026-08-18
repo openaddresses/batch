@@ -47,7 +47,7 @@ export async function explode(url) {
                 source: url,
                 layer: layer,
                 name: j.name,
-                license: j.license ? { ...j.license, website: j.website } : undefined
+                license: (j.license && typeof j.license === 'object') ? { ...j.license, website: j.website } : undefined
             });
         }
     }

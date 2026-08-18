@@ -75,3 +75,37 @@ test('explode() sets license to undefined when the layer has none', async () => 
         license: undefined
     }], 'job spec has no license');
 });
+
+test('explode() ignores a string-valued license instead of spreading it', async () => {
+    const url = 'https://raw.githubusercontent.com/openaddresses/openaddresses/testsha3/sources/us/vt/statewide.json';
+
+    const mockAgent = new MockAgent();
+    setGlobalDispatcher(mockAgent);
+
+    const mockPool = mockAgent.get('https://raw.githubusercontent.com');
+    mockPool
+        .intercept({
+            path: '/openaddresses/openaddresses/testsha3/sources/us/vt/statewide.json',
+            method: 'GET'
+        })
+        .reply(200, {
+            schema: 2,
+            coverage: { country: 'us' },
+            layers: {
+                addresses: [{
+                    name: 'state',
+                    website: 'https://vcgi.vermont.gov',
+                    license: 'https://vcgi.vermont.gov/warranty.html'
+                }]
+            }
+        });
+
+    const jobs = await explode(url);
+
+    assert.deepEqual(jobs, [{
+        source: url,
+        layer: 'addresses',
+        name: 'state',
+        license: undefined
+    }], 'a string license is not spread into character-indexed keys');
+});

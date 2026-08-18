@@ -21,6 +21,7 @@
     },
     "devDependencies": {
         "eslint": "^9.0.0",
-        "eslint-plugin-n": "^17.10.2"
+        "eslint-plugin-n": "^17.10.2",
+        "nock": "^14.0.17"
     }
 }

@@ -41,8 +41,12 @@ license: { ...j.license, website: j.website }
 
 `Job.generate()` → `Generic.generate()`/`commit()` (in `@openaddresses/batch-generic`) writes any
 key present on the object straight to the matching Postgres column, auto-`JSON.stringify`-ing
-plain objects — so no other code path needs to change for this to start writing real data on every
-new job.
+plain objects.
+
+However, `Run.populate()` (`batch/api/lib/types/run.js`, ~line 227) currently reconstructs the job
+object passed to `Job.generate()` as a literal `{ run, source, layer, name }`, dropping any other
+field `explode()` put on `jobs[i]`. It needs to also pass through `license: jobs[i].license` for
+the new field to actually reach the database.
 
 ### 2. Backfill current results
 

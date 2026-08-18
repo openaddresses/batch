@@ -112,7 +112,8 @@ export default async function router(schema, config) {
             return res.json(await Run.populate(config.pool, new_run.id, [{
                 source: job.source,
                 layer: job.layer,
-                name: job.name
+                name: job.name,
+                license: job.license
             }]));
         } catch (err) {
             return Err.respond(err, res);
@@ -314,6 +315,7 @@ export default async function router(schema, config) {
             const job = await Job.commit(config.pool, req.params.job, req.body);
             await Run.ping(config.pool, ci, job);
             await config.cacher.del('data');
+            await config.cacher.del('licenses');
 
             return res.json(job.serialize());
         } catch (err) {
@@ -334,6 +336,7 @@ export default async function router(schema, config) {
 
             await Job.delete(config.pool, req.params.job);
             await config.cacher.del('data');
+            await config.cacher.del('licenses');
 
             return res.json({
                 status: 200,

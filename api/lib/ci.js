@@ -290,7 +290,10 @@ export default class CI {
                     jobs.push({
                         source: file.raw,
                         layer: branch_sources[branch]._layer,
-                        name: branch_sources[branch].name
+                        name: branch_sources[branch].name,
+                        license: (branch_sources[branch].license && typeof branch_sources[branch].license === 'object')
+                            ? { ...branch_sources[branch].license, website: branch_sources[branch].website }
+                            : undefined
                     });
 
                     continue;
@@ -303,7 +306,10 @@ export default class CI {
                     jobs.push({
                         source: file.raw,
                         layer: branch_sources[branch]._layer,
-                        name: branch_sources[branch].name
+                        name: branch_sources[branch].name,
+                        license: (branch_sources[branch].license && typeof branch_sources[branch].license === 'object')
+                            ? { ...branch_sources[branch].license, website: branch_sources[branch].website }
+                            : undefined
                     });
                 }
             }

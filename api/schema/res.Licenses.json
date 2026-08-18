@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["licenses"],
+    "properties": {
+        "licenses": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["attribution", "license", "sources"],
+                "properties": {
+                    "attribution": { "type": ["string", "null"] },
+                    "license": { "type": ["string", "null"] },
+                    "sources": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": { "type": ["string", "null"] }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

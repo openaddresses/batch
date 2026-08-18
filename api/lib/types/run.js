@@ -227,7 +227,8 @@ export default class Run extends Generic {
                     run: run_id,
                     source: jobs[i].source,
                     layer: jobs[i].layer,
-                    name: jobs[i].name
+                    name: jobs[i].name,
+                    license: jobs[i].license
                 });
 
                 await jobs[i].batch(run.github && run.github.check);

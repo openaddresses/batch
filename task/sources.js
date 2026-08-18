@@ -122,7 +122,8 @@ function list(tmp, sha) {
                     jobs.push({
                         source: `https://raw.githubusercontent.com/openaddresses/openaddresses/${sha}/sources/${glob}`,
                         layer: layer,
-                        name: name.name
+                        name: name.name,
+                        license: (name.license && typeof name.license === 'object') ? { ...name.license, website: name.website } : undefined
                     });
                 }
             }

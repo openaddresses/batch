@@ -209,6 +209,11 @@
         "query": false,
         "res": true
     },
+    "GET /licenses": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /level": {
         "body": false,
         "query": true,

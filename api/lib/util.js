@@ -46,7 +46,8 @@ export async function explode(url) {
             jobs.push({
                 source: url,
                 layer: layer,
-                name: j.name
+                name: j.name,
+                license: (j.license && typeof j.license === 'object') ? { ...j.license, website: j.website } : undefined
             });
         }
     }

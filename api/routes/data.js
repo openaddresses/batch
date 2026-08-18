@@ -45,6 +45,7 @@ export default async function router(schema, config) {
             req.body.id = req.params.data;
 
             await config.cacher.del('data');
+            await config.cacher.del('licenses');
 
             return res.json(await Data.commit(config.pool, req.body));
         } catch (err) {
@@ -66,6 +67,7 @@ export default async function router(schema, config) {
             const data = await Data.from(config.pool, req.params.data);
             await data.delete(config.pool);
             await config.cacher.del('data');
+            await config.cacher.del('licenses');
 
             return res.json(data);
         } catch (err) {

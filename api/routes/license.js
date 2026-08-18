@@ -1,6 +1,5 @@
 import Err from '@openaddresses/batch-error';
 import License from '../lib/types/license.js';
-import Cacher from '../lib/cacher.js';
 
 export default async function router(schema, config) {
     await schema.get('/licenses', {
@@ -11,7 +10,7 @@ export default async function router(schema, config) {
         res: 'res.Licenses.json'
     }, async (req, res) => {
         try {
-            const licenses = await config.cacher.get(Cacher.Miss(req.query, 'licenses'), async () => {
+            const licenses = await config.cacher.get('licenses', async () => {
                 return await License.list(config.pool);
             });
 

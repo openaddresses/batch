@@ -31,7 +31,9 @@ def derive_license(source_json, layer, name):
     for entry in layers.get(layer, []):
         if entry.get('name') == name:
             license_obj = entry.get('license')
-            if license_obj is None:
+            # Some sources use a bare string (a URL) or other non-dict value for
+            # `license` - treat anything that isn't a dict as "no license".
+            if not isinstance(license_obj, dict):
                 return None
             return {**license_obj, 'website': entry.get('website')}
     return None
@@ -62,6 +64,8 @@ def main():
     for i, (job_id, source_url, layer, name) in enumerate(rows):
         if i % 100 == 0 and i > 0:
             print(f"  Progress: {i}/{len(rows)}, {updated} updated", file=sys.stderr)
+            if not args.dry_run:
+                conn.commit()
 
         if source_url not in cache:
             try:
@@ -77,7 +81,13 @@ def main():
             skipped += 1
             continue
 
-        license_data = derive_license(source_json, layer, name)
+        try:
+            license_data = derive_license(source_json, layer, name)
+        except Exception as e:
+            print(f"  Warning: Failed to derive license for job {job_id} ({source_url} {layer}/{name}): {e}", file=sys.stderr)
+            skipped += 1
+            continue
+
         if license_data is None:
             skipped += 1
             continue
@@ -85,7 +95,13 @@ def main():
         if args.dry_run:
             print(f"  Would update: job {job_id} -> {json.dumps(license_data)}", file=sys.stderr)
         else:
-            cur.execute("UPDATE job SET license = %s WHERE id = %s", (json.dumps(license_data), job_id))
+            try:
+                cur.execute("UPDATE job SET license = %s WHERE id = %s", (json.dumps(license_data), job_id))
+            except Exception as e:
+                print(f"  Warning: Failed to update job {job_id}: {e}", file=sys.stderr)
+                conn.rollback()
+                skipped += 1
+                continue
         updated += 1
 
     if not args.dry_run:

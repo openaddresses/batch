@@ -166,6 +166,7 @@ test('GET /api/licenses groups by attribution + license text', async () => {
             {
                 attribution: null,
                 license: 'CC BY 3.0 AT',
+                url: 'https://data.tirol.gv.at/nutzungsbedingungen/',
                 sources: [
                     ['at/tirol.json', 'https://www.data.gv.at']
                 ]
@@ -173,6 +174,7 @@ test('GET /api/licenses groups by attribution + license text', async () => {
             {
                 attribution: 'City of Brandon',
                 license: 'Contains public sector Datasets made available under the City of Brandon\'s Open Data Licence',
+                url: 'https://opendata.brandon.ca/terms.aspx',
                 sources: [
                     ['ca/mb/brandon.json', 'https://opengov.brandon.ca/OpenDataService/opendata.html']
                 ]
@@ -180,6 +182,7 @@ test('GET /api/licenses groups by attribution + license text', async () => {
             {
                 attribution: 'City of Sacramento',
                 license: 'Open Data provided by the City of Sacramento',
+                url: 'https://data.cityofsacramento.org/pages/terms',
                 sources: [
                     ['us/ca/sacramento.json', 'https://data.cityofsacramento.org']
                 ]
@@ -187,12 +190,13 @@ test('GET /api/licenses groups by attribution + license text', async () => {
             {
                 attribution: 'Vermont Center for Geographic Information',
                 license: 'Public Domain',
+                url: null,
                 sources: [
                     ['us/vt/statewide.json', 'https://vcgi.vermont.gov']
                 ]
             }
         ]
-    }, 'grouped by attribution/license text, deduped by source, unlicensed job excluded, legacy `attribution` key honoured, boolean attribution flag not treated as a name');
+    }, 'grouped by attribution/license text, deduped by source, unlicensed job excluded, legacy `attribution` key honoured, boolean attribution flag not treated as a name, license url exposed for linking');
 });
 
 flight.landing();

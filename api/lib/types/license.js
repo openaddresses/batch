@@ -52,6 +52,7 @@ export default class License {
             const legacyAttribution = typeof license['attribution'] === 'string' ? license['attribution'] : null;
             const attribution = license['attribution name'] || legacyAttribution || null;
             const text = license.text || null;
+            const url = license.url || null;
             const website = license.website || null;
             const key = JSON.stringify([attribution, text]);
 
@@ -59,6 +60,7 @@ export default class License {
                 groups.set(key, {
                     attribution,
                     license: text,
+                    url,
                     sources: [],
                     seen: new Set()
                 });
@@ -76,6 +78,7 @@ export default class License {
             licenses: Array.from(groups.values()).map((group) => ({
                 attribution: group.attribution,
                 license: group.license,
+                url: group.url,
                 sources: group.sources
             }))
         };

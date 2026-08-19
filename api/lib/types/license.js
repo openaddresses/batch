@@ -45,7 +45,12 @@ export default class License {
 
             if (!license || typeof license !== 'object') continue;
 
-            const attribution = license['attribution name'] || license['attribution'] || null;
+            // `attribution` is polymorphic in source JSON: usually a boolean
+            // flag ("is attribution required?"), but ~150 sources use it as
+            // a legacy attribution-name string instead. Only treat it as a
+            // name when it's actually a string - a boolean flag isn't a name.
+            const legacyAttribution = typeof license['attribution'] === 'string' ? license['attribution'] : null;
+            const attribution = license['attribution name'] || legacyAttribution || null;
             const text = license.text || null;
             const website = license.website || null;
             const key = JSON.stringify([attribution, text]);

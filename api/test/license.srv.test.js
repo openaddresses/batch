@@ -90,6 +90,31 @@ test('setup mock for GitHub API', () => {
             }
         })
         .persist();
+
+    // Most sources use `attribution` as a boolean flag ("is attribution
+    // required?"), not a name - it must not leak through as the literal
+    // string "true"/"false" when there's no `attribution name`
+    mockPool
+        .intercept({
+            path: '/openaddresses/openaddresses/testshaD/sources/at/tirol.json',
+            method: 'GET'
+        })
+        .reply(200, {
+            schema: 2,
+            coverage: { country: 'at' },
+            layers: {
+                addresses: [{
+                    name: 'state',
+                    website: 'https://www.data.gv.at',
+                    license: {
+                        url: 'https://data.tirol.gv.at/nutzungsbedingungen/',
+                        text: 'CC BY 3.0 AT',
+                        attribution: true
+                    }
+                }]
+            }
+        })
+        .persist();
 });
 
 test('POST /api/run', async () => {
@@ -110,16 +135,17 @@ test('POST /api/run/1/jobs', async () => {
             jobs: [
                 'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaA/sources/ca/mb/brandon.json',
                 'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaB/sources/us/ca/sacramento.json',
-                'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaC/sources/us/vt/statewide.json'
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaC/sources/us/vt/statewide.json',
+                'https://raw.githubusercontent.com/openaddresses/openaddresses/testshaD/sources/at/tirol.json'
             ]
         }
     }, true);
 
-    assert.deepEqual(res.body, { run: 1, jobs: [1, 2, 3, 4, 5], errors: [] }, 'Run 1 populated with 5 jobs');
+    assert.deepEqual(res.body, { run: 1, jobs: [1, 2, 3, 4, 5, 6], errors: [] }, 'Run 1 populated with 6 jobs');
 });
 
 test('mark all jobs Success', async () => {
-    for (const id of [1, 2, 3, 4, 5]) {
+    for (const id of [1, 2, 3, 4, 5, 6]) {
         const res = await flight.fetch(`/api/job/${id}`, {
             method: 'PATCH',
             headers: { 'shared-secret': '123' },
@@ -137,6 +163,13 @@ test('GET /api/licenses groups by attribution + license text', async () => {
 
     assert.deepEqual(res.body, {
         licenses: [
+            {
+                attribution: null,
+                license: 'CC BY 3.0 AT',
+                sources: [
+                    ['at/tirol.json', 'https://www.data.gv.at']
+                ]
+            },
             {
                 attribution: 'City of Brandon',
                 license: 'Contains public sector Datasets made available under the City of Brandon\'s Open Data Licence',
@@ -159,7 +192,7 @@ test('GET /api/licenses groups by attribution + license text', async () => {
                 ]
             }
         ]
-    }, 'grouped by attribution/license text, deduped by source, unlicensed job excluded, legacy `attribution` key honoured');
+    }, 'grouped by attribution/license text, deduped by source, unlicensed job excluded, legacy `attribution` key honoured, boolean attribution flag not treated as a name');
 });
 
 flight.landing();

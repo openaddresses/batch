@@ -9,16 +9,23 @@
 """Backfill job.license for jobs referenced by current results rows.
 
 explode()/Run.populate() only started writing job.license going forward;
-this backfills the ~5k jobs current `results` rows point at by re-fetching
+this backfills the ~5k jobs current `results` rows point at by re-reading
 each job's source JSON and re-deriving the license the same way explode() does.
 
+Prefers a local checkout of the openaddresses/openaddresses sources/
+directory (via --sources-dir) over fetching each job's source URL, which is
+pinned to the commit SHA in effect when that job was created and can 404 if
+the source has since moved or the branch it references no longer exists.
+Falls back to fetching source_url over HTTP for any source not found locally.
+
 Usage:
-  uv run scripts/backfill-license.py "postgresql://user:pass@host:5432/dbname"
-  uv run scripts/backfill-license.py "postgresql://..." --dry-run
+  uv run scripts/backfill-license.py "postgresql://user:pass@host:5432/dbname" --sources-dir /path/to/addresses/sources
+  uv run scripts/backfill-license.py "postgresql://..." --sources-dir /path/to/addresses/sources --dry-run
 """
 
 import argparse
 import json
+import os
 import sys
 
 import psycopg2
@@ -42,6 +49,7 @@ def derive_license(source_json, layer, name):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('db_uri', help='Postgres connection URI')
+    parser.add_argument('--sources-dir', help='Local path to openaddresses/openaddresses sources/ directory')
     parser.add_argument('--dry-run', action='store_true', help='Show what would be updated without making changes')
     args = parser.parse_args()
 
@@ -68,13 +76,27 @@ def main():
                 conn.commit()
 
         if source_url not in cache:
-            try:
-                resp = requests.get(source_url, timeout=10)
-                resp.raise_for_status()
-                cache[source_url] = resp.json()
-            except Exception as e:
-                print(f"  Warning: Failed to fetch {source_url}: {e}", file=sys.stderr)
-                cache[source_url] = None
+            source_json = None
+
+            if args.sources_dir and '/sources/' in source_url:
+                rel_path = source_url.split('/sources/', 1)[1]
+                local_path = os.path.join(args.sources_dir, rel_path)
+                if os.path.exists(local_path):
+                    try:
+                        with open(local_path) as f:
+                            source_json = json.load(f)
+                    except Exception as e:
+                        print(f"  Warning: Failed to read {local_path}: {e}", file=sys.stderr)
+
+            if source_json is None:
+                try:
+                    resp = requests.get(source_url, timeout=10)
+                    resp.raise_for_status()
+                    source_json = resp.json()
+                except Exception as e:
+                    print(f"  Warning: Failed to fetch {source_url}: {e}", file=sys.stderr)
+
+            cache[source_url] = source_json
 
         source_json = cache[source_url]
         if source_json is None:

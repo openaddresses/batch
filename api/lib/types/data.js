@@ -202,13 +202,13 @@ export default class Data extends Generic {
 
     /**
      * Return a complete job history for a given data source
-     * (jobs part of live run, defaulting to only Success status)
+     * (jobs part of live run, defaulting to every job status)
      *
      * @param {Pool} pool - Postgres Pool Instance
      * @param {Numeric} data_id - ID of data row
-     * @param {String} [status=Success] - 'Success' (default) or 'all' to include every job status
+     * @param {String} [status=all] - 'all' (default) or 'Success' to only include successful jobs
      */
-    static async history(pool, data_id, status = 'Success') {
+    static async history(pool, data_id, status = 'all') {
         try {
             const pgres = await pool.query(sql`
                 SELECT

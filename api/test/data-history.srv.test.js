@@ -132,15 +132,20 @@ test('PATCH: api/job/2 -> Fail', async () => {
     }
 });
 
-test('GET: api/data/:data/history - defaults to Success-only jobs (existing contract preserved)', async () => {
+test('GET: api/data/:data/history - defaults to every job status, including the failing job', async () => {
     try {
         const res = await flight.fetch(`/api/data/${dataId}/history`, {
             method: 'GET'
         }, true);
 
-        assert.equal(res.body.jobs.length, 1, 'jobs.length: 1');
-        assert.equal(res.body.jobs[0].id, 1, 'jobs[0].id: 1');
-        assert.equal(res.body.jobs[0].status, 'Success', 'jobs[0].status: Success');
+        assert.equal(res.body.jobs.length, 2, 'jobs.length: 2');
+
+        const statuses = res.body.jobs.map((j) => j.status).sort();
+        assert.deepEqual(statuses, ['Fail', 'Success'], 'jobs statuses: [Fail, Success]');
+
+        const failJob = res.body.jobs.find((j) => j.status === 'Fail');
+        assert.equal(failJob.id, 2, 'fail job.id: 2');
+        assert.equal(failJob.count, 0, 'fail job.count defaults to 0, not null');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -156,10 +161,20 @@ test('GET: api/data/:data/history?status=all - includes the failing job', async 
 
         const statuses = res.body.jobs.map((j) => j.status).sort();
         assert.deepEqual(statuses, ['Fail', 'Success'], 'jobs statuses: [Fail, Success]');
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
+});
 
-        const failJob = res.body.jobs.find((j) => j.status === 'Fail');
-        assert.equal(failJob.id, 2, 'fail job.id: 2');
-        assert.equal(failJob.count, 0, 'fail job.count defaults to 0, not null');
+test('GET: api/data/:data/history?status=Success - filters to Success-only jobs', async () => {
+    try {
+        const res = await flight.fetch(`/api/data/${dataId}/history?status=Success`, {
+            method: 'GET'
+        }, true);
+
+        assert.equal(res.body.jobs.length, 1, 'jobs.length: 1');
+        assert.equal(res.body.jobs[0].id, 1, 'jobs[0].id: 1');
+        assert.equal(res.body.jobs[0].status, 'Success', 'jobs[0].status: Success');
     } catch (err) {
         assert.ifError(err, 'no error');
     }

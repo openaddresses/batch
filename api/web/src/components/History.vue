@@ -218,7 +218,7 @@ export default {
         getHistory: async function() {
             try {
                 this.loading.history = true;
-                this.history = await window.std(`/api/data/${this.dataid}/history?status=all`);
+                this.history = await window.std(`/api/data/${this.dataid}/history`);
 
                 this.chart = {
                     datasets: [{

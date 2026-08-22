@@ -4,12 +4,12 @@
     "properties": {
         "status": {
             "type": "string",
-            "default": "Success",
+            "default": "all",
             "enum": [
                 "Success",
                 "all"
             ],
-            "description": "By default only Success jobs are returned. Set to 'all' to include every job status (Pending, Running, Fail, Warn) so failed runs are visible"
+            "description": "By default every job status (Pending, Running, Fail, Warn, Success) is returned, matching the dashboard's Job History table. Set to 'Success' to only see successful runs"
         }
     }
 }

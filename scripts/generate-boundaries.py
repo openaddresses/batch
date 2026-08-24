@@ -18,6 +18,7 @@ Map.populate().
 Sources:
   country.geojson  - Natural Earth 10m admin-0 countries
   region.geojson   - Natural Earth 10m admin-1 states/provinces
+                   - Mainland Norway counties from Kartverket
   district.geojson - US Census TIGER counties + ABS Australian LGAs
 
 Usage:
@@ -31,6 +32,7 @@ import json
 import os
 import sys
 import tempfile
+from itertools import chain
 from pathlib import Path
 
 import geopandas as gpd
@@ -77,12 +79,21 @@ def feature_to_geojson(row, name_col, code_col):
     }
 
 
+def gdf_features(gdf, name_col, code_col):
+    """Yield GeoJSON Feature dicts from a GeoDataFrame."""
+    return (feature_to_geojson(row, name_col, code_col) for _, row in gdf.iterrows())
+
+
 def write_ld_geojson(gdf, output_path, name_col, code_col):
     """Write a GeoDataFrame as line-delimited GeoJSON with {name, code} properties."""
+    return write_features(gdf_features(gdf, name_col, code_col), output_path)
+
+
+def write_features(features, output_path):
+    """Write an iterable of GeoJSON Feature dicts as line-delimited GeoJSON."""
     count = 0
     with open(output_path, "w") as f:
-        for _, row in gdf.iterrows():
-            feature = feature_to_geojson(row, name_col, code_col)
+        for feature in features:
             if feature is None:
                 continue
             f.write(json.dumps(feature, separators=(",", ":")) + "\n")
@@ -112,8 +123,73 @@ def generate_countries(tmpdir, output_dir):
     return write_ld_geojson(gdf, output_path, "label", "code")
 
 
+class RegionOverride:
+    """Replaces one country's Natural Earth admin-1 regions with authoritative data.
+
+    Natural Earth's admin-1 dataset lags administrative reforms. A subclass
+    sets ``prefix`` (e.g. ``"no-"``) and any ``keep`` codes to retain from
+    Natural Earth, then yields replacement features from ``features()``. Add a
+    country by writing a subclass and registering it in ``REGION_OVERRIDES``.
+    """
+
+    prefix = ""
+    keep = frozenset()
+
+    def drops(self, code):
+        """Return True if a Natural Earth region code should be dropped."""
+        return code.startswith(self.prefix) and code not in self.keep
+
+    def features(self):
+        """Yield replacement GeoJSON Feature dicts."""
+        raise NotImplementedError
+
+
+class NorwayRegions(RegionOverride):
+    """Current mainland Norway counties from Kartverket.
+
+    Kartverket omits Svalbard, so Natural Earth's no-21 feature is retained.
+    """
+
+    prefix = "no-"
+    keep = frozenset({"no-21"})
+    api = "https://api.kartverket.no/kommuneinfo/v1/fylker"
+
+    def features(self):
+        with requests.Session() as session:
+            counties = session.get(self.api, timeout=60)
+            counties.raise_for_status()
+
+            for county in sorted(counties.json(), key=lambda c: c["fylkesnummer"]):
+                number = county["fylkesnummer"]
+                if not (isinstance(number, str) and number.isdigit() and len(number) == 2):
+                    raise ValueError(f"Invalid Kartverket county number: {number!r}")
+
+                area = session.get(
+                    f"{self.api}/{number}/omrade",
+                    params={"utkoordsys": 4326},
+                    timeout=60,
+                )
+                area.raise_for_status()
+                geometry = area.json()["omrade"]
+
+                yield {
+                    "type": "Feature",
+                    "properties": {
+                        "name": county["fylkesnavn"],
+                        "code": f"no-{number}",
+                    },
+                    "geometry": {
+                        "type": geometry["type"],
+                        "coordinates": geometry["coordinates"],
+                    },
+                }
+
+
+REGION_OVERRIDES = [NorwayRegions()]
+
+
 def generate_regions(tmpdir, output_dir):
-    """Generate region.geojson from Natural Earth."""
+    """Generate region.geojson from Natural Earth plus per-country overrides."""
     print("Generating region.geojson...", file=sys.stderr)
     path = download(NE_REGIONS_URL, tmpdir)
     gdf = gpd.read_file(path)
@@ -126,10 +202,17 @@ def generate_regions(tmpdir, output_dir):
     ]
     gdf["code"] = gdf["iso_3166_2"].str.lower()
 
+    # Drop the base regions an override replaces with authoritative data.
+    for override in REGION_OVERRIDES:
+        gdf = gdf[~gdf["code"].map(override.drops)]
+
     gdf = gdf.to_crs(epsg=4326)
 
+    overrides = chain.from_iterable(o.features() for o in REGION_OVERRIDES)
     output_path = os.path.join(output_dir, "region.geojson")
-    return write_ld_geojson(gdf, output_path, "name", "code")
+    return write_features(
+        chain(gdf_features(gdf, "name", "code"), overrides), output_path
+    )
 
 
 def generate_districts(tmpdir, output_dir):
@@ -152,20 +235,12 @@ def generate_districts(tmpdir, output_dir):
     au["label"] = au["LGA_NAME21"]
     au = au.to_crs(epsg=4326)
 
+    features = chain(
+        gdf_features(us, "label", "code"),
+        gdf_features(au, "label", "code"),
+    )
     output_path = os.path.join(output_dir, "district.geojson")
-
-    count = 0
-    with open(output_path, "w") as f:
-        for gdf in [us, au]:
-            for _, row in gdf.iterrows():
-                feature = feature_to_geojson(row, "label", "code")
-                if feature is None:
-                    continue
-                f.write(json.dumps(feature, separators=(",", ":")) + "\n")
-                count += 1
-
-    print(f"  Wrote {count} features to {output_path}", file=sys.stderr)
-    return count
+    return write_features(features, output_path)
 
 
 def verify(output_dir, aws_profile=None):
@@ -241,8 +316,9 @@ def upload(output_dir, aws_profile=None):
 def populate_db(output_dir, db_uri):
     """Load generated boundaries into the map table.
 
-    For each code, deletes any existing row then inserts the new one.
-    Custom geometries added by Map.match() (hash-based codes) are preserved.
+    Existing rows are updated in place so jobs keep their map identifiers.
+    Missing rows are inserted. Custom geometries added by Map.match()
+    (hash-based codes) are preserved.
     """
     import psycopg2
 
@@ -264,15 +340,23 @@ def populate_db(output_dir, db_uri):
                 code = feat["properties"]["code"]
                 geom = json.dumps(feat["geometry"])
 
-                # Delete existing row with this code (if any), then insert
-                cur.execute("DELETE FROM map WHERE code = %s", (code,))
                 cur.execute(
                     """
-                    INSERT INTO map (name, code, geom)
-                    VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
+                    UPDATE map
+                    SET name = %s,
+                        geom = ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)
+                    WHERE code = %s
                     """,
-                    (name, code, geom),
+                    (name, geom, code),
                 )
+                if cur.rowcount == 0:
+                    cur.execute(
+                        """
+                        INSERT INTO map (name, code, geom)
+                        VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
+                        """,
+                        (name, code, geom),
+                    )
                 count += 1
 
         print(f"  Loaded {count} features", file=sys.stderr)

@@ -233,6 +233,14 @@ export default class CI {
         const jobs = [];
 
         for (const file of files) {
+            // Only source definition files under sources/ should ever be turned into jobs.
+            // Without this guard, any changed/added JSON file anywhere in the repo (eg.
+            // scripts/**/*.json template or helper files) that happens to contain a
+            // "layers" key gets treated as a real source and queued as a job.
+            if (!file.filename.startsWith('sources/') || !file.filename.endsWith('.json')) {
+                continue;
+            }
+
             const branch_sources = {};
             const master_sources = {};
 

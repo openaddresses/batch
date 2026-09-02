@@ -119,6 +119,31 @@ test('CI#internaldiff - Internal Diff', async () => {
     }]);
 });
 
+test('CI#internaldiff - ignores non-sources JSON files', async () => {
+    const mockAgent = new MockAgent();
+    mockAgent.disableNetConnect();
+    setGlobalDispatcher(mockAgent);
+
+    // No interceptors are registered - if internaldiff() attempted to fetch
+    // either of these files it would throw, since they live outside sources/
+    // (a template) or aren't JSON (a README) and must be skipped before any
+    // network call is made. This reproduces openaddresses/openaddresses#7988,
+    // where scripts/au/tas/LIST_template.json - a template file containing
+    // unresolved {PLACEHOLDER} tokens - was being queued as a real job.
+    const jobs = await CI.internaldiff([
+        {
+            filename: 'scripts/au/tas/LIST_template.json',
+            raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/scripts/au/tas/LIST_template.json'
+        },
+        {
+            filename: 'scripts/au/tas/README.md',
+            raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/scripts/au/tas/README.md'
+        }
+    ]);
+
+    assert.deepEqual(jobs, []);
+});
+
 test('CI#format_issue - formats with count', async (t) => {
     const ci = new CI({ octo: {} });
     const origJobs = Run.jobs;

@@ -116,8 +116,17 @@
                             <h2 class='card-title'>
                                 Individual Sources
                             </h2>
+                            <div
+                                v-if='!loading.sources'
+                                class='text-secondary mx-3'
+                                v-text='`${needsAttentionCount} of ${datas.length} sources need attention`'
+                            />
 
                             <div class='ms-auto btn-list'>
+                                <TablerToggle
+                                    v-model='showUnhealthyOnly'
+                                    label='Show unhealthy only'
+                                />
                                 <IconArrowsMaximize
                                     v-if='!fullscreen'
                                     class='cursor-pointer'
@@ -219,7 +228,7 @@
                             />
                         </div>
                         <div
-                            v-else-if='!datas.length'
+                            v-else-if='!filteredDatas.length'
                             class='card-body'
                         >
                             <TablerNone
@@ -238,7 +247,7 @@
                                 </thead>
                                 <tbody>
                                     <template
-                                        v-for='d in datas'
+                                        v-for='d in filteredDatas'
                                         :key='d.source'
                                     >
                                         <tr>
@@ -264,30 +273,66 @@
                                                 class='cursor-pointer'
                                                 @click='d._open = !d._open'
                                             >
-                                                <LayerIcon
+                                                <span
                                                     v-if='d.has.buildings'
-                                                    layer='buildings'
-                                                    size='32'
-                                                    stroke='1'
-                                                />
-                                                <LayerIcon
+                                                    v-tooltip='layerTooltip(d, "buildings")'
+                                                    class='layer-icon-wrap'
+                                                >
+                                                    <LayerIcon
+                                                        layer='buildings'
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <span
+                                                        class='health-dot'
+                                                        :class='healthDotClass(d.health.buildings)'
+                                                    />
+                                                </span>
+                                                <span
                                                     v-if='d.has.addresses'
-                                                    layer='addresses'
-                                                    size='32'
-                                                    stroke='1'
-                                                />
-                                                <LayerIcon
+                                                    v-tooltip='layerTooltip(d, "addresses")'
+                                                    class='layer-icon-wrap'
+                                                >
+                                                    <LayerIcon
+                                                        layer='addresses'
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <span
+                                                        class='health-dot'
+                                                        :class='healthDotClass(d.health.addresses)'
+                                                    />
+                                                </span>
+                                                <span
                                                     v-if='d.has.parcels'
-                                                    layer='parcels'
-                                                    size='32'
-                                                    stroke='1'
-                                                />
-                                                <LayerIcon
+                                                    v-tooltip='layerTooltip(d, "parcels")'
+                                                    class='layer-icon-wrap'
+                                                >
+                                                    <LayerIcon
+                                                        layer='parcels'
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <span
+                                                        class='health-dot'
+                                                        :class='healthDotClass(d.health.parcels)'
+                                                    />
+                                                </span>
+                                                <span
                                                     v-if='d.has.centerlines'
-                                                    layer='centerlines'
-                                                    size='32'
-                                                    stroke='1'
-                                                />
+                                                    v-tooltip='layerTooltip(d, "centerlines")'
+                                                    class='layer-icon-wrap'
+                                                >
+                                                    <LayerIcon
+                                                        layer='centerlines'
+                                                        size='32'
+                                                        stroke='1'
+                                                    />
+                                                    <span
+                                                        class='health-dot'
+                                                        :class='healthDotClass(d.health.centerlines)'
+                                                    />
+                                                </span>
                                             </td>
                                             <td>
                                                 <div class='d-flex'>
@@ -426,6 +471,7 @@ import {
     TablerDelete,
     TablerInput
 } from '@tak-ps/vue-tabler';
+import { classifyEntry, worstState } from '../util/health.js';
 
 export default {
     name: 'OAData',
@@ -464,6 +510,7 @@ export default {
                 collections: false
             },
             showFilter: false,
+            showUnhealthyOnly: false,
             loginModal: false,
             filter: {
                 switches: {
@@ -480,6 +527,15 @@ export default {
             datas: [],
             collections: []
         };
+    },
+    computed: {
+        needsAttentionCount: function() {
+            return this.datas.filter((d) => d.worst && d.worst !== 'healthy').length;
+        },
+        filteredDatas: function() {
+            if (!this.showUnhealthyOnly) return this.datas;
+            return this.datas.filter((d) => d.worst && d.worst !== 'healthy');
+        }
     },
     watch: {
         showFilter: function() {
@@ -508,6 +564,21 @@ export default {
         },
         emitjob: function(jobid) {
             this.$router.push({ path: `/job/${jobid}` })
+        },
+        healthDotClass: function(state) {
+            if (state === 'healthy') return 'bg-green';
+            if (state === 'stale') return 'bg-yellow';
+            if (state === 'never') return 'bg-red';
+            return '';
+        },
+        layerTooltip: function(d, layer) {
+            return d.sources
+                .filter((s) => s.layer === layer)
+                .map((s) => {
+                    const label = s.updated ? `updated ${this.fmt(s.updated)}` : 'never succeeded';
+                    return `${s.name || d.source}: ${label}`;
+                })
+                .join(' | ');
         },
         emithistory: function(jobid) {
         },
@@ -584,6 +655,7 @@ export default {
                 }
 
                 const data = [];
+                const now = new Date();
 
                 for (const sourcename of Object.keys(dataname)) {
                     const d = {
@@ -596,6 +668,13 @@ export default {
                             parcels: false,
                             centerlines: false
                         },
+                        health: {
+                            addresses: null,
+                            buildings: null,
+                            parcels: null,
+                            centerlines: null
+                        },
+                        worst: null,
                         sources: []
                     };
 
@@ -604,7 +683,12 @@ export default {
                         d.sources.push(source);
                         source._confirm = false;
                         if (source.map) d.map = source.map;
+
+                        const state = classifyEntry(source, now);
+                        d.health[source.layer] = worstState([d.health[source.layer], state].filter(Boolean));
                     }
+
+                    d.worst = worstState(Object.values(d.health).filter(Boolean));
 
                     data.push(d);
                 }
@@ -619,3 +703,19 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.layer-icon-wrap {
+    position: relative;
+    display: inline-block;
+}
+.health-dot {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+</style>

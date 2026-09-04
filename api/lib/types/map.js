@@ -55,6 +55,7 @@ export default class Map extends Generic {
                     n.layer @> ARRAY['addresses'] AS addresses,
                     n.layer @> ARRAY['parcels'] AS parcels,
                     n.layer @> ARRAY['buildings'] AS buildings,
+                    n.layer @> ARRAY['centerlines'] AS centerlines,
                     ST_AsGeoJSON(geom)::JSON AS geometry
                 FROM
                     map
@@ -87,7 +88,8 @@ export default class Map extends Generic {
                                 code: chunk.row.code,
                                 addresses: chunk.row.addresses,
                                 buildings: chunk.row.buildings,
-                                parcels: chunk.row.parcels
+                                parcels: chunk.row.parcels,
+                                centerlines: chunk.row.centerlines
                             },
                             geometry: chunk.row.geometry
                         }) + '\n');
@@ -169,6 +171,7 @@ export default class Map extends Generic {
                         n.addresses,
                         n.buildings,
                         n.parcels,
+                        n.centerlines,
                         ST_AsMVTGeom(
                             ST_Transform(n.geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
@@ -186,7 +189,8 @@ export default class Map extends Generic {
                             map.geom,
                             cov.layer @> ARRAY['addresses'] AS addresses,
                             cov.layer @> ARRAY['buildings'] AS buildings,
-                            cov.layer @> ARRAY['parcels'] AS parcels
+                            cov.layer @> ARRAY['parcels'] AS parcels,
+                            cov.layer @> ARRAY['centerlines'] AS centerlines
                         FROM
                             map
                             INNER JOIN (
@@ -276,13 +280,13 @@ export default class Map extends Generic {
             code = hash(raw.coverage.geometry.coordinates);
         } else if (eq(keys, ['country'])) {
             code = raw.coverage.country.toLowerCase();
-        } else if (eq(keys, ['country', 'state'])) {
-            if (raw.coverage['ISO 3166'] && raw.coverage['ISO 3166'].alpha2) {
-                code = raw.coverage['ISO 3166'].alpha2.toLowerCase();
-            } else {
-                const country = raw.coverage.country.toLowerCase();
-                const state = raw.coverage.state.toLowerCase();
-                code = `${country}-${state}`;
+        } else {
+            const iso = raw.coverage['ISO 3166']?.alpha2?.toLowerCase();
+
+            if (eq(keys, ['country', 'state'])) {
+                code = iso || `${raw.coverage.country.toLowerCase()}-${raw.coverage.state.toLowerCase()}`;
+            } else if (iso && eq(keys, ['country', 'county', 'state'])) {
+                code = iso;
             }
         }
 

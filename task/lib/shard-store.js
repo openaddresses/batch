@@ -35,7 +35,10 @@ export function openShardWriters(tmp, tileCount) {
         async closeAll() {
             const streams = writers.flatMap((w) => [w.core, w.borrowed]);
             await Promise.all(streams.map((stream) => new Promise((resolve, reject) => {
-                stream.end((err) => err ? reject(err) : resolve());
+                stream.end((err) => {
+                    if (err) return reject(err);
+                    return resolve();
+                });
             })));
         }
     };

@@ -18,7 +18,10 @@ import minimist from 'minimist';
 import readline from 'node:readline';
 import { Readable, Transform } from 'node:stream';
 import { loadBoundaries } from './lib/boundaries.js';
-import { buildProcessedFeatures } from './lib/process-collection.js';
+import { isValidFeature } from './lib/valid-feature.js';
+import { countCoordinate, buildTiles, assignTiles, DEFAULT_CELL_DEG } from './lib/tiling.js';
+import { openShardWriters, readShard, cleanupShard } from './lib/shard-store.js';
+import { buildShardFeatures } from './lib/process-shard.js';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
@@ -146,29 +149,20 @@ async function collect(tmp, collection, oa, boundaries) {
     }
 }
 
-// Dedupe genuinely needs every feature in the collection resident at once
-// (cross-source matching can't be done incrementally without a geographic
-// sharding pass, which is a larger redesign - see the follow-up note on
-// process_collection below). This constant is the guard that keeps that
-// tradeoff from taking down the whole job.
-//
-// Sizing: the collect job runs with 15000MB of container memory, and
-// api/lib/batch.js launches it with --max-old-space-size=10000 so Node
-// actually uses most of that (the remaining ~5000MB is left for the OS,
-// container overhead, and non-heap memory). Retaining one parsed GeoJSON
-// address costs roughly 1-1.5KB in V8 - the Feature object, its properties
-// object with ~8 unshared string values, the geometry object and coordinate
-// array, the per-record wrapper built by process-collection.js, plus
-// dedupe's grid buckets, union-find array and survivor/discarded structures
-// over the same data. At ~1.5KB, a 10000MB heap is ~6.8M features, so 5M
-// leaves headroom for the spikier sources and for the boundary set loaded
-// alongside.
-//
-// Collections above this (notably `Global`, which globs every source) are
-// skipped rather than attempted: a V8 heap OOM is not catchable and would
-// abort the process mid-loop, costing every *later* collection its RAW zip
-// rebuild too.
-export const MAX_PROCESSED_FEATURES = 5000000;
+// See docs/superpowers/specs/2026-09-07-sharded-processed-collections-design.md.
+// process_collection() below shards a collection geographically instead of
+// holding it all in memory at once - matches between records only ever
+// happen within a ~22m radius (dedupe.js's 3x3 grid-cell neighborhood), so
+// each tile can be deduped/backfilled independently. This is the per-tile
+// cap the quadtree in buildTiles() splits down to: a shard this size costs
+// roughly 1.5GB resident (Feature object, properties, geometry, and
+// dedupe's own working structures per record - see the sizing note this
+// replaced, preserved in git history), leaving wide headroom under the
+// 10000MB heap (api/lib/batch.js) regardless of how many tiles a
+// collection produces. No collection is skipped by size alone anymore -
+// see the per-shard safety valve in process_collection() for the one
+// remaining size-based skip, scoped to a single pathological tile.
+export const SHARD_FEATURE_BUDGET = 1000000;
 
 /**
  * Read one source's line-delimited GeoJSON into an array of features.
@@ -176,12 +170,8 @@ export const MAX_PROCESSED_FEATURES = 5000000;
  * Streamed line-by-line (rather than readFileSync().split('\n')) so a
  * single >512MB source file can't blow the V8 max string length, and so
  * the raw file text never has to be resident alongside the parsed objects.
- *
- * `budget` caps how many features will be read; reading stops as soon as it
- * is exceeded so an oversized collection is detected without allocating its
- * way to an OOM first.
  */
-export async function readSourceFeatures(file, relPath, budget = Infinity) {
+export async function readSourceFeatures(file, relPath) {
     const features = [];
 
     const input = fs.createReadStream(file);
@@ -200,19 +190,45 @@ export async function readSourceFeatures(file, relPath, budget = Infinity) {
                 console.error(`not ok - skipping malformed feature in ${relPath}: ${err.message}`);
                 continue;
             }
-
-            if (features.length > budget) break;
         }
     } finally {
-        // Breaking out of the loop early (budget exceeded) leaves the
-        // underlying read stream open - rl.close() alone doesn't destroy
-        // it, so without this an oversized collection leaks a file
-        // descriptor per source it doesn't finish reading.
         rl.close();
         input.destroy();
     }
 
     return features;
+}
+
+/**
+ * Stream one source's features purely to bucket their coordinates into the
+ * density counts map - never retains a features array, so this pass costs
+ * O(1) memory per source regardless of collection size. Malformed lines are
+ * silently skipped here; they are already logged when readSourceFeatures
+ * reads the same file for real during the assign pass below.
+ */
+async function countSourceFeatures(file, counts) {
+    const input = fs.createReadStream(file);
+    const rl = readline.createInterface({ input, crlfDelay: Infinity });
+
+    try {
+        for await (const line of rl) {
+            if (!line.trim()) continue;
+
+            let feature;
+            try {
+                feature = JSON.parse(line);
+            } catch {
+                continue;
+            }
+
+            if (!isValidFeature(feature)) continue;
+            const [lon, lat] = feature.geometry.coordinates;
+            countCoordinate(counts, lon, lat, DEFAULT_CELL_DEG);
+        }
+    } finally {
+        rl.close();
+        input.destroy();
+    }
 }
 
 /**
@@ -241,39 +257,62 @@ export async function writeFeatures(out, features) {
     }
 }
 
-// TODO (follow-up): this holds the whole collection in memory at once, which
-// is why MAX_PROCESSED_FEATURES exists. The real fix is to shard the collection
-// geographically (e.g. by boundary or by coarse grid tile), dedupe each shard
-// independently and concatenate the outputs - duplicates only ever match within
-// a ~11m radius, so a sharded pass with a small overlap buffer is equivalent.
-// That is a design change, tracked separately from this safety valve.
+/**
+ * Build the deduped/backfilled processed dataset for one collection by
+ * sharding it geographically instead of holding every feature in memory
+ * at once: count each source's feature density, partition the populated
+ * area into tiles bounded by SHARD_FEATURE_BUDGET, assign every feature to
+ * its home tile (plus any neighboring tile it should be borrowed into for
+ * boundary matching), then dedupe/backfill and concatenate one tile at a
+ * time. See docs/superpowers/specs/2026-09-07-sharded-processed-collections-design.md.
+ */
 async function process_collection(tmp, collection, collection_data, boundaries) {
-    const sourceRecords = [];
-    let total = 0;
-
+    const counts = new Map();
     for (const relPath of collection_data) {
-        const features = await readSourceFeatures(
-            path.resolve(tmp, 'sources', relPath),
-            relPath,
-            MAX_PROCESSED_FEATURES - total
-        );
-
-        total += features.length;
-        sourceRecords.push({ path: relPath, features });
-
-        if (total > MAX_PROCESSED_FEATURES) break;
+        await countSourceFeatures(path.resolve(tmp, 'sources', relPath), counts);
     }
 
-    if (total > MAX_PROCESSED_FEATURES) {
-        console.error(`not ok - skipping processed build for ${collection.name}: ${total}+ features exceeds the ${MAX_PROCESSED_FEATURES}-feature safety limit`);
+    const { tiles, cellToTile } = buildTiles(counts, { budget: SHARD_FEATURE_BUDGET, cellDeg: DEFAULT_CELL_DEG });
+
+    if (tiles.length === 0) {
+        console.error(`not ok - skipping processed build for ${collection.name}: no valid features found`);
         return null;
     }
 
-    const processed = buildProcessedFeatures(sourceRecords, boundaries);
+    const writers = openShardWriters(tmp, tiles.length);
+    for (const relPath of collection_data) {
+        const features = await readSourceFeatures(path.resolve(tmp, 'sources', relPath), relPath);
+        for (const feature of features) {
+            if (!isValidFeature(feature)) continue;
+            const [lon, lat] = feature.geometry.coordinates;
+            const { home, borrowed } = assignTiles(cellToTile, DEFAULT_CELL_DEG, lon, lat);
+            if (home === undefined) continue;
+
+            writers.writeCore(home, relPath, feature);
+            for (const tileIdx of borrowed) writers.writeBorrowed(tileIdx, relPath, feature);
+        }
+    }
+    await writers.closeAll();
 
     const geojsonPath = path.resolve(tmp, `${collection.name}-processed.geojson`);
     const out = fs.createWriteStream(geojsonPath);
-    await writeFeatures(out, processed);
+
+    for (let idx = 0; idx < tiles.length; idx++) {
+        const { core, borrowed } = await readShard(tmp, idx);
+        const coreCount = [...core.values()].reduce((sum, f) => sum + f.length, 0);
+        const borrowedCount = [...borrowed.values()].reduce((sum, f) => sum + f.length, 0);
+
+        if (coreCount + borrowedCount > SHARD_FEATURE_BUDGET) {
+            console.error(`not ok - skipping shard ${idx} (bbox ${tiles[idx].bbox.join(',')}) for ${collection.name}: ${coreCount + borrowedCount}+ features exceeds the ${SHARD_FEATURE_BUDGET}-feature per-shard budget`);
+            cleanupShard(tmp, idx);
+            continue;
+        }
+
+        const features = buildShardFeatures(core, borrowed, boundaries);
+        await writeFeatures(out, features);
+        cleanupShard(tmp, idx);
+    }
+
     await new Promise((resolve, reject) => {
         out.end((err) => {
             if (err) return reject(err);

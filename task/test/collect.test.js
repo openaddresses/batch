@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { Writable } from 'node:stream';
-import { readSourceFeatures, writeFeatures, MAX_PROCESSED_FEATURES } from '../collect.js';
+import { readSourceFeatures, writeFeatures, SHARD_FEATURE_BUDGET } from '../collect.js';
 
 function tmpSource(lines) {
     const dir = fs.mkdtempSync(path.resolve(os.tmpdir(), 'oa-collect-test-'));
@@ -49,18 +49,6 @@ test('readSourceFeatures skips a malformed line without aborting the source', as
     t.end();
 });
 
-test('readSourceFeatures stops reading once the feature budget is exceeded', async (t) => {
-    // The safety valve in process_collection depends on this: an oversized
-    // collection has to be detected without first allocating its way to an
-    // uncatchable V8 heap OOM.
-    const file = tmpSource([feature(1), feature(2), feature(3), feature(4), feature(5)]);
-
-    const features = await readSourceFeatures(file, 'a.json', 2);
-
-    t.equals(features.length, 3, 'reading stops one feature past the budget, not at the end of the file');
-    t.end();
-});
-
 test('readSourceFeatures reads a file whose total size exceeds the V8 max string length in chunks', async (t) => {
     // Not a real 512MB file (too slow for CI) - this just pins the contract
     // that the reader never materializes the whole file as one JS string,
@@ -86,12 +74,14 @@ test('readSourceFeatures reads a file whose total size exceeds the V8 max string
     t.end();
 });
 
-test('MAX_PROCESSED_FEATURES is a defined, conservative safety limit', (t) => {
-    t.equals(typeof MAX_PROCESSED_FEATURES, 'number');
+test('SHARD_FEATURE_BUDGET is a defined, conservative per-tile safety limit', (t) => {
+    t.equals(typeof SHARD_FEATURE_BUDGET, 'number');
     // api/lib/batch.js runs the collect job with --max-old-space-size=10000;
-    // at ~1.5KB/feature that heap ceiling is ~6.8M features, so the limit
-    // should sit comfortably under that with headroom to spare.
-    t.ok(MAX_PROCESSED_FEATURES > 0 && MAX_PROCESSED_FEATURES <= 6800000, 'limit is set within the batch worker\'s 10000MB old-space heap ceiling');
+    // at ~1.5KB/feature that heap ceiling is ~6.8M features. Unlike the old
+    // whole-collection MAX_PROCESSED_FEATURES, this now bounds a single
+    // tile's working set, so it should sit well under that ceiling with
+    // room to spare for the boundary set and multiple in-flight structures.
+    t.ok(SHARD_FEATURE_BUDGET > 0 && SHARD_FEATURE_BUDGET <= 2000000, 'budget leaves wide headroom under the batch worker\'s 10000MB old-space heap ceiling');
     t.end();
 });
 

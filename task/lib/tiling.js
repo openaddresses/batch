@@ -98,4 +98,27 @@ export function buildTiles(counts, { budget, cellDeg = DEFAULT_CELL_DEG, floorDe
     };
 }
 
+/**
+ * Home tile plus any neighboring tiles a point should also be borrowed
+ * into. Searches the same 3x3 base-cell neighborhood dedupe.js already
+ * uses for match candidates, so a record within one base cell (cellDeg) of
+ * a tile boundary - comfortably wider than the ~22m match radius - is
+ * duplicated into both tiles' working sets.
+ */
+export function assignTiles(cellToTile, cellDeg, lon, lat) {
+    const [cellLon, cellLat] = toCell(lon, lat, cellDeg);
+    const home = cellToTile.get(cellKey(cellLon, cellLat));
+    const borrowed = new Set();
+
+    for (let dLon = -1; dLon <= 1; dLon++) {
+        for (let dLat = -1; dLat <= 1; dLat++) {
+            if (dLon === 0 && dLat === 0) continue;
+            const tileIdx = cellToTile.get(cellKey(cellLon + dLon, cellLat + dLat));
+            if (tileIdx !== undefined && tileIdx !== home) borrowed.add(tileIdx);
+        }
+    }
+
+    return { home, borrowed: [...borrowed] };
+}
+
 export { DEFAULT_CELL_DEG };

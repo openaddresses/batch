@@ -23,7 +23,7 @@
         "@supercharge/promise-pool": "^3.0.0",
         "@turf/turf": "^6.3.0",
         "archiver": "^6.0.0",
-        "csv-parse": "^5.0.0",
+        "csv-parse": "^7.0.2",
         "decompress": "^4.2.1",
         "find": "^0.3.0",
         "glob": "^10.5.0",

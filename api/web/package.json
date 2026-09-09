@@ -21,7 +21,7 @@
         "date-fns": "^2.29.3",
         "floating-vue": "^2.0.0-beta.17",
         "imask": "^7.6.1",
-        "maplibre-gl": "^5.0.0",
+        "maplibre-gl": "^6.4.1",
         "moment-timezone": "^0.5.33",
         "pmtiles": "^4.4.0",
         "sass": "^1.32.12",

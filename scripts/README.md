@@ -11,7 +11,7 @@ Generates the three boundary GeoJSON files used by the map coverage system (`cou
 | File | Source | Description |
 |------|--------|-------------|
 | `country.geojson` | [Natural Earth](https://www.naturalearthdata.com/) 10m admin-0 | Country boundaries using `ISO_A2_EH` codes |
-| `region.geojson` | Natural Earth 10m admin-1 | State/province boundaries using `iso_3166_2` codes |
+| `region.geojson` | Natural Earth 10m admin-1 + [Kartverket](https://api.kartverket.no/kommuneinfo/v1/) | State/province boundaries using `iso_3166_2` codes, with current authoritative mainland Norway counties replacing Natural Earth's pre-reform boundaries |
 | `district.geojson` | [US Census TIGER](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) 2024 counties + [ABS](https://www.abs.gov.au/) ASGS LGA 2021 | US county and Australian LGA boundaries |
 
 ### Usage

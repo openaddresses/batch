@@ -21,6 +21,7 @@ export default defineConfig({
         include: ["showdown"],
     },
     build: {
+        target: 'esnext',
         rolldownOptions: {
             input: {
                 main: path.resolve(import.meta.dirname, 'index.html'),

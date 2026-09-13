@@ -22,12 +22,15 @@
                                 </h3>
 
                                 <div class='ms-auto btn-list'>
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
+                                    <TablerIconButton
                                         title='Refresh runs'
                                         @click='fetchRuns'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
 
@@ -98,12 +101,14 @@ import {
 } from '@tabler/icons-vue';
 import {
     TablerLoading,
-    TablerBreadCrumb
+    TablerBreadCrumb,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Runs',
     components: {
+        TablerIconButton,
         Status,
         IconRefresh,
         TableFooter,

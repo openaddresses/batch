@@ -6,31 +6,47 @@
             </h2>
 
             <div class='ms-auto btn-list'>
-                <IconSearch
+                <TablerIconButton
                     v-if='!showFilter'
-                    class='cursor-pointer'
-                    size='32'
+                    title='Show filters'
                     @click='showFilter = true'
-                />
-                <IconX
+                >
+                    <IconSearch
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
+                <TablerIconButton
                     v-else
-                    class='cursor-pointer'
-                    size='32'
+                    title='Hide filters'
                     @click='showFilter = false'
-                />
+                >
+                    <IconX
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
 
-                <IconPlus
+                <TablerIconButton
+                    title='Add level'
                     :disabled='add'
-                    class='cursor-pointer'
-                    size='32'
                     @click='addLevel'
-                />
+                >
+                    <IconPlus
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
 
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
+                <TablerIconButton
+                    title='Refresh levels'
                     @click='getLevels'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
 
@@ -127,11 +143,15 @@
                             <td>
                                 <div class='d-flex'>
                                     <div class='ms-auto btn-list'>
-                                        <IconTrash
-                                            class='cursor-pointer'
-                                            size='32'
+                                        <TablerIconButton
+                                            title='Delete level'
                                             @click='deleteLevel(level)'
-                                        />
+                                        >
+                                            <IconTrash
+                                                :size='32'
+                                                stroke='1'
+                                            />
+                                        </TablerIconButton>
                                     </div>
                                 </div>
                             </td>
@@ -162,12 +182,14 @@ import {
     TablerInput,
     TablerEnum,
     TablerLoading,
-    TablerNone
+    TablerNone,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'AdminOverrides',
     components: {
+        TablerIconButton,
         IconSearch,
         IconPlus,
         IconRefresh,

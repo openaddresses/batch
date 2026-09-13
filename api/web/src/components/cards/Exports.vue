@@ -5,11 +5,15 @@
                 Exports
             </h3>
             <div class='d-flex ms-auto btn-list'>
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
+                <TablerIconButton
+                    title='Refresh exports'
                     @click='fetchExports'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
         <TablerLoading
@@ -68,6 +72,7 @@ import TableFooter from '../util/TableFooter.vue';
 import {
     TablerLoading,
     TablerNone,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import {
     IconRefresh
@@ -76,6 +81,7 @@ import {
 export default {
     name: 'CardExports',
     components: {
+        TablerIconButton,
         IconRefresh,
         TableFooter,
         TablerLoading,

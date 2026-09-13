@@ -176,7 +176,6 @@ export default class Flight {
             const srv = await api(await Config.env(Object.assign({
                 postgres: 'postgres://postgres@localhost:5432/openaddresses_test',
                 'no-cache': true,
-                'no-tilebase': true,
                 silent: true,
                 test: true
             }, custom)));

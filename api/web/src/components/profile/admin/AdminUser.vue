@@ -6,24 +6,36 @@
             </h2>
 
             <div class='d-flex ms-auto btn-list'>
-                <IconSearch
+                <TablerIconButton
                     v-if='!showFilter'
-                    class='cursor-pointer'
-                    size='32'
+                    title='Show filters'
                     @click='showFilter = true'
-                />
-                <IconX
+                >
+                    <IconSearch
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
+                <TablerIconButton
                     v-else
-                    class='cursor-pointer'
-                    size='32'
+                    title='Hide filters'
                     @click='showFilter = false'
-                />
+                >
+                    <IconX
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
 
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
+                <TablerIconButton
+                    title='Refresh users'
                     @click='getUsers'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
 
@@ -145,11 +157,15 @@
                                             User Settings
                                         </h3>
                                         <div class='ms-auto'>
-                                            <IconRefresh
-                                                class='cursor-pointer'
-                                                size='32'
+                                            <TablerIconButton
+                                                title='Refresh user'
                                                 @click='getUser(user)'
-                                            />
+                                            >
+                                                <IconRefresh
+                                                    :size='32'
+                                                    stroke='1'
+                                                />
+                                            </TablerIconButton>
                                         </div>
                                     </div>
                                     <div class='col-12'>
@@ -200,6 +216,7 @@ import {
     TablerEnum,
     TablerInput,
     TablerNone,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 import {
@@ -211,6 +228,7 @@ import {
 export default {
     name: 'AdminUser',
     components: {
+        TablerIconButton,
         TableFooter,
         TablerLoading,
         TablerNone,

@@ -74,12 +74,14 @@
                                                             <template v-if='auth && auth.access === "admin"'>
                                                                 <TablerDropdown>
                                                                     <slot>
-                                                                        <IconSettings
-                                                                            size='32'
-                                                                            stroke='1'
-                                                                            class='cursor-pointer'
+                                                                        <TablerIconButton
                                                                             title='Admin settings'
-                                                                        />
+                                                                        >
+                                                                            <IconSettings
+                                                                                :size='32'
+                                                                                stroke='1'
+                                                                            />
+                                                                        </TablerIconButton>
                                                                     </slot>
                                                                     <template #dropdown>
                                                                         <TablerToggle
@@ -91,13 +93,15 @@
                                                                 </TablerDropdown>
                                                             </template>
 
-                                                            <IconHistory
-                                                                size='32'
-                                                                stroke='1'
-                                                                class='cursor-pointer'
+                                                            <TablerIconButton
                                                                 title='View history'
                                                                 @click.stop.prevent='emithistory(job.id)'
-                                                            />
+                                                            >
+                                                                <IconHistory
+                                                                    :size='32'
+                                                                    stroke='1'
+                                                                />
+                                                            </TablerIconButton>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -127,7 +131,8 @@ import {
     TablerLoading,
     TablerDropdown,
     TablerBreadCrumb,
-    TablerToggle
+    TablerToggle,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
@@ -136,6 +141,7 @@ import { fmtDate } from '../util/date.js';
 export default {
     name: 'Location',
     components: {
+        TablerIconButton,
         Download,
         Coverage,
         TablerLoading,

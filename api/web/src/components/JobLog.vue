@@ -36,13 +36,15 @@
                                 </div>
 
                                 <div class='ms-auto btn-list'>
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    <TablerIconButton
                                         title='Refresh log'
                                         @click='getJob'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
                             <TablerLoading v-if='loading' />
@@ -73,11 +75,13 @@ import {
     TablerBreadCrumb,
     TablerLoading,
     TablerAlert,
+    TablerIconButton
 } from '@tak-ps/vue-tabler'
 
 export default {
     name: 'JobLog',
     components: {
+        TablerIconButton,
         IconRefresh,
         TablerAlert,
         TablerLoading,

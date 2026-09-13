@@ -41,13 +41,15 @@
                                         title='View commit on GitHub'
                                         @click.stop.prevent='github(run)'
                                     >Github</span>
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    <TablerIconButton
                                         title='Refresh'
                                         @click='fetchRun'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
 
@@ -190,7 +192,8 @@ import TableFooter from './util/TableFooter.vue';
 import {
     TablerNone,
     TablerBreadCrumb,
-    TablerLoading
+    TablerLoading,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import {
     IconRefresh
@@ -199,6 +202,7 @@ import {
 export default {
     name: 'Run',
     components: {
+        TablerIconButton,
         TableFooter,
         TablerBreadCrumb,
         TablerLoading,

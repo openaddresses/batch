@@ -449,7 +449,7 @@ import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
-import moment from 'moment-timezone';
+import { fmtDate } from '../util/date.js';
 import {
     IconArrowsMaximize,
     IconArrowsMinimize,
@@ -503,7 +503,6 @@ export default {
     props: ['auth'],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             fullscreen: false,
             loading: {
                 sources: false,
@@ -555,7 +554,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+            return fmtDate(date);
         },
         size: function(bytes) {
             if (bytes == 0) { return "0.00 B"; }

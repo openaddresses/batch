@@ -63,7 +63,7 @@
 
 <script>
 import Status from '../util/Status.vue';
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../../util/date.js';
 import TableFooter from '../util/TableFooter.vue';
 import {
     TablerLoading,
@@ -85,7 +85,6 @@ export default {
     props: [ 'profile' ],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             loading: false,
             list: {
                 total: 0,
@@ -112,7 +111,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         fetchExports: async function() {
             try {

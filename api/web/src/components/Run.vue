@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../util/date.js';
 import Status from './util/Status.vue';
 import TableFooter from './util/TableFooter.vue';
 import {
@@ -209,7 +209,6 @@ export default {
     props: ['runid'],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             showFilter: false,
             paging: {
                 source: '',
@@ -261,7 +260,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         filterShortcut: function(status) {
             this.showFilter = true;

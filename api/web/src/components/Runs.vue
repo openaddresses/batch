@@ -91,7 +91,7 @@
 
 <script>
 import Status from './util/Status.vue';
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../util/date.js';
 import TableFooter from './util/TableFooter.vue';
 import {
     IconRefresh
@@ -112,7 +112,6 @@ export default {
     },
     data: function() {
         return {
-            tz: moment.tz.guess(),
             loading: false,
             paging: {
                 filter: '',
@@ -140,7 +139,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);

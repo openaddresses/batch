@@ -251,7 +251,17 @@ export async function trigger(event) {
                 command: ['node', 'task.js'],
                 environment: [
                     { name: 'OA_JOB_ID', value: String(event.job) }
-                ]
+                ],
+                // The job definition's default 1900MB container memory cap is a
+                // hard Docker/ECS limit - a huge single-layer source (a
+                // multi-GB statewide GDB, a multi-million-row paginated
+                // FeatureServer) can exceed it mid-conversion and get silently
+                // OOM-killed with no exception surfaced to task.js. Give
+                // conform.size:"large" sources more headroom, sized to fit
+                // within the large queue's m5.large instances (8GB RAM) -
+                // Batch will schedule these only on instance types that can
+                // satisfy the request.
+                ...(tier === 'large' ? { memory: 7000 } : {})
             },
             timeout: {
                 attemptDurationSeconds: timeout

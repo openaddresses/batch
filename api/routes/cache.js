@@ -1,13 +1,16 @@
 import Err from '@openaddresses/batch-error';
 import Auth from '../lib/auth.js';
+import { Type } from '@sinclair/typebox';
+import {
+    StandardResponse
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     schema.delete('/cache', {
         name: 'Flush Cache',
         group: 'Cache',
-        auth: 'admin',
         description: 'Flush the Memcached Cache',
-        res: 'res.Standard.json'
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -26,10 +29,11 @@ export default async function router(schema, config) {
     schema.delete('/cache/:cache_key', {
         name: 'Delete Key',
         group: 'Cache',
-        auth: 'admin',
         description: 'Flush the Memcached Cache',
-        ':cache_key': 'string',
-        res: 'res.Standard.json'
+        params: Type.Object({
+            cache_key: Type.String()
+        }),
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);

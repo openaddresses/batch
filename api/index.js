@@ -12,6 +12,7 @@ import minimist from 'minimist';
 
 import User from './lib/user.js';
 import Token from './lib/token.js';
+import { StandardResponse } from './lib/schema.js';
 
 try {
     const dotfile = new URL('.env', import.meta.url);
@@ -108,9 +109,21 @@ export default async function server(config) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: new URL('./schema', import.meta.url),
-        openapi: true,
-        limit: 50
+        prefix: '/api',
+        limit: 50,
+        error: {
+            400: StandardResponse,
+            401: StandardResponse,
+            403: StandardResponse,
+            404: StandardResponse,
+            500: StandardResponse
+        },
+        openapi: {
+            info: {
+                title: 'OpenAddresses Batch API',
+                version: pkg.version
+            }
+        }
     });
 
     app.disable('x-powered-by');
@@ -144,6 +157,9 @@ export default async function server(config) {
         res.set('Cache-Control', 'no-store');
         next();
     });
+
+    // GitHub signs the raw payload, so it must reach the route as text before the JSON body parser
+    app.use('/api/github/event', express.text({ type: '*/*', limit: '500kb' }));
 
     app.use('/api', schema.router);
 
@@ -220,12 +236,8 @@ export default async function server(config) {
         }
     );
 
-    schema.docs.base.servers = [{ url: '/api' }];
     app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
-    app.use('/*', express.static('web/dist'));
-
-    schema.not_found();
-    schema.error();
+    app.use('/{*splat}', express.static('web/dist'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {

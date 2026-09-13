@@ -1,15 +1,27 @@
 import Err from '@openaddresses/batch-error';
 import Run from '../lib/types/run.js';
 import Auth from '../lib/auth.js';
+import { Type } from '@sinclair/typebox';
+import {
+    ListRunsQuery,
+    ListRunsResponse,
+    CreateRunBody,
+    RunResponse,
+    RunStatsResponse,
+    PatchRunBody,
+    SingleJobsCreateBody,
+    SingleJobsCreateResponse,
+    SingleJobsResponse,
+    StandardResponse
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     await schema.get('/run', {
         name: 'List Runs',
         group: 'Run',
-        auth: 'public',
         description: 'Runs are container objects that contain jobs that were started at the same time or by the same process',
-        query: 'req.query.ListRuns.json',
-        res: 'res.ListRuns.json'
+        query: ListRunsQuery,
+        res: ListRunsResponse
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
@@ -24,10 +36,9 @@ export default async function router(schema, config) {
     await schema.post('/run', {
         name: 'Create Runs',
         group: 'Run',
-        auth: 'admin',
         description: 'Create a new run to hold a batch of jobs',
-        body: 'req.body.CreateRun.json',
-        res: 'res.Run.json'
+        body: CreateRunBody,
+        res: RunResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -43,10 +54,11 @@ export default async function router(schema, config) {
     await schema.get('/run/:run', {
         name: 'Get Runs',
         group: 'Run',
-        auth: 'public',
         description: 'Get a single run',
-        ':run': 'integer',
-        res: 'res.Run.json'
+        params: Type.Object({
+            run: Type.Integer()
+        }),
+        res: RunResponse
     }, async (req, res) => {
         try {
             const run = await Run.from(config.pool, req.params.run);
@@ -59,10 +71,11 @@ export default async function router(schema, config) {
     await schema.get('/run/:run/count', {
         name: 'Run Stats',
         group: 'Run',
-        auth: 'public',
         description: 'Return statistics about jobs within a given run',
-        ':run': 'integer',
-        res: 'res.RunStats.json'
+        params: Type.Object({
+            run: Type.Integer()
+        }),
+        res: RunStatsResponse
     }, async (req, res) => {
         try {
             res.json(await Run.stats(config.pool, req.params.run));
@@ -74,11 +87,12 @@ export default async function router(schema, config) {
     await schema.patch('/run/:run', {
         name: 'Update Run',
         group: 'Run',
-        auth: 'public',
         description: 'Update a run',
-        ':run': 'integer',
-        body: 'req.body.PatchRun.json',
-        res: 'res.Run.json'
+        params: Type.Object({
+            run: Type.Integer()
+        }),
+        body: PatchRunBody,
+        res: RunResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -99,7 +113,6 @@ export default async function router(schema, config) {
     await schema.post('/run/:run/jobs', {
         name: 'Populate Run Jobs',
         group: 'Run',
-        auth: 'admin',
         description: `
             Given an array sources, explode it into multiple jobs and submit to batch
             or pass in a predefined list of sources/layer/names
@@ -107,9 +120,11 @@ export default async function router(schema, config) {
             Note: once jobs are attached to a run, the run is "closed" and subsequent
             jobs cannot be attached to it
         `,
-        ':run': 'integer',
-        body: 'req.body.SingleJobsCreate.json',
-        res: 'res.SingleJobsCreate.json'
+        params: Type.Object({
+            run: Type.Integer()
+        }),
+        body: SingleJobsCreateBody,
+        res: SingleJobsCreateResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -123,10 +138,11 @@ export default async function router(schema, config) {
     await schema.get('/run/:run/jobs', {
         name: 'List Run Jobs',
         group: 'Run',
-        auth: 'public',
         description: 'return all jobs for a given run',
-        ':run': 'integer',
-        res: 'res.SingleJobs.json'
+        params: Type.Object({
+            run: Type.Integer()
+        }),
+        res: SingleJobsResponse
     }, async (req, res) => {
         try {
             const jobs = await Run.jobs(config.pool, req.params.run);
@@ -143,10 +159,11 @@ export default async function router(schema, config) {
     await schema.delete('/run/:run', {
         name: 'Delete Run',
         group: 'Run',
-        auth: 'admin',
         description: 'Delete a run. The run must have no remaining jobs.',
-        ':run': 'integer',
-        res: 'res.Standard.json'
+        params: Type.Object({
+            run: Type.Integer()
+        }),
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);

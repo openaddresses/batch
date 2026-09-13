@@ -4,6 +4,19 @@ import Job from '../lib/types/job.js';
 import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 import S3 from '../lib/s3.js';
+import { Type } from '@sinclair/typebox';
+import {
+    ListJobsQuery,
+    ListJobsResponse,
+    ListOrphanedJobsQuery,
+    JobResponse,
+    SingleJobsCreateResponse,
+    SingleDeltaResponse,
+    SingleLogQuery,
+    SingleLogResponse,
+    PatchJobBody,
+    StandardResponse
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     const ci = new CI(config);
@@ -11,10 +24,9 @@ export default async function router(schema, config) {
     await schema.get('/job', {
         name: 'List Jobs',
         group: 'Job',
-        auth: 'public',
         description: 'Return information about a given subset of jobs',
-        query: 'req.query.ListJobs.json',
-        res: 'res.ListJobs.json'
+        query: ListJobsQuery,
+        res: ListJobsResponse
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
@@ -37,10 +49,9 @@ export default async function router(schema, config) {
     await schema.get('/job/orphaned', {
         name: 'List Orphaned Jobs',
         group: 'Job',
-        auth: 'admin',
         description: 'Return jobs that have no matching entry in the results table',
-        query: 'req.query.ListOrphanedJobs.json',
-        res: 'res.ListJobs.json'
+        query: ListOrphanedJobsQuery,
+        res: ListJobsResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -56,10 +67,11 @@ export default async function router(schema, config) {
     await schema.get('/job/:job', {
         name: 'Get Job',
         group: 'Job',
-        auth: 'public',
         description: 'Return all information about a given job',
-        ':job': 'integer',
-        res: 'res.Job.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: JobResponse
     }, async (req, res) => {
         try {
             const job = await Job.from(config.pool, req.params.job);
@@ -78,9 +90,10 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/raw', {
         name: 'Raw Source',
         group: 'Job',
-        auth: 'public',
         description: 'Return the raw source from github - this API is not stable nor will it always return a consistent result',
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             const job = await Job.from(config.pool, req.params.job);
@@ -94,10 +107,11 @@ export default async function router(schema, config) {
     await schema.post('/job/:job/rerun', {
         name: 'Rerun Job',
         group: 'Job',
-        auth: 'admin',
         description: 'Submit a job for reprocessing - often useful for network errors',
-        ':job': 'integer',
-        res: 'res.SingleJobsCreate.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: SingleJobsCreateResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -123,10 +137,11 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/delta', {
         name: 'Job Stats Comparison',
         group: 'Job',
-        auth: 'public',
         description: 'Compare the stats of the given job against the current live data job',
-        ':job': 'integer',
-        res: 'res.SingleDelta.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: SingleDeltaResponse
     }, async (req, res) => {
         try {
             const delta = await Job.delta(config.pool, req.params.job);
@@ -140,9 +155,10 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/source.png', {
         name: 'Get Job Preview',
         group: 'Job',
-        auth: 'public',
         description: 'Return a preview image for the job',
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             console.error(`s3://${process.env.Bucket}/${process.env.StackName}/job/${req.params.job}/source.png`);
@@ -160,7 +176,6 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/validated.geojson.gz', {
         name: 'Validated Data',
         group: 'Job',
-        auth: 'user',
         description: `
             Sponsors of our project receive access to validated data as a way of saying thanks for
             keeping our project alive.
@@ -174,7 +189,9 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_level(req, 'sponsor');
@@ -192,7 +209,6 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/source.geojson.gz', {
         name: 'Get Job Data',
         group: 'Job',
-        auth: 'user',
         description: `
             Note: the user must be authenticated to perform a download. One of our largest costs is
             S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data free.
@@ -203,7 +219,9 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
@@ -221,9 +239,10 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/sample', {
         name: 'Small Sample',
         group: 'Job',
-        auth: 'public',
         description: 'Return an Array containing a sample of the properties',
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             const s3 = new S3({
@@ -245,7 +264,6 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/cache.zip', {
         name: 'Get Job Cache',
         group: 'Job',
-        auth: 'user',
         description: `
             Note: the user must be authenticated to perform a download. One of our largest costs is
             S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data free.
@@ -256,7 +274,9 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
@@ -270,15 +290,16 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/log', {
         name: 'Get Job Log',
         group: 'Job',
-        auth: 'public',
         description: `
             Return the batch-machine processing log for a given job
             Note: These are stored in AWS CloudWatch and *do* expire
             The presence of a loglink on a job, does not guarantee log retention
         `,
-        ':job': 'integer',
-        query: 'req.query.SingleLog.json',
-        res: 'res.SingleLog.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        query: SingleLogQuery,
+        res: SingleLogResponse
     }, async (req, res) => {
         try {
             const job = await Job.from(config.pool, req.params.job);
@@ -303,11 +324,12 @@ export default async function router(schema, config) {
     await schema.patch('/job/:job', {
         name: 'Update Job',
         group: 'Job',
-        auth: 'admin',
         description: 'Update a job',
-        ':job': 'integer',
-        body: 'req.body.PatchJob.json',
-        res: 'res.Job.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        body: PatchJobBody,
+        res: JobResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -326,10 +348,11 @@ export default async function router(schema, config) {
     await schema.delete('/job/:job', {
         name: 'Delete Job',
         group: 'Job',
-        auth: 'admin',
         description: 'Delete a job and its associated database record',
-        ':job': 'integer',
-        res: 'res.Standard.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);

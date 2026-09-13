@@ -2,19 +2,21 @@ import Err from '@openaddresses/batch-error';
 import busboy from 'busboy';
 import Upload from '../lib/upload.js';
 import Auth from '../lib/auth.js';
+import {
+    StandardResponse
+} from '../lib/schema.js';
 
 export default async function router(schema) {
     await schema.post('/upload', {
         name: 'Create Upload',
         group: 'Upload',
-        auth: 'upload',
         description: `
             Statically cache source data
 
             If a source is unable to be pulled from directly, authenticated users can cache
             data resources to the OpenAddresses S3 cache to be pulled from
         `,
-        res: 'res.Standard.json'
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_flag(req, 'upload');

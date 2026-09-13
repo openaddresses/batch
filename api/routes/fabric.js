@@ -1,13 +1,16 @@
 import Err from '@openaddresses/batch-error';
 import Cacher from '../lib/cacher.js';
+import { Type } from '@sinclair/typebox';
+import {
+    TileJSONResponse
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     await schema.get('/fabric', {
         name: 'Fabric TileJSON',
         group: 'Map',
-        auth: 'public',
         description: 'Return a TileJSON for the current fabric',
-        res: 'res.TileJSON.json'
+        res: TileJSONResponse
     }, async (req, res) => {
         try {
             res.json(config.tb.tilejson());
@@ -19,11 +22,12 @@ export default async function router(schema, config) {
     await schema.get('/fabric/:z/:x/:y.mvt', {
         name: 'Fabric MVT',
         group: 'Map',
-        auth: 'public',
         description: 'Retreive fabric Mapbox Vector Tiles',
-        ':z': 'integer',
-        ':x': 'integer',
-        ':y': 'integer'
+        params: Type.Object({
+            z: Type.Integer(),
+            x: Type.Integer(),
+            y: Type.Integer()
+        })
     }, async (req, res) => {
         let tile;
         try {

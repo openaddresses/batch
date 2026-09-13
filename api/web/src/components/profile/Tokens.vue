@@ -5,18 +5,24 @@
                 API Tokens:
             </h3>
             <div class='d-flex ms-auto btn-list'>
-                <IconPlus
-                    class='cursor-pointer'
-                    size='32'
-                    stroke='1'
+                <TablerIconButton
+                    title='Create token'
                     @click='newToken.show = true'
-                />
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
-                    stroke='1'
+                >
+                    <IconPlus
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
+                <TablerIconButton
+                    title='Refresh tokens'
                     @click='refresh'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
         <TablerLoading
@@ -26,7 +32,7 @@
         <TablerNone
             v-else-if='!tokens.length && !newToken.show'
             :create='false'
-            label='Tokens'
+            label='No Tokens'
         />
         <template v-else>
             <template v-if='newToken.show && !newToken.token'>
@@ -36,11 +42,15 @@
                             <h2 class='subheader'>
                                 Create New Token
                             </h2>
-                            <IconX
-                                class='cursor-pointer'
-                                size='32'
+                            <TablerIconButton
+                                title='Cancel'
                                 @click='newToken.show = false'
-                            />
+                            >
+                                <IconX
+                                    :size='32'
+                                    stroke='1'
+                                />
+                            </TablerIconButton>
                         </div>
 
                         <div class='col-10'>
@@ -52,11 +62,15 @@
                             />
                         </div>
                         <div class='col-2'>
-                            <IconCheck
-                                class='cursor-pointer'
-                                size='32'
+                            <TablerIconButton
+                                title='Create token'
                                 @click='setToken'
-                            />
+                            >
+                                <IconCheck
+                                    :size='32'
+                                    stroke='1'
+                                />
+                            </TablerIconButton>
                         </div>
                     </div>
                 </div>
@@ -67,11 +81,15 @@
                         class='txt-bold fl'
                         v-text='newToken.name'
                     />
-                    <IconX
-                        class='cursor-pointer'
-                        size='32'
+                    <TablerIconButton
+                        title='Close'
                         @click='newToken.show = false'
-                    />
+                    >
+                        <IconX
+                            :size='32'
+                            stroke='1'
+                        />
+                    </TablerIconButton>
                 </div>
 
                 <div class='col-12'>
@@ -99,11 +117,15 @@
                             <td>
                                 <div class='d-flex'>
                                     <div class='ms-auto'>
-                                        <IconTrash
-                                            class='cursor-pointer'
-                                            size='32'
+                                        <TablerIconButton
+                                            title='Delete token'
                                             @click='deleteToken(token.id)'
-                                        />
+                                        >
+                                            <IconTrash
+                                                :size='32'
+                                                stroke='1'
+                                            />
+                                        </TablerIconButton>
                                     </div>
                                 </div>
                             </td>
@@ -119,7 +141,8 @@
 import {
     TablerLoading,
     TablerInput,
-    TablerNone
+    TablerNone,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import {
     IconX,
@@ -132,6 +155,7 @@ import {
 export default {
     name: 'Tokens',
     components: {
+        TablerIconButton,
         IconX,
         IconPlus,
         IconTrash,

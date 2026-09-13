@@ -22,18 +22,24 @@
                                 </h3>
 
                                 <div class='ms-auto btn-list'>
-                                    <IconSearch
-                                        class='cursor-pointer'
-                                        size='32'
+                                    <TablerIconButton
                                         title='Toggle filters'
                                         @click='showFilter = !showFilter'
-                                    />
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
+                                    >
+                                        <IconSearch
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
                                         title='Refresh errors'
                                         @click='fetchProblems'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
                             <template v-if='showFilter'>
@@ -56,7 +62,7 @@
                             />
                             <TablerNone
                                 v-else-if='!list.total'
-                                label='Errors'
+                                label='No Errors'
                                 :create='false'
                             />
                             <table
@@ -135,12 +141,14 @@ import TableFooter from './util/TableFooter.vue';
 import {
     TablerNone,
     TablerLoading,
-    TablerBreadCrumb
+    TablerBreadCrumb,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Errors',
     components: {
+        TablerIconButton,
         IconSearch,
         IconRefresh,
         Status,

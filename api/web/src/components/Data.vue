@@ -60,13 +60,16 @@
                             </h2>
 
                             <div class='ms-auto btn-list'>
-                                <IconRefresh
-                                    class='cursor-pointer'
-                                    size='32'
-                                    stroke='1'
+                                <TablerIconButton
                                     title='Refresh collections'
+                                    :hover='false'
                                     @click='fetchCollections'
-                                />
+                                >
+                                    <IconRefresh
+                                        :size='32'
+                                        stroke='1'
+                                    />
+                                </TablerIconButton>
                             </div>
                         </div>
 
@@ -95,13 +98,16 @@
                                     <td class='d-flex align-items-center'>
                                         <span v-text='size(c.size)' />
                                         <div class='ms-auto btn-list'>
-                                            <IconDownload
-                                                class='cursor-pointer'
-                                                size='32'
-                                                stroke='1'
+                                            <TablerIconButton
                                                 title='Download collection'
+                                                :hover='false'
                                                 @click.stop.prevent='collectionpls(c)'
-                                            />
+                                            >
+                                                <IconDownload
+                                                    :size='32'
+                                                    stroke='1'
+                                                />
+                                            </TablerIconButton>
                                         </div>
                                     </td>
                                 </tr>
@@ -127,47 +133,57 @@
                                     v-model='showUnhealthyOnly'
                                     label='Show unhealthy only'
                                 />
-                                <IconArrowsMaximize
+                                <TablerIconButton
                                     v-if='!fullscreen'
-                                    class='cursor-pointer'
-                                    size='32'
-                                    stroke='1'
                                     title='Expand map'
                                     @click='fullscreen = true'
-                                />
-                                <IconArrowsMinimize
+                                >
+                                    <IconArrowsMaximize
+                                        :size='32'
+                                        stroke='1'
+                                    />
+                                </TablerIconButton>
+                                <TablerIconButton
                                     v-else
-                                    class='cursor-pointer'
-                                    size='32'
-                                    stroke='1'
                                     title='Collapse map'
                                     @click='fullscreen = false'
-                                />
+                                >
+                                    <IconArrowsMinimize
+                                        :size='32'
+                                        stroke='1'
+                                    />
+                                </TablerIconButton>
 
-                                <IconSearch
+                                <TablerIconButton
                                     v-if='!showFilter'
-                                    class='cursor-pointer'
-                                    size='32'
-                                    stroke='1'
                                     title='Show filters'
                                     @click='showFilter = !showFilter'
-                                />
-                                <IconX
+                                >
+                                    <IconSearch
+                                        :size='32'
+                                        stroke='1'
+                                    />
+                                </TablerIconButton>
+                                <TablerIconButton
                                     v-else
-                                    class='cursor-pointer'
-                                    size='32'
-                                    stroke='1'
                                     title='Hide filters'
                                     @click='showFilter = !showFilter'
-                                />
+                                >
+                                    <IconX
+                                        :size='32'
+                                        stroke='1'
+                                    />
+                                </TablerIconButton>
 
-                                <IconRefresh
-                                    class='cursor-pointer'
-                                    size='32'
-                                    stroke='1'
+                                <TablerIconButton
                                     title='Refresh sources'
                                     @click='fetchData'
-                                />
+                                >
+                                    <IconRefresh
+                                        :size='32'
+                                        stroke='1'
+                                    />
+                                </TablerIconButton>
                             </div>
                         </div>
 
@@ -233,7 +249,7 @@
                         >
                             <TablerNone
                                 :create='false'
-                                label='Data Sources'
+                                label='No Data Sources'
                             />
                         </div>
                         <template v-else>
@@ -337,14 +353,16 @@
                                             <td>
                                                 <div class='d-flex'>
                                                     <div class='ms-auto btn-list'>
-                                                        <IconMap
+                                                        <TablerIconButton
                                                             v-if='d.map'
-                                                            class='cursor-pointer'
-                                                            size='32'
-                                                            stroke='1'
                                                             title='View on map'
                                                             @click='$router.push(`/location/${d.map}`)'
-                                                        />
+                                                        >
+                                                            <IconMap
+                                                                :size='32'
+                                                                stroke='1'
+                                                            />
+                                                        </TablerIconButton>
                                                     </div>
                                                 </div>
                                             </td>
@@ -394,12 +412,14 @@
                                                                     <template v-if='auth && auth.access === "admin"'>
                                                                         <TablerDropdown>
                                                                             <slot>
-                                                                                <IconSettings
-                                                                                    class='cursor-pointer'
-                                                                                    size='32'
-                                                                                    stroke='1'
+                                                                                <TablerIconButton
                                                                                     title='Admin settings'
-                                                                                />
+                                                                                >
+                                                                                    <IconSettings
+                                                                                        :size='32'
+                                                                                        stroke='1'
+                                                                                    />
+                                                                                </TablerIconButton>
                                                                             </slot>
                                                                             <template #dropdown>
                                                                                 <TablerToggle
@@ -412,13 +432,15 @@
                                                                         </TablerDropdown>
                                                                     </template>
 
-                                                                    <IconHistory
-                                                                        class='cursor-pointer'
-                                                                        size='32'
-                                                                        stroke='1'
+                                                                    <TablerIconButton
                                                                         title='View history'
                                                                         @click='$router.push(`/data/${job.id}/history`)'
-                                                                    />
+                                                                    >
+                                                                        <IconHistory
+                                                                            :size='32'
+                                                                            stroke='1'
+                                                                        />
+                                                                    </TablerIconButton>
                                                                 </template>
                                                             </div>
                                                         </div>
@@ -449,7 +471,7 @@ import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
-import moment from 'moment-timezone';
+import { fmtDate } from '../util/date.js';
 import {
     IconArrowsMaximize,
     IconArrowsMinimize,
@@ -469,13 +491,15 @@ import {
     TablerDropdown,
     TablerToggle,
     TablerDelete,
-    TablerInput
+    TablerInput,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import { classifyEntry, worstState } from '../util/health.js';
 
 export default {
     name: 'OAData',
     components: {
+        TablerIconButton,
         MustLogin,
         IconArrowsMaximize,
         IconArrowsMinimize,
@@ -503,7 +527,6 @@ export default {
     props: ['auth'],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             fullscreen: false,
             loading: {
                 sources: false,
@@ -555,7 +578,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+            return fmtDate(date);
         },
         size: function(bytes) {
             if (bytes == 0) { return "0.00 B"; }

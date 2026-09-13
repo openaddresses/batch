@@ -41,11 +41,14 @@
                                 <div class='ms-auto btn-list'>
                                     <TablerDropdown>
                                         <slot>
-                                            <IconDotsVertical
-                                                class='cursor-pointer'
-                                                size='32'
+                                            <TablerIconButton
                                                 title='More actions'
-                                            />
+                                            >
+                                                <IconDotsVertical
+                                                    :size='32'
+                                                    stroke='1'
+                                                />
+                                            </TablerIconButton>
                                         </slot>
                                         <template #dropdown>
                                             <div
@@ -57,12 +60,15 @@
                                         </template>
                                     </TablerDropdown>
 
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
+                                    <TablerIconButton
                                         title='Refresh'
                                         @click='refresh'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
                             <div class='card-body'>
@@ -131,12 +137,14 @@ import {
 import {
     TablerLoading,
     TablerDropdown,
-    TablerBreadCrumb
+    TablerBreadCrumb,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Export',
     components: {
+        TablerIconButton,
         IconArrowDown,
         IconRefresh,
         IconDotsVertical,

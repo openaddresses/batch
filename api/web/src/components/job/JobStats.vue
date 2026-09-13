@@ -2,7 +2,7 @@
     <div class='col-12'>
         <TablerNone
             v-if='!job.stats || JSON.stringify(job.stats) === "{}"'
-            label='Job Stats'
+            label='No Job Stats'
             :create='false'
         />
         <template v-else>

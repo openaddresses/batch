@@ -22,12 +22,15 @@
                                 </h3>
 
                                 <div class='ms-auto btn-list'>
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
+                                    <TablerIconButton
                                         title='Refresh runs'
                                         @click='fetchRuns'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
 
@@ -91,19 +94,21 @@
 
 <script>
 import Status from './util/Status.vue';
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../util/date.js';
 import TableFooter from './util/TableFooter.vue';
 import {
     IconRefresh
 } from '@tabler/icons-vue';
 import {
     TablerLoading,
-    TablerBreadCrumb
+    TablerBreadCrumb,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Runs',
     components: {
+        TablerIconButton,
         Status,
         IconRefresh,
         TableFooter,
@@ -112,7 +117,6 @@ export default {
     },
     data: function() {
         return {
-            tz: moment.tz.guess(),
             loading: false,
             paging: {
                 filter: '',
@@ -140,7 +144,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         github: function(run) {
             this.external(`https://github.com/openaddresses/openaddresses/commit/${run.github.sha}`);

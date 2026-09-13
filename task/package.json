@@ -36,7 +36,6 @@
         "prompts": "^2.4.0",
         "request": "^2.88.2",
         "split2": "^4.1.0",
-        "tilebase": "^4.0.0",
         "wellknown": "^0.5.0"
     },
     "devDependencies": {

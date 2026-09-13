@@ -6,16 +6,24 @@
             </h2>
 
             <div class='ms-auto btn-list'>
-                <IconPlus
-                    class='cursor-pointer'
-                    size='32'
+                <TablerIconButton
+                    title='Add collection'
                     @click='collections.splice(0, 0, {})'
-                />
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
+                >
+                    <IconPlus
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
+                <TablerIconButton
+                    title='Refresh collections'
                     @click='refresh'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
 
@@ -50,12 +58,14 @@ import {
 } from '@tabler/icons-vue';
 
 import {
-    TablerLoading
+    TablerLoading,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'AdminCollections',
     components: {
+        TablerIconButton,
         TablerLoading,
         IconPlus,
         IconRefresh,

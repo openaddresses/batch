@@ -42,12 +42,15 @@
                     </h3>
 
                     <div class='d-flex ms-auto'>
-                        <IconRefresh
-                            class='cursor-pointer'
-                            size='32'
-                            stroke='1'
+                        <TablerIconButton
+                            title='Refresh'
                             @click='$emit("refresh")'
-                        />'
+                        >
+                            <IconRefresh
+                                :size='32'
+                                stroke='1'
+                            />
+                        </TablerIconButton>'
                     </div>
                 </div>
                 <div class='card-body row'>
@@ -268,7 +271,8 @@
 
 <script>
 import {
-    TablerInput
+    TablerInput,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 import {
@@ -286,6 +290,7 @@ import Exports from '../cards/Exports.vue'
 export default {
     name: 'ProfileDefault',
     components: {
+        TablerIconButton,
         Tokens,
         Exports,
         IconUser,

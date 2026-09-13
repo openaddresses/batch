@@ -5,11 +5,15 @@
                 Exports
             </h3>
             <div class='d-flex ms-auto btn-list'>
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
+                <TablerIconButton
+                    title='Refresh exports'
                     @click='fetchExports'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
         <TablerLoading
@@ -63,11 +67,12 @@
 
 <script>
 import Status from '../util/Status.vue';
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../../util/date.js';
 import TableFooter from '../util/TableFooter.vue';
 import {
     TablerLoading,
     TablerNone,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import {
     IconRefresh
@@ -76,6 +81,7 @@ import {
 export default {
     name: 'CardExports',
     components: {
+        TablerIconButton,
         IconRefresh,
         TableFooter,
         TablerLoading,
@@ -85,7 +91,6 @@ export default {
     props: [ 'profile' ],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             loading: false,
             list: {
                 total: 0,
@@ -112,7 +117,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         fetchExports: async function() {
             try {

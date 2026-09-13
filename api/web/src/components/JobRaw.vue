@@ -7,24 +7,34 @@
                 </h2>
 
                 <div class='ms-auto btn-list'>
-                    <IconRefresh
-                        class='cursor-pointer'
-                        size='32'
-                        stroke='1'
+                    <TablerIconButton
+                        title='Refresh'
                         @click='refresh'
-                    />
-                    <IconBrandGithub
-                        class='cursor-pointer'
-                        size='32'
-                        stroke='1'
+                    >
+                        <IconRefresh
+                            :size='32'
+                            stroke='1'
+                        />
+                    </TablerIconButton>
+                    <TablerIconButton
+                        title='View source on GitHub'
                         @click='external(job.source)'
-                    />
-                    <IconLink
+                    >
+                        <IconBrandGithub
+                            :size='32'
+                            stroke='1'
+                        />
+                    </TablerIconButton>
+                    <TablerIconButton
                         v-if='job.source'
-                        size='32'
-                        stroke='1'
+                        title='Open source URL'
                         @click='external(raw.data)'
-                    />
+                    >
+                        <IconLink
+                            :size='32'
+                            stroke='1'
+                        />
+                    </TablerIconButton>
                 </div>
             </div>
         </div>
@@ -45,6 +55,9 @@
 
 <script>
 import {
+    TablerIconButton
+} from '@tak-ps/vue-tabler';
+import {
     IconRefresh,
     IconBrandGithub,
     IconLink
@@ -53,6 +66,7 @@ import {
 export default {
     name: 'JobRaw',
     components: {
+        TablerIconButton,
         IconRefresh,
         IconBrandGithub,
         IconLink

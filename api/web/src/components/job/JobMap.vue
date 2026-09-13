@@ -2,7 +2,7 @@
     <div class='col-12'>
         <TablerNone
             v-if='!job.bounds'
-            label='Job Bounds'
+            label='No Job Bounds'
             :create='false'
         />
         <template v-else>

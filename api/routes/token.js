@@ -7,7 +7,7 @@ import {
     CreateTokenBody,
     CreateTokenResponse,
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     const token = new Token(config.pool);

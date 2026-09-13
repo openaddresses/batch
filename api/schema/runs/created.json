@@ -1,9 +1,0 @@
-{
-    "type": [
-        "integer",
-        "null"
-    ],
-    "format": "date-time",
-    "description": "",
-    "$comment": "timestamp"
-}

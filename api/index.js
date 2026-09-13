@@ -9,10 +9,12 @@ import Schema from '@openaddresses/batch-schema';
 import Err from '@openaddresses/batch-error';
 import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';
+import * as pgschema from './lib/schema.js';
+import Models from './lib/models.js';
 
 import User from './lib/user.js';
 import Token from './lib/token.js';
-import { StandardResponse } from './lib/schema.js';
+import { StandardResponse } from './lib/types.js';
 
 try {
     const dotfile = new URL('.env', import.meta.url);
@@ -69,18 +71,15 @@ async function configure(args) {
 
 export default async function server(config) {
     config.cacher = new Cacher(config.args['no-cache'], config.silent);
-    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses', {
-        schemas: {
-            dir: new URL('./schema/', import.meta.url)
-        },
-        parsing: {
-            geometry: true
-        }
+    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses', pgschema, {
+        ssl: process.env.StackName === 'test' ? undefined : { rejectUnauthorized: false }
     });
+
+    config.models = new Models(config.pool);
 
     try {
         if (config.args.populate) {
-            await Map.populate(config.pool);
+            await config.models.Map.populate();
         }
     } catch (err) {
         throw new Error(err);

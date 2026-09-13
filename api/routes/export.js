@@ -1,6 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import Job from '../lib/types/job.js';
-import Exporter from '../lib/types/exporter.js';
 import Auth from '../lib/auth.js';
 import { Type } from '@sinclair/typebox';
 import {
@@ -11,7 +9,7 @@ import {
     ListExportResponse,
     StandardResponse,
     PatchExportBody
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.post('/export', {
@@ -24,18 +22,18 @@ export default async function router(schema, config) {
         try {
             await Auth.is_level(req, 'backer');
 
-            if (req.auth.access !== 'admin' && await Exporter.count(config.pool, req.auth.uid) >= config.limits.exports) {
+            if (req.auth.access !== 'admin' && await config.models.Exporter.monthly(req.auth.uid) >= config.limits.exports) {
                 throw new Err(400, null, 'Reached Monthly Export Limit');
             }
 
-            const job = await Job.from(config.pool, req.body.job_id);
+            const job = await config.models.Job.from(req.body.job_id);
             if (job.status !== 'Success') throw new Err(400, null, 'Cannot export a job that was not successful');
 
             req.body.uid = req.auth.uid;
 
-            const exp = await Exporter.generate(config.pool, req.body);
-            await exp.batch();
-            return res.json(exp.serialize());
+            const exp = await config.models.Exporter.generate(req.body);
+            await config.models.Exporter.batch(exp);
+            return res.json(exp);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -55,10 +53,10 @@ export default async function router(schema, config) {
         res: SingleLogResponse
     }, async (req, res) => {
         try {
-            const exp = await Exporter.from(config.pool, req.params.exportid);
+            const exp = await config.models.Exporter.from(req.params.exportid);
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
-            return res.json(await exp.log());
+            return res.json(await config.models.Exporter.log(exp));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -76,7 +74,12 @@ export default async function router(schema, config) {
                 req.query.uid = req.auth.uid;
             }
 
-            res.json(await Exporter.list(config.pool, req.query));
+            const list = await config.models.Exporter.list(req.query);
+
+            res.json({
+                total: list.total,
+                exports: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -92,7 +95,7 @@ export default async function router(schema, config) {
         res: ExportResponse
     }, async (req, res) => {
         try {
-            const exp = (await Exporter.from(config.pool, req.params.exportid)).serialize();
+            const exp = await config.models.Exporter.from(req.params.exportid);
             if (req.auth.access !== 'admin' && req.auth.uid !== exp.uid) throw new Err(403, null, 'You didn\'t create that export');
 
             res.json(exp);
@@ -113,13 +116,13 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const exp = await Exporter.commit(config.pool, req.params.exportid, {
+            const exp = await config.models.Exporter.commit(req.params.exportid, {
                 status: 'Pending',
                 loglink: null,
                 size: null
             });
 
-            await exp.batch();
+            await config.models.Exporter.batch(exp);
 
             res.json(exp);
         } catch (err) {
@@ -138,7 +141,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            await Exporter.data(config.pool, req.auth, req.params.exportid, res);
+            await config.models.Exporter.data(req.auth, req.params.exportid, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -157,9 +160,9 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const exp = await Exporter.commit(config.pool, req.params.exportid, req.body);
+            const exp = await config.models.Exporter.commit(req.params.exportid, req.body);
 
-            return res.json(exp.serialize());
+            return res.json(exp);
         } catch (err) {
             return Err.respond(err, res);
         }

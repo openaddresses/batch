@@ -1,10 +1,10 @@
 import Err from '@openaddresses/batch-error';
-import { PatchUserBody } from './schema.js';
+import { PatchUserBody } from './types.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { promisify } from 'util';
 import moment from 'moment';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 
 const randomBytes = promisify(crypto.randomBytes);
 
@@ -28,7 +28,7 @@ export default class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     uid
                 FROM
@@ -42,20 +42,20 @@ export default class User {
             throw new Err(500, err, 'User Verify Error');
         }
 
-        if (pgres.rows.length !== 1) {
+        if (pgres.length !== 1) {
             throw new Err(401, null, 'Invalid or Expired Verify Token');
         }
 
         try {
-            await this.pool.query(sql`
+            await this.pool.execute(sql`
                 DELETE FROM users_reset
-                    WHERE uid = ${pgres.rows[0].uid}
+                    WHERE uid = ${pgres[0].uid}
             `);
 
-            await this.pool.query(sql`
+            await this.pool.execute(sql`
                 UPDATE users
                     SET validated = True
-                    WHERE id = ${pgres.rows[0].uid}
+                    WHERE id = ${pgres[0].uid}
             `);
 
             return {
@@ -73,7 +73,7 @@ export default class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     uid
                 FROM
@@ -87,16 +87,16 @@ export default class User {
             throw new Err(500, err, 'User Reset Error');
         }
 
-        if (pgres.rows.length !== 1) {
+        if (pgres.length !== 1) {
             throw new Err(401, null, 'Invalid or Expired Reset Token');
         }
 
-        const uid = pgres.rows[0].uid;
+        const uid = pgres[0].uid;
 
         try {
             const userhash = await bcrypt.hash(user.password, 10);
 
-            await this.pool.query(sql`
+            await this.pool.execute(sql`
                 UPDATE users
                     SET
                         password = ${userhash},
@@ -105,7 +105,7 @@ export default class User {
                         id = ${uid}
             `);
 
-            await this.pool.query(sql`
+            await this.pool.execute(sql`
                 DELETE FROM users_reset
                     WHERE uid = ${uid}
             `);
@@ -131,7 +131,7 @@ export default class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     id,
                     username,
@@ -150,15 +150,15 @@ export default class User {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        if (pgres.rows.length !== 1) return;
-        const u = pgres.rows[0];
+        if (pgres.length !== 1) return;
+        const u = pgres[0];
 
         if (action === 'verify' && u.validated) {
             throw new Err(400, null, 'User is already verified');
         }
 
         try {
-            await this.pool.query(sql`
+            await this.pool.execute(sql`
                 DELETE FROM
                     users_reset
                 WHERE
@@ -172,7 +172,7 @@ export default class User {
         try {
             const buffer = await randomBytes(40);
 
-            await this.pool.query(sql`
+            await this.pool.execute(sql`
                 INSERT INTO
                     users_reset (uid, expires, token, action)
                 VALUES (
@@ -201,7 +201,7 @@ export default class User {
         console.error(email, level);
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 UPDATE users
                     SET
                         level = ${level}
@@ -212,7 +212,7 @@ export default class User {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        return !!pgres.rows.length;
+        return pgres.count > 0;
     }
 
     async patch(uid, patch) {
@@ -226,7 +226,7 @@ export default class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 UPDATE users
                     SET
                         flags = ${JSON.stringify(user.flags)},
@@ -242,7 +242,7 @@ export default class User {
 
         // TODO Force relogin on account changes
 
-        const row = pgres.rows[0];
+        const row = pgres[0];
 
         return {
             id: row.id,
@@ -301,7 +301,7 @@ export default class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     count(*) OVER() AS count,
                     id,
@@ -333,8 +333,8 @@ export default class User {
         }
 
         return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            users: pgres.rows.map((row) => {
+            total: pgres.length ? parseInt(pgres[0].count) : 0,
+            users: pgres.map((row) => {
                 return {
                     id: parseInt(row.id),
                     level: row.level,
@@ -351,7 +351,7 @@ export default class User {
     async user(uid) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     id,
                     level,
@@ -368,17 +368,17 @@ export default class User {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        if (pgres.rows.length === 0) {
+        if (pgres.length === 0) {
             throw new Error(404, null, 'Failed to retrieve user');
         }
 
         return {
-            uid: parseInt(pgres.rows[0].id),
-            level: pgres.rows[0].level,
-            username: pgres.rows[0].username,
-            email: pgres.rows[0].email,
-            access: pgres.rows[0].access,
-            flags: pgres.rows[0].flags
+            uid: parseInt(pgres[0].id),
+            level: pgres[0].level,
+            username: pgres[0].username,
+            email: pgres[0].email,
+            access: pgres[0].access,
+            flags: pgres[0].flags
         };
     }
 
@@ -390,7 +390,7 @@ export default class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     id,
                     username,
@@ -410,29 +410,29 @@ export default class User {
             throw new Err(500, err, 'Internal Login Error');
         }
 
-        if (pgres.rows.length === 0) {
+        if (pgres.length === 0) {
             throw new Err(403, null, 'Invalid Username or Pass');
         }
 
-        if (!await bcrypt.compare(user.password, pgres.rows[0].password)) {
+        if (!await bcrypt.compare(user.password, pgres[0].password)) {
             throw new Err(403, null, 'Invalid Username or Pass');
         }
 
-        if (!pgres.rows[0].validated) {
+        if (!pgres[0].validated) {
             throw new Err(403, null, 'User has not confirmed email');
         }
 
-        if (pgres.rows[0].access === 'disabled') {
+        if (pgres[0].access === 'disabled') {
             throw new Err(403, null, 'Account Disabled - Please Contact Us');
         }
 
         return {
-            uid: parseInt(pgres.rows[0].id),
-            level: pgres.rows[0].level,
-            username: pgres.rows[0].username,
-            access: pgres.rows[0].access,
-            email: pgres.rows[0].email,
-            flags: pgres.rows[0].flags
+            uid: parseInt(pgres[0].id),
+            level: pgres[0].level,
+            username: pgres[0].username,
+            access: pgres[0].access,
+            email: pgres[0].email,
+            flags: pgres[0].flags
         };
     }
 
@@ -446,7 +446,7 @@ export default class User {
         try {
             const uhash = await bcrypt.hash(user.password, 10);
 
-            const pgres = await this.pool.query(sql`
+            const pgres = await this.pool.execute(sql`
                 INSERT INTO users (
                     username,
                     email,
@@ -462,7 +462,7 @@ export default class User {
                 ) RETURNING *
             `);
 
-            const row = pgres.rows[0];
+            const row = pgres[0];
 
             return {
                 id: parseInt(row.id),
@@ -473,7 +473,7 @@ export default class User {
                 flags: row.flags
             };
         } catch (err) {
-            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
+            if (err.code === '23505' || (err.cause && err.cause.code === '23505')) {
                 throw new Err(400, null, 'User already exists');
             }
 

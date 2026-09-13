@@ -1,7 +1,7 @@
 import Err from '@openaddresses/batch-error';
 import moment from 'moment';
 import User from './user.js';
-import Override from './types/level-override.js';
+import LevelOverrideModel from './models/LevelOverride.js';
 import fs from 'fs';
 
 const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
@@ -19,6 +19,7 @@ export default class Level {
         this.OpenCollective = process.env.OPENCOLLECTIVE_API_KEY;
         this.base = 'https://api.opencollective.com/graphql/v2';
         this.user = new User(pool);
+        this.override = new LevelOverrideModel(pool);
         this.pool = pool;
     }
 
@@ -31,7 +32,7 @@ export default class Level {
      * @param {String} email
      */
     async single(email) {
-        for (const override of (await Override.list(this.pool)).level_override) {
+        for (const override of (await this.override.list()).items) {
             if (email.match(override.pattern)) {
                 return await this.user.level(email, override.level);
             }
@@ -168,7 +169,7 @@ export default class Level {
             if (!usr.account.transactions.nodes.length) continue;
             if (!usr.account.email) continue;
 
-            for (const override of (await Override.list(this.pool)).level_override) {
+            for (const override of (await this.override.list()).items) {
                 if (usr.account.email.match(override.pattern)) {
                     return await this.user.level(usr.account.email, override.level);
                 }

@@ -1,8 +1,8 @@
 import Err from '@openaddresses/batch-error';
-import License from '../lib/types/license.js';
+import License from '../lib/license.js';
 import {
     LicensesResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.get('/licenses', {

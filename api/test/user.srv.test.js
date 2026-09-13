@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 import moment from 'moment';
 
 const flight = new Flight();
@@ -84,7 +84,7 @@ test('POST: api/login (not confirmed)', async () => {
 
 test('META: Validate User', async () => {
     try {
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             UPDATE users SET validated = True;
         `);
     } catch (err) {

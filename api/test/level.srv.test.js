@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'assert';
 import Level from '../lib/level.js';
-import LevelOverride from '../lib/types/level-override.js';
 import Flight from './flight.js';
 import nock from 'nock';
 import moment from 'moment';
@@ -80,7 +79,7 @@ flight.user('hello');
 test('Level#user - override', async () =>  {
     const level = new Level(flight.config.pool);
 
-    await LevelOverride.generate(flight.config.pool, {
+    await flight.config.models.LevelOverride.generate({
         pattern: '^hello@openaddresses.io$',
         level: 'sponsor'
     });

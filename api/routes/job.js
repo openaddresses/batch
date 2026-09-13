@@ -1,6 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Run from '../lib/types/run.js';
-import Job from '../lib/types/job.js';
+import Job from '../lib/models/Job.js';
 import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 import S3 from '../lib/s3.js';
@@ -16,7 +15,7 @@ import {
     SingleLogResponse,
     PatchJobBody,
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     const ci = new CI(config);
@@ -31,16 +30,19 @@ export default async function router(schema, config) {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
 
-            const list = await Job.list(config.pool, req.query);
+            const list = await config.models.Job.list(req.query);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
-                for (const j of list.jobs) {
+                for (const j of list.items) {
                     delete j.s3;
                     delete j.s3_validated;
                 }
             }
 
-            return res.json(list);
+            return res.json({
+                total: list.total,
+                jobs: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -56,9 +58,12 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const list = await Job.orphaned(config.pool, req.query);
+            const list = await config.models.Job.orphaned(req.query);
 
-            return res.json(list);
+            return res.json({
+                total: list.total,
+                jobs: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -74,14 +79,14 @@ export default async function router(schema, config) {
         res: JobResponse
     }, async (req, res) => {
         try {
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 delete job.s3;
                 delete job.s3_validated;
             }
 
-            return res.json(job.serialize());
+            return res.json(job);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -96,9 +101,9 @@ export default async function router(schema, config) {
         })
     }, async (req, res) => {
         try {
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
-            return res.json(await job.get_raw());
+            return res.json(await Job.raw(job));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -116,14 +121,14 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const job = await Job.from(config.pool, req.params.job);
-            const run = await Run.from(config.pool, job.run);
+            const job = await config.models.Job.from(req.params.job);
+            const run = await config.models.Run.from(job.run);
 
-            const new_run = await Run.generate(config.pool, {
+            const new_run = await config.models.Run.generate({
                 live: !!run.live
             });
 
-            return res.json(await Run.populate(config.pool, new_run.id, [{
+            return res.json(await config.models.Run.populate(new_run.id, [{
                 source: job.source,
                 layer: job.layer,
                 name: job.name,
@@ -144,7 +149,7 @@ export default async function router(schema, config) {
         res: SingleDeltaResponse
     }, async (req, res) => {
         try {
-            const delta = await Job.delta(config.pool, req.params.job);
+            const delta = await config.models.Job.delta(req.params.job);
 
             return res.json(delta);
         } catch (err) {
@@ -196,7 +201,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_level(req, 'sponsor');
 
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
             if (!job.output.validated) throw new Err(400, null, 'Job does not have validated data');
 
@@ -226,7 +231,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
             if (!job.output.output) throw new Err(400, null, 'Job does not have output data');
 
@@ -302,9 +307,9 @@ export default async function router(schema, config) {
         res: SingleLogResponse
     }, async (req, res) => {
         try {
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
-            const log = await job.log(req.query.format);
+            const log = await config.models.Job.log(job, req.query.format);
 
             if (!req.query.dl) {
                 if (!req.query.format || req.query.format === 'json') {
@@ -334,12 +339,12 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const job = await Job.commit(config.pool, req.params.job, req.body);
-            await Run.ping(config.pool, ci, job);
+            const job = await config.models.Job.commit(req.params.job, req.body);
+            await config.models.Run.ping(ci, job);
             await config.cacher.del('data');
             await config.cacher.del('licenses');
 
-            return res.json(job.serialize());
+            return res.json(job);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -357,7 +362,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            await Job.delete(config.pool, req.params.job);
+            await config.models.Job.delete(req.params.job);
             await config.cacher.del('data');
             await config.cacher.del('licenses');
 

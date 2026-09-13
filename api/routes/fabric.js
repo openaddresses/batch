@@ -3,7 +3,7 @@ import Cacher from '../lib/cacher.js';
 import { Type } from '@sinclair/typebox';
 import {
     TileJSONResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.get('/fabric', {

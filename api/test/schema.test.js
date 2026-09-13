@@ -3,7 +3,7 @@ import assert from 'assert';
 import { KindGuard } from '@sinclair/typebox';
 // eslint-disable-next-line n/no-extraneous-import
 import { Ajv } from 'ajv';
-import * as schemas from '../lib/schema.js';
+import * as schemas from '../lib/types.js';
 
 const ajv = new Ajv({
     strict: false,

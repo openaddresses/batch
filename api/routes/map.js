@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Map from '../lib/types/map.js';
+import Map from '../lib/models/Map.js';
 import Cacher from '../lib/cacher.js';
 import { Type } from '@sinclair/typebox';
 
@@ -17,7 +17,7 @@ export default async function router(schema, config) {
         group: 'Map',
         description: 'Return all map objects in Line Delimited GeoJSON'
     }, async (req, res) => {
-        (await Map.stream(config.pool, res)).pipe(res);
+        config.models.Map.stream().pipe(res);
     });
 
     await schema.get('/map/:mapid', {
@@ -28,7 +28,7 @@ export default async function router(schema, config) {
             mapid: Type.Integer()
         })
     }, async (req, res) => {
-        return res.json(await Map.from_id(config.pool, req.params.mapid));
+        return res.json(await config.models.Map.from_id(req.params.mapid));
     });
 
     await schema.get('/map/:z/:x/:y.mvt', {
@@ -46,7 +46,7 @@ export default async function router(schema, config) {
             if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
 
             const tile = await config.cacher.get(Cacher.Miss(req.query, `tile-border-${req.params.z}-${req.params.x}-${req.params.y}`), async () => {
-                return await Map.tile(config.pool, req.params.z, req.params.x, req.params.y);
+                return await config.models.Map.tile(req.params.z, req.params.x, req.params.y);
             }, false);
 
             res.writeHead(200, {

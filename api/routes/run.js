@@ -1,5 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import Run from '../lib/types/run.js';
 import Auth from '../lib/auth.js';
 import { Type } from '@sinclair/typebox';
 import {
@@ -13,7 +12,7 @@ import {
     SingleJobsCreateResponse,
     SingleJobsResponse,
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.get('/run', {
@@ -25,9 +24,12 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
-            const list = await Run.list(config.pool, req.query);
+            const list = await config.models.Run.list(req.query);
 
-            return res.json(list);
+            return res.json({
+                total: list.total,
+                runs: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -43,9 +45,9 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const run = await Run.generate(config.pool, req.body);
+            const run = await config.models.Run.generate(req.body);
 
-            return res.json(run.serialize());
+            return res.json(run);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -61,8 +63,8 @@ export default async function router(schema, config) {
         res: RunResponse
     }, async (req, res) => {
         try {
-            const run = await Run.from(config.pool, req.params.run);
-            return res.json(run.serialize());
+            const run = await config.models.Run.from(req.params.run);
+            return res.json(run);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -78,7 +80,7 @@ export default async function router(schema, config) {
         res: RunStatsResponse
     }, async (req, res) => {
         try {
-            res.json(await Run.stats(config.pool, req.params.run));
+            res.json(await config.models.Run.stats(req.params.run));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -97,14 +99,14 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const run = await Run.from(config.pool, req.params.run);
+            let run = await config.models.Run.from(req.params.run);
 
             // The CI is making a CI run "live" and updating the /data list
             if ((!run.live && req.body.live) || (run.live && !req.body.live)) await config.cacher.del('data');
 
-            await run.commit(req.body);
+            run = await config.models.Run.commit(run.id, req.body);
 
-            return res.json(run.serialize());
+            return res.json(run);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -129,7 +131,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            return res.json(await Run.populate(config.pool, req.params.run, req.body.jobs));
+            return res.json(await config.models.Run.populate(req.params.run, req.body.jobs));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -145,7 +147,7 @@ export default async function router(schema, config) {
         res: SingleJobsResponse
     }, async (req, res) => {
         try {
-            const jobs = await Run.jobs(config.pool, req.params.run);
+            const jobs = await config.models.Run.jobs(req.params.run);
 
             res.json({
                 run: req.params.run,
@@ -168,12 +170,12 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const jobs = await Run.jobs(config.pool, req.params.run);
+            const jobs = await config.models.Run.jobs(req.params.run);
             if (jobs.length > 0) {
                 throw new Err(400, null, 'Run still has jobs — delete them first');
             }
 
-            await Run.delete(config.pool, req.params.run);
+            await config.models.Run.delete(req.params.run);
 
             return res.json({
                 status: 200,

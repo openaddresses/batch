@@ -1,5 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import Data from '../lib/types/data.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
 import { Type } from '@sinclair/typebox';
@@ -11,7 +10,7 @@ import {
     StandardResponse,
     DataHistoryQuery,
     DataHistoryResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.get('/data', {
@@ -23,17 +22,17 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         try {
             const data = await config.cacher.get(Cacher.Miss(req.query, 'data'), async () => {
-                return await Data.list(config.pool, req.query);
+                return await config.models.Data.list(req.query);
             });
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
-                for (const d of data.results) {
+                for (const d of data.items) {
                     delete d.s3;
                     delete d.s3_validated;
                 }
             }
 
-            return res.json(data.results);
+            return res.json(data.items);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -52,12 +51,12 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            req.body.id = req.params.data;
+            await config.models.Data.commit(req.params.data, req.body);
 
             await config.cacher.del('data');
             await config.cacher.del('licenses');
 
-            return res.json(await Data.commit(config.pool, req.body));
+            return res.json(await config.models.Data.from(req.params.data));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -75,8 +74,8 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const data = await Data.from(config.pool, req.params.data);
-            await data.delete(config.pool);
+            const data = await config.models.Data.from(req.params.data);
+            await config.models.Data.delete(req.params.data);
             await config.cacher.del('data');
             await config.cacher.del('licenses');
 
@@ -96,7 +95,7 @@ export default async function router(schema, config) {
         res: DataResponse
     }, async (req, res) => {
         try {
-            const data = await Data.from(config.pool, req.params.data);
+            const data = await config.models.Data.from(req.params.data);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 delete data.s3;
@@ -120,7 +119,7 @@ export default async function router(schema, config) {
         res: DataHistoryResponse
     }, async (req, res) => {
         try {
-            const history = await Data.history(config.pool, req.params.data, req.query.status);
+            const history = await config.models.Data.history(req.params.data, req.query.status);
 
             return res.json(history);
         } catch (err) {

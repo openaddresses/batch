@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 
 /**
  * @class
@@ -16,7 +16,7 @@ export default class SiteMap {
                     </url>
             `.trim();
 
-            const pgres = await pool.query(sql`
+            const pgres = await pool.execute(sql`
                 SELECT
                     id,
                     code,
@@ -25,7 +25,7 @@ export default class SiteMap {
                     map
             `);
 
-            for (const loc of pgres.rows) {
+            for (const loc of pgres) {
                 map = map + `
                     <url>
                          <loc>https://batch.openaddresses.io/location/${loc.id}</loc>

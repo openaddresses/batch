@@ -1,6 +1,6 @@
 import {
     HealthResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema) {
     schema.get('/health', {

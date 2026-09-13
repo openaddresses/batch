@@ -30,11 +30,11 @@ export default async function router(schema, config) {
 
         try {
             if (req.headers['x-github-event'] === 'push') {
-                await ci.push(config.pool, req.body);
+                await ci.push(req.body);
 
                 res.json(true);
             } else if (req.headers['x-github-event'] === 'pull_request') {
-                await ci.pull(config.pool, req.body);
+                await ci.pull(req.body);
 
                 res.json(true);
             } else {

@@ -2,7 +2,7 @@ process.env.StackName = 'test';
 
 import test from 'node:test';
 import assert from 'assert';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 import fs from 'fs';
 import Knex from 'knex';
 import KnexConfig from '../knexfile.js';
@@ -216,7 +216,7 @@ export default class Flight {
 
                 if (new_user.status !== 200) throw new Error(JSON.stringify(new_user.body));
 
-                await this.config.pool.query(sql`
+                await this.config.pool.execute(sql`
                      UPDATE users
                         SET
                             validated = True
@@ -225,7 +225,7 @@ export default class Flight {
                 `);
 
                 if (admin) {
-                    await this.config.pool.query(sql`
+                    await this.config.pool.execute(sql`
                          UPDATE users
                             SET
                                 access = 'admin'
@@ -236,7 +236,7 @@ export default class Flight {
                 }
 
                 if (opts.level) {
-                    await this.config.pool.query(sql`
+                    await this.config.pool.execute(sql`
                          UPDATE users
                             SET
                                 level = ${opts.level}

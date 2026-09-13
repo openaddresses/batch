@@ -109,7 +109,7 @@ import {
     TablerLoading,
     TablerNone
 } from '@tak-ps/vue-tabler';
-import mapgl from 'maplibre-gl';
+import * as mapgl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol, PMTiles } from 'pmtiles';
 

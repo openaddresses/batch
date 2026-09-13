@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import mapgl from 'maplibre-gl'
+import * as mapgl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {
     TablerNone

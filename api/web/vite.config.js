@@ -8,8 +8,10 @@ export default defineConfig({
     optimizeDeps: {
         include: ["showdown"],
     },
+    worker: {
+        format: 'es'
+    },
     server: {
         port: 8080,
     }
 })
-

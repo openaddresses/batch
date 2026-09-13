@@ -16,8 +16,7 @@
 </template>
 
 <script>
-import * as mapgl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css';
+import mapgl from '../../util/maplibre.js';
 import {
     TablerNone
 } from '@tak-ps/vue-tabler';

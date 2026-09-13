@@ -153,7 +153,7 @@ import {
 import LayerIcon from './util/LayerIcon.vue';
 import Status from './util/Status.vue';
 import Download from './util/Download.vue';
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../util/date.js';
 import TableFooter from './util/TableFooter.vue';
 import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
@@ -183,7 +183,6 @@ export default {
     props: [ 'auth' ],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             showFilter: false,
             paging: {
                 source: '',
@@ -217,7 +216,7 @@ export default {
             window.open(url, "_blank");
         },
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         fetchJobs: async function() {
             try {

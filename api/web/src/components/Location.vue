@@ -131,7 +131,7 @@ import {
 } from '@tak-ps/vue-tabler';
 import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
-import moment from 'moment-timezone';
+import { fmtDate } from '../util/date.js';
 
 export default {
     name: 'Location',
@@ -148,7 +148,6 @@ export default {
     props: [ 'auth', 'locid' ],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             location: {},
             jobs: [],
             loading: true,
@@ -160,7 +159,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+            return fmtDate(date);
         },
         updateData: async function(job) {
             await window.std(`/api/data/${job.id}`, {

@@ -146,7 +146,7 @@ import {
 } from '@tabler/icons-vue';
 import { Line as LineChart } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale } from 'chart.js'
-import moment from 'moment-timezone';
+import { fmtDate } from '../util/date.js';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale)
 
@@ -166,7 +166,6 @@ export default {
     props: ['dataid'],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             loading: {
                 history: true
             },
@@ -200,7 +199,7 @@ export default {
     },
     methods: {
         fmtDate: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+            return fmtDate(date);
         },
         fmtNumber: function(num) {
             return new Intl.NumberFormat().format(num);

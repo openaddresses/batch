@@ -1,8 +1,0 @@
-{
-    "type": "string",
-    "enum": [
-        "shapefile",
-        "csv"
-    ],
-    "description": "Formats that can be exported to"
-}

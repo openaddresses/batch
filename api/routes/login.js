@@ -3,6 +3,15 @@ import Email from '../lib/email.js';
 import jwt from 'jsonwebtoken';
 import User from '../lib/user.js';
 import Level from '../lib/level.js';
+import {
+    VerifyLoginQuery,
+    StandardResponse,
+    GetLoginQuery,
+    LoginResponse,
+    CreateLoginBody,
+    ForgotLoginBody,
+    ResetLoginBody
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     const email = new Email();
@@ -12,10 +21,9 @@ export default async function router(schema, config) {
     await schema.get('/login/verify', {
         name: 'Verify User',
         group: 'Login',
-        auth: 'public',
         description: 'Email Verification of new user',
-        query: 'req.query.VerifyLogin.json',
-        res: 'res.Standard.json'
+        query: VerifyLoginQuery,
+        res: StandardResponse
     }, async (req, res) => {
         try {
             res.json(await user.verify(req.query.token));
@@ -27,10 +35,9 @@ export default async function router(schema, config) {
     await schema.get('/login', {
         name: 'Session Info',
         group: 'Login',
-        auth: 'user',
         description: 'Return information about the currently logged in user',
-        query: 'req.query.GetLogin.json',
-        res: 'res.Login.json'
+        query: GetLoginQuery,
+        res: LoginResponse
     }, async (req, res) => {
         if (req.auth && req.auth.username) {
             try {
@@ -56,10 +63,9 @@ export default async function router(schema, config) {
     await schema.post('/login', {
         name: 'Create Session',
         group: 'Login',
-        auth: 'user',
         description: 'Log a user into the service and create an authenticated cookie',
-        body: 'req.body.CreateLogin.json',
-        res: 'res.Login.json'
+        body: CreateLoginBody,
+        res: LoginResponse
     }, async (req, res) => {
         try {
             req.auth = await user.login({
@@ -88,10 +94,9 @@ export default async function router(schema, config) {
     await schema.post('/login/forgot', {
         name: 'Forgot Login',
         group: 'Login',
-        auth: 'public',
         description: 'If a user has forgotten their password, send them a password reset link to their email',
-        body: 'req.body.ForgotLogin.json',
-        res: 'res.Standard.json'
+        body: ForgotLoginBody,
+        res: StandardResponse
     }, async (req, res) => {
         try {
             const reset = await user.forgot(req.body.user); // Username or email
@@ -108,13 +113,12 @@ export default async function router(schema, config) {
     await schema.post('/login/reset', {
         name: 'Reset Login',
         group: 'Login',
-        auth: 'public',
         description: `
             Once a user has obtained a password reset by email via the Forgot Login API,
             use the token to reset the password
         `,
-        body: 'req.body.ResetLogin.json',
-        res: 'res.Standard.json'
+        body: ResetLoginBody,
+        res: StandardResponse
     }, async (req, res) => {
         try {
             return res.json(await user.reset({

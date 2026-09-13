@@ -1,10 +1,13 @@
+import {
+    HealthResponse
+} from '../lib/schema.js';
+
 export default async function router(schema) {
     schema.get('/health', {
         name: 'Server Healthcheck',
         group: 'Health',
-        auth: 'public',
         description: 'AWS ELB Healthcheck',
-        res: 'res.Health.json'
+        res: HealthResponse
     }, (req, res) => {
         return res.json({
             healthy: true,

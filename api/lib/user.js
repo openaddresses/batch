@@ -1,5 +1,5 @@
-import fs from 'fs';
 import Err from '@openaddresses/batch-error';
+import { PatchUserBody } from './schema.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { promisify } from 'util';
@@ -20,7 +20,7 @@ export default class User {
     constructor(pool) {
         this.pool = pool;
 
-        this.attrs = Object.keys(JSON.parse(fs.readFileSync(new URL('../schema/req.body.PatchUser.json', import.meta.url))).properties);
+        this.attrs = Object.keys(PatchUserBody.properties);
     }
 
     async verify(token) {

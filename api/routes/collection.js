@@ -3,14 +3,21 @@ import { sql } from 'slonik';
 import Collection from '../lib/types/collections.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
+import { Type } from '@sinclair/typebox';
+import {
+    ListCollectionsResponse,
+    StandardResponse,
+    CreateCollectionBody,
+    CollectionResponse,
+    PatchCollectionBody
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     await schema.get('/collections', {
         name: 'List Collections',
         group: 'Collections',
-        auth: 'public',
         description: 'Return a list of all collections and their glob rules',
-        res: 'res.ListCollections.json'
+        res: ListCollectionsResponse
     }, async (req, res) => {
         try {
             const collections = await config.cacher.get(Cacher.Miss(req.query, 'collection'), async () => {
@@ -33,7 +40,6 @@ export default async function router(schema, config) {
     await schema.get('/collections/:collection/data', {
         name: 'Collection Data',
         group: 'Collections',
-        auth: 'user',
         description: `
             Download a given collection file
 
@@ -46,7 +52,9 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':collection': 'integer'
+        params: Type.Object({
+            collection: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
@@ -61,7 +69,6 @@ export default async function router(schema, config) {
     await schema.get('/collections/:collection/processed', {
         name: 'Collection Processed Data',
         group: 'Collections',
-        auth: 'user',
         description: `
             Download a given collection's deduped, backfilled processed dataset.
 
@@ -74,7 +81,9 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of them the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':collection': 'integer'
+        params: Type.Object({
+            collection: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
@@ -89,10 +98,11 @@ export default async function router(schema, config) {
     await schema.get('/collections/:collection', {
         name: 'Get Collection',
         group: 'Collections',
-        auth: 'public',
         description: 'Get a given collection',
-        ':collection': 'integer',
-        'res': 'res.Collection.json'
+        params: Type.Object({
+            collection: Type.Integer()
+        }),
+        res: CollectionResponse
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
@@ -108,10 +118,11 @@ export default async function router(schema, config) {
     await schema.delete('/collections/:collection', {
         name: 'Delete Collection',
         group: 'Collections',
-        auth: 'admin',
         description: 'Delete a collection (This should not be done lightly)',
-        ':collection': 'integer',
-        res: 'res.Standard.json'
+        params: Type.Object({
+            collection: Type.Integer()
+        }),
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -130,10 +141,9 @@ export default async function router(schema, config) {
     await schema.post('/collections', {
         name: 'Create Collection',
         group: 'Collections',
-        auth: 'admin',
         description: 'Create a new collection',
-        body: 'req.body.CreateCollection.json',
-        res: 'res.Collection.json'
+        body: CreateCollectionBody,
+        res: CollectionResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
@@ -158,11 +168,12 @@ export default async function router(schema, config) {
     await schema.patch('/collections/:collection', {
         name: 'Update Collection',
         group: 'Collections',
-        auth: 'admin',
         description: 'Update a collection',
-        ':collection': 'integer',
-        body: 'req.body.PatchCollection.json',
-        res: 'res.Collection.json'
+        params: Type.Object({
+            collection: Type.Integer()
+        }),
+        body: PatchCollectionBody,
+        res: CollectionResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);

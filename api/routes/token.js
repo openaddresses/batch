@@ -1,6 +1,13 @@
 import Err from '@openaddresses/batch-error';
 import Auth from '../lib/auth.js';
 import Token from '../lib/token.js';
+import { Type } from '@sinclair/typebox';
+import {
+    ListTokensResponse,
+    CreateTokenBody,
+    CreateTokenResponse,
+    StandardResponse
+} from '../lib/schema.js';
 
 export default async function router(schema, config) {
     const token = new Token(config.pool);
@@ -8,9 +15,8 @@ export default async function router(schema, config) {
     await schema.get('/token', {
         name: 'List Tokens',
         group: 'Token',
-        auth: 'user',
         description: 'List all tokens associated with the requester\'s account',
-        res: 'res.ListTokens.json'
+        res: ListTokensResponse
     }, async (req, res) => {
         try {
             await Auth.is_auth(req);
@@ -24,10 +30,9 @@ export default async function router(schema, config) {
     await schema.post('/token', {
         name: 'Create Tokens',
         group: 'Token',
-        auth: 'user',
         description: 'Create a new API token for programatic access',
-        body: 'req.body.CreateToken.json',
-        res: 'res.CreateToken.json'
+        body: CreateTokenBody,
+        res: CreateTokenResponse
     }, async (req, res) => {
         try {
             await Auth.is_auth(req);
@@ -41,10 +46,11 @@ export default async function router(schema, config) {
     await schema.delete('/token/:id', {
         name: 'Delete Tokens',
         group: 'Token',
-        auth: 'user',
         description: 'Delete a user\'s API Token',
-        ':id': 'integer',
-        res: 'res.Standard.json'
+        params: Type.Object({
+            id: Type.Integer()
+        }),
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_auth(req);

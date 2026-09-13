@@ -38,8 +38,7 @@
 </template>
 
 <script>
-import * as mapgl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css';
+import mapgl from '../../util/maplibre.js';
 let map = null;
 
 export default {

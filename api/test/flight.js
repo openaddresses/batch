@@ -1,11 +1,10 @@
 process.env.StackName = 'test';
 
+import { fetch } from 'undici';
 import test from 'node:test';
 import assert from 'assert';
 import { sql } from 'drizzle-orm';
 import fs from 'fs';
-import Knex from 'knex';
-import KnexConfig from '../knexfile.js';
 import Config from '../lib/config.js';
 import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
@@ -43,16 +42,12 @@ export default class Flight {
     }
 
     /**
-     * Clear and restore an empty database schema
+     * Clear the database - the schema is recreated by the migrations run on server takeoff
      */
     init() {
         test('start: database', async () => {
             try {
                 await drop();
-                KnexConfig.connection = process.env.Postgres || 'postgres://postgres@localhost:5432/openaddresses_test';
-                const knex = Knex(KnexConfig);
-                await knex.migrate.latest();
-                await knex.destroy();
             } catch (err) {
                 assert.ifError(err);
             }

@@ -1,59 +1,63 @@
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';
-import nock from 'nock';
+import { MockAgent, setGlobalDispatcher } from 'undici';
 import { sql } from 'drizzle-orm';
 
 const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('nocks', () => {
-    nock.disableNetConnect();
+const mockAgent = new MockAgent();
 
-    nock('https://github.com')
-        .persist()
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'US Census': {
-                    'geoid': '42017',
-                    'name': 'Bucks County',
-                    'state': 'Pennsylvania'
-                },
-                'country': 'us',
-                'state': 'pa',
-                'county': 'Bucks'
-            }
-        })
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'country': 'us'
-            }
-        })
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'country': 'ca'
-            }
-        })
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'geometry': {
-                    'type': 'Point',
-                    'coordinates': [-135.087890625,60.73768583450925]
-                },
-                'country': 'ca',
-                'state': 'yk',
-                'town': 'whitehorse'
-            }
-        });
+test('mocks', () => {
+    mockAgent.disableNetConnect();
+    setGlobalDispatcher(mockAgent);
+
+    const github = mockAgent.get('https://github.com');
+    const base = '/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources';
+    const headers = { 'content-type': 'application/json' };
+
+    github.intercept({ path: `${base}/us/pa/bucks.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'US Census': {
+                'geoid': '42017',
+                'name': 'Bucks County',
+                'state': 'Pennsylvania'
+            },
+            'country': 'us',
+            'state': 'pa',
+            'county': 'Bucks'
+        }
+    }, { headers }).persist();
+
+    github.intercept({ path: `${base}/us/countrywide.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'country': 'us'
+        }
+    }, { headers }).persist();
+
+    github.intercept({ path: `${base}/ca/countrywide.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'country': 'ca'
+        }
+    }, { headers }).persist();
+
+    github.intercept({ path: `${base}/ca/yk/city_of_whitehorse.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [-135.087890625,60.73768583450925]
+            },
+            'country': 'ca',
+            'state': 'yk',
+            'town': 'whitehorse'
+        }
+    }, { headers }).persist();
 });
 
 test('Map#get_feature - country', async () => {
@@ -281,7 +285,6 @@ test('Map#match - geom', async () => {
 
 flight.landing();
 
-test('end', () => {
-    nock.cleanAll();
-    nock.enableNetConnect();
+test('end', async () => {
+    await mockAgent.close();
 });

@@ -1,12 +1,10 @@
-import PG from 'pg';
-const Pool = PG.Pool;
+import { Pool } from '@openaddresses/batch-generic';
+import { sql } from 'drizzle-orm';
 
 export default async function drop() {
-    const pool = new Pool({
-        connectionString: process.env.Postgres || 'postgres://postgres@localhost:5432/openaddresses_test'
-    });
+    const pool = await Pool.connect(process.env.Postgres || 'postgres://postgres@localhost:5432/openaddresses_test', {});
 
-    const pgres = await pool.query(`
+    const pgres = await pool.execute(sql`
         SELECT
             'drop table "' || tablename || '" cascade;' AS drop
         FROM
@@ -16,9 +14,11 @@ export default async function drop() {
             AND tablename != 'spatial_ref_sys'
     `);
 
-    for (const r of pgres.rows) {
-        await pool.query(r.drop);
+    for (const r of pgres) {
+        await pool.execute(sql.raw(r.drop));
     }
+
+    await pool.execute(sql`DROP SCHEMA IF EXISTS drizzle CASCADE`);
 
     await pool.end();
 }

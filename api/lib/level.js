@@ -1,3 +1,4 @@
+import { fetch } from 'undici';
 import Err from '@openaddresses/batch-error';
 import moment from 'moment';
 import User from './user.js';

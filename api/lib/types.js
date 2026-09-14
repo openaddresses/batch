@@ -739,10 +739,10 @@ export const ListLevelOverrideResponse = Type.Object({
 
 export const LicensesResponse = Type.Object({
     licenses: Type.Array(Type.Object({
-        attribution: Type.Union([Type.String(), Type.Null()]),
-        license: Type.Union([Type.String(), Type.Null()]),
-        url: Type.Union([Type.String(), Type.Null()]),
-        sources: Type.Array(Type.Array(Type.Union([Type.String(), Type.Null()]), {
+        attribution: Type.Union([Type.Null(), Type.String()]),
+        license: Type.Union([Type.Null(), Type.String()]),
+        url: Type.Union([Type.Null(), Type.String()]),
+        sources: Type.Array(Type.Array(Type.Union([Type.Null(), Type.String()]), {
             minItems: 2,
             maxItems: 2
         }))

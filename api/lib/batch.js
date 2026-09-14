@@ -1,3 +1,4 @@
+import { fetch } from 'undici';
 import Batch from '@aws-sdk/client-batch';
 import ASG from '@aws-sdk/client-auto-scaling';
 import ECS from '@aws-sdk/client-ecs';

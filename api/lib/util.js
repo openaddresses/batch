@@ -1,3 +1,4 @@
+import { fetch } from 'undici';
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';
 import { StatusValues } from './types.js';

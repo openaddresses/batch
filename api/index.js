@@ -28,7 +28,7 @@ try {
 
 const pkg = JSON.parse(String(fs.readFileSync(new URL('./package.json', import.meta.url))));
 const args = minimist(process.argv, {
-    boolean: ['help', 'populate', 'email', 'no-cache', 'silent'],
+    boolean: ['help', 'populate', 'email', 'no-cache', 'no-migrate', 'silent'],
     alias: {
         no_c: 'no-cache'
     },
@@ -72,7 +72,8 @@ async function configure(args) {
 export default async function server(config) {
     config.cacher = new Cacher(config.args['no-cache'], config.silent);
     config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses', pgschema, {
-        ssl: process.env.StackName === 'test' ? undefined : { rejectUnauthorized: false }
+        ssl: process.env.StackName === 'test' ? undefined : { rejectUnauthorized: false },
+        migrationsFolder: config.args['no-migrate'] ? undefined : new URL('./migrations/', import.meta.url).pathname
     });
 
     config.models = new Models(config.pool);

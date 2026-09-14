@@ -1,3 +1,4 @@
+import { fetch } from 'undici';
 import assert from 'assert';
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';

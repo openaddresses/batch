@@ -1,3 +1,4 @@
+import { fetch } from 'undici';
 import Modeler from '@openaddresses/batch-generic';
 import Err from '@openaddresses/batch-error';
 import { sql, eq, and, gt, lt, asc, desc, ilike, inArray, notExists } from 'drizzle-orm';

@@ -1,60 +1,105 @@
 <template>
-    <div class='col col--12'>
-        <div class='col col--12 grid border-b border--gray-light bg-white pt12'>
-            <div class='col col--12'>
-                <h2 class='txt-h4 ml12 pb12 fl'>
-                    Job #<span v-text='$route.params.jobid' />
-                </h2>
-
-                <div class='ms-auto btn-list'>
-                    <TablerIconButton
-                        title='Refresh'
-                        @click='refresh'
-                    >
-                        <IconRefresh
-                            :size='32'
-                            stroke='1'
-                        />
-                    </TablerIconButton>
-                    <TablerIconButton
-                        title='View source on GitHub'
-                        @click='external(job.source)'
-                    >
-                        <IconBrandGithub
-                            :size='32'
-                            stroke='1'
-                        />
-                    </TablerIconButton>
-                    <TablerIconButton
-                        v-if='job.source'
-                        title='Open source URL'
-                        @click='external(raw.data)'
-                    >
-                        <IconLink
-                            :size='32'
-                            stroke='1'
-                        />
-                    </TablerIconButton>
+    <div>
+        <div class='page-wrapper'>
+            <div class='page-header d-print-none'>
+                <div class='container-xl'>
+                    <div class='row g-2 align-items-center'>
+                        <div class='col d-flex'>
+                            <TablerBreadCrumb />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <template v-if='loading.job || loading.raw'>
-            <div class='flex flex--center-main w-full py24'>
-                <div class='loading' />
+        <div class='page-body'>
+            <div class='container-xl'>
+                <div class='row row-deck row-cards'>
+                    <div class='col-12'>
+                        <div class='card'>
+                            <div class='card-header'>
+                                <div class='card-title row'>
+                                    <div class='d-flex'>
+                                        <Status
+                                            v-if='job.status'
+                                            :status='job.status'
+                                        />
+                                        <div class='mx-2 align-self-center'>
+                                            Job <span v-text='$route.params.jobid' /> Raw Source
+                                        </div>
+                                    </div>
+                                    <div
+                                        style='padding-left: 50px;'
+                                        class='subheader'
+                                        v-text='`${job.source_name} - ${job.layer} - ${job.name}`'
+                                    />
+                                </div>
+
+                                <div class='ms-auto btn-list'>
+                                    <TablerIconButton
+                                        v-if='job.source'
+                                        title='View source on GitHub'
+                                        @click='external(job.source)'
+                                    >
+                                        <IconBrandGithub
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
+                                        v-if='raw && raw.data'
+                                        title='Open source URL'
+                                        @click='external(raw.data)'
+                                    >
+                                        <IconLink
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
+                                        title='Refresh'
+                                        @click='refresh'
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                </div>
+                            </div>
+
+                            <TablerLoading
+                                v-if='loading'
+                                :desc='`Loading Raw Source for Job ${$route.params.jobid}`'
+                            />
+                            <TablerAlert
+                                v-else-if='error'
+                                :err='error'
+                            />
+                            <TablerNone
+                                v-else-if='!raw'
+                                :create='false'
+                                label='Matching Layer Not Found In Source'
+                            />
+                            <pre
+                                v-else
+                                v-text='JSON.stringify(raw, null, 4)'
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-        </template>
-        <template v-else>
-            <pre
-                class='pre'
-                v-text='JSON.stringify(raw, null, 4)'
-            />
-        </template>
+        </div>
     </div>
 </template>
 
 <script>
+import Status from './util/Status.vue'
 import {
+    TablerBreadCrumb,
+    TablerLoading,
+    TablerAlert,
+    TablerNone,
     TablerIconButton
 } from '@tak-ps/vue-tabler';
 import {
@@ -66,6 +111,11 @@ import {
 export default {
     name: 'JobRaw',
     components: {
+        Status,
+        TablerBreadCrumb,
+        TablerLoading,
+        TablerAlert,
+        TablerNone,
         TablerIconButton,
         IconRefresh,
         IconBrandGithub,
@@ -73,12 +123,9 @@ export default {
     },
     data: function () {
         return {
-            loading: {
-                job: true,
-                raw: true
-            },
+            loading: true,
+            error: undefined,
             job: {},
-            coverage: false,
             raw: false
         }
     },
@@ -87,40 +134,26 @@ export default {
     },
     methods: {
         refresh: async function() {
-            await this.getJob();
+            try {
+                this.error = undefined;
+                this.loading = true;
+                this.raw = false;
+
+                this.job = await window.std(`/api/job/${this.$route.params.jobid}`);
+
+                const res = await window.std(`/api/job/${this.$route.params.jobid}/raw`);
+                for (const l of (res.layers && res.layers[this.job.layer]) || []) {
+                    if (l.name === this.job.name) this.raw = l;
+                }
+            } catch (err) {
+                this.error = err;
+            }
+
+            this.loading = false;
         },
         external: function(url) {
             window.open(url, "_blank");
-        },
-        getJob: async function() {
-            try {
-                this.loading.job = true;
-                this.job = await window.std(`/api/job/${this.$route.params.jobid}`);
-
-                this.name = this.job.source
-                    .replace(/.*sources\//, '')
-                    .replace(/\.json/, '');
-
-                this.loading.job = false;
-                this.getRaw();
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        },
-        getRaw: async function() {
-            try {
-                this.loading.raw = true;
-                const res = await window.std(`/api/job/${this.jobid}/raw`);
-                for (const l of res.layers[this.job.layer]) {
-                    if (l.name == this.job.name) this.raw = l;
-                }
-
-                this.coverage = res.coverage;
-                this.loading.raw = false;
-            } catch(err) {
-                this.$emit('err', err);
-            }
-        },
+        }
     }
 }
 </script>

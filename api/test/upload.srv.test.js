@@ -1,10 +1,9 @@
-import fs from 'fs';
 import fsp from 'fs/promises';
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';
-import AWS from '@mapbox/mock-aws-sdk-js';
-import { pipeline } from 'stream/promises';
+import { mockClient } from 'aws-sdk-client-mock';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 const flight = new Flight();
 
@@ -12,18 +11,16 @@ flight.init();
 flight.takeoff();
 
 test('POST: api/upload', async () => {
+    const s3 = mockClient(S3Client);
+
     try {
-        AWS.stub('S3', 'upload', async function(params) {
+        s3.on(PutObjectCommand).callsFake((params) => {
             assert.equal(params.Bucket, 'v2.openaddresses.io');
             assert.equal(params.ACL, 'public-read');
             assert.equal(!!params.Key.includes('test/upload/'), true);
+            assert.ok(params.Body.length > 0, 'upload body is not empty');
 
-            await pipeline(
-                params.Body,
-                fs.createWriteStream('/dev/null')
-            );
-
-            return this.request.promise.returns(Promise.resolve({}));
+            return {};
         });
 
         const form = new FormData();
@@ -42,9 +39,11 @@ test('POST: api/upload', async () => {
             status: 200
         });
 
-        AWS.S3.restore();
+        assert.equal(s3.commandCalls(PutObjectCommand).length, 1, 'one PutObject call');
     } catch (err) {
         assert.ifError(err, 'no error');
+    } finally {
+        s3.restore();
     }
 });
 

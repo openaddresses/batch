@@ -59,7 +59,7 @@
         "undici": "^6.28.0"
     },
     "devDependencies": {
-        "@mapbox/mock-aws-sdk-js": "^1.0.0",
+        "aws-sdk-client-mock": "^4.1.0",
         "codecov": "^3.8.2",
         "drizzle-kit": "^0.31.10",
         "eslint": "^9.0.0",

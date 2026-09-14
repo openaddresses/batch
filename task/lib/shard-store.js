@@ -21,16 +21,37 @@ export function openShardWriters(tmp, tileCount) {
         });
     }
 
+    // Honours backpressure - firing write() in a tight loop across
+    // potentially thousands of shard files buffers unboundedly in memory
+    // when disk throughput can't keep up, which is exactly the memory this
+    // sharding was built to avoid (see writeFeatures() in collect.js).
     function writeLine(stream, sourcePath, feature) {
-        stream.write(JSON.stringify({ path: sourcePath, feature }) + '\n');
+        if (stream.write(JSON.stringify({ path: sourcePath, feature }) + '\n')) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            function onDrain() {
+                stream.removeListener('error', onError);
+                resolve();
+            }
+
+            function onError(err) {
+                stream.removeListener('drain', onDrain);
+                reject(err);
+            }
+
+            stream.once('drain', onDrain);
+            stream.once('error', onError);
+        });
     }
 
     return {
         writeCore(idx, sourcePath, feature) {
-            writeLine(writers[idx].core, sourcePath, feature);
+            return writeLine(writers[idx].core, sourcePath, feature);
         },
         writeBorrowed(idx, sourcePath, feature) {
-            writeLine(writers[idx].borrowed, sourcePath, feature);
+            return writeLine(writers[idx].borrowed, sourcePath, feature);
         },
         async closeAll() {
             const streams = writers.flatMap((w) => [w.core, w.borrowed]);

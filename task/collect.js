@@ -288,8 +288,8 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
             const { home, borrowed } = assignTiles(cellToTile, DEFAULT_CELL_DEG, lon, lat);
             if (home === undefined) continue;
 
-            writers.writeCore(home, relPath, feature);
-            for (const tileIdx of borrowed) writers.writeBorrowed(tileIdx, relPath, feature);
+            await writers.writeCore(home, relPath, feature);
+            for (const tileIdx of borrowed) await writers.writeBorrowed(tileIdx, relPath, feature);
         }
     }
     await writers.closeAll();

@@ -1,6 +1,7 @@
+import { fetch } from 'undici';
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';
-import { StatusValues } from './schema.js';
+import { StatusValues } from './types.js';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 

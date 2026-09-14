@@ -1,6 +1,6 @@
+import { fetch } from 'undici';
 import assert from 'assert';
 import fs from 'fs';
-import Run from './types/run.js';
 import Err from '@openaddresses/batch-error';
 import GH from './gh.js';
 
@@ -22,10 +22,9 @@ export default class CI {
     /**
      * Once a run is finished, update the corresponding github check
      *
-     * @param {Pool} pool - Postgres Pool instance
      * @param {Run} run object to update GH status with
      */
-    async finish_check(pool, run) {
+    async finish_check(run) {
         if (!['Success', 'Fail'].includes(run.status)) {
             throw new Err(400, null, `Github check can only report Success/Fail, given: ${run.status}`);
         }
@@ -40,7 +39,7 @@ export default class CI {
                 conclusion: conclusion
             });
 
-            const issue = await this.format_issue(pool, run);
+            const issue = await this.format_issue(run);
             console.error('ISSUE: ', issue);
             if (!issue) return; // No Successful Jobs = No Issue Comment
 
@@ -56,12 +55,11 @@ export default class CI {
     /**
      * Once a run is created, create a pending github check
      *
-     * @param {Pool} pool - Postgres Pool instance
      * @param {String} sha - GitSha to attach to
      * @param {String} ref - Git Ref
      * @param {Object} head_commit - Information about head commit
      */
-    async create_check(pool, sha, ref, head_commit) {
+    async create_check(sha, ref, head_commit) {
         try {
             const check = await this.config.octo.checks.create({
                 owner: 'openaddresses',
@@ -104,13 +102,13 @@ export default class CI {
                 });
                 console.error(`ok - GH:Push:${sha}: Closed Check - No Jobs`);
             } else {
-                const run = await Run.generate(pool, {
+                const run = await this.config.models.Run.generate({
                     live: is_live,
                     github: gh.json()
                 });
                 console.error(`ok - GH:Push:${sha}: Run ${run.id} Created `);
 
-                const jobs = await Run.populate(pool, run.id, gh.jobs);
+                const jobs = await this.config.models.Run.populate(run.id, gh.jobs);
                 console.error(`ok - GH:Push:${sha}: Run Populated`);
 
                 if (jobs.jobs.length === 0) {
@@ -140,11 +138,10 @@ export default class CI {
     /**
      * Create a markdown formatted issue showing successful preview.pngs for all jobs in a given run
      *
-     * @param {Pool} pool - Postgres Pool instance
      * @param {Run} run object to update GH status with
      */
-    async format_issue(pool, run) {
-        const jobs = await Run.jobs(pool, run.id);
+    async format_issue(run) {
+        const jobs = await this.config.models.Run.jobs(run.id);
         let issue = '';
 
         for (const job of jobs) {
@@ -329,17 +326,15 @@ export default class CI {
     /**
      * Respond to push events
      *
-     * @param {Pool} pool - Postgres Pool instance
      * @param {Object} event - GitHub Event Object
      */
-    async push(pool, event) {
+    async push(event) {
         // The push event was to merge/delete a given branch/pr
         if (event.after === '0000000000000000000000000000000000000000') {
             return true;
         }
 
         await this.create_check(
-            pool,
             event.after, // GitSha
             event.ref,
             event.head_commit
@@ -351,16 +346,14 @@ export default class CI {
     /**
      * Respond to pull request events
      *
-     * @param {Pool} pool - Postgres Pool instance
      * @param {Object} event - GitHub Event Object
      */
-    async pull(pool, event) {
+    async pull(event) {
         console.error('PULL', JSON.stringify(event));
 
         // Create a CheckSuite
         if (['opened', 'synchronize'].includes(event.action) && event.pull_request.head.repo.fork) {
             await this.create_check(
-                pool,
                 event.pull_request.head.sha,
                 event.pull_request.head.label,
                 {
@@ -372,16 +365,16 @@ export default class CI {
         } else if (event.action === 'closed' && event.pull_request.merged_at) {
             const sha = event.pull_request.head.sha;
 
-            const run = await Run.from_sha(pool, sha);
+            const run = await this.config.models.Run.from_sha(sha);
 
-            await run.commit({
+            await this.config.models.Run.commit(run.id, {
                 live: true
             });
 
-            const jobs = await Run.jobs(pool, run.id);
+            const jobs = await this.config.models.Run.jobs(run.id);
 
             for (const job of jobs) {
-                await Run.ping(pool, this, job);
+                await this.config.models.Run.ping(this, job);
             }
         }
 

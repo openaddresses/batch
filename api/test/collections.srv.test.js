@@ -36,7 +36,7 @@ test('GET: /api/collection/2 - doesn\'t exist', async () => {
         }, false);
 
         assert.deepEqual(res.body, {
-            message: 'collections not found',
+            message: 'Item Not Found',
             messages: [],
             status: 404
         });

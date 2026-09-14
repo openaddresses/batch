@@ -4,7 +4,7 @@ import Upload from '../lib/upload.js';
 import Auth from '../lib/auth.js';
 import {
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema) {
     await schema.post('/upload', {

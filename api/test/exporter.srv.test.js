@@ -50,6 +50,7 @@ test('POST: /api/run/:run/jobs', async () => {
 
         assert.deepEqual(res.body, {
             run: 1,
+            errors: [],
             jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {
@@ -203,7 +204,7 @@ test('GET /api/export/100 - backer', async () =>  {
             method: 'GET'
         }, false);
 
-        assert.deepEqual(exp.body, { status: 404, message: 'exports not found', messages: [] });
+        assert.deepEqual(exp.body, { status: 404, message: 'Item Not Found', messages: [] });
     } catch (err) {
         assert.ifError(err, 'no errors');
     }

@@ -167,7 +167,7 @@ test('GET: api/level/2', async () => {
 
         assert.deepEqual(res.body, {
             status: 404,
-            message: 'level_override not found',
+            message: 'Item Not Found',
             messages: []
         });
     } catch (err) {

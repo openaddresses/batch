@@ -1,6 +1,6 @@
 import Err from '@openaddresses/batch-error';
-import { sql } from 'slonik';
-import Collection from '../lib/types/collections.js';
+import { sql } from 'drizzle-orm';
+import Collection from '../lib/models/Collection.js';
 import Cacher from '../lib/cacher.js';
 import Auth from '../lib/auth.js';
 import { Type } from '@sinclair/typebox';
@@ -10,7 +10,7 @@ import {
     CreateCollectionBody,
     CollectionResponse,
     PatchCollectionBody
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.get('/collections', {
@@ -21,7 +21,7 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         try {
             const collections = await config.cacher.get(Cacher.Miss(req.query, 'collection'), async () => {
-                return await Collection.list(config.pool);
+                return (await config.models.Collection.list()).items;
             });
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
@@ -59,7 +59,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            const collection = await Collection.from(config.pool, req.params.collection);
+            const collection = await config.models.Collection.from(req.params.collection);
             return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}.zip`);
         } catch (err) {
             return Err.respond(err, res);
@@ -88,7 +88,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            const collection = await Collection.from(config.pool, req.params.collection);
+            const collection = await config.models.Collection.from(req.params.collection);
             return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}-processed.zip`);
         } catch (err) {
             return Err.respond(err, res);
@@ -107,9 +107,9 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req, true);
 
-            const collection = await Collection.from(config.pool, req.params.collection);
+            const collection = await config.models.Collection.from(req.params.collection);
 
-            return res.json(collection.serialize());
+            return res.json(collection);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -127,7 +127,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            await Collection.delete(config.pool, req.params.collection);
+            await config.models.Collection.delete(req.params.collection);
 
             return res.json({
                 status: 200,
@@ -148,7 +148,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const collection = await Collection.generate(config.pool, {
+            const collection = await config.models.Collection.generate({
                 created: sql`NOW()`,
                 ...req.body
             });
@@ -156,10 +156,10 @@ export default async function router(schema, config) {
             await config.cacher.del('collection');
 
             if (req.auth && req.auth.level && req.auth.level === 'sponsor') {
-                collection._s3();
+                Collection.s3(collection);
             }
 
-            return res.json(collection.serialize());
+            return res.json(collection);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -178,16 +178,16 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const collection = await Collection.commit(config.pool, req.params.collection, {
+            const collection = await config.models.Collection.commit(req.params.collection, {
                 created: sql`NOW()`,
                 ...req.body
             });
 
             await config.cacher.del('collection');
 
-            collection._s3();
+            Collection.s3(collection);
 
-            return res.json(collection.serialize());
+            return res.json(collection);
         } catch (err) {
             return Err.respond(err, res);
         }

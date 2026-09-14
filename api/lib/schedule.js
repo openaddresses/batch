@@ -1,25 +1,24 @@
 import Err from '@openaddresses/batch-error';
-import JobError from './types/joberror.js';
 import {
     scale_in,
     trigger
 } from './batch.js';
 import Level from './level.js';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 
 /**
  * @class
  */
 export default class Schedule {
-    static async event(pool, event) {
+    static async event(config, event) {
         if (['fabric', 'collect', 'sources', 'cleanup'].includes(event.type)) {
-            await Schedule.batch(event.type, pool);
+            await Schedule.batch(event.type, config);
         } else if (event.type === 'close') {
-            await Schedule.close(pool);
+            await Schedule.close(config.pool);
         } else if (event.type === 'level') {
-            await Schedule.level(pool);
+            await Schedule.level(config.pool);
         } else if (event.type === 'scale') {
-            await Schedule.scale(pool);
+            await Schedule.scale();
         }
     }
 
@@ -35,10 +34,10 @@ export default class Schedule {
      * Generic function for triggering a batch job
      *
      * @param {String} type Type of batch job to trigger
-     * @param {Pool} pool Instantiated Postgres Pool
+     * @param {Config} config Server config
      */
-    static async batch(type, pool) {
-        if (type === 'sources') await JobError.clear(pool);
+    static async batch(type, config) {
+        if (type === 'sources') await config.models.JobError.clear();
 
         try {
             return await trigger({
@@ -62,7 +61,7 @@ export default class Schedule {
     static async close(pool) {
         // TODO Close old run/jobs
 
-        await pool.query(sql`
+        await pool.execute(sql`
             DELETE FROM
                 users_reset
             WHERE

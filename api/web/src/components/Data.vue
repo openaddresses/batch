@@ -291,7 +291,7 @@
                                             >
                                                 <span
                                                     v-if='d.has.buildings'
-                                                    v-tooltip='layerTooltip(d, "buildings")'
+                                                    :title='layerTooltip(d, "buildings")'
                                                     class='layer-icon-wrap'
                                                 >
                                                     <LayerIcon
@@ -306,7 +306,7 @@
                                                 </span>
                                                 <span
                                                     v-if='d.has.addresses'
-                                                    v-tooltip='layerTooltip(d, "addresses")'
+                                                    :title='layerTooltip(d, "addresses")'
                                                     class='layer-icon-wrap'
                                                 >
                                                     <LayerIcon
@@ -321,7 +321,7 @@
                                                 </span>
                                                 <span
                                                     v-if='d.has.parcels'
-                                                    v-tooltip='layerTooltip(d, "parcels")'
+                                                    :title='layerTooltip(d, "parcels")'
                                                     class='layer-icon-wrap'
                                                 >
                                                     <LayerIcon
@@ -336,7 +336,7 @@
                                                 </span>
                                                 <span
                                                     v-if='d.has.centerlines'
-                                                    v-tooltip='layerTooltip(d, "centerlines")'
+                                                    :title='layerTooltip(d, "centerlines")'
                                                     class='layer-icon-wrap'
                                                 >
                                                     <LayerIcon

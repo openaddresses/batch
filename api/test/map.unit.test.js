@@ -1,66 +1,68 @@
-import Map from '../lib/types/map.js';
-import Job from '../lib/types/job.js';
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';
-import nock from 'nock';
-import { sql } from 'slonik';
+import { MockAgent, setGlobalDispatcher } from 'undici';
+import { sql } from 'drizzle-orm';
 
 const flight = new Flight();
 flight.init();
 flight.takeoff();
 
-test('nocks', () => {
-    nock.disableNetConnect();
+const mockAgent = new MockAgent();
 
-    nock('https://github.com')
-        .persist()
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'US Census': {
-                    'geoid': '42017',
-                    'name': 'Bucks County',
-                    'state': 'Pennsylvania'
-                },
-                'country': 'us',
-                'state': 'pa',
-                'county': 'Bucks'
-            }
-        })
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'country': 'us'
-            }
-        })
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'country': 'ca'
-            }
-        })
-        .get('/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json')
-        .reply(200, {
-            'schema': 2,
-            'coverage': {
-                'geometry': {
-                    'type': 'Point',
-                    'coordinates': [-135.087890625,60.73768583450925]
-                },
-                'country': 'ca',
-                'state': 'yk',
-                'town': 'whitehorse'
-            }
-        });
+test('mocks', () => {
+    mockAgent.disableNetConnect();
+    setGlobalDispatcher(mockAgent);
+
+    const github = mockAgent.get('https://github.com');
+    const base = '/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources';
+    const headers = { 'content-type': 'application/json' };
+
+    github.intercept({ path: `${base}/us/pa/bucks.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'US Census': {
+                'geoid': '42017',
+                'name': 'Bucks County',
+                'state': 'Pennsylvania'
+            },
+            'country': 'us',
+            'state': 'pa',
+            'county': 'Bucks'
+        }
+    }, { headers }).persist();
+
+    github.intercept({ path: `${base}/us/countrywide.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'country': 'us'
+        }
+    }, { headers }).persist();
+
+    github.intercept({ path: `${base}/ca/countrywide.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'country': 'ca'
+        }
+    }, { headers }).persist();
+
+    github.intercept({ path: `${base}/ca/yk/city_of_whitehorse.json`, method: 'GET' }).reply(200, {
+        'schema': 2,
+        'coverage': {
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [-135.087890625,60.73768583450925]
+            },
+            'country': 'ca',
+            'state': 'yk',
+            'town': 'whitehorse'
+        }
+    }, { headers }).persist();
 });
 
 test('Map#get_feature - country', async () => {
     try {
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             INSERT INTO map (
                 name,
                 code
@@ -71,14 +73,14 @@ test('Map#get_feature - country', async () => {
         `);
 
         {
-            await Job.generate(flight.config.pool, {
+            await flight.config.models.Job.generate({
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'addresses',
                 name: 'fed',
                 map: 1
             });
 
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
+            assert.deepEqual(await flight.config.models.Map.get_feature('us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -88,14 +90,14 @@ test('Map#get_feature - country', async () => {
         }
 
         {
-            await Job.generate(flight.config.pool, {
+            await flight.config.models.Job.generate({
                 source: 'http://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'addresses',
                 name: 'fed',
                 map: 1
             });
 
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
+            assert.deepEqual(await flight.config.models.Map.get_feature('us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -105,14 +107,14 @@ test('Map#get_feature - country', async () => {
         }
 
         {
-            await Job.generate(flight.config.pool, {
+            await flight.config.models.Job.generate({
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/countrywide.json',
                 layer: 'buildings',
                 name: 'fed',
                 map: 1
             });
 
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'us'), {
+            assert.deepEqual(await flight.config.models.Map.get_feature('us'), {
                 id: 1,
                 name: 'United States',
                 code: 'us',
@@ -127,7 +129,7 @@ test('Map#get_feature - country', async () => {
 
 test('Map#match - county', async () => {
     try {
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             INSERT INTO map (
                 name,
                 code
@@ -140,7 +142,7 @@ test('Map#match - county', async () => {
         assert.ifError(err);
     }
 
-    assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
+    assert.deepEqual(await flight.config.models.Map.get_feature('us-42017'), {
         id: 2,
         name: 'Bucks County',
         code: 'us-42017',
@@ -149,14 +151,14 @@ test('Map#match - county', async () => {
     });
 
     {
-        const job = await Job.generate(flight.config.pool, {
+        const job = await flight.config.models.Job.generate({
             source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'addresses',
             name: 'city'
         });
 
-        await Map.match(flight.config.pool, job);
-        assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
+        await flight.config.models.Map.match(job);
+        assert.deepEqual(await flight.config.models.Map.get_feature('us-42017'), {
             id: 2,
             name: 'Bucks County',
             code: 'us-42017',
@@ -166,14 +168,14 @@ test('Map#match - county', async () => {
     }
 
     {
-        const job = await Job.generate(flight.config.pool, {
+        const job = await flight.config.models.Job.generate({
             source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/us/pa/bucks.json',
             layer: 'buildings',
             name: 'city'
         });
 
-        await Map.match(flight.config.pool, job);
-        assert.deepEqual(await Map.get_feature(flight.config.pool, 'us-42017'), {
+        await flight.config.models.Map.match(job);
+        assert.deepEqual(await flight.config.models.Map.get_feature('us-42017'), {
             id: 2,
             name: 'Bucks County',
             code: 'us-42017',
@@ -185,7 +187,7 @@ test('Map#match - county', async () => {
 
 test('Map#match - country', async () => {
     try {
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             INSERT INTO map (
                 name,
                 code
@@ -195,7 +197,7 @@ test('Map#match - country', async () => {
             );
         `);
 
-        assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
+        assert.deepEqual(await flight.config.models.Map.get_feature('ca'), {
             id: 3,
             name: 'Canada',
             code: 'ca',
@@ -204,14 +206,14 @@ test('Map#match - country', async () => {
         });
 
         {
-            const job = await Job.generate(flight.config.pool, {
+            const job = await flight.config.models.Job.generate({
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
                 layer: 'addresses',
                 name: 'countrywide'
             });
 
-            await Map.match(flight.config.pool, job);
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
+            await flight.config.models.Map.match(job);
+            assert.deepEqual(await flight.config.models.Map.get_feature('ca'), {
                 id: 3,
                 name: 'Canada',
                 code: 'ca',
@@ -221,14 +223,14 @@ test('Map#match - country', async () => {
         }
 
         {
-            const job = await Job.generate(flight.config.pool, {
+            const job = await flight.config.models.Job.generate({
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/countrywide.json',
                 layer: 'buildings',
                 name: 'city'
             });
 
-            await Map.match(flight.config.pool, job);
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'ca'), {
+            await flight.config.models.Map.match(job);
+            assert.deepEqual(await flight.config.models.Map.get_feature('ca'), {
                 id: 3,
                 name: 'Canada',
                 code: 'ca',
@@ -244,14 +246,14 @@ test('Map#match - country', async () => {
 test('Map#match - geom', async () => {
     try {
         {
-            const job = await Job.generate(flight.config.pool, {
+            const job = await flight.config.models.Job.generate({
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
                 layer: 'addresses',
                 name: 'city'
             });
 
-            await Map.match(flight.config.pool, job);
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
+            await flight.config.models.Map.match(job);
+            assert.deepEqual(await flight.config.models.Map.get_feature('d05fd64031aaf953c47310381bc49a64d58a3ee9'), {
                 id: 4,
                 name: 'ca/yk/city_of_whitehorse',
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
@@ -261,14 +263,14 @@ test('Map#match - geom', async () => {
         }
 
         {
-            const job = await Job.generate(flight.config.pool, {
+            const job = await flight.config.models.Job.generate({
                 source: 'https://github.com/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/ca/yk/city_of_whitehorse.json',
                 layer: 'buildings',
                 name: 'city'
             });
 
-            await Map.match(flight.config.pool, job);
-            assert.deepEqual(await Map.get_feature(flight.config.pool, 'd05fd64031aaf953c47310381bc49a64d58a3ee9'), {
+            await flight.config.models.Map.match(job);
+            assert.deepEqual(await flight.config.models.Map.get_feature('d05fd64031aaf953c47310381bc49a64d58a3ee9'), {
                 id: 4,
                 name: 'ca/yk/city_of_whitehorse',
                 code: 'd05fd64031aaf953c47310381bc49a64d58a3ee9',
@@ -283,7 +285,6 @@ test('Map#match - geom', async () => {
 
 flight.landing();
 
-test('end', () => {
-    nock.cleanAll();
-    nock.enableNetConnect();
+test('end', async () => {
+    await mockAgent.close();
 });

@@ -1,7 +1,7 @@
 import Err from '@openaddresses/batch-error';
 import crypto from 'crypto';
 import { promisify } from 'util';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 
 const randomBytes = promisify(crypto.randomBytes);
 
@@ -20,7 +20,7 @@ export default class Token {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 DELETE FROM
                     users_tokens
                 WHERE
@@ -33,7 +33,7 @@ export default class Token {
             throw new Err(500, err, 'Failed to delete token');
         }
 
-        if (!pgres.rows.length) throw new Err(401, null, 'You can only access your own tokens');
+        if (!pgres.length) throw new Err(401, null, 'You can only access your own tokens');
 
         return {
             status: 200,
@@ -48,7 +48,7 @@ export default class Token {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await this.pool.execute(sql`
                 SELECT
                     users.id AS uid,
                     users.level,
@@ -66,18 +66,18 @@ export default class Token {
             throw new Err(500, err, 'Failed to validate token');
         }
 
-        if (!pgres.rows.length) {
+        if (!pgres.length) {
             throw new Err(401, null, 'Invalid token');
-        } else if (pgres.rows.length > 1) {
+        } else if (pgres.length > 1) {
             throw new Err(401, null, 'Token collision');
         }
 
         return {
-            uid: parseInt(pgres.rows[0].uid),
-            level: pgres.rows[0].level,
-            username: pgres.rows[0].username,
-            access: pgres.rows[0].access,
-            email: pgres.rows[0].email
+            uid: parseInt(pgres[0].uid),
+            level: pgres[0].level,
+            username: pgres[0].username,
+            access: pgres[0].access,
+            email: pgres[0].email
         };
     }
 
@@ -87,7 +87,7 @@ export default class Token {
         }
 
         try {
-            const pgres = await this.pool.query(sql`
+            const pgres = await this.pool.execute(sql`
                 SELECT
                     id,
                     created,
@@ -99,8 +99,8 @@ export default class Token {
             `);
 
             return {
-                total: pgres.rows.length,
-                tokens: pgres.rows.map((token) => {
+                total: pgres.length,
+                tokens: pgres.map((token) => {
                     token.id = parseInt(token.id);
 
                     return token;
@@ -121,7 +121,7 @@ export default class Token {
         }
 
         try {
-            const pgres = await this.pool.query(sql`
+            const pgres = await this.pool.execute(sql`
                 INSERT INTO users_tokens (
                     token,
                     created,
@@ -136,10 +136,10 @@ export default class Token {
             `);
 
             return {
-                id: parseInt(pgres.rows[0].id),
-                name: pgres.rows[0].name,
-                token: pgres.rows[0].token,
-                created: pgres.rows[0].created
+                id: parseInt(pgres[0].id),
+                name: pgres[0].name,
+                token: pgres[0].token,
+                created: pgres[0].created
             };
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');

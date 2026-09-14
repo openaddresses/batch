@@ -4,7 +4,7 @@ import Auth from '../lib/auth.js';
 import {
     ScheduleBody,
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.post('/schedule', {
@@ -17,7 +17,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            await Schedule.event(config.pool, req.body);
+            await Schedule.event(config, req.body);
 
             return res.json({
                 status: 200,

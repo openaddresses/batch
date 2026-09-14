@@ -11,7 +11,7 @@ import {
     CreateLoginBody,
     ForgotLoginBody,
     ResetLoginBody
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     const email = new Email();

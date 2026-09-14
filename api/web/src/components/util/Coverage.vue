@@ -106,6 +106,12 @@ export default {
             this.$emit('point', this.point);
         }
     },
+    unmounted: function() {
+        if (map) {
+            map.remove();
+            map = null;
+        }
+    },
     mounted: async function() {
         this.$nextTick(async () => {
             await this.init();

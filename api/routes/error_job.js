@@ -1,5 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import JobError from '../lib/types/joberror.js';
 import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 import { Type } from '@sinclair/typebox';
@@ -11,7 +10,7 @@ import {
     ErrorCreateBody,
     ErrorModerateBody,
     ErrorModerateResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     const ci = new CI(config);
@@ -30,7 +29,12 @@ export default async function router(schema, config) {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
 
-            return res.json(await JobError.list(config.pool, req.query));
+            const list = await config.models.JobError.list(req.query);
+
+            return res.json({
+                total: list.total,
+                errors: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -43,7 +47,7 @@ export default async function router(schema, config) {
         res: ErrorCountResponse
     }, async (req, res) => {
         try {
-            return res.json(await JobError.count(config.pool));
+            return res.json({ count: await config.models.JobError.count() });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -60,8 +64,7 @@ export default async function router(schema, config) {
         res: JobErrorResponse
     }, async (req, res) => {
         try {
-            const joberror = await JobError.from(config.pool, req.params.job);
-            return res.json(joberror.serialize());
+            return res.json(await config.models.JobError.from(req.params.job));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -77,9 +80,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const joberror = await JobError.generate(config.pool, req.body);
-
-            return res.json(joberror.serialize());
+            return res.json(await config.models.JobError.generate(req.body));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -98,7 +99,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_flag(req, 'moderator');
 
-            res.json(await JobError.moderate(config.pool, ci, req.params.job, req.body));
+            res.json(await config.models.JobError.moderate(ci, req.params.job, req.body));
         } catch (err) {
             return Err.respond(err, res);
         }

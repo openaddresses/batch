@@ -1,5 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import LevelOverride from '../lib/types/level-override.js';
 import Auth from '../lib/auth.js';
 import { Type } from '@sinclair/typebox';
 import {
@@ -9,7 +8,7 @@ import {
     LevelOverrideResponse,
     PatchLevelOverrideBody,
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     await schema.get('/level', {
@@ -22,7 +21,12 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            return res.json(await LevelOverride.list(config.pool, req.query));
+            const list = await config.models.LevelOverride.list(req.query);
+
+            return res.json({
+                total: list.total,
+                level_override: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -38,9 +42,9 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const level = await LevelOverride.generate(config.pool, req.body);
+            const level = await config.models.LevelOverride.generate(req.body);
 
-            return res.json(level.serialize());
+            return res.json(level);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -59,9 +63,9 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const level = await LevelOverride.commit(config.pool, req.params.levelid, req.body);
+            const level = await config.models.LevelOverride.commit(req.params.levelid, req.body);
 
-            return res.json(level.serialize());
+            return res.json(level);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -79,8 +83,8 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            const level = await LevelOverride.from(config.pool, req.params.levelid);
-            return res.json(level.serialize());
+            const level = await config.models.LevelOverride.from(req.params.levelid);
+            return res.json(level);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -98,7 +102,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_admin(req);
 
-            await LevelOverride.delete(config.pool, req.params.levelid);
+            await config.models.LevelOverride.delete(req.params.levelid);
 
             return res.json({
                 status: 200,

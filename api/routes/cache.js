@@ -3,7 +3,7 @@ import Auth from '../lib/auth.js';
 import { Type } from '@sinclair/typebox';
 import {
     StandardResponse
-} from '../lib/schema.js';
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     schema.delete('/cache', {

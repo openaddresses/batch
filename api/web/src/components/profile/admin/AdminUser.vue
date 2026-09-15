@@ -208,6 +208,17 @@
                                             label='Source Moderator'
                                             @change='patchUser(user)'
                                         />
+
+                                        <TablerInput
+                                            v-model='user.oc_contribution_id'
+                                            label='OpenCollective Contribution ID'
+                                            @change='patchUser(user)'
+                                        />
+                                        <a
+                                            v-if='user.oc_contribution_id'
+                                            target='_blank'
+                                            :href='`https://opencollective.com/openaddresses/contributions/${user.oc_contribution_id}`'
+                                        >View on OpenCollective</a>
                                     </div>
                                 </div>
                             </td>
@@ -347,6 +358,7 @@ export default {
                         access: user.access,
                         level: user.level,
                         flags: user.flags,
+                        oc_contribution_id: user.oc_contribution_id,
                         validated: user.validated
                     }
                 });

@@ -197,17 +197,28 @@ export default class User {
         }
     }
 
-    async level(email, level) {
+    async level(email, level, oc_contribution_id) {
         console.error(email, level);
         let pgres;
         try {
-            pgres = await this.pool.execute(sql`
-                UPDATE users
-                    SET
-                        level = ${level}
-                    WHERE
-                        email = ${email}
-            `);
+            if (oc_contribution_id === undefined) {
+                pgres = await this.pool.execute(sql`
+                    UPDATE users
+                        SET
+                            level = ${level}
+                        WHERE
+                            email = ${email}
+                `);
+            } else {
+                pgres = await this.pool.execute(sql`
+                    UPDATE users
+                        SET
+                            level = ${level},
+                            oc_contribution_id = ${oc_contribution_id}
+                        WHERE
+                            email = ${email}
+                `);
+            }
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -232,6 +243,7 @@ export default class User {
                         flags = ${JSON.stringify(user.flags)},
                         access = ${user.access},
                         level = ${user.level},
+                        oc_contribution_id = ${user.oc_contribution_id},
                         validated = ${user.validated}
                     WHERE
                         id = ${uid}
@@ -252,6 +264,7 @@ export default class User {
             validated: row.validated,
             email: row.email,
             access: row.access,
+            oc_contribution_id: row.oc_contribution_id,
             flags: row.flags
         };
     }
@@ -311,7 +324,8 @@ export default class User {
                     access,
                     email,
                     flags,
-                    validated
+                    validated,
+                    oc_contribution_id
                 FROM
                     users
                 WHERE
@@ -343,7 +357,8 @@ export default class User {
                     email: row.email,
                     access: row.access,
                     flags: row.flags,
-                    validated: row.validated
+                    validated: row.validated,
+                    oc_contribution_id: row.oc_contribution_id
                 };
             })
         };
@@ -359,7 +374,8 @@ export default class User {
                     username,
                     access,
                     email,
-                    flags
+                    flags,
+                    oc_contribution_id
                 FROM
                     users
                 WHERE
@@ -379,7 +395,8 @@ export default class User {
             username: pgres[0].username,
             email: pgres[0].email,
             access: pgres[0].access,
-            flags: pgres[0].flags
+            flags: pgres[0].flags,
+            oc_contribution_id: pgres[0].oc_contribution_id
         };
     }
 

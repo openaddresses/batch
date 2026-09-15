@@ -68,6 +68,9 @@ export default class Level {
                                   value
                                   currency
                               }
+                              order {
+                                legacyId
+                              }
                             }
                           }
                           ... on Individual {
@@ -105,8 +108,10 @@ export default class Level {
         if (!account.transactions.nodes.length) return;
         if (!account.email) return;
 
-        const level = Level.calc(account.transactions.nodes[0]);
-        await this.user.level(account.email, level);
+        const transaction = account.transactions.nodes[0];
+        const level = Level.calc(transaction);
+        const oc_contribution_id = transaction.order ? String(transaction.order.legacyId) : null;
+        await this.user.level(account.email, level, oc_contribution_id);
     }
 
     /**
@@ -145,6 +150,9 @@ export default class Level {
                                   value
                                   currency
                               }
+                              order {
+                                legacyId
+                              }
                             }
                           }
                         }
@@ -176,8 +184,10 @@ export default class Level {
                 }
             }
 
-            const level = Level.calc(usr.account.transactions.nodes[0]);
-            await this.user.level(usr.account.email, level);
+            const transaction = usr.account.transactions.nodes[0];
+            const level = Level.calc(transaction);
+            const oc_contribution_id = transaction.order ? String(transaction.order.legacyId) : null;
+            await this.user.level(usr.account.email, level, oc_contribution_id);
         }
     }
 

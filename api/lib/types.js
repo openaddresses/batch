@@ -211,6 +211,7 @@ export const PatchUserBody = Type.Object({
     flags: Type.Optional(AnyObject()),
     access: Type.Optional(Access),
     level: Type.Optional(Level),
+    oc_contribution_id: Type.Optional(Type.Union([Type.Null(), Type.String()])),
     validated: Type.Optional(Type.Boolean())
 }, {
     additionalProperties: false
@@ -801,6 +802,9 @@ export const UserResponse = Type.Object({
     email: Type.String(),
     access: Access,
     level: Level,
+    oc_contribution_id: Type.Optional(Type.Union([Type.Null(), Type.String()], {
+        description: 'The OpenCollective contribution/order ID backing this user\'s level, if any'
+    })),
     flags: AnyObject()
 }, {
     additionalProperties: false
@@ -814,6 +818,9 @@ export const ListUsersResponse = Type.Object({
         email: Type.String({ description: 'The users email address' }),
         access: Access,
         level: Level,
+        oc_contribution_id: Type.Optional(Type.Union([Type.Null(), Type.String()], {
+            description: 'The OpenCollective contribution/order ID backing this user\'s level, if any'
+        })),
         flags: AnyObject(),
         validated: Type.Boolean()
     }, {

@@ -70,54 +70,49 @@
 
         <div
             v-if='add'
-            class='col col--12 grid border border--gray-light round px12 py12 my6 grid'
+            class='card-body border-top'
         >
-            <div class='col col--12 pb6'>
-                <h2 class='txt-bold fl'>
+            <div class='d-flex mb-2'>
+                <h3 class='card-title'>
                     New Level Override
-                </h2>
-                <button
-                    class='fr btn round btn--s btn--stroke btn--gray'
-                    @click='add = false'
-                >
-                    <svg class='icon'><use xlink:href='#icon-close' /></svg>
-                </button>
+                </h3>
+                <div class='ms-auto'>
+                    <TablerIconButton
+                        title='Cancel'
+                        @click='add = false'
+                    >
+                        <IconX
+                            :size='32'
+                            stroke='1'
+                        />
+                    </TablerIconButton>
+                </div>
             </div>
 
-            <div class='col col--12 grid grid--gut12'>
-                <div class='col col--9'>
-                    <label>Email RegExp Pattern </label>
-                    <input
+            <div class='row'>
+                <div class='col-9'>
+                    <TablerInput
                         v-model='newLevel.pattern'
-                        class='input'
-                    >
+                        label='Email RegExp Pattern'
+                    />
                 </div>
 
-                <div class='col col--3'>
-                    <label>Account Level</label>
-                    <div class='w-full select-container'>
-                        <select
-                            v-model='newLevel.level'
-                            class='select select--stroke'
-                        >
-                            <option>basic</option>
-                            <option>backer</option>
-                            <option>sponsor</option>
-                        </select>
-                        <div class='select-arrow' />
-                    </div>
+                <div class='col-3'>
+                    <TablerEnum
+                        v-model='newLevel.level'
+                        label='Account Level'
+                        :options='["basic", "backer", "sponsor"]'
+                    />
                 </div>
+            </div>
 
-                <div class='col col--12 clearfix'>
-                    <div class='col col--2 fr'>
-                        <button
-                            class='my12 w-full btn btn--stroke round color-gray color-green-on-hover'
-                            @click='createLevel'
-                        >
-                            <svg class='fl icon mt6'><use href='#icon-check' /></svg><span>Save</span>
-                        </button>
-                    </div>
-                </div>
+            <div class='d-flex mt-3'>
+                <button
+                    class='btn btn-primary ms-auto'
+                    @click='createLevel'
+                >
+                    Save
+                </button>
             </div>
         </div>
 

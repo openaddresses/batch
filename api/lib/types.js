@@ -210,6 +210,7 @@ export const CreateUserBody = Type.Object({
 export const PatchUserBody = Type.Object({
     flags: Type.Optional(AnyObject()),
     access: Type.Optional(Access),
+    level: Type.Optional(Level),
     validated: Type.Optional(Type.Boolean())
 }, {
     additionalProperties: false

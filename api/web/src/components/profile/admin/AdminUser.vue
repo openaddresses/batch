@@ -137,8 +137,18 @@
                                     />
 
                                     <span
-                                        v-if='user.level !== "basic"'
+                                        v-if='user.level === "sponsor"'
+                                        class='badge bg-yellow text-white'
+                                        v-text='user.level'
+                                    />
+                                    <span
+                                        v-else-if='user.level === "backer"'
                                         class='badge bg-purple text-white'
+                                        v-text='user.level'
+                                    />
+                                    <span
+                                        v-else
+                                        class='badge bg-secondary text-white'
                                         v-text='user.level'
                                     />
 
@@ -173,6 +183,13 @@
                                             v-model='user.access'
                                             label='Access Level'
                                             :options='["disabled", "admin", "user"]'
+                                            @change='patchUser(user)'
+                                        />
+
+                                        <TablerEnum
+                                            v-model='user.level'
+                                            label='Contribution Level'
+                                            :options='["basic", "backer", "sponsor"]'
                                             @change='patchUser(user)'
                                         />
 
@@ -339,6 +356,7 @@ export default {
                     method: 'PATCH',
                     body: {
                         access: user.access,
+                        level: user.level,
                         flags: user.flags,
                         oc_contribution_id: user.oc_contribution_id,
                         validated: user.validated

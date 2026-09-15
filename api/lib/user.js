@@ -242,6 +242,7 @@ export default class User {
                     SET
                         flags = ${JSON.stringify(user.flags)},
                         access = ${user.access},
+                        level = ${user.level},
                         oc_contribution_id = ${user.oc_contribution_id},
                         validated = ${user.validated}
                     WHERE

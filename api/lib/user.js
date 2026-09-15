@@ -137,7 +137,7 @@ export default class User {
                     username,
                     email,
                     validated,
-                    flags,
+                    COALESCE(flags, '{}'::jsonb) AS flags,
                     level,
                     access
                 FROM
@@ -240,7 +240,7 @@ export default class User {
             pgres = await this.pool.execute(sql`
                 UPDATE users
                     SET
-                        flags = ${JSON.stringify(user.flags)},
+                        flags = ${JSON.stringify(user.flags)}::jsonb,
                         access = ${user.access},
                         level = ${user.level},
                         oc_contribution_id = ${user.oc_contribution_id},
@@ -323,7 +323,7 @@ export default class User {
                     level,
                     access,
                     email,
-                    flags,
+                    COALESCE(flags, '{}'::jsonb) AS flags,
                     validated,
                     oc_contribution_id
                 FROM
@@ -374,7 +374,7 @@ export default class User {
                     username,
                     access,
                     email,
-                    flags,
+                    COALESCE(flags, '{}'::jsonb) AS flags,
                     oc_contribution_id
                 FROM
                     users
@@ -416,7 +416,7 @@ export default class User {
                     access,
                     email,
                     password,
-                    flags,
+                    COALESCE(flags, '{}'::jsonb) AS flags,
                     validated
                 FROM
                     users

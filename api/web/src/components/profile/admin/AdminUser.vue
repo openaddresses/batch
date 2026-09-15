@@ -137,8 +137,18 @@
                                     />
 
                                     <span
-                                        v-if='user.level !== "basic"'
+                                        v-if='user.level === "sponsor"'
+                                        class='badge bg-yellow text-white'
+                                        v-text='user.level'
+                                    />
+                                    <span
+                                        v-else-if='user.level === "backer"'
                                         class='badge bg-purple text-white'
+                                        v-text='user.level'
+                                    />
+                                    <span
+                                        v-else
+                                        class='badge bg-secondary text-white'
                                         v-text='user.level'
                                     />
 

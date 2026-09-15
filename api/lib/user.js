@@ -240,7 +240,7 @@ export default class User {
             pgres = await this.pool.execute(sql`
                 UPDATE users
                     SET
-                        flags = ${JSON.stringify(user.flags)},
+                        flags = ${JSON.stringify(user.flags)}::jsonb,
                         access = ${user.access},
                         level = ${user.level},
                         oc_contribution_id = ${user.oc_contribution_id},

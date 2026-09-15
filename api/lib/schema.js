@@ -15,7 +15,8 @@ export const User = pgTable('users', {
     username: text().notNull(),
     email: text().notNull(),
     password: text().notNull(),
-    validated: boolean().notNull().default(false)
+    validated: boolean().notNull().default(false),
+    oc_contribution_id: text()
 }, (t) => [
     unique('users_username_key').on(t.username),
     unique('users_email_key').on(t.email)

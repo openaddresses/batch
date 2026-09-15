@@ -186,6 +186,13 @@
                                             @change='patchUser(user)'
                                         />
 
+                                        <TablerEnum
+                                            v-model='user.level'
+                                            label='Contribution Level'
+                                            :options='["basic", "backer", "sponsor"]'
+                                            @change='patchUser(user)'
+                                        />
+
                                         <TablerToggle
                                             v-model='user.validated'
                                             label='Email Validated'
@@ -338,6 +345,7 @@ export default {
                     method: 'PATCH',
                     body: {
                         access: user.access,
+                        level: user.level,
                         flags: user.flags,
                         validated: user.validated
                     }

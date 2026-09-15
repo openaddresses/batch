@@ -231,6 +231,7 @@ export default class User {
                     SET
                         flags = ${JSON.stringify(user.flags)},
                         access = ${user.access},
+                        level = ${user.level},
                         validated = ${user.validated}
                     WHERE
                         id = ${uid}

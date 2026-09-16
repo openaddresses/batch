@@ -165,15 +165,19 @@ async function collect(tmp, collection, oa, boundaries) {
 export const SHARD_FEATURE_BUDGET = 1000000;
 
 /**
- * Read one source's line-delimited GeoJSON into an array of features.
+ * Stream one source's features directly into its assigned tiles' shard
+ * writers, one line at a time - never builds a features array for the file,
+ * so assign-pass memory stays O(1) per source regardless of a single
+ * source's size. A single "statewide"/"countywide" source file can itself
+ * exceed SHARD_FEATURE_BUDGET even though no individual tile does (that
+ * budget bounds a tile's working set, not a source file), so unlike the
+ * count pass this can't just re-check isValidFeature and move on - it has
+ * to avoid ever materializing the file as an array in the first place.
  *
  * Streamed line-by-line (rather than readFileSync().split('\n')) so a
- * single >512MB source file can't blow the V8 max string length, and so
- * the raw file text never has to be resident alongside the parsed objects.
+ * single >512MB source file can't blow the V8 max string length either.
  */
-export async function readSourceFeatures(file, relPath) {
-    const features = [];
-
+export async function assignSourceFeatures(file, relPath, cellToTile, writers) {
     const input = fs.createReadStream(file);
     const rl = readline.createInterface({
         input,
@@ -184,26 +188,33 @@ export async function readSourceFeatures(file, relPath) {
         for await (const line of rl) {
             if (!line.trim()) continue;
 
+            let feature;
             try {
-                features.push(JSON.parse(line));
+                feature = JSON.parse(line);
             } catch (err) {
                 console.error(`not ok - skipping malformed feature in ${relPath}: ${err.message}`);
                 continue;
             }
+
+            if (!isValidFeature(feature)) continue;
+            const [lon, lat] = feature.geometry.coordinates;
+            const { home, borrowed } = assignTiles(cellToTile, DEFAULT_CELL_DEG, lon, lat);
+            if (home === undefined) continue;
+
+            await writers.writeCore(home, relPath, feature);
+            for (const tileIdx of borrowed) await writers.writeBorrowed(tileIdx, relPath, feature);
         }
     } finally {
         rl.close();
         input.destroy();
     }
-
-    return features;
 }
 
 /**
  * Stream one source's features purely to bucket their coordinates into the
  * density counts map - never retains a features array, so this pass costs
  * O(1) memory per source regardless of collection size. Malformed lines are
- * silently skipped here; they are already logged when readSourceFeatures
+ * silently skipped here; they are already logged when assignSourceFeatures
  * reads the same file for real during the assign pass below.
  */
 async function countSourceFeatures(file, counts) {
@@ -281,16 +292,7 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
 
     const writers = openShardWriters(tmp, tiles.length);
     for (const relPath of collection_data) {
-        const features = await readSourceFeatures(path.resolve(tmp, 'sources', relPath), relPath);
-        for (const feature of features) {
-            if (!isValidFeature(feature)) continue;
-            const [lon, lat] = feature.geometry.coordinates;
-            const { home, borrowed } = assignTiles(cellToTile, DEFAULT_CELL_DEG, lon, lat);
-            if (home === undefined) continue;
-
-            await writers.writeCore(home, relPath, feature);
-            for (const tileIdx of borrowed) await writers.writeBorrowed(tileIdx, relPath, feature);
-        }
+        await assignSourceFeatures(path.resolve(tmp, 'sources', relPath), relPath, cellToTile, writers);
     }
     await writers.closeAll();
 

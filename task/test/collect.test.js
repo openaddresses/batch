@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { Writable } from 'node:stream';
-import { readSourceFeatures, writeFeatures, SHARD_FEATURE_BUDGET } from '../collect.js';
+import { assignSourceFeatures, writeFeatures, SHARD_FEATURE_BUDGET } from '../collect.js';
+import { countCoordinate, buildTiles, DEFAULT_CELL_DEG } from '../lib/tiling.js';
 
 function tmpSource(lines) {
     const dir = fs.mkdtempSync(path.resolve(os.tmpdir(), 'oa-collect-test-'));
@@ -20,40 +21,63 @@ function feature(number) {
     });
 }
 
-test('readSourceFeatures streams a source file line by line', async (t) => {
+// Every test feature above sits at the same coordinate, so a cellToTile
+// built from that one coordinate routes them all to tile 0.
+function singleTileCellToTile() {
+    const counts = new Map();
+    countCoordinate(counts, -122, 38, DEFAULT_CELL_DEG);
+    return buildTiles(counts, { budget: 1000000, cellDeg: DEFAULT_CELL_DEG }).cellToTile;
+}
+
+function fakeWriters() {
+    const core = [];
+    const borrowed = [];
+    return {
+        core,
+        borrowed,
+        writeCore: async (idx, relPath, feat) => { core.push({ idx, relPath, feat }); },
+        writeBorrowed: async (idx, relPath, feat) => { borrowed.push({ idx, relPath, feat }); }
+    };
+}
+
+test('assignSourceFeatures streams a source file line by line into shard writers', async (t) => {
     const file = tmpSource([feature(1), feature(2), '', feature(3), '']);
+    const writers = fakeWriters();
 
-    const features = await readSourceFeatures(file, 'a.json');
+    await assignSourceFeatures(file, 'a.json', singleTileCellToTile(), writers);
 
-    t.equals(features.length, 3, 'blank lines are skipped, real features are parsed');
-    t.equals(features[2].properties.number, '3');
+    t.equals(writers.core.length, 3, 'blank lines are skipped, real features are written');
+    t.equals(writers.core[2].feat.properties.number, '3');
     t.end();
 });
 
-test('readSourceFeatures skips a malformed line without aborting the source', async (t) => {
+test('assignSourceFeatures skips a malformed line without aborting the source', async (t) => {
     const file = tmpSource([feature(1), '{"type": "Feature", "propert', feature(2)]);
+    const writers = fakeWriters();
 
     const logs = [];
     const original = console.error;
     console.error = (msg) => logs.push(msg);
 
-    let features;
     try {
-        features = await readSourceFeatures(file, 'a.json');
+        await assignSourceFeatures(file, 'a.json', singleTileCellToTile(), writers);
     } finally {
         console.error = original;
     }
 
-    t.equals(features.length, 2, 'the good features either side of the bad line are kept');
+    t.equals(writers.core.length, 2, 'the good features either side of the bad line are kept');
     t.equals(logs.length, 1, 'the malformed line is logged once');
     t.end();
 });
 
-test('readSourceFeatures reads a file whose total size exceeds the V8 max string length in chunks', async (t) => {
+test('assignSourceFeatures reads a file whose total size exceeds the V8 max string length in chunks', async (t) => {
     // Not a real 512MB file (too slow for CI) - this just pins the contract
     // that the reader never materializes the whole file as one JS string,
-    // which is what readFileSync(..., 'utf8') used to do.
+    // which is what readFileSync(..., 'utf8') used to do, nor as one array
+    // of parsed features, which used to let a single huge source file blow
+    // the heap regardless of SHARD_FEATURE_BUDGET.
     const file = tmpSource(Array.from({ length: 5000 }, (_, i) => feature(i)));
+    const writers = fakeWriters();
 
     const readFileSync = fs.readFileSync;
     let readWholeFile = false;
@@ -62,14 +86,13 @@ test('readSourceFeatures reads a file whose total size exceeds the V8 max string
         return readFileSync(...args);
     };
 
-    let features;
     try {
-        features = await readSourceFeatures(file, 'a.json');
+        await assignSourceFeatures(file, 'a.json', singleTileCellToTile(), writers);
     } finally {
         fs.readFileSync = readFileSync;
     }
 
-    t.equals(features.length, 5000);
+    t.equals(writers.core.length, 5000);
     t.equals(readWholeFile, false, 'the source file is never slurped with readFileSync');
     t.end();
 });

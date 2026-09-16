@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'assert';
 import Flight from './flight.js';
-import { sql } from 'slonik';
+import { sql } from 'drizzle-orm';
 
 const flight = new Flight();
 
@@ -10,7 +10,7 @@ flight.takeoff();
 
 test('Populate Map', async () => {
     try {
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             INSERT INTO map (
                 name,
                 code,
@@ -22,7 +22,7 @@ test('Populate Map', async () => {
             );
         `);
 
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             INSERT INTO map (
                 name,
                 code,
@@ -34,7 +34,7 @@ test('Populate Map', async () => {
             );
         `);
 
-        await flight.config.pool.query(sql`
+        await flight.config.pool.execute(sql`
             WITH coverage (code, layer) AS (
                 VALUES
                     ('us', 'addresses'),

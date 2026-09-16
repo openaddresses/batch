@@ -4,6 +4,11 @@
         "query": true,
         "res": true
     },
+    "GET /openapi": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "DELETE /cache": {
         "body": false,
         "query": false,
@@ -20,6 +25,11 @@
         "res": true
     },
     "GET /collections/:collection/data": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /collections/:collection/processed": {
         "body": false,
         "query": false,
         "res": false
@@ -66,7 +76,7 @@
     },
     "GET /data/:data/history": {
         "body": false,
-        "query": false,
+        "query": true,
         "res": true
     },
     "GET /job/error": {
@@ -154,6 +164,11 @@
         "query": true,
         "res": true
     },
+    "GET /job/orphaned": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "GET /job/:job": {
         "body": false,
         "query": false,
@@ -209,7 +224,7 @@
         "query": false,
         "res": true
     },
-    "GET /licenses": {
+    "DELETE /job/:job": {
         "body": false,
         "query": false,
         "res": true
@@ -235,6 +250,11 @@
         "res": true
     },
     "DELETE /level/:levelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /licenses": {
         "body": false,
         "query": false,
         "res": true
@@ -324,6 +344,11 @@
         "query": false,
         "res": true
     },
+    "DELETE /run/:run": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "POST /schedule": {
         "body": true,
         "query": false,
@@ -351,7 +376,7 @@
     },
     "GET /user": {
         "body": false,
-        "query": false,
+        "query": true,
         "res": true
     },
     "POST /user": {

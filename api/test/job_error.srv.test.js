@@ -47,6 +47,7 @@ test('POST: api/run/:run/jobs', async () => {
 
         assert.deepEqual(res.body, {
             run: 1,
+            errors: [],
             jobs: [1]
         }, 'Run 1 populated');
     } catch (err) {

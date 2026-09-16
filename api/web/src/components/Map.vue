@@ -92,8 +92,7 @@
 </template>
 
 <script>
-import mapgl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
+import mapgl from '../util/maplibre.js';
 import { Protocol } from 'pmtiles';
 
 const TILES_BASE = 'https://v2.openaddresses.io/fabric';

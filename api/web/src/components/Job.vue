@@ -107,50 +107,56 @@
                                         @login='$emit("login")'
                                         @perk='$emit("perk", $event)'
                                     />
-                                    <IconLicense
+                                    <TablerIconButton
                                         v-if='job.license'
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
                                         title='View license'
-                                    />
-                                    <IconCode
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    >
+                                        <IconLicense
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
                                         title='View raw job data'
                                         @click='$router.push({ path: `/job/${$route.params.jobid}/raw` })'
-                                    />
-                                    <IconNotes
+                                    >
+                                        <IconCode
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
                                         v-if='job.loglink'
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
                                         title='View job log'
                                         @click='$router.push({ path: `/job/${$route.params.jobid}/log` })'
-                                    />
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    >
+                                        <IconNotes
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
                                         title='Refresh'
                                         @click='refresh'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
 
                                     <div class='dropdown'>
-                                        <div
+                                        <TablerIconButton
                                             id='jobAdmin'
-                                            type='button'
+                                            title='More actions'
                                             data-bs-toggle='dropdown'
                                             aria-expanded='false'
                                         >
                                             <IconDotsVertical
-                                                class='cursor-pointer'
+                                                :size='32'
                                                 stroke='1'
-                                                size='32'
-                                                title='More actions'
                                             />
-                                        </div>
+                                        </TablerIconButton>
                                         <ul
                                             class='dropdown-menu'
                                             aria-labelledby='jobAdmin'
@@ -238,6 +244,7 @@ import {
 import {
     TablerBreadCrumb,
     TablerLoading,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import ErrorsModerate from './util/ErrorsModerate.vue';
 import Download from './util/Download.vue';
@@ -249,6 +256,7 @@ import JobMap from './job/JobMap.vue';
 export default {
     name: 'Job',
     components: {
+        TablerIconButton,
         Log,
         JobMap,
         JobSample,

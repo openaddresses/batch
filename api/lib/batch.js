@@ -1,3 +1,4 @@
+import { fetch } from 'undici';
 import Batch from '@aws-sdk/client-batch';
 import ASG from '@aws-sdk/client-auto-scaling';
 import ECS from '@aws-sdk/client-ecs';
@@ -251,7 +252,17 @@ export async function trigger(event) {
                 command: ['node', 'task.js'],
                 environment: [
                     { name: 'OA_JOB_ID', value: String(event.job) }
-                ]
+                ],
+                // The job definition's default 1900MB container memory cap is a
+                // hard Docker/ECS limit - a huge single-layer source (a
+                // multi-GB statewide GDB, a multi-million-row paginated
+                // FeatureServer) can exceed it mid-conversion and get silently
+                // OOM-killed with no exception surfaced to task.js. Give
+                // conform.size:"large" sources more headroom, sized to fit
+                // within the large queue's m5.large instances (8GB RAM) -
+                // Batch will schedule these only on instance types that can
+                // satisfy the request.
+                ...(tier === 'large' ? { memory: 7000 } : {})
             },
             timeout: {
                 attemptDurationSeconds: timeout
@@ -294,6 +305,17 @@ export async function trigger(event) {
             },
             timeout: {
                 attemptDurationSeconds: 60 * 60 * 24  // 24 hour backstop; per-source fetches self-timeout well before this
+            },
+            // Mega compute environment is SPOT (task.template.js) - a multi-hour
+            // collect run can lose its host mid-run with no app-level error, same
+            // as fabric below. Auto-retry only that case; any other failure (real
+            // bug, non-zero exit, OOM) still fails immediately.
+            retryStrategy: {
+                attempts: 2,
+                evaluateOnExit: [
+                    { action: 'RETRY', onStatusReason: 'Host EC2*' },
+                    { action: 'EXIT', onReason: '*' }
+                ]
             }
         };
     } else if (event.type === 'fabric') {

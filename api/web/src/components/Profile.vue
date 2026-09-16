@@ -51,11 +51,15 @@
 
                                     <TablerDropdown>
                                         <slot>
-                                            <IconSettings
-                                                class='cursor-pointer mx-3'
-                                                size='32'
-                                                stroke='1'
-                                            />
+                                            <TablerIconButton
+                                                title='Admin settings'
+                                                class='mx-3'
+                                            >
+                                                <IconSettings
+                                                    :size='32'
+                                                    stroke='1'
+                                                />
+                                            </TablerIconButton>
                                         </slot>
                                         <template #dropdown>
                                             <div
@@ -111,12 +115,14 @@ import {
 import {
     TablerLoading,
     TablerBreadCrumb,
-    TablerDropdown
+    TablerDropdown,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Profile',
     components: {
+        TablerIconButton,
         IconSettings,
         TablerBreadCrumb,
         TablerLoading,

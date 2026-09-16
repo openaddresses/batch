@@ -4,12 +4,14 @@
         @click.stop.prevent=''
     >
         <slot>
-            <IconDownload
-                size='32'
-                class='cursor-pointer'
-                stroke='1'
+            <TablerIconButton
                 title='Download data'
-            />
+            >
+                <IconDownload
+                    :size='32'
+                    stroke='1'
+                />
+            </TablerIconButton>
         </slot>
 
         <template #dropdown>
@@ -43,13 +45,16 @@
                             GeoJSON+LD
                         </span>
                         <div class='ms-auto'>
-                            <IconInfoCircle
-                                class='fr color-blue-on-hover cursor-pointer mt3'
-                                size='16'
-                                stroke='1'
+                            <TablerIconButton
                                 title='About GeoJSON+LD format'
+                                class='fr color-blue-on-hover mt3'
                                 @click='external("https://stevage.github.io/ndgeojson/")'
-                            />
+                            >
+                                <IconInfoCircle
+                                    :size='16'
+                                    stroke='1'
+                                />
+                            </TablerIconButton>
                         </div>
                     </div>
 
@@ -61,13 +66,16 @@
                             ShapeFile
                         </span>
                         <div class='ms-auto'>
-                            <IconInfoCircle
-                                class='fr color-blue-on-hover cursor-pointer mt3'
-                                size='16'
-                                stroke='1'
+                            <TablerIconButton
                                 title='About Shapefile format'
+                                class='fr color-blue-on-hover mt3'
                                 @click='external("https://en.wikipedia.org/wiki/Shapefile")'
-                            />
+                            >
+                                <IconInfoCircle
+                                    :size='16'
+                                    stroke='1'
+                                />
+                            </TablerIconButton>
                         </div>
                     </div>
 
@@ -79,13 +87,16 @@
                             CSV
                         </span>
                         <div class='ms-auto'>
-                            <IconInfoCircle
-                                class='fr cursor-pointer color-blue-on-hover mt3'
-                                size='16'
-                                stroke='1'
+                            <TablerIconButton
                                 title='About CSV format'
+                                class='fr color-blue-on-hover mt3'
                                 @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")'
-                            />
+                            >
+                                <IconInfoCircle
+                                    :size='16'
+                                    stroke='1'
+                                />
+                            </TablerIconButton>
                         </div>
                     </div>
                 </div>
@@ -128,13 +139,16 @@
                         >
                             GeoJSON+LD
                         </span>
-                        <IconInfoCircle
-                            class='fr color-blue-on-hover cursor-pointer mt3'
-                            size='16'
-                            stroke='1'
+                        <TablerIconButton
                             title='About GeoJSON+LD format'
+                            class='fr color-blue-on-hover mt3'
                             @click='external("https://stevage.github.io/ndgeojson/")'
-                        />
+                        >
+                            <IconInfoCircle
+                                :size='16'
+                                stroke='1'
+                            />
+                        </TablerIconButton>
                     </div>
                 </div>
             </div>
@@ -154,12 +168,14 @@ import {
 } from '@tabler/icons-vue';
 import MustLogin from './MustLogin.vue';
 import {
-    TablerDropdown
+    TablerDropdown,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Download',
     components: {
+        TablerIconButton,
         MustLogin,
         TablerDropdown,
         IconInfoCircle,

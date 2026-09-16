@@ -6,24 +6,36 @@
             </h2>
 
             <div class='d-flex ms-auto btn-list'>
-                <IconSearch
+                <TablerIconButton
                     v-if='!showFilter'
-                    class='cursor-pointer'
-                    size='32'
+                    title='Show filters'
                     @click='showFilter = true'
-                />
-                <IconX
+                >
+                    <IconSearch
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
+                <TablerIconButton
                     v-else
-                    class='cursor-pointer'
-                    size='32'
+                    title='Hide filters'
                     @click='showFilter = false'
-                />
+                >
+                    <IconX
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
 
-                <IconRefresh
-                    class='cursor-pointer'
-                    size='32'
+                <TablerIconButton
+                    title='Refresh users'
                     @click='getUsers'
-                />
+                >
+                    <IconRefresh
+                        :size='32'
+                        stroke='1'
+                    />
+                </TablerIconButton>
             </div>
         </div>
 
@@ -125,8 +137,18 @@
                                     />
 
                                     <span
-                                        v-if='user.level !== "basic"'
+                                        v-if='user.level === "sponsor"'
+                                        class='badge bg-yellow text-white'
+                                        v-text='user.level'
+                                    />
+                                    <span
+                                        v-else-if='user.level === "backer"'
                                         class='badge bg-purple text-white'
+                                        v-text='user.level'
+                                    />
+                                    <span
+                                        v-else
+                                        class='badge bg-secondary text-white'
                                         v-text='user.level'
                                     />
 
@@ -145,11 +167,15 @@
                                             User Settings
                                         </h3>
                                         <div class='ms-auto'>
-                                            <IconRefresh
-                                                class='cursor-pointer'
-                                                size='32'
+                                            <TablerIconButton
+                                                title='Refresh user'
                                                 @click='getUser(user)'
-                                            />
+                                            >
+                                                <IconRefresh
+                                                    :size='32'
+                                                    stroke='1'
+                                                />
+                                            </TablerIconButton>
                                         </div>
                                     </div>
                                     <div class='col-12'>
@@ -157,6 +183,13 @@
                                             v-model='user.access'
                                             label='Access Level'
                                             :options='["disabled", "admin", "user"]'
+                                            @change='patchUser(user)'
+                                        />
+
+                                        <TablerEnum
+                                            v-model='user.level'
+                                            label='Contribution Level'
+                                            :options='["basic", "backer", "sponsor"]'
                                             @change='patchUser(user)'
                                         />
 
@@ -175,6 +208,17 @@
                                             label='Source Moderator'
                                             @change='patchUser(user)'
                                         />
+
+                                        <TablerInput
+                                            v-model='user.oc_contribution_id'
+                                            label='OpenCollective Contribution ID'
+                                            @change='patchUser(user)'
+                                        />
+                                        <a
+                                            v-if='user.oc_contribution_id'
+                                            target='_blank'
+                                            :href='`https://opencollective.com/openaddresses/contributions/${user.oc_contribution_id}`'
+                                        >View on OpenCollective</a>
                                     </div>
                                 </div>
                             </td>
@@ -200,6 +244,7 @@ import {
     TablerEnum,
     TablerInput,
     TablerNone,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 import {
@@ -211,6 +256,7 @@ import {
 export default {
     name: 'AdminUser',
     components: {
+        TablerIconButton,
         TableFooter,
         TablerLoading,
         TablerNone,
@@ -310,7 +356,9 @@ export default {
                     method: 'PATCH',
                     body: {
                         access: user.access,
+                        level: user.level,
                         flags: user.flags,
+                        oc_contribution_id: user.oc_contribution_id,
                         validated: user.validated
                     }
                 });

@@ -1,5 +1,7 @@
+import { fetch } from 'undici';
 import fs from 'fs';
 import Err from '@openaddresses/batch-error';
+import { StatusValues } from './types.js';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
@@ -8,7 +10,7 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.ur
  */
 export class Status {
     static list() {
-        return JSON.parse(fs.readFileSync(new URL('../schema/util/status.json', import.meta.url))).enum;
+        return [...StatusValues];
     }
 
     static verify(statuses) {

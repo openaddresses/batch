@@ -1,17 +1,20 @@
 import fs from 'fs';
+import { fileURLToPath } from 'node:url';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import Cacher from './lib/cacher.js';
 import express from 'express';
 import minify from 'express-minify';
 import Schema from '@openaddresses/batch-schema';
-import SwaggerUI from 'swagger-ui-express';
 import Err from '@openaddresses/batch-error';
 import { Pool } from '@openaddresses/batch-generic';
 import minimist from 'minimist';
+import * as pgschema from './lib/schema.js';
+import Models from './lib/models.js';
 
 import User from './lib/user.js';
 import Token from './lib/token.js';
+import { StandardResponse } from './lib/types.js';
 
 try {
     const dotfile = new URL('.env', import.meta.url);
@@ -25,9 +28,8 @@ try {
 
 const pkg = JSON.parse(String(fs.readFileSync(new URL('./package.json', import.meta.url))));
 const args = minimist(process.argv, {
-    boolean: ['help', 'populate', 'email', 'no-cache', 'no-tilebase', 'silent'],
+    boolean: ['help', 'populate', 'email', 'no-cache', 'no-migrate', 'silent'],
     alias: {
-        no_tb: 'no-tilebase',
         no_c: 'no-cache'
     },
     string: ['postgres']
@@ -68,35 +70,17 @@ async function configure(args) {
  */
 
 export default async function server(config) {
-    const TileBase = (await import('tilebase')).default;
-
-    if (!config.args['no-tilebase']) {
-        try {
-            if (!config.silent) console.log(`ok - loading: s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
-            config.borders = new TileBase(`s3://${config.Bucket}/${config.StackName}/borders.tilebase`);
-            if (!config.silent) console.log('ok - loaded TileBase (Borders)');
-            await config.borders.open();
-        } catch (err) {
-            console.error(err);
-            config.borders = null;
-        }
-    } else {
-        if (!config.silent) console.log('ok - TileBase Disabled');
-    }
-
     config.cacher = new Cacher(config.args['no-cache'], config.silent);
-    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses', {
-        schemas: {
-            dir: new URL('./schema/', import.meta.url)
-        },
-        parsing: {
-            geometry: true
-        }
+    config.pool = await Pool.connect(process.env.POSTGRES || config.args.postgres || 'postgres://postgres@localhost:5432/openaddresses', pgschema, {
+        ssl: process.env.StackName === 'test' ? undefined : { rejectUnauthorized: false },
+        migrationsFolder: config.args['no-migrate'] ? undefined : new URL('./migrations/', import.meta.url).pathname
     });
+
+    config.models = new Models(config.pool);
 
     try {
         if (config.args.populate) {
-            await Map.populate(config.pool);
+            await config.models.Map.populate();
         }
     } catch (err) {
         throw new Error(err);
@@ -108,9 +92,21 @@ export default async function server(config) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: new URL('./schema', import.meta.url),
-        openapi: true,
-        limit: 50
+        prefix: '/api',
+        limit: 50,
+        error: {
+            400: StandardResponse,
+            401: StandardResponse,
+            403: StandardResponse,
+            404: StandardResponse,
+            500: StandardResponse
+        },
+        openapi: {
+            info: {
+                title: 'OpenAddresses Batch API',
+                version: pkg.version
+            }
+        }
     });
 
     app.disable('x-powered-by');
@@ -144,6 +140,9 @@ export default async function server(config) {
         res.set('Cache-Control', 'no-store');
         next();
     });
+
+    // GitHub signs the raw payload, so it must reach the route as text before the JSON body parser
+    app.use('/api/github/event', express.text({ type: '*/*', limit: '500kb' }));
 
     app.use('/api', schema.router);
 
@@ -220,12 +219,10 @@ export default async function server(config) {
         }
     );
 
-    schema.docs.base.servers = [{ url: '/api' }];
-    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
-    app.use('/*', express.static('web/dist'));
-
-    schema.not_found();
-    schema.error();
+    app.get('/docs', (req, res) => {
+        res.sendFile(fileURLToPath(new URL('./web/dist/docs.html', import.meta.url)));
+    });
+    app.use('/{*splat}', express.static('web/dist'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(4999, (err) => {

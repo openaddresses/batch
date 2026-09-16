@@ -38,8 +38,7 @@
 </template>
 
 <script>
-import mapgl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css';
+import mapgl from '../../util/maplibre.js';
 let map = null;
 
 export default {
@@ -105,6 +104,12 @@ export default {
                 });
             }
             this.$emit('point', this.point);
+        }
+    },
+    unmounted: function() {
+        if (map) {
+            map.remove();
+            map = null;
         }
     },
     mounted: async function() {

@@ -4,7 +4,6 @@ export default async function router(schema) {
     await schema.post('/opencollective/event', {
         name: 'OpenCollective',
         group: 'Webhooks',
-        auth: 'admin',
         description: 'Callback endpoint for OpenCollective. Should not be called by user functions'
     }, async (req, res) => {
         try {

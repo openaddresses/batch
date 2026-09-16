@@ -41,13 +41,15 @@
                                         title='View commit on GitHub'
                                         @click.stop.prevent='github(run)'
                                     >Github</span>
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    <TablerIconButton
                                         title='Refresh'
                                         @click='fetchRun'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
 
@@ -184,13 +186,14 @@
 </template>
 
 <script>
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../util/date.js';
 import Status from './util/Status.vue';
 import TableFooter from './util/TableFooter.vue';
 import {
     TablerNone,
     TablerBreadCrumb,
-    TablerLoading
+    TablerLoading,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import {
     IconRefresh
@@ -199,6 +202,7 @@ import {
 export default {
     name: 'Run',
     components: {
+        TablerIconButton,
         TableFooter,
         TablerBreadCrumb,
         TablerLoading,
@@ -209,7 +213,6 @@ export default {
     props: ['runid'],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             showFilter: false,
             paging: {
                 source: '',
@@ -261,7 +264,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         filterShortcut: function(status) {
             this.showFilter = true;

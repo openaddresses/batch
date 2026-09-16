@@ -1,35 +1,20 @@
-import fs from 'fs';
-import path from 'path';
 import test from 'node:test';
 import assert from 'assert';
-
-import { globSync } from 'glob';
-import $RefParser from 'json-schema-ref-parser';
-
+import { KindGuard } from '@sinclair/typebox';
 // eslint-disable-next-line n/no-extraneous-import
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
+import { Ajv } from 'ajv';
+import * as schemas from '../lib/types.js';
 
 const ajv = new Ajv({
+    strict: false,
     allErrors: true
 });
 
-addFormats(ajv);
+for (const [name, schema] of Object.entries(schemas)) {
+    if (!KindGuard.IsSchema(schema)) continue;
 
-for (const source of globSync(new URL('../schema/**.json', import.meta.url).pathname)) {
-    test(`schema/${path.parse(source).base}`, async () => {
+    test(`lib/schema.js: ${name}`, () => {
         try {
-            const file = fs.readFileSync(source);
-            assert.ok(file.length, 'file loaded');
-
-            JSON.parse(file);
-        } catch (err) {
-            assert.ifError(err, 'no JSON errors');
-        }
-
-        try {
-            const schema = await $RefParser.dereference(source);
-
             ajv.compile(schema);
         } catch (err) {
             assert.ifError(err, 'no errors');

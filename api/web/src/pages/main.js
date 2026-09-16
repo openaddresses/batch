@@ -17,8 +17,6 @@ const router = new VueRouter.createRouter({
 
         { path: '/error', component: () => import('../components/Errors.vue') },
 
-        { path: '/health', component: () => import('../components/Health.vue') },
-
         { path: '/run', component: () => import('../components/Runs.vue') },
         { path: '/run/:runid', component: () => import('../components/Run.vue'), props: true },
 

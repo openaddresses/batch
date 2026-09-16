@@ -72,10 +72,16 @@
                 >
                     <div class='pre'>
                         <span v-text='source' />
-                        <svg
-                            class='cursor-pointer fr icon color-gray-light color-red-on-hover'
+                        <TablerIconButton
+                            title='Remove source'
+                            class='fr'
                             @click='sources.splice(i, 1)'
-                        ><use href='#icon-trash' /></svg>
+                        >
+                            <IconTrash
+                                :size='32'
+                                stroke='1'
+                            />
+                        </TablerIconButton>
                     </div>
                 </div>
 
@@ -96,8 +102,19 @@
 </template>
 
 <script>
+import {
+    TablerIconButton
+} from '@tak-ps/vue-tabler';
+import {
+    IconTrash
+} from '@tabler/icons-vue';
+
 export default {
     name: 'Collection',
+    components: {
+        TablerIconButton,
+        IconTrash
+    },
     props: ['collection'],
     data: function() {
         return {

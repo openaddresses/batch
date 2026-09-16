@@ -74,12 +74,14 @@
                                                             <template v-if='auth && auth.access === "admin"'>
                                                                 <TablerDropdown>
                                                                     <slot>
-                                                                        <IconSettings
-                                                                            size='32'
-                                                                            stroke='1'
-                                                                            class='cursor-pointer'
+                                                                        <TablerIconButton
                                                                             title='Admin settings'
-                                                                        />
+                                                                        >
+                                                                            <IconSettings
+                                                                                :size='32'
+                                                                                stroke='1'
+                                                                            />
+                                                                        </TablerIconButton>
                                                                     </slot>
                                                                     <template #dropdown>
                                                                         <TablerToggle
@@ -91,13 +93,15 @@
                                                                 </TablerDropdown>
                                                             </template>
 
-                                                            <IconHistory
-                                                                size='32'
-                                                                stroke='1'
-                                                                class='cursor-pointer'
+                                                            <TablerIconButton
                                                                 title='View history'
                                                                 @click.stop.prevent='emithistory(job.id)'
-                                                            />
+                                                            >
+                                                                <IconHistory
+                                                                    :size='32'
+                                                                    stroke='1'
+                                                                />
+                                                            </TablerIconButton>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -127,15 +131,17 @@ import {
     TablerLoading,
     TablerDropdown,
     TablerBreadCrumb,
-    TablerToggle
+    TablerToggle,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import Download from './util/Download.vue';
 import Coverage from './util/Coverage.vue';
-import moment from 'moment-timezone';
+import { fmtDate } from '../util/date.js';
 
 export default {
     name: 'Location',
     components: {
+        TablerIconButton,
         Download,
         Coverage,
         TablerLoading,
@@ -148,7 +154,6 @@ export default {
     props: [ 'auth', 'locid' ],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             location: {},
             jobs: [],
             loading: true,
@@ -160,7 +165,7 @@ export default {
     },
     methods: {
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+            return fmtDate(date);
         },
         updateData: async function(job) {
             await window.std(`/api/data/${job.id}`, {

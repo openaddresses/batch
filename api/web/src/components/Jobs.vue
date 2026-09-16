@@ -22,20 +22,24 @@
                                 </h3>
 
                                 <div class='ms-auto btn-list'>
-                                    <IconSearch
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    <TablerIconButton
                                         title='Toggle filters'
                                         @click='showFilter = !showFilter'
-                                    />
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    >
+                                        <IconSearch
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
+                                    <TablerIconButton
                                         title='Refresh jobs'
                                         @click='fetchJobs'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
                             <template v-if='showFilter'>
@@ -106,24 +110,25 @@
                                                         @login='$emit("login")'
                                                         @perk='$emit("perk", $event)'
                                                     />
-                                                    <span @click.stop.prevent='external(job.source)' title='View source on GitHub'>
+                                                    <TablerIconButton
+                                                        title='View source on GitHub'
+                                                        @click.stop.prevent='external(job.source)'
+                                                    >
                                                         <IconBrandGithub
-                                                            class='cursor-pointer'
-                                                            size='32'
+                                                            :size='32'
                                                             stroke='1'
                                                         />
-                                                    </span>
-                                                    <span
+                                                    </TablerIconButton>
+                                                    <TablerIconButton
                                                         v-if='job.loglink'
                                                         title='View job log'
                                                         @click.stop.prevent='$router.push(`/job/${job.id}/log`)'
                                                     >
                                                         <IconNotes
-                                                            class='cursor-pointer'
-                                                            size='32'
+                                                            :size='32'
                                                             stroke='1'
                                                         />
-                                                    </span>
+                                                    </TablerIconButton>
                                                 </div>
                                             </div>
                                         </td>
@@ -153,19 +158,21 @@ import {
 import LayerIcon from './util/LayerIcon.vue';
 import Status from './util/Status.vue';
 import Download from './util/Download.vue';
-import moment from 'moment-timezone';
+import { fmtDateTime } from '../util/date.js';
 import TableFooter from './util/TableFooter.vue';
 import QueryStatus from './query/Status.vue';
 import QuerySource from './query/Source.vue';
 import QueryLayer from './query/Layer.vue';
 import {
     TablerLoading,
-    TablerBreadCrumb
+    TablerBreadCrumb,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'Jobs',
     components: {
+        TablerIconButton,
         IconSearch,
         IconBrandGithub,
         IconRefresh,
@@ -183,7 +190,6 @@ export default {
     props: [ 'auth' ],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             showFilter: false,
             paging: {
                 source: '',
@@ -217,7 +223,7 @@ export default {
             window.open(url, "_blank");
         },
         fmt: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD hh:mm');
+            return fmtDateTime(date);
         },
         fetchJobs: async function() {
             try {

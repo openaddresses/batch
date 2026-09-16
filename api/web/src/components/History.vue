@@ -24,13 +24,15 @@
                                 />
 
                                 <div class='ms-auto btn-list'>
-                                    <IconRefresh
-                                        class='cursor-pointer'
-                                        size='32'
-                                        stroke='1'
+                                    <TablerIconButton
                                         title='Refresh history'
                                         @click='refresh'
-                                    />
+                                    >
+                                        <IconRefresh
+                                            :size='32'
+                                            stroke='1'
+                                        />
+                                    </TablerIconButton>
                                 </div>
                             </div>
 
@@ -105,14 +107,16 @@
                                             <td>
                                                 <div class='d-flex'>
                                                     <div class='ms-auto'>
-                                                        <IconDownload
+                                                        <TablerIconButton
                                                             v-if='job.output.output'
-                                                            class='cursor-pointer'
-                                                            size='32'
-                                                            stroke='1'
                                                             title='Download output'
                                                             @click.stop.prevent='datapls(job.id)'
-                                                        />
+                                                        >
+                                                            <IconDownload
+                                                                :size='32'
+                                                                stroke='1'
+                                                            />
+                                                        </TablerIconButton>
                                                     </div>
                                                 </div>
                                             </td>
@@ -137,6 +141,7 @@
 import {
     TablerBreadCrumb,
     TablerLoading,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 import TableFooter from './util/TableFooter.vue';
 import Status from './util/Status.vue';
@@ -146,7 +151,7 @@ import {
 } from '@tabler/icons-vue';
 import { Line as LineChart } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale } from 'chart.js'
-import moment from 'moment-timezone';
+import { fmtDate } from '../util/date.js';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, LinearScale, TimeScale, PointElement, LineElement, CategoryScale)
 
@@ -155,6 +160,7 @@ import 'chartjs-adapter-date-fns';
 export default {
     name: 'History',
     components: {
+        TablerIconButton,
         Status,
         IconRefresh,
         IconDownload,
@@ -166,7 +172,6 @@ export default {
     props: ['dataid'],
     data: function() {
         return {
-            tz: moment.tz.guess(),
             loading: {
                 history: true
             },
@@ -200,7 +205,7 @@ export default {
     },
     methods: {
         fmtDate: function(date) {
-            return moment(date).tz(this.tz).format('YYYY-MM-DD');
+            return fmtDate(date);
         },
         fmtNumber: function(num) {
             return new Intl.NumberFormat().format(num);

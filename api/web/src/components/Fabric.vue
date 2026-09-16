@@ -48,8 +48,7 @@ import {
     IconMapPin,
     IconBuildingCommunity
 } from '@tabler/icons-vue';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import mapgl from '../util/maplibre.js';
 
 export default {
     name: 'Fabric',
@@ -105,14 +104,14 @@ export default {
             try {
                 const res = await window.std('/api/map');
 
-                this.map = new mapboxgl.Map({
+                this.map = new mapgl.Map({
                     container: 'map',
                     center: this.tilejson.center,
                     zoom: this.tilejson.minzoom,
                     style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key
                 });
 
-                this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+                this.map.addControl(new mapgl.NavigationControl(), 'bottom-right');
 
                 this.map.on('load', () => {
                     this.map.addSource('fabric', {

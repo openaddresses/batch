@@ -28,7 +28,7 @@
                 <div class='ms-auto'>
                     <div class='btn-list'>
                         <a
-                            href='/docs/'
+                            href='/docs'
                             class='btn btn-dark'
                             target='_blank'
                             rel='noreferrer'
@@ -68,10 +68,6 @@
                                     class='dropdown-item cursor-pointer'
                                     @click='$router.push("/job")'
                                 >Jobs</a>
-                                <a
-                                    class='dropdown-item cursor-pointer'
-                                    @click='$router.push("/health")'
-                                >Health</a>
                                 <a
                                     class='dropdown-item cursor-pointer'
                                     @click='$router.push("/error")'
@@ -125,13 +121,16 @@
                             </div>
 
 
-                            <IconLogin
+                            <TablerIconButton
                                 v-else
-                                size='32'
-                                stroke='1'
                                 title='Sign in'
                                 @click='$router.push("/login")'
-                            />
+                            >
+                                <IconLogin
+                                    :size='32'
+                                    stroke='1'
+                                />
+                            </TablerIconButton>
                         </a>
                     </div>
                 </div>
@@ -163,12 +162,14 @@ import {
     IconMap
 } from '@tabler/icons-vue'
 import {
-    TablerError
+    TablerError,
+    TablerIconButton
 } from '@tak-ps/vue-tabler';
 
 export default {
     name: 'OpenAddresses',
     components: {
+        TablerIconButton,
         Err,
         IconHelp,
         IconMenu,

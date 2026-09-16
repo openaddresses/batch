@@ -2,7 +2,7 @@
     <div class='col-12'>
         <TablerNone
             v-if='!job.bounds'
-            label='Job Bounds'
+            label='No Job Bounds'
             :create='false'
         />
         <template v-else>
@@ -16,8 +16,7 @@
 </template>
 
 <script>
-import mapgl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css';
+import mapgl from '../../util/maplibre.js';
 import {
     TablerNone
 } from '@tak-ps/vue-tabler';

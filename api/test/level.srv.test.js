@@ -1,20 +1,29 @@
 import test from 'node:test';
 import assert from 'assert';
 import Level from '../lib/level.js';
-import LevelOverride from '../lib/types/level-override.js';
 import Flight from './flight.js';
-import nock from 'nock';
 import moment from 'moment';
+import { MockAgent, setGlobalDispatcher } from 'undici';
 
 const flight = new Flight();
+
+const mockAgent = new MockAgent();
+setGlobalDispatcher(mockAgent);
+
+// Each call intercepts exactly one OpenCollective GraphQL request
+function opencollective() {
+    return mockAgent
+        .get('https://api.opencollective.com')
+        .intercept({ path: '/graphql/v2', method: 'POST' })
+        .defaultReplyHeaders({ 'content-type': 'application/json' });
+}
 
 flight.init();
 flight.takeoff();
 flight.user('test_all');
 
 test('Level#all', async () =>  {
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(200, {
             'data': {
                 'account': {
@@ -80,7 +89,7 @@ flight.user('hello');
 test('Level#user - override', async () =>  {
     const level = new Level(flight.config.pool);
 
-    await LevelOverride.generate(flight.config.pool, {
+    await flight.config.models.LevelOverride.generate({
         pattern: '^hello@openaddresses.io$',
         level: 'sponsor'
     });
@@ -113,8 +122,7 @@ test('Level#user - override', async () =>  {
 flight.user('test_single');
 
 test('Level#user', async () =>  {
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(200, {
             'data': {
                 'account': {
@@ -177,8 +185,7 @@ test('Level#user', async () =>  {
 flight.user('test_single1');
 
 test('Level#user - no contrib', async () =>  {
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(200, {
             'data': {
                 'account': {
@@ -233,8 +240,7 @@ test('Level#user - no contrib', async () =>  {
 flight.user('test_single_none');
 
 test('Level#user - no match', async () =>  {
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(200, {
             'data': {
                 'account': {
@@ -279,8 +285,7 @@ test('Level#single - null account node does not crash', async () => {
     // Reproduces the production crash: OC returns a node where account is null
     // (deleted/deactivated OC account). Before the fix this threw:
     //   TypeError: Cannot read properties of null (reading 'email')
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(200, {
             'data': {
                 'account': {
@@ -348,8 +353,7 @@ test('Level#single - OC API error response does not crash profile page', async (
     // When OC returns a non-ok response (expired key, rate limit, etc.),
     // level.single() should throw a proper Err rather than a cryptic TypeError,
     // and login.js wraps it so the profile page still loads.
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(401, {
             'errors': [{ 'message': 'Invalid API key' }]
         });
@@ -360,7 +364,7 @@ test('Level#single - OC API error response does not crash profile page', async (
     await assert.rejects(
         () => level.single('test_oc_error@openaddresses.io'),
         (err) => {
-            assert.ok(err.message.includes('OpenCollective API Error'), `expected OC error message, got: ${err.message}`);
+            assert.equal(err.safe, 'OpenCollective API Error', `expected OC error message, got: ${err.message}`);
             return true;
         }
     );
@@ -380,8 +384,7 @@ flight.user('test_all_null');
 test('Level#all - null account node is skipped, valid nodes still processed', async () => {
     // Level.all() was using return instead of continue so a null account node
     // would abort the entire refresh loop. Also accessing usr.account.x on null crashed.
-    nock('https://api.opencollective.com')
-        .post('/graphql/v2')
+    opencollective()
         .reply(200, {
             'data': {
                 'account': {
@@ -442,9 +445,107 @@ test('Level#all - null account node is skipped, valid nodes still processed', as
     }
 });
 
+flight.user('test_all_override_a');
+flight.user('test_all_override_b');
+
+test('Level#all - override match does not abort processing of later users', async () => {
+    // Level.all() used `return` instead of `continue` when a user matched an
+    // override pattern, aborting the refresh for every user later in the list.
+    await flight.config.models.LevelOverride.generate({
+        pattern: '^test_all_override_a@openaddresses.io$',
+        level: 'sponsor'
+    });
+
+    opencollective()
+        .reply(200, {
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [
+                            {
+                                'id': 'override-node',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'override-id',
+                                    'slug': 'test_all_override_a',
+                                    'transactions': {
+                                        'nodes': [
+                                            {
+                                                'createdAt': moment().subtract(10, 'days').format('YYYY-MM-DD'),
+                                                'netAmount': {
+                                                    'value': -5,
+                                                    'currency': 'USD'
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    'email': 'test_all_override_a@openaddresses.io'
+                                }
+                            },
+                            {
+                                'id': 'later-node',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'later-id',
+                                    'slug': 'test_all_override_b',
+                                    'transactions': {
+                                        'nodes': [
+                                            {
+                                                'createdAt': moment().subtract(10, 'days').format('YYYY-MM-DD'),
+                                                'netAmount': {
+                                                    'value': -500,
+                                                    'currency': 'USD'
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    'email': 'test_all_override_b@openaddresses.io'
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        });
+
+    const level = new Level(flight.config.pool);
+
+    try {
+        const a_pre = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_a }
+        }, true);
+        assert.equal(a_pre.body.level, 'basic');
+
+        const b_pre = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_b }
+        }, true);
+        assert.equal(b_pre.body.level, 'basic');
+
+        await level.all();
+
+        const a_post = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_a }
+        }, true);
+        // Overridden to 'sponsor' even though the calculated level from the
+        // transaction amount would have been 'backer'
+        assert.equal(a_post.body.level, 'sponsor');
+
+        const b_post = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_b }
+        }, true);
+        // Must still be processed even though it comes after the override match
+        assert.equal(b_post.body.level, 'sponsor');
+    } catch (err) {
+        assert.ifError(err, 'no errors');
+    }
+});
+
 flight.landing();
 
-test('close', () => {
-    nock.cleanAll();
-    nock.enableNetConnect();
+test('close', async () => {
+    await mockAgent.close();
 });

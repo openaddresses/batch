@@ -10,31 +10,32 @@
         "test": "node --test src/util/*.test.js"
     },
     "dependencies": {
-        "@tabler/core": "^1.0.0-beta17",
-        "@tabler/icons-vue": "^3.1.0",
-        "@tak-ps/vue-tabler": "^3.8.0",
+        "@scalar/api-reference": "^1.68.0",
+        "@tabler/core": "^1.5.1",
+        "@tabler/icons-vue": "^3.46.0",
+        "@tak-ps/vue-tabler": "^5.4.0",
+        "@unhead/vue": "^2.1.17",
         "@vueuse/core": "^14.4.0",
         "autosize": "^6.0.1",
-        "chart.js": "^4.4.0",
+        "chart.js": "^4.5.1",
         "chartjs-adapter-date-fns": "^3.0.0",
-        "core-js": "^3.12.0",
-        "date-fns": "^2.29.3",
-        "floating-vue": "^2.0.0-beta.17",
+        "core-js": "^3.50.0",
+        "date-fns": "^4.4.0",
+        "floating-vue": "^5.4.0",
         "imask": "^7.6.1",
-        "maplibre-gl": "^5.0.0",
-        "moment-timezone": "^0.5.33",
-        "pmtiles": "^4.4.0",
-        "sass": "^1.32.12",
-        "sass-loader": "^16.0.0",
-        "vue": "^3.2.31",
-        "vue-chartjs": "^5.2.0",
-        "vue-router": "^4.0.14"
+        "maplibre-gl": "^6.9.0",
+        "pmtiles": "^4.5.0",
+        "sass": "^1.104.1",
+        "sass-loader": "^17.0.1",
+        "vue": "^3.5.42",
+        "vue-chartjs": "^5.3.4",
+        "vue-router": "^5.3.1"
     },
     "devDependencies": {
-        "@vitejs/plugin-vue": "^6.0.7",
-        "eslint": "^9.0.0",
-        "eslint-plugin-vue": "^10.0.0",
-        "typescript-eslint": "^8.23.0",
-        "vite": "^8.0.16"
+        "@vitejs/plugin-vue": "^6.0.8",
+        "eslint": "^10.10.0",
+        "eslint-plugin-vue": "^10.11.0",
+        "typescript-eslint": "^8.70.0",
+        "vite": "^8.3.0"
     }
 }

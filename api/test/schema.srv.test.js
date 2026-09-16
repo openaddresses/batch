@@ -35,20 +35,13 @@ test('GET: api/schema?method=FAKE', async () => {
         }, false);
 
         assert.equal(res.status, 400, 'http: 400');
-
-        assert.deepEqual(res.body, {
-            status: 400,
-            message: 'validation error',
-            messages: [{
-                keyword: 'enum',
-                instancePath: '/method',
-                schemaPath: '#/properties/method/enum',
-                params: {
-                    allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
-                },
-                message: 'must be equal to one of the allowed values'
-            }]
-        });
+        assert.equal(res.body.message, 'Validation Error GET /schema');
+        assert.equal(res.body.messages.length, 1);
+        assert.equal(res.body.messages[0].type, 'Query');
+        assert.ok(res.body.messages[0].errors.length);
+        for (const error of res.body.messages[0].errors) {
+            assert.equal(error.instancePath, '/method');
+        }
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -96,6 +89,7 @@ test('GET: api/schema?method=POST&url=/login', async () => {
         }, true);
 
         assert.deepEqual(res.body, {
+            deprecated: false,
             body: {
                 type: 'object',
                 additionalProperties: false,
@@ -111,7 +105,6 @@ test('GET: api/schema?method=POST&url=/login', async () => {
                     }
                 }
             },
-            query: null,
             res: {
                 type: 'object',
                 required: ['uid', 'username', 'email', 'access', 'level', 'flags'],
@@ -146,21 +139,18 @@ test('POST: api/login', async () => {
         assert.equal(res.status, 400, 'http: 400');
         assert.deepEqual(res.body, {
             status: 400,
-            message: 'validation error',
+            message: 'Validation Error POST /login',
             messages: [{
-                keyword: 'required',
-                instancePath: '',
-                schemaPath: '#/required',
-                params: {
-                    missingProperty: 'password'
-                },
-                message: 'must have required property \'password\''
-            },{
-                keyword: 'type',
-                instancePath: '/username',
-                schemaPath: '#/properties/username/type',
-                params: { type: 'string' },
-                message: 'must be string'
+                type: 'Body',
+                errors: [{
+                    keyword: 'required',
+                    instancePath: '',
+                    schemaPath: '#/required',
+                    params: {
+                        missingProperty: 'password'
+                    },
+                    message: 'must have required property \'password\''
+                }]
             }]
         });
     } catch (err) {

@@ -1,5 +1,4 @@
 import CI from '../lib/ci.js';
-import Run from '../lib/types/run.js';
 import test from 'node:test';
 import assert from 'assert';
 import { MockAgent, setGlobalDispatcher } from 'undici';
@@ -119,18 +118,46 @@ test('CI#internaldiff - Internal Diff', async () => {
     }]);
 });
 
-test('CI#format_issue - formats with count', async (t) => {
-    const ci = new CI({ octo: {} });
-    const origJobs = Run.jobs;
-    t.after(() => { Run.jobs = origJobs; });
+test('CI#internaldiff - ignores non-sources JSON files', async () => {
+    const mockAgent = new MockAgent();
+    mockAgent.disableNetConnect();
+    setGlobalDispatcher(mockAgent);
 
-    Run.jobs = async () => [
-        { id: 1, status: 'Success', source_name: 'us/ca/alameda', layer: 'addresses', name: 'county', count: 12345 },
-        { id: 2, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 },
-        { id: 3, status: 'Warn', source_name: 'us/ca/la', layer: 'parcels', name: 'county', count: null }
-    ];
+    // No interceptors are registered - if internaldiff() attempted to fetch
+    // either of these files it would throw, since they live outside sources/
+    // (a template) or aren't JSON (a README) and must be skipped before any
+    // network call is made. This reproduces openaddresses/openaddresses#7988,
+    // where scripts/au/tas/LIST_template.json - a template file containing
+    // unresolved {PLACEHOLDER} tokens - was being queued as a real job.
+    const jobs = await CI.internaldiff([
+        {
+            filename: 'scripts/au/tas/LIST_template.json',
+            raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/scripts/au/tas/LIST_template.json'
+        },
+        {
+            filename: 'scripts/au/tas/README.md',
+            raw: 'https://raw.githubusercontent.com/openaddresses/openaddresses/123/scripts/au/tas/README.md'
+        }
+    ]);
 
-    const issue = await ci.format_issue(null, { id: 99 });
+    assert.deepEqual(jobs, []);
+});
+
+test('CI#format_issue - formats with count', async () => {
+    const ci = new CI({
+        octo: {},
+        models: {
+            Run: {
+                jobs: async () => [
+                    { id: 1, status: 'Success', source_name: 'us/ca/alameda', layer: 'addresses', name: 'county', count: 12345 },
+                    { id: 2, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 },
+                    { id: 3, status: 'Warn', source_name: 'us/ca/la', layer: 'parcels', name: 'county', count: null }
+                ]
+            }
+        }
+    });
+
+    const issue = await ci.format_issue({ id: 99 });
 
     assert.ok(issue.includes('[View Map](https://batch.openaddresses.io/job/1)'));
     assert.ok(issue.includes('12,345 features'));
@@ -139,15 +166,18 @@ test('CI#format_issue - formats with count', async (t) => {
     assert.ok(!issue.includes('null'), 'Null count should not appear');
 });
 
-test('CI#format_issue - empty run returns empty string', async (t) => {
-    const ci = new CI({ octo: {} });
-    const origJobs = Run.jobs;
-    t.after(() => { Run.jobs = origJobs; });
+test('CI#format_issue - empty run returns empty string', async () => {
+    const ci = new CI({
+        octo: {},
+        models: {
+            Run: {
+                jobs: async () => [
+                    { id: 1, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 }
+                ]
+            }
+        }
+    });
 
-    Run.jobs = async () => [
-        { id: 1, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 }
-    ];
-
-    const issue = await ci.format_issue(null, { id: 99 });
+    const issue = await ci.format_issue({ id: 99 });
     assert.strictEqual(issue, '');
 });

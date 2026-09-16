@@ -8,7 +8,7 @@
         <TablerNone
             v-else-if='alert'
             :create='false'
-            label='Log Yet Produced'
+            label='No Log Yet Produced'
         />
         <pre v-else>
             <div

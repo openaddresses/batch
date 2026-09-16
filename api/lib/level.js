@@ -1,7 +1,8 @@
+import { fetch } from 'undici';
 import Err from '@openaddresses/batch-error';
 import moment from 'moment';
 import User from './user.js';
-import Override from './types/level-override.js';
+import LevelOverrideModel from './models/LevelOverride.js';
 import fs from 'fs';
 
 const pkg  = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
@@ -19,6 +20,7 @@ export default class Level {
         this.OpenCollective = process.env.OPENCOLLECTIVE_API_KEY;
         this.base = 'https://api.opencollective.com/graphql/v2';
         this.user = new User(pool);
+        this.override = new LevelOverrideModel(pool);
         this.pool = pool;
     }
 
@@ -31,7 +33,7 @@ export default class Level {
      * @param {String} email
      */
     async single(email) {
-        for (const override of (await Override.list(this.pool)).level_override) {
+        for (const override of (await this.override.list()).items) {
             if (email.match(override.pattern)) {
                 return await this.user.level(email, override.level);
             }
@@ -65,6 +67,9 @@ export default class Level {
                                 netAmount {
                                   value
                                   currency
+                              }
+                              order {
+                                legacyId
                               }
                             }
                           }
@@ -103,8 +108,10 @@ export default class Level {
         if (!account.transactions.nodes.length) return;
         if (!account.email) return;
 
-        const level = Level.calc(account.transactions.nodes[0]);
-        await this.user.level(account.email, level);
+        const transaction = account.transactions.nodes[0];
+        const level = Level.calc(transaction);
+        const oc_contribution_id = transaction.order ? String(transaction.order.legacyId) : null;
+        await this.user.level(account.email, level, oc_contribution_id);
     }
 
     /**
@@ -143,6 +150,9 @@ export default class Level {
                                   value
                                   currency
                               }
+                              order {
+                                legacyId
+                              }
                             }
                           }
                         }
@@ -161,6 +171,8 @@ export default class Level {
         const usrs = body.data.account.members.nodes;
         if (!usrs.length) return;
 
+        const overrides = (await this.override.list()).items;
+
         for (const usr of usrs) {
             // Skip nodes where account is null (OC can return null accounts for deleted users)
             if (!usr.account) continue;
@@ -168,14 +180,16 @@ export default class Level {
             if (!usr.account.transactions.nodes.length) continue;
             if (!usr.account.email) continue;
 
-            for (const override of (await Override.list(this.pool)).level_override) {
-                if (usr.account.email.match(override.pattern)) {
-                    return await this.user.level(usr.account.email, override.level);
-                }
+            const override = overrides.find((o) => usr.account.email.match(o.pattern));
+            if (override) {
+                await this.user.level(usr.account.email, override.level);
+                continue;
             }
 
-            const level = Level.calc(usr.account.transactions.nodes[0]);
-            await this.user.level(usr.account.email, level);
+            const transaction = usr.account.transactions.nodes[0];
+            const level = Level.calc(transaction);
+            const oc_contribution_id = transaction.order ? String(transaction.order.legacyId) : null;
+            await this.user.level(usr.account.email, level, oc_contribution_id);
         }
     }
 

@@ -84,24 +84,30 @@ export default class Meta {
             return;
         }
 
-        const asg = new AutoScaling.AutoScalingClient({ region: process.env.AWS_DEFAULT_REGION });
+        try {
+            const asg = new AutoScaling.AutoScalingClient({ region: process.env.AWS_DEFAULT_REGION });
 
-        // Find which ASG this instance actually belongs to
-        const desc = await asg.send(new AutoScaling.DescribeAutoScalingInstancesCommand({
-            InstanceIds: [this.instance]
-        }));
+            // Find which ASG this instance actually belongs to
+            const desc = await asg.send(new AutoScaling.DescribeAutoScalingInstancesCommand({
+                InstanceIds: [this.instance]
+            }));
 
-        const asgName = desc.AutoScalingInstances?.[0]?.AutoScalingGroupName;
-        if (!asgName) {
-            console.error(`ok - skipping meta#protection: instance ${this.instance} not in any ASG`);
-            return;
+            const asgName = desc.AutoScalingInstances?.[0]?.AutoScalingGroupName;
+            if (!asgName) {
+                console.error(`ok - skipping meta#protection: instance ${this.instance} not in any ASG`);
+                return;
+            }
+
+            await asg.send(new AutoScaling.SetInstanceProtectionCommand({
+                AutoScalingGroupName: asgName,
+                InstanceIds: [this.instance],
+                ProtectedFromScaleIn: protect
+            }));
+        } catch (err) {
+            // protection is best-effort infra bookkeeping - it must never mask
+            // a job's real success/failure status or crash the process
+            console.error(`warn - meta#protection failed: ${err.message}`);
         }
-
-        await asg.send(new AutoScaling.SetInstanceProtectionCommand({
-            AutoScalingGroupName: asgName,
-            InstanceIds: [this.instance],
-            ProtectedFromScaleIn: protect
-        }));
     }
 
     /**

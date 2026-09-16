@@ -1,9 +1,21 @@
 import Err from '@openaddresses/batch-error';
-import Run from '../lib/types/run.js';
-import Job from '../lib/types/job.js';
+import Job from '../lib/models/Job.js';
 import Auth from '../lib/auth.js';
 import CI from '../lib/ci.js';
 import S3 from '../lib/s3.js';
+import { Type } from '@sinclair/typebox';
+import {
+    ListJobsQuery,
+    ListJobsResponse,
+    ListOrphanedJobsQuery,
+    JobResponse,
+    SingleJobsCreateResponse,
+    SingleDeltaResponse,
+    SingleLogQuery,
+    SingleLogResponse,
+    PatchJobBody,
+    StandardResponse
+} from '../lib/types.js';
 
 export default async function router(schema, config) {
     const ci = new CI(config);
@@ -11,24 +23,26 @@ export default async function router(schema, config) {
     await schema.get('/job', {
         name: 'List Jobs',
         group: 'Job',
-        auth: 'public',
         description: 'Return information about a given subset of jobs',
-        query: 'req.query.ListJobs.json',
-        res: 'res.ListJobs.json'
+        query: ListJobsQuery,
+        res: ListJobsResponse
     }, async (req, res) => {
         try {
             if (req.query.status) req.query.status = req.query.status.split(',');
 
-            const list = await Job.list(config.pool, req.query);
+            const list = await config.models.Job.list(req.query);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
-                for (const j of list.jobs) {
+                for (const j of list.items) {
                     delete j.s3;
                     delete j.s3_validated;
                 }
             }
 
-            return res.json(list);
+            return res.json({
+                total: list.total,
+                jobs: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -37,17 +51,19 @@ export default async function router(schema, config) {
     await schema.get('/job/orphaned', {
         name: 'List Orphaned Jobs',
         group: 'Job',
-        auth: 'admin',
         description: 'Return jobs that have no matching entry in the results table',
-        query: 'req.query.ListOrphanedJobs.json',
-        res: 'res.ListJobs.json'
+        query: ListOrphanedJobsQuery,
+        res: ListJobsResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
 
-            const list = await Job.orphaned(config.pool, req.query);
+            const list = await config.models.Job.orphaned(req.query);
 
-            return res.json(list);
+            return res.json({
+                total: list.total,
+                jobs: list.items
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -56,20 +72,21 @@ export default async function router(schema, config) {
     await schema.get('/job/:job', {
         name: 'Get Job',
         group: 'Job',
-        auth: 'public',
         description: 'Return all information about a given job',
-        ':job': 'integer',
-        res: 'res.Job.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: JobResponse
     }, async (req, res) => {
         try {
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
             if (!req.auth || !req.auth.level || req.auth.level !== 'sponsor') {
                 delete job.s3;
                 delete job.s3_validated;
             }
 
-            return res.json(job.serialize());
+            return res.json(job);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -78,14 +95,15 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/raw', {
         name: 'Raw Source',
         group: 'Job',
-        auth: 'public',
         description: 'Return the raw source from github - this API is not stable nor will it always return a consistent result',
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
-            return res.json(await job.get_raw());
+            return res.json(await Job.raw(job));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -94,22 +112,23 @@ export default async function router(schema, config) {
     await schema.post('/job/:job/rerun', {
         name: 'Rerun Job',
         group: 'Job',
-        auth: 'admin',
         description: 'Submit a job for reprocessing - often useful for network errors',
-        ':job': 'integer',
-        res: 'res.SingleJobsCreate.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: SingleJobsCreateResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
 
-            const job = await Job.from(config.pool, req.params.job);
-            const run = await Run.from(config.pool, job.run);
+            const job = await config.models.Job.from(req.params.job);
+            const run = await config.models.Run.from(job.run);
 
-            const new_run = await Run.generate(config.pool, {
+            const new_run = await config.models.Run.generate({
                 live: !!run.live
             });
 
-            return res.json(await Run.populate(config.pool, new_run.id, [{
+            return res.json(await config.models.Run.populate(new_run.id, [{
                 source: job.source,
                 layer: job.layer,
                 name: job.name,
@@ -123,13 +142,14 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/delta', {
         name: 'Job Stats Comparison',
         group: 'Job',
-        auth: 'public',
         description: 'Compare the stats of the given job against the current live data job',
-        ':job': 'integer',
-        res: 'res.SingleDelta.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: SingleDeltaResponse
     }, async (req, res) => {
         try {
-            const delta = await Job.delta(config.pool, req.params.job);
+            const delta = await config.models.Job.delta(req.params.job);
 
             return res.json(delta);
         } catch (err) {
@@ -140,9 +160,10 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/source.png', {
         name: 'Get Job Preview',
         group: 'Job',
-        auth: 'public',
         description: 'Return a preview image for the job',
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             console.error(`s3://${process.env.Bucket}/${process.env.StackName}/job/${req.params.job}/source.png`);
@@ -160,7 +181,6 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/validated.geojson.gz', {
         name: 'Validated Data',
         group: 'Job',
-        auth: 'user',
         description: `
             Sponsors of our project receive access to validated data as a way of saying thanks for
             keeping our project alive.
@@ -174,12 +194,14 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_level(req, 'sponsor');
 
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
             if (!job.output.validated) throw new Err(400, null, 'Job does not have validated data');
 
@@ -192,7 +214,6 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/source.geojson.gz', {
         name: 'Get Job Data',
         group: 'Job',
-        auth: 'user',
         description: `
             Note: the user must be authenticated to perform a download. One of our largest costs is
             S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data free.
@@ -203,12 +224,14 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
 
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
             if (!job.output.output) throw new Err(400, null, 'Job does not have output data');
 
@@ -221,9 +244,10 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/sample', {
         name: 'Small Sample',
         group: 'Job',
-        auth: 'public',
         description: 'Return an Array containing a sample of the properties',
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             const s3 = new S3({
@@ -245,7 +269,6 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/output/cache.zip', {
         name: 'Get Job Cache',
         group: 'Job',
-        auth: 'user',
         description: `
             Note: the user must be authenticated to perform a download. One of our largest costs is
             S3 egress, authenticated downloads allow us to prevent abuse and keep the project running and the data free.
@@ -256,7 +279,9 @@ export default async function router(schema, config) {
             OpenAddresses is entirely funded by volunteers (many of then the developers themselves!)
             Please consider donating if you are able https://opencollective.com/openaddresses
         `,
-        ':job': 'integer'
+        params: Type.Object({
+            job: Type.Integer()
+        })
     }, async (req, res) => {
         try {
             await Auth.is_auth(req, true);
@@ -270,20 +295,21 @@ export default async function router(schema, config) {
     await schema.get('/job/:job/log', {
         name: 'Get Job Log',
         group: 'Job',
-        auth: 'public',
         description: `
             Return the batch-machine processing log for a given job
             Note: These are stored in AWS CloudWatch and *do* expire
             The presence of a loglink on a job, does not guarantee log retention
         `,
-        ':job': 'integer',
-        query: 'req.query.SingleLog.json',
-        res: 'res.SingleLog.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        query: SingleLogQuery,
+        res: SingleLogResponse
     }, async (req, res) => {
         try {
-            const job = await Job.from(config.pool, req.params.job);
+            const job = await config.models.Job.from(req.params.job);
 
-            const log = await job.log(req.query.format);
+            const log = await config.models.Job.log(job, req.query.format);
 
             if (!req.query.dl) {
                 if (!req.query.format || req.query.format === 'json') {
@@ -303,21 +329,22 @@ export default async function router(schema, config) {
     await schema.patch('/job/:job', {
         name: 'Update Job',
         group: 'Job',
-        auth: 'admin',
         description: 'Update a job',
-        ':job': 'integer',
-        body: 'req.body.PatchJob.json',
-        res: 'res.Job.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        body: PatchJobBody,
+        res: JobResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
 
-            const job = await Job.commit(config.pool, req.params.job, req.body);
-            await Run.ping(config.pool, ci, job);
+            const job = await config.models.Job.commit(req.params.job, req.body);
+            await config.models.Run.ping(ci, job);
             await config.cacher.del('data');
             await config.cacher.del('licenses');
 
-            return res.json(job.serialize());
+            return res.json(job);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -326,15 +353,16 @@ export default async function router(schema, config) {
     await schema.delete('/job/:job', {
         name: 'Delete Job',
         group: 'Job',
-        auth: 'admin',
         description: 'Delete a job and its associated database record',
-        ':job': 'integer',
-        res: 'res.Standard.json'
+        params: Type.Object({
+            job: Type.Integer()
+        }),
+        res: StandardResponse
     }, async (req, res) => {
         try {
             await Auth.is_admin(req);
 
-            await Job.delete(config.pool, req.params.job);
+            await config.models.Job.delete(req.params.job);
             await config.cacher.del('data');
             await config.cacher.del('licenses');
 

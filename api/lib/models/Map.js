@@ -98,7 +98,8 @@ export default class MapModel extends Modeler {
                             code: row.code,
                             addresses: layers ? layers.includes('addresses') : null,
                             buildings: layers ? layers.includes('buildings') : null,
-                            parcels: layers ? layers.includes('parcels') : null
+                            parcels: layers ? layers.includes('parcels') : null,
+                            centerlines: layers ? layers.includes('centerlines') : null
                         },
                         geometry: row.geometry
                     }) + '\n';
@@ -173,6 +174,7 @@ export default class MapModel extends Modeler {
                         n.addresses,
                         n.buildings,
                         n.parcels,
+                        n.centerlines,
                         ST_AsMVTGeom(
                             ST_Transform(n.geom, 3857),
                             ST_SetSRID(ST_MakeBox2D(
@@ -190,7 +192,8 @@ export default class MapModel extends Modeler {
                             map.geom,
                             cov.layer @> ARRAY['addresses'] AS addresses,
                             cov.layer @> ARRAY['buildings'] AS buildings,
-                            cov.layer @> ARRAY['parcels'] AS parcels
+                            cov.layer @> ARRAY['parcels'] AS parcels,
+                            cov.layer @> ARRAY['centerlines'] AS centerlines
                         FROM
                             map
                             INNER JOIN (
@@ -281,13 +284,13 @@ export default class MapModel extends Modeler {
             code = hash(raw.coverage.geometry.coordinates);
         } else if (eq_list(keys, ['country'])) {
             code = raw.coverage.country.toLowerCase();
-        } else if (eq_list(keys, ['country', 'state'])) {
-            if (raw.coverage['ISO 3166'] && raw.coverage['ISO 3166'].alpha2) {
-                code = raw.coverage['ISO 3166'].alpha2.toLowerCase();
-            } else {
-                const country = raw.coverage.country.toLowerCase();
-                const state = raw.coverage.state.toLowerCase();
-                code = `${country}-${state}`;
+        } else {
+            const iso = raw.coverage['ISO 3166']?.alpha2?.toLowerCase();
+
+            if (eq_list(keys, ['country', 'state'])) {
+                code = iso || `${raw.coverage.country.toLowerCase()}-${raw.coverage.state.toLowerCase()}`;
+            } else if (iso && eq_list(keys, ['country', 'county', 'state'])) {
+                code = iso;
             }
         }
 

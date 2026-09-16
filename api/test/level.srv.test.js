@@ -445,6 +445,105 @@ test('Level#all - null account node is skipped, valid nodes still processed', as
     }
 });
 
+flight.user('test_all_override_a');
+flight.user('test_all_override_b');
+
+test('Level#all - override match does not abort processing of later users', async () => {
+    // Level.all() used `return` instead of `continue` when a user matched an
+    // override pattern, aborting the refresh for every user later in the list.
+    await flight.config.models.LevelOverride.generate({
+        pattern: '^test_all_override_a@openaddresses.io$',
+        level: 'sponsor'
+    });
+
+    opencollective()
+        .reply(200, {
+            'data': {
+                'account': {
+                    'members': {
+                        'nodes': [
+                            {
+                                'id': 'override-node',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'override-id',
+                                    'slug': 'test_all_override_a',
+                                    'transactions': {
+                                        'nodes': [
+                                            {
+                                                'createdAt': moment().subtract(10, 'days').format('YYYY-MM-DD'),
+                                                'netAmount': {
+                                                    'value': -5,
+                                                    'currency': 'USD'
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    'email': 'test_all_override_a@openaddresses.io'
+                                }
+                            },
+                            {
+                                'id': 'later-node',
+                                'role': 'BACKER',
+                                'account': {
+                                    'id': 'later-id',
+                                    'slug': 'test_all_override_b',
+                                    'transactions': {
+                                        'nodes': [
+                                            {
+                                                'createdAt': moment().subtract(10, 'days').format('YYYY-MM-DD'),
+                                                'netAmount': {
+                                                    'value': -500,
+                                                    'currency': 'USD'
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    'email': 'test_all_override_b@openaddresses.io'
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        });
+
+    const level = new Level(flight.config.pool);
+
+    try {
+        const a_pre = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_a }
+        }, true);
+        assert.equal(a_pre.body.level, 'basic');
+
+        const b_pre = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_b }
+        }, true);
+        assert.equal(b_pre.body.level, 'basic');
+
+        await level.all();
+
+        const a_post = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_a }
+        }, true);
+        // Overridden to 'sponsor' even though the calculated level from the
+        // transaction amount would have been 'backer'
+        assert.equal(a_post.body.level, 'sponsor');
+
+        const b_post = await flight.fetch('/api/login', {
+            method: 'GET',
+            auth: { bearer: flight.token.test_all_override_b }
+        }, true);
+        // Must still be processed even though it comes after the override match
+        assert.equal(b_post.body.level, 'sponsor');
+    } catch (err) {
+        assert.ifError(err, 'no errors');
+    }
+});
+
 flight.landing();
 
 test('close', async () => {

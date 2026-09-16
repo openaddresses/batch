@@ -283,23 +283,24 @@ test('Map#match - geom', async () => {
     }
 });
 
-test('Map#match - Norway county requires an ISO subdivision', async () => {
+test('Map#match - ISO subdivision matching supports an additional county key', async () => {
     const feature = await flight.config.models.Map.generate({
-        name: 'Østfold',
-        code: 'no-31'
+        name: 'Example Region',
+        code: 'xx-01'
     });
 
     for (const scenario of [
-        { iso: 'NO-31', matched: true, map: feature.id },
-        { iso: undefined, matched: false, map: null }
+        { county: undefined, iso: 'XX-01', matched: true, map: feature.id },
+        { county: 'Example County', iso: 'XX-01', matched: true, map: feature.id },
+        { county: 'Example County', iso: undefined, matched: false, map: null }
     ]) {
-        const path = '/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/no/31/statewide.json';
+        const path = '/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/xx/01/statewide.json';
         mockAgent.get('https://github.com').intercept({ path, method: 'GET' }).reply(200, {
             schema: 2,
             coverage: {
-                country: 'no',
-                county: 'Østfold',
-                state: 'Østfold',
+                country: 'xx',
+                county: scenario.county,
+                state: 'Example State',
                 'ISO 3166': scenario.iso ? { alpha2: scenario.iso } : undefined
             }
         }, { headers: { 'content-type': 'application/json' } });

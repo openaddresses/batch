@@ -171,6 +171,8 @@ export default class Level {
         const usrs = body.data.account.members.nodes;
         if (!usrs.length) return;
 
+        const overrides = (await this.override.list()).items;
+
         for (const usr of usrs) {
             // Skip nodes where account is null (OC can return null accounts for deleted users)
             if (!usr.account) continue;
@@ -178,10 +180,10 @@ export default class Level {
             if (!usr.account.transactions.nodes.length) continue;
             if (!usr.account.email) continue;
 
-            for (const override of (await this.override.list()).items) {
-                if (usr.account.email.match(override.pattern)) {
-                    return await this.user.level(usr.account.email, override.level);
-                }
+            const override = overrides.find((o) => usr.account.email.match(o.pattern));
+            if (override) {
+                await this.user.level(usr.account.email, override.level);
+                continue;
             }
 
             const transaction = usr.account.transactions.nodes[0];

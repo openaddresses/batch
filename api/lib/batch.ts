@@ -306,6 +306,17 @@ export async function trigger(event: BatchEvent): Promise<void> {
             timeout: {
                 attemptDurationSeconds: 60 * 60 * 24, // 24 hour backstop; per-source fetches self-timeout well before this
             },
+            // Mega compute environment is SPOT (task.template.js) - a multi-hour
+            // collect run can lose its host mid-run with no app-level error, same
+            // as fabric below. Auto-retry only that case; any other failure (real
+            // bug, non-zero exit, OOM) still fails immediately.
+            retryStrategy: {
+                attempts: 2,
+                evaluateOnExit: [
+                    { action: 'RETRY', onStatusReason: 'Host EC2*' },
+                    { action: 'EXIT', onReason: '*' },
+                ],
+            },
         };
     } else if (event.type === 'fabric') {
         // Each layer (plus borders) is submitted as its own job with its own

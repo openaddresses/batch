@@ -12,6 +12,7 @@ const pkg: { version: string } = JSON.parse(String(fs.readFileSync(new URL('../p
 interface OCTransaction {
     createdAt: string;
     netAmount: { value: number; currency: string };
+    order?: { legacyId: number } | null;
 }
 
 interface OCAccount {
@@ -90,6 +91,9 @@ export default class Level {
                                   value
                                   currency
                               }
+                              order {
+                                legacyId
+                              }
                             }
                           }
                           ... on Individual {
@@ -128,8 +132,10 @@ export default class Level {
         if (!account.transactions.nodes.length) return;
         if (!account.email) return;
 
-        const level = Level.calc(account.transactions.nodes[0]);
-        await this.user.level(account.email, level);
+        const transaction = account.transactions.nodes[0];
+        const level = Level.calc(transaction);
+        const oc_contribution_id = transaction.order ? String(transaction.order.legacyId) : null;
+        await this.user.level(account.email, level, oc_contribution_id);
     }
 
     /**
@@ -168,6 +174,9 @@ export default class Level {
                                   value
                                   currency
                               }
+                              order {
+                                legacyId
+                              }
                             }
                           }
                         }
@@ -186,21 +195,29 @@ export default class Level {
         const usrs = body.data?.account?.members.nodes ?? [];
         if (!usrs.length) return;
 
+        const overrides = (await this.override.list()).items;
+
         for (const usr of usrs) {
             // Skip nodes where account is null (OC can return null accounts for deleted users)
             if (!usr.account) continue;
-            // The user has never made a transaction
-            if (!usr.account.transactions.nodes.length) continue;
-            if (!usr.account.email) continue;
 
-            for (const override of (await this.override.list()).items) {
-                if (usr.account.email.match(override.pattern)) {
-                    return await this.user.level(usr.account.email, override.level);
-                }
+            const account = usr.account;
+            // The user has never made a transaction
+            if (!account.transactions.nodes.length) continue;
+            if (!account.email) continue;
+
+            const email = account.email;
+
+            const override = overrides.find(o => email.match(o.pattern));
+            if (override) {
+                await this.user.level(email, override.level);
+                continue;
             }
 
-            const level = Level.calc(usr.account.transactions.nodes[0]);
-            await this.user.level(usr.account.email, level);
+            const transaction = account.transactions.nodes[0];
+            const level = Level.calc(transaction);
+            const oc_contribution_id = transaction.order ? String(transaction.order.legacyId) : null;
+            await this.user.level(email, level, oc_contribution_id);
         }
     }
 

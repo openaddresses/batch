@@ -362,7 +362,14 @@ export default class Job {
     }
 
     async compare() {
-        const delta = await this.oa.cmd('job', 'update', {
+        // GET /job/:job/delta returns the {compare, master, delta} shape
+        // check_stats() expects. Calling 'update' (PATCH /job/:job) here
+        // instead sent a spurious no-op patch that made every completed job
+        // ping the run - and thus post its GitHub comment - a second time,
+        // and handed check_stats() a plain job object instead of a delta,
+        // which threw and was silently swallowed by flow()'s catch, so the
+        // feature-count/field-coverage regression warnings never actually ran.
+        const delta = await this.oa.cmd('job', 'delta', {
             ':job': this.job
         });
 

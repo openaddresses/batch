@@ -17,7 +17,7 @@
         "migratedb": "tsx ./node_modules/.bin/drizzle-kit generate",
         "dev": "tsx watch -i ./web index.ts",
         "cov-html": "nyc tape 'test/*.test.ts' && nyc report --reporter=html",
-        "cov": "nyc tape 'test/*.test.ts' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
+        "cov": "nyc tape 'test/*.test.ts' && nyc report --reporter=text-lcov > coverage.lcov"
     },
     "dependencies": {
         "@aws-sdk/client-auto-scaling": "^3.987.0",
@@ -39,7 +39,7 @@
         "@openaddresses/lib": "github:openaddresses/lib#v4.5.0",
         "@sinclair/typebox": "^0.34.0",
         "@turf/turf": "^6.5.0",
-        "bcrypt": "^5.0.0",
+        "bcrypt": "^6.0.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "csv-stringify": "^6.0.0",
@@ -68,19 +68,18 @@
         "@types/minimist": "^1.2.5",
         "@types/object-hash": "^3.0.6",
         "aws-sdk-client-mock": "^4.1.0",
-        "codecov": "^3.8.2",
         "drizzle-kit": "^0.31.10",
         "drizzle-typebox": "^0.3.3",
         "eslint": "^9.0.0",
         "eslint-plugin-n": "^17.10.2",
         "nodemon": "^3.0.0",
-        "nyc": "^17.0.0",
+        "nyc": "^18.0.0",
         "path-to-regexp": "^6.2.1",
         "tap-merge": "^0.3.1",
         "typescript-eslint": "^8.70.1"
     },
     "allowScripts": {
-        "bcrypt@5.1.1": true,
+        "bcrypt@6.0.0": true,
         "sqlite3@5.1.7": true
     }
 }

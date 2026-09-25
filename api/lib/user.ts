@@ -26,6 +26,7 @@ export interface UserProfile {
     email: string;
     access: string;
     flags: Record<string, boolean>;
+    oc_contribution_id?: string | null;
 }
 
 export interface UserForgotResult {
@@ -182,7 +183,7 @@ export default class User {
                     username,
                     email,
                     validated,
-                    flags,
+                    COALESCE(flags, '{}'::jsonb) AS flags,
                     level,
                     access
                 FROM
@@ -242,17 +243,28 @@ export default class User {
         }
     }
 
-    async level(email: string, level: string): Promise<boolean> {
+    async level(email: string, level: string, oc_contribution_id?: string | null): Promise<boolean> {
         console.error(email, level);
         let pgres;
         try {
-            pgres = await this.pool.execute(sql`
-                UPDATE users
-                    SET
-                        level = ${level}
-                    WHERE
-                        email = ${email}
-            `);
+            if (oc_contribution_id === undefined) {
+                pgres = await this.pool.execute(sql`
+                    UPDATE users
+                        SET
+                            level = ${level}
+                        WHERE
+                            email = ${email}
+                `);
+            } else {
+                pgres = await this.pool.execute(sql`
+                    UPDATE users
+                        SET
+                            level = ${level},
+                            oc_contribution_id = ${oc_contribution_id}
+                        WHERE
+                            email = ${email}
+                `);
+            }
         } catch (err) {
             throw new Err(500, err instanceof Error ? err : new Error(String(err)), 'Internal User Error');
         }
@@ -280,12 +292,15 @@ export default class User {
                 validated: boolean;
                 email: string;
                 access: string;
+                oc_contribution_id: string | null;
                 flags: Record<string, boolean>;
             }>(sql`
                 UPDATE users
                     SET
-                        flags = ${JSON.stringify(user.flags)},
+                        flags = ${JSON.stringify(user.flags)}::jsonb,
                         access = ${user.access},
+                        level = ${user.level},
+                        oc_contribution_id = ${user.oc_contribution_id},
                         validated = ${user.validated}
                     WHERE
                         id = ${uid}
@@ -306,6 +321,7 @@ export default class User {
             validated: row.validated,
             email: row.email,
             access: row.access,
+            oc_contribution_id: row.oc_contribution_id,
             flags: row.flags,
         };
     }
@@ -361,6 +377,7 @@ export default class User {
                 email: string;
                 flags: Record<string, boolean>;
                 validated: boolean;
+                oc_contribution_id: string | null;
             }>(sql`
                 SELECT
                     count(*) OVER() AS count,
@@ -369,8 +386,9 @@ export default class User {
                     level,
                     access,
                     email,
-                    flags,
-                    validated
+                    COALESCE(flags, '{}'::jsonb) AS flags,
+                    validated,
+                    oc_contribution_id
                 FROM
                     users
                 WHERE
@@ -403,6 +421,7 @@ export default class User {
                     access: row.access,
                     flags: row.flags,
                     validated: row.validated,
+                    oc_contribution_id: row.oc_contribution_id,
                 };
             }),
         };
@@ -418,6 +437,7 @@ export default class User {
                 access: string;
                 email: string;
                 flags: Record<string, boolean>;
+                oc_contribution_id: string | null;
             }>(sql`
                 SELECT
                     id,
@@ -425,7 +445,8 @@ export default class User {
                     username,
                     access,
                     email,
-                    flags
+                    COALESCE(flags, '{}'::jsonb) AS flags,
+                    oc_contribution_id
                 FROM
                     users
                 WHERE
@@ -446,6 +467,7 @@ export default class User {
             email: pgres[0].email,
             access: pgres[0].access,
             flags: pgres[0].flags,
+            oc_contribution_id: pgres[0].oc_contribution_id,
         };
     }
 
@@ -474,7 +496,7 @@ export default class User {
                     access,
                     email,
                     password,
-                    flags,
+                    COALESCE(flags, '{}'::jsonb) AS flags,
                     validated
                 FROM
                     users

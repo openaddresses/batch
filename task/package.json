@@ -24,7 +24,7 @@
         "@turf/turf": "^6.3.0",
         "archiver": "^6.0.0",
         "csv-parse": "^7.0.2",
-        "decompress": "^4.2.1",
+        "extract-zip": "^2.0.1",
         "find": "^0.3.0",
         "glob": "^10.5.0",
         "inquirer": "^9.3.8",
@@ -34,14 +34,13 @@
         "oa": "github:openaddresses/openaddresses#v5.15.0",
         "ogr2ogr": "^2.1.1",
         "prompts": "^2.4.0",
-        "request": "^2.88.2",
         "split2": "^4.1.0",
         "wellknown": "^0.5.0"
     },
     "devDependencies": {
         "eslint": "^9.0.0",
         "eslint-plugin-n": "^17.10.2",
-        "sinon": "^19.0.0",
+        "sinon": "^22.1.0",
         "tape": "^5.0.0"
     }
 }

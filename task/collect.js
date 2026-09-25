@@ -82,8 +82,8 @@ async function cli() {
         const datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
-        await sources(oa, tmp, datas);
-        console.error('ok - all sources fetched');
+        const stats = await sources(oa, tmp, datas);
+        console.error(`ok - all sources fetched (${stats.sources} sources, ${stats.count} features)`);
 
         let boundaries = { region: [], district: [] };
         try {
@@ -165,15 +165,19 @@ async function collect(tmp, collection, oa, boundaries) {
 export const SHARD_FEATURE_BUDGET = 1000000;
 
 /**
- * Read one source's line-delimited GeoJSON into an array of features.
+ * Stream one source's features directly into its assigned tiles' shard
+ * writers, one line at a time - never builds a features array for the file,
+ * so assign-pass memory stays O(1) per source regardless of a single
+ * source's size. A single "statewide"/"countywide" source file can itself
+ * exceed SHARD_FEATURE_BUDGET even though no individual tile does (that
+ * budget bounds a tile's working set, not a source file), so unlike the
+ * count pass this can't just re-check isValidFeature and move on - it has
+ * to avoid ever materializing the file as an array in the first place.
  *
  * Streamed line-by-line (rather than readFileSync().split('\n')) so a
- * single >512MB source file can't blow the V8 max string length, and so
- * the raw file text never has to be resident alongside the parsed objects.
+ * single >512MB source file can't blow the V8 max string length either.
  */
-export async function readSourceFeatures(file, relPath) {
-    const features = [];
-
+export async function assignSourceFeatures(file, relPath, cellToTile, writers) {
     const input = fs.createReadStream(file);
     const rl = readline.createInterface({
         input,
@@ -184,26 +188,33 @@ export async function readSourceFeatures(file, relPath) {
         for await (const line of rl) {
             if (!line.trim()) continue;
 
+            let feature;
             try {
-                features.push(JSON.parse(line));
+                feature = JSON.parse(line);
             } catch (err) {
                 console.error(`not ok - skipping malformed feature in ${relPath}: ${err.message}`);
                 continue;
             }
+
+            if (!isValidFeature(feature)) continue;
+            const [lon, lat] = feature.geometry.coordinates;
+            const { home, borrowed } = assignTiles(cellToTile, DEFAULT_CELL_DEG, lon, lat);
+            if (home === undefined) continue;
+
+            await writers.writeCore(home, relPath, feature);
+            for (const tileIdx of borrowed) await writers.writeBorrowed(tileIdx, relPath, feature);
         }
     } finally {
         rl.close();
         input.destroy();
     }
-
-    return features;
 }
 
 /**
  * Stream one source's features purely to bucket their coordinates into the
  * density counts map - never retains a features array, so this pass costs
  * O(1) memory per source regardless of collection size. Malformed lines are
- * silently skipped here; they are already logged when readSourceFeatures
+ * silently skipped here; they are already logged when assignSourceFeatures
  * reads the same file for real during the assign pass below.
  */
 async function countSourceFeatures(file, counts) {
@@ -281,16 +292,7 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
 
     const writers = openShardWriters(tmp, tiles.length);
     for (const relPath of collection_data) {
-        const features = await readSourceFeatures(path.resolve(tmp, 'sources', relPath), relPath);
-        for (const feature of features) {
-            if (!isValidFeature(feature)) continue;
-            const [lon, lat] = feature.geometry.coordinates;
-            const { home, borrowed } = assignTiles(cellToTile, DEFAULT_CELL_DEG, lon, lat);
-            if (home === undefined) continue;
-
-            await writers.writeCore(home, relPath, feature);
-            for (const tileIdx of borrowed) await writers.writeBorrowed(tileIdx, relPath, feature);
-        }
+        await assignSourceFeatures(path.resolve(tmp, 'sources', relPath), relPath, cellToTile, writers);
     }
     await writers.closeAll();
 
@@ -329,6 +331,13 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
     return zipSize;
 }
 
+// 50 concurrent GetObjects on a 4-vCPU box starves large statewide/countrywide
+// files of enough bandwidth to finish inside GET_SOURCE_TIMEOUT_MS - that's
+// what silently dropped ~80 of the biggest sources (and shrank the published
+// global collection by ~15%) in the 2026-09-20 run. Lower concurrency so each
+// fetch gets a fair share of throughput.
+const SOURCE_FETCH_CONCURRENCY = 10;
+
 async function sources(oa, tmp, datas) {
     datas = datas.filter((data) => {
         if (!data.output.output) {
@@ -343,9 +352,9 @@ async function sources(oa, tmp, datas) {
         sources: datas.length
     };
 
-    await PromisePool
+    const { errors } = await PromisePool
         .for(datas)
-        .withConcurrency(50)
+        .withConcurrency(SOURCE_FETCH_CONCURRENCY)
         .process(async (data) => {
             let attempt = 0;
             let error = false;
@@ -364,13 +373,23 @@ async function sources(oa, tmp, datas) {
                     console.error(`Attempt ${attempt}: ${err}`);
                     error = err;
                 }
-
-                console.error(done);
             } while (!done && attempt < 5);
             if (!done && error) throw error;
 
             return done;
         });
+
+    // PromisePool.process() never rejects on a per-item throw - it collects
+    // them here instead - so a source that exhausts all 5 attempts used to
+    // vanish without a trace: the job would still log success and build a
+    // collection quietly missing that source. Fail loudly instead of
+    // publishing a collection we know is incomplete.
+    if (errors.length > 0) {
+        for (const err of errors) {
+            console.error(`not ok - permanently failed to fetch job ${err.item.job} (${err.item.source}) after 5 attempts: ${err.message}`);
+        }
+        throw new Error(`${errors.length}/${datas.length} sources permanently failed to fetch - refusing to build a collection from incomplete data`);
+    }
 
     return stats;
 }

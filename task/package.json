@@ -24,7 +24,7 @@
         "@turf/turf": "^6.3.0",
         "archiver": "^6.0.0",
         "csv-parse": "^7.0.2",
-        "decompress": "^4.2.1",
+        "extract-zip": "^2.0.1",
         "find": "^0.3.0",
         "glob": "^10.5.0",
         "inquirer": "^9.3.8",

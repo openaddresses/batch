@@ -6,7 +6,7 @@ import fs from 'fs';
 import { globSync } from 'glob';
 import path from 'path';
 import { pipeline } from 'stream/promises';
-import decompress from 'decompress';
+import extract from 'extract-zip';
 import minimist from 'minimist';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
@@ -95,13 +95,31 @@ async function cli() {
     }
 }
 
+// extract-zip has no fixed release for GHSA-jmr9-qjv8-65gv/GHSA-7pqw-9j4j-h8q3:
+// a symlink entry's target is written to disk unvalidated, so a crafted zip can
+// point it outside the extraction dir and have a later entry write through it.
+// The repo zip we extract here has no legitimate reason to contain a symlink,
+// so refuse the whole extraction if one shows up instead of trusting the lib.
+const ZIP_MODE_IFMT = 61440;
+const ZIP_MODE_IFLNK = 40960;
+
+function rejectSymlinkEntries(entry) {
+    const mode = (entry.externalFileAttributes >> 16) & 0xFFFF;
+    if ((mode & ZIP_MODE_IFMT) === ZIP_MODE_IFLNK) {
+        throw new Error(`refusing to extract symlink zip entry: ${entry.fileName}`);
+    }
+}
+
 async function fetch_repo(tmp) {
     await pipeline(
         (await fetch(`https://github.com/openaddresses/openaddresses/archive/${process.env.OA_BRANCH}.zip`)).body,
         fs.createWriteStream(path.resolve(tmp, 'openaddresses.zip'))
     );
 
-    await decompress(path.resolve(tmp, 'openaddresses.zip'), path.resolve(tmp, 'openaddresses'));
+    await extract(path.resolve(tmp, 'openaddresses.zip'), {
+        dir: path.resolve(tmp, 'openaddresses'),
+        onEntry: rejectSymlinkEntries
+    });
 }
 
 function list(tmp, sha) {

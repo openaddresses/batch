@@ -16,7 +16,7 @@
         "migratedb": "drizzle-kit generate",
         "dev": "nodemon -i ./web -e ./schema index.js",
         "cov-html": "nyc tape 'test/*.test.js' && nyc report --reporter=html",
-        "cov": "nyc tape 'test/*.test.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
+        "cov": "nyc tape 'test/*.test.js' && nyc report --reporter=text-lcov > coverage.lcov"
     },
     "dependencies": {
         "@aws-sdk/client-auto-scaling": "^3.987.0",
@@ -59,7 +59,6 @@
     },
     "devDependencies": {
         "aws-sdk-client-mock": "^4.1.0",
-        "codecov": "^3.8.2",
         "drizzle-kit": "^0.31.10",
         "eslint": "^9.0.0",
         "eslint-plugin-n": "^17.10.2",

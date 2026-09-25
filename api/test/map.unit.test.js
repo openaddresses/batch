@@ -283,6 +283,40 @@ test('Map#match - geom', async () => {
     }
 });
 
+test('Map#match - ISO subdivision matching supports an additional county key', async () => {
+    const feature = await flight.config.models.Map.generate({
+        name: 'Example Region',
+        code: 'xx-01'
+    });
+
+    for (const scenario of [
+        { county: undefined, iso: 'XX-01', matched: true, map: feature.id },
+        { county: 'Example County', iso: 'XX-01', matched: true, map: feature.id },
+        { county: 'Example County', iso: undefined, matched: false, map: null }
+    ]) {
+        const path = '/openaddresses/openaddresses/48ad45b0c73205457c1bfe4ff6ed7a45011d25a8/sources/xx/01/statewide.json';
+        mockAgent.get('https://github.com').intercept({ path, method: 'GET' }).reply(200, {
+            schema: 2,
+            coverage: {
+                country: 'xx',
+                county: scenario.county,
+                state: 'Example State',
+                'ISO 3166': scenario.iso ? { alpha2: scenario.iso } : undefined
+            }
+        }, { headers: { 'content-type': 'application/json' } });
+
+        const job = await flight.config.models.Job.generate({
+            source: `https://github.com${path}`,
+            layer: 'addresses',
+            name: 'statewide'
+        });
+
+        assert.equal(await flight.config.models.Map.match(job), scenario.matched);
+        assert.equal(job.map, scenario.map);
+        assert.equal((await flight.config.models.Job.from(job.id)).map, scenario.map);
+    }
+});
+
 flight.landing();
 
 test('end', async () => {

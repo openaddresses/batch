@@ -38,7 +38,7 @@
         "@openaddresses/lib": "github:openaddresses/lib#v4.5.0",
         "@sinclair/typebox": "^0.34.0",
         "@turf/turf": "^6.5.0",
-        "bcrypt": "^5.0.0",
+        "bcrypt": "^6.0.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "csv-stringify": "^6.0.0",
@@ -69,7 +69,7 @@
         "tap-merge": "^0.3.1"
     },
     "allowScripts": {
-        "bcrypt@5.1.1": true,
+        "bcrypt@6.0.0": true,
         "sqlite3@5.1.7": true
     }
 }

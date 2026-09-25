@@ -82,8 +82,8 @@ async function cli() {
         const datas = await oa.cmd('data', 'list');
         console.error('ok - got data list');
 
-        await sources(oa, tmp, datas);
-        console.error('ok - all sources fetched');
+        const stats = await sources(oa, tmp, datas);
+        console.error(`ok - all sources fetched (${stats.sources} sources, ${stats.count} features)`);
 
         let boundaries = { region: [], district: [] };
         try {
@@ -352,7 +352,7 @@ async function sources(oa, tmp, datas) {
         sources: datas.length
     };
 
-    await PromisePool
+    const { errors } = await PromisePool
         .for(datas)
         .withConcurrency(SOURCE_FETCH_CONCURRENCY)
         .process(async (data) => {
@@ -373,13 +373,23 @@ async function sources(oa, tmp, datas) {
                     console.error(`Attempt ${attempt}: ${err}`);
                     error = err;
                 }
-
-                console.error(done);
             } while (!done && attempt < 5);
             if (!done && error) throw error;
 
             return done;
         });
+
+    // PromisePool.process() never rejects on a per-item throw - it collects
+    // them here instead - so a source that exhausts all 5 attempts used to
+    // vanish without a trace: the job would still log success and build a
+    // collection quietly missing that source. Fail loudly instead of
+    // publishing a collection we know is incomplete.
+    if (errors.length > 0) {
+        for (const err of errors) {
+            console.error(`not ok - permanently failed to fetch job ${err.item.job} (${err.item.source}) after 5 attempts: ${err.message}`);
+        }
+        throw new Error(`${errors.length}/${datas.length} sources permanently failed to fetch - refusing to build a collection from incomplete data`);
+    }
 
     return stats;
 }

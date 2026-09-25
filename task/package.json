@@ -40,7 +40,7 @@
     "devDependencies": {
         "eslint": "^9.0.0",
         "eslint-plugin-n": "^17.10.2",
-        "sinon": "^19.0.0",
+        "sinon": "^22.1.0",
         "tape": "^5.0.0"
     }
 }

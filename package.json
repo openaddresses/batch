@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@aws-sdk/s3-request-presigner": "^3.987.0",
-        "@openaddresses/batch-alarms": "^4.0.0",
+        "@openaddresses/batch-alarms": "^5.0.4",
         "@openaddresses/cloudfriend": "^7.0.0"
     },
     "devDependencies": {

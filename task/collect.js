@@ -331,6 +331,13 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
     return zipSize;
 }
 
+// 50 concurrent GetObjects on a 4-vCPU box starves large statewide/countrywide
+// files of enough bandwidth to finish inside GET_SOURCE_TIMEOUT_MS - that's
+// what silently dropped ~80 of the biggest sources (and shrank the published
+// global collection by ~15%) in the 2026-09-20 run. Lower concurrency so each
+// fetch gets a fair share of throughput.
+const SOURCE_FETCH_CONCURRENCY = 10;
+
 async function sources(oa, tmp, datas) {
     datas = datas.filter((data) => {
         if (!data.output.output) {
@@ -347,7 +354,7 @@ async function sources(oa, tmp, datas) {
 
     await PromisePool
         .for(datas)
-        .withConcurrency(50)
+        .withConcurrency(SOURCE_FETCH_CONCURRENCY)
         .process(async (data) => {
             let attempt = 0;
             let error = false;

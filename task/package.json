@@ -34,7 +34,6 @@
         "oa": "github:openaddresses/openaddresses#v5.15.0",
         "ogr2ogr": "^2.1.1",
         "prompts": "^2.4.0",
-        "request": "^2.88.2",
         "split2": "^4.1.0",
         "wellknown": "^0.5.0"
     },

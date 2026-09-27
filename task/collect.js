@@ -338,6 +338,40 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
 // fetch gets a fair share of throughput.
 const SOURCE_FETCH_CONCURRENCY = 10;
 
+// Sources at/above this size (~p99 across all sources; the 2026-09-27 run's
+// p99 was ~216MB) are whole-country/whole-state files that can be 500MB-1.5GB.
+// A handful of these landing in the same 10-wide pool as each other still
+// saturates the box's bandwidth and gets their sockets reset mid-download
+// (all 8 failures in the 2026-09-27 run were sources in this tier). Fetch
+// them one at a time, with the full pool's bandwidth to themselves, before
+// the bulk of smaller sources runs at normal concurrency.
+const LARGE_SOURCE_BYTES = 200 * 1024 * 1024;
+const LARGE_SOURCE_CONCURRENCY = 1;
+
+async function fetch_with_retry(oa, tmp, data, stats) {
+    let attempt = 0;
+    let error = false;
+    let done = false;
+
+    do {
+        try {
+            ++attempt;
+            done = await get_source(oa, tmp, data, stats);
+        } catch (err) {
+            if (err.name === 'NoSuchKey') {
+                console.error(`ok - skipping job ${data.job}: source.geojson.gz not found`);
+                done = true;
+                break;
+            }
+            console.error(`Attempt ${attempt}: ${err}`);
+            error = err;
+        }
+    } while (!done && attempt < 5);
+    if (!done && error) throw error;
+
+    return done;
+}
+
 async function sources(oa, tmp, datas) {
     datas = datas.filter((data) => {
         if (!data.output.output) {
@@ -352,32 +386,20 @@ async function sources(oa, tmp, datas) {
         sources: datas.length
     };
 
-    const { errors } = await PromisePool
-        .for(datas)
+    const large = datas.filter((data) => data.size >= LARGE_SOURCE_BYTES);
+    const small = datas.filter((data) => data.size < LARGE_SOURCE_BYTES);
+
+    const { errors: largeErrors } = await PromisePool
+        .for(large)
+        .withConcurrency(LARGE_SOURCE_CONCURRENCY)
+        .process((data) => fetch_with_retry(oa, tmp, data, stats));
+
+    const { errors: smallErrors } = await PromisePool
+        .for(small)
         .withConcurrency(SOURCE_FETCH_CONCURRENCY)
-        .process(async (data) => {
-            let attempt = 0;
-            let error = false;
-            let done = false;
+        .process((data) => fetch_with_retry(oa, tmp, data, stats));
 
-            do {
-                try {
-                    ++attempt;
-                    done = await get_source(oa, tmp, data, stats);
-                } catch (err) {
-                    if (err.name === 'NoSuchKey') {
-                        console.error(`ok - skipping job ${data.job}: source.geojson.gz not found`);
-                        done = true;
-                        break;
-                    }
-                    console.error(`Attempt ${attempt}: ${err}`);
-                    error = err;
-                }
-            } while (!done && attempt < 5);
-            if (!done && error) throw error;
-
-            return done;
-        });
+    const errors = [...largeErrors, ...smallErrors];
 
     // PromisePool.process() never rejects on a per-item throw - it collects
     // them here instead - so a source that exhausts all 5 attempts used to

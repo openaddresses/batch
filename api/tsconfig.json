@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "useUnknownInCatchVariables": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "module": "NodeNext",
+        "target": "es2022",
+        "moduleResolution": "nodenext",
+        "sourceMap": true,
+        "outDir": "dist",
+        "resolveJsonModule": true
+    },
+    "exclude": [
+        "web",
+        "dist",
+        "node_modules",
+        "migrations"
+    ],
+    "include": [
+        "*.ts",
+        "*.d.ts",
+        "lib/",
+        "routes/",
+        "test/"
+    ]
+}

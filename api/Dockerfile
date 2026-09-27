@@ -26,6 +26,8 @@ RUN cd web \
     && NODE_OPTIONS=--openssl-legacy-provider npm run build \
     && cd ..
 
+RUN npm run build
+
 CMD service nginx restart \
     && service memcached restart \
     && npm run start

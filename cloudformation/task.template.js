@@ -43,9 +43,9 @@ export default {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeResources: {
                     ImageId: 'ami-074bb5e3c681b0735',
-                    // 32 (rather than 16) so an r5.4xlarge addresses job (16
+                    // 32 (rather than 16) so an r6a.4xlarge addresses job (16
                     // vCPUs) can run alongside the other fabric jobs
-                    // (r5.2xlarge, 8 vCPUs each) instead of serializing them.
+                    // (r6a.2xlarge, 8 vCPUs each) instead of serializing them.
                     MaxvCpus: 32,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
@@ -62,18 +62,21 @@ export default {
                         'subnet-35d87242',
                         'subnet-b978ade0'
                     ],
-                    Type: 'SPOT',
-                    BidPercentage: 100,
-                    SpotIamFleetRole: cf.getAtt('BatchSpotFleetRole', 'Arn'),
-                    AllocationStrategy: 'SPOT_CAPACITY_OPTIMIZED',
+                    // On-demand: collect/fabric jobs run for 8-30+ hours with
+                    // no checkpointing, so a spot reclaim mid-run threw away
+                    // the whole attempt - 3 of the last 4 weekly mega-queue
+                    // runs never completed at all. These jobs run weekly, so
+                    // on-demand's cost over spot is trivial next to that.
+                    Type: 'EC2',
+                    AllocationStrategy: 'BEST_FIT_PROGRESSIVE',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    // r5.4xlarge (16 vCPU / 128GB) added for the addresses
+                    // r6a.4xlarge (16 vCPU / 128GB) added for the addresses
                     // fabric job specifically - see api/lib/batch.js's fabric
                     // submission, which requests 110GB for that job alone.
                     // Batch places each job on whichever allowed type fits its
                     // requested resources, so the other (lighter) fabric jobs
-                    // still land on r5.2xlarge.
-                    InstanceTypes : ['r5.2xlarge', 'r5.4xlarge']
+                    // still land on r6a.2xlarge.
+                    InstanceTypes : ['r6a.2xlarge', 'r6a.4xlarge']
                 },
                 State: 'ENABLED'
             }

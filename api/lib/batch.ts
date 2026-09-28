@@ -306,10 +306,10 @@ export async function trigger(event: BatchEvent): Promise<void> {
             timeout: {
                 attemptDurationSeconds: 60 * 60 * 24, // 24 hour backstop; per-source fetches self-timeout well before this
             },
-            // Mega compute environment is SPOT (task.template.js) - a multi-hour
-            // collect run can lose its host mid-run with no app-level error, same
-            // as fabric below. Auto-retry only that case; any other failure (real
-            // bug, non-zero exit, OOM) still fails immediately.
+            // Mega compute environment is on-demand (task.template.js), so this
+            // should be rare - kept as a safety net for the odd AWS-initiated
+            // host retirement. Auto-retry only that case; any other failure
+            // (real bug, non-zero exit, OOM) still fails immediately.
             retryStrategy: {
                 attempts: 2,
                 evaluateOnExit: [
@@ -337,7 +337,7 @@ export async function trigger(event: BatchEvent): Promise<void> {
             // empirically exceeds 58GB at national scale (confirmed by a real
             // OOM here, and by local scaling tests up to 51GB of real source
             // data). Give it a bigger box; the other layers/border fit
-            // comfortably within the default r5.2xlarge-sized job.
+            // comfortably within the default r6a.2xlarge-sized job.
             const big = job.name === 'Addresses';
             await submit({
                 jobDefinition: jobDefinition,
@@ -352,10 +352,9 @@ export async function trigger(event: BatchEvent): Promise<void> {
                 timeout: {
                     attemptDurationSeconds: 60 * 60 * 24 * 3, // 3 day hard cap, per layer
                 },
-                // Mega compute environment is SPOT (task.template.js), so a
-                // multi-hour fabric run can lose its host mid-tiling with no
-                // app-level error - Batch reports statusReason "Host EC2 (...)
-                // terminated." and no exitCode. Auto-retry only that case;
+                // Mega compute environment is on-demand (task.template.js), so
+                // this should be rare - kept as a safety net for the odd
+                // AWS-initiated host retirement. Auto-retry only that case;
                 // any other failure (real bug, non-zero exit) still fails
                 // immediately instead of burning another multi-hour attempt.
                 retryStrategy: {

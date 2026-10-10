@@ -287,35 +287,58 @@ async function cli() {
 
                 console.error(`ok - generating ${l} tiles (${shardInputs.length} shard${shardInputs.length === 1 ? '' : 's'})`);
 
-                const tileOptions = {
+                const baseOptions = {
                     layer: l,
                     std: true,
                     force: true,
                     drop: true,
                     name: `OpenAddresses ${l} fabric`,
                     attribution: 'OpenAddresses',
-                    description: `OpenAddresses ${l} fabric`,
-                    limit: {
-                        features: false,
-                        size: false
-                    },
-                    zoom: {
-                        max: 14,
-                        min: zooms[l]
-                    }
+                    description: `OpenAddresses ${l} fabric`
                 };
+
+                // Unlimited tile size at every zoom keeps every feature in
+                // every tile, so a dense metro's low-zoom tiles get enormous
+                // and tile-join has to decode 100 x threads of them at once.
+                // For addresses, tile zooms below ADDRESS_DETAIL_ZOOM as
+                // attribute-free points under tippecanoe's normal 500K /
+                // 200k-feature caps: --drop-densest-as-needed thins the dense
+                // areas but still shows where the data is. From that zoom up
+                // tiles are small enough to keep unlimited with full attributes.
+                const ADDRESS_DETAIL_ZOOM = 13;
+                const passes = l === 'addresses' ? [{
+                    suffix: 'overview',
+                    options: {
+                        excludeAttributes: true,
+                        zoom: { min: zooms[l], max: ADDRESS_DETAIL_ZOOM - 1 }
+                    }
+                }, {
+                    suffix: 'detail',
+                    options: {
+                        limit: { features: false, size: false },
+                        zoom: { min: ADDRESS_DETAIL_ZOOM, max: 14 }
+                    }
+                }] : [{
+                    suffix: 'all',
+                    options: {
+                        limit: { features: false, size: false },
+                        zoom: { min: zooms[l], max: 14 }
+                    }
+                }];
+
+                const shardOutputs = [];
 
                 // Tile each shard concurrently - this is what actually uses the
                 // box's other vCPUs, since a single tippecanoe process can't.
-                await Promise.all(shardInputs.map(({ index, file }) =>
-                    tippecanoe.tile(
-                        fs.createReadStream(file),
-                        path.resolve(DRIVE, `${l}.shard${index}.pmtiles`),
-                        tileOptions
-                    )
-                ));
-
-                const shardOutputs = shardInputs.map(({ index }) => path.resolve(DRIVE, `${l}.shard${index}.pmtiles`));
+                // Passes run one after another to keep tippecanoe's own memory
+                // at one process per vCPU.
+                for (const pass of passes) {
+                    await Promise.all(shardInputs.map(({ index, file }) => {
+                        const out = path.resolve(DRIVE, `${l}.shard${index}.${pass.suffix}.pmtiles`);
+                        shardOutputs.push(out);
+                        return tippecanoe.tile(fs.createReadStream(file), out, { ...baseOptions, ...pass.options });
+                    }));
+                }
 
                 if (shardOutputs.length === 1) {
                     await fsp.rename(shardOutputs[0], path.resolve(DRIVE, `${l}.pmtiles`));

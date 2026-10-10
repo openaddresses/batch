@@ -31,6 +31,7 @@ export default class Tippecanoe {
      * @param {Object} options.zoom Zoom Options
      * @param {Number} options.zoom.max Max zoom of tiles
      * @param {Number} options.zoom.min Min zoom of tiles
+     * @param {Boolean} [options.excludeAttributes=false] Drop all feature attributes (--exclude-all), keeping only geometry
      * @param {Boolean} [options.parallel=false] Use multiple CPUs for tiling (-P flag)
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
      * @param {Object} options.limit Limit Options
@@ -62,6 +63,7 @@ export default class Tippecanoe {
             if (options.limit.features === false) base = base.concat(['--no-feature-limit']);
             if (options.limit.size === false) base = base.concat(['--no-tile-size-limit']);
             if (options.drop) base = base.concat(['--drop-densest-as-needed']);
+            if (options.excludeAttributes) base = base.concat(['--exclude-all']);
             if (options.parallel) base = base.concat(['-P']);
 
             const tippecanoe = CP.spawn('tippecanoe', base, {
@@ -112,6 +114,9 @@ export default class Tippecanoe {
      * @param {Boolean} options.force Delete the mbtiles file if it already exists instead of giving an error
      * @param {Object} options.limit Limit Options
      * @param {Boolean} [options.limit.size=true] Limit tiles to 500K bytes
+     * @param {Number} [options.threads=4] Max worker threads. tile-join decodes
+     *        100 x threads tiles at once and defaults to every CPU on the host,
+     *        so on a big instance with large tiles that is what exhausts memory.
      *
      * @returns {Promise}
      */
@@ -130,7 +135,7 @@ export default class Tippecanoe {
             if (options.limit.size === false) base = base.concat(['--no-tile-size-limit']);
 
             const tilejoin = CP.spawn('tile-join', base, {
-                env: process.env
+                env: { ...process.env, TIPPECANOE_MAX_THREADS: String(options.threads || 4) }
             })
                 .on('error', reject)
                 .on('close', (code) => {

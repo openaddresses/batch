@@ -510,6 +510,24 @@ async function upload_zip_collection(file, name) {
     console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/collection-${name}.zip`);
 }
 
+// Zipping the global collection runs for hours without writing anything to
+// stdout, which made a stuck job indistinguishable from a slow one. archiver
+// emits a progress event per entry; log at most one line per interval.
+const ZIP_PROGRESS_INTERVAL_MS = 60 * 1000;
+
+function log_zip_progress(archive, name) {
+    let last = Date.now();
+
+    archive.on('progress', (progress) => {
+        const now = Date.now();
+        if (now - last < ZIP_PROGRESS_INTERVAL_MS) return;
+        last = now;
+
+        const { entries, fs: files } = progress;
+        console.error(`ok - zipping ${name}: ${entries.processed}/${entries.total} files, ${(files.processedBytes / 1024 ** 3).toFixed(1)}/${(files.totalBytes / 1024 ** 3).toFixed(1)} GiB read`);
+    });
+}
+
 function zip_processed(tmp, geojsonPath, name) {
     return new Promise((resolve, reject) => {
         const output = fs.createWriteStream(path.resolve(tmp, `${name}-processed.zip`))
@@ -528,6 +546,8 @@ function zip_processed(tmp, geojsonPath, name) {
             console.error('not ok - ' + err.message);
             return reject(err);
         });
+
+        log_zip_progress(archive, `${name}-processed`);
 
         archive.pipe(output);
         archive.file(geojsonPath, { name: `${name}.geojson` });
@@ -594,6 +614,8 @@ function zip_datas(tmp, datas, name) {
             console.error('not ok - ' + err.message);
             return reject(err);
         });
+
+        log_zip_progress(archive, name);
 
         archive.pipe(output);
 

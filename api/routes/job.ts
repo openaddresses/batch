@@ -200,7 +200,7 @@ export default async function router(schema: Schema, config: Config) {
         }),
     }, async (req, res) => {
         try {
-            await Auth.is_level(req, 'sponsor');
+            await Auth.is_level(req, 'sponsor', true);
 
             const job = await config.models.Job.from(req.params.job);
 

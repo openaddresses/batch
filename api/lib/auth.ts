@@ -41,8 +41,8 @@ export default class Auth {
         return req.auth;
     }
 
-    static async is_level(req: AnyRequest, level: string): Promise<AuthObject> {
-        const auth = await this.is_auth(req);
+    static async is_level(req: AnyRequest, level: string, token = false): Promise<AuthObject> {
+        const auth = await this.is_auth(req, token);
 
         if (level === 'basic') {
             return auth;

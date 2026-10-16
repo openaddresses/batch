@@ -301,7 +301,7 @@ export default class User {
                         access = ${user.access},
                         level = ${user.level},
                         oc_contribution_id = ${user.oc_contribution_id},
-                        validated = ${user.validated}
+                        validated = ${user.validated === undefined ? sql`validated` : user.validated}
                     WHERE
                         id = ${uid}
                     RETURNING *

@@ -15,141 +15,59 @@
         </slot>
 
         <template #dropdown>
-            <div class='row'>
-                <div class='flex-inline pb12'>
-                    <button
-                        :class='{ "btn--stroke": mode !== "base" }'
-                        class='btn btn--s btn--pill btn--pill-hl round mx0'
-                        @click='mode = "base"'
-                    >
-                        Base
-                    </button>
-                    <button
-                        :class='{ "btn--stroke": mode !== "validated" }'
-                        class='btn btn--s btn--pill btn--pill-hr round mx0'
-                        @click='mode = "validated"'
-                    >
-                        Validated
-                    </button>
-                </div>
-
-                <div
-                    v-if='mode === "base"'
-                    class='col-12'
-                >
-                    <div class='col-12 d-flex px-2 py-2'>
-                        <span
-                            class='cursor-pointer'
-                            @click='datapls(job.job || job.id)'
-                        >
-                            GeoJSON+LD
-                        </span>
-                        <div class='ms-auto'>
-                            <TablerIconButton
-                                title='About GeoJSON+LD format'
-                                class='fr color-blue-on-hover mt3'
-                                @click='external("https://stevage.github.io/ndgeojson/")'
-                            >
-                                <IconInfoCircle
-                                    :size='16'
-                                    stroke='1'
-                                />
-                            </TablerIconButton>
-                        </div>
-                    </div>
-
-                    <div class='col-12 d-flex px-2 py-2'>
-                        <span
-                            class='cursor-pointer'
-                            @click='datapls(job.job || job.id, "shapefile")'
-                        >
-                            ShapeFile
-                        </span>
-                        <div class='ms-auto'>
-                            <TablerIconButton
-                                title='About Shapefile format'
-                                class='fr color-blue-on-hover mt3'
-                                @click='external("https://en.wikipedia.org/wiki/Shapefile")'
-                            >
-                                <IconInfoCircle
-                                    :size='16'
-                                    stroke='1'
-                                />
-                            </TablerIconButton>
-                        </div>
-                    </div>
-
-                    <div class='col-12 d-flex px-2 py-2'>
-                        <span
-                            class='cursor-pointer'
-                            @click='datapls(job.job || job.id, "csv")'
-                        >
-                            CSV
-                        </span>
-                        <div class='ms-auto'>
-                            <TablerIconButton
-                                title='About CSV format'
-                                class='fr color-blue-on-hover mt3'
-                                @click='external("https://en.wikipedia.org/wiki/Comma-separated_values")'
-                            >
-                                <IconInfoCircle
-                                    :size='16'
-                                    stroke='1'
-                                />
-                            </TablerIconButton>
-                        </div>
-                    </div>
+            <div class='px-3 py-2'>
+                <div class='fw-bold'>
+                    Base
                 </div>
                 <div
-                    v-else-if='!job.output.validated'
-                    class='col col-12'
+                    v-for='f in formats'
+                    :key='f.fmt'
+                    class='d-flex align-items-center py-1'
                 >
-                    <div class='col-12 d-flex align-items-center justify-content-center'>
+                    <span>{{ f.name }}</span>
+                    <TablerIconButton
+                        :title='`About ${f.name} format`'
+                        @click.stop='external(f.url)'
+                    >
                         <IconInfoCircle
-                            size='32'
+                            :size='16'
                             stroke='1'
                         />
-                    </div>
-                    <div class='align-center'>
-                        No Validated Data
-                    </div>
+                    </TablerIconButton>
+                    <a
+                        class='ms-auto cursor-pointer'
+                        @click.stop='datapls(job.job || job.id, f.fmt)'
+                        v-text='f.fmt === "geojson" ? "download" : "request"'
+                    />
                 </div>
-                <div
-                    v-else-if='auth.level !== "sponsor"'
-                    class='col-12'
-                >
-                    <div class='d-flex align-items-center justify-content-center pt-1 pb-2'>
+
+                <div class='fw-bold mt-2'>
+                    Validated
+                </div>
+                <div class='d-flex align-items-center py-1'>
+                    <span>GeoJSON+LD</span>
+                    <TablerIconButton
+                        title='About GeoJSON+LD format'
+                        @click.stop='external(formats[0].url)'
+                    >
                         <IconInfoCircle
-                            size='32'
+                            :size='16'
                             stroke='1'
                         />
-                    </div>
-                    <div class='d-flex justify-content-center'>
-                        Sponsor Benefit
-                    </div>
-                </div>
-                <div
-                    v-else
-                    class='col col--12'
-                >
-                    <div class='col col--12'>
-                        <span
-                            class='cursor-pointer'
-                            @click='datapls(job.job || job.id, "geojson", true)'
-                        >
-                            GeoJSON+LD
-                        </span>
-                        <TablerIconButton
-                            title='About GeoJSON+LD format'
-                            class='fr color-blue-on-hover mt3'
-                            @click='external("https://stevage.github.io/ndgeojson/")'
-                        >
-                            <IconInfoCircle
-                                :size='16'
-                                stroke='1'
-                            />
-                        </TablerIconButton>
-                    </div>
+                    </TablerIconButton>
+                    <span
+                        v-if='!job.output.validated'
+                        class='ms-auto text-muted'
+                    >unavailable</span>
+                    <span
+                        v-else-if='auth.level !== "sponsor"'
+                        class='ms-auto text-muted'
+                    >sponsor benefit</span>
+                    <a
+                        v-else
+                        class='ms-auto cursor-pointer'
+                        @click.stop='datapls(job.job || job.id, "geojson", true)'
+                    >download</a>
                 </div>
             </div>
         </template>
@@ -186,7 +104,11 @@ export default {
         return {
             loginModal: false,
             perkModal: false,
-            mode: 'base'
+            formats: [
+                { fmt: 'geojson', name: 'GeoJSON+LD', url: 'https://stevage.github.io/ndgeojson/' },
+                { fmt: 'shapefile', name: 'ShapeFile', url: 'https://en.wikipedia.org/wiki/Shapefile' },
+                { fmt: 'csv', name: 'CSV', url: 'https://en.wikipedia.org/wiki/Comma-separated_values' }
+            ]
         }
     },
     methods: {

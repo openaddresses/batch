@@ -297,7 +297,7 @@ export default class User {
             }>(sql`
                 UPDATE users
                     SET
-                        flags = ${JSON.stringify(user.flags)}::jsonb,
+                        flags = ${JSON.stringify(user.flags)}::text::jsonb,
                         access = ${user.access},
                         level = ${user.level},
                         oc_contribution_id = ${user.oc_contribution_id},

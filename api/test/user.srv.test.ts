@@ -387,4 +387,28 @@ test('GET: api/user?after=<NOW>', async () => {
     }
 });
 
+test('PATCH: api/user/:id (flags stored as a jsonb object)', async () => {
+    try {
+        const res = await flight.fetch('/api/user/5', {
+            auth: {
+                bearer: flight.token.admin,
+            },
+            method: 'PATCH',
+            body: {
+                flags: { upload: true },
+            },
+        }, true);
+
+        assert.deepEqual((res.body as { flags: object }).flags, { upload: true });
+
+        const rows = await flight.config.pool.execute<{ type: string }>(sql`
+            SELECT jsonb_typeof(flags) AS type FROM users WHERE id = 5
+        `);
+
+        assert.equal(rows[0].type, 'object', 'flags must not be double-encoded');
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
+});
+
 flight.landing();

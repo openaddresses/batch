@@ -304,7 +304,13 @@ export async function trigger(event: BatchEvent): Promise<void> {
                 memory: 15000,
             },
             timeout: {
-                attemptDurationSeconds: 60 * 60 * 24, // 24 hour backstop; per-source fetches self-timeout well before this
+                // The global collection alone takes more than 24 hours: in the
+                // 2026-10-18 run the fetch took ~1h, zipping ~8h, the S3/R2
+                // upload ~30min, and the processed build was still going after
+                // another ~14h when the old 24 hour cap killed the job, before
+                // the five regional collections ran at all. Per-source fetches
+                // self-timeout well before this, so it is only a backstop.
+                attemptDurationSeconds: 60 * 60 * 24 * 3, // 3 days, matching the fabric jobs
             },
             // Mega compute environment is on-demand (task.template.js), so this
             // should be rare - kept as a safety net for the odd AWS-initiated

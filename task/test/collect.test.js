@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { Writable } from 'node:stream';
-import { assignSourceFeatures, writeFeatures, SHARD_FEATURE_BUDGET, SHARD_FEATURE_LIMIT } from '../collect.js';
+import { assignSourceFeatures, writeFeatures, createProgressLogger, SHARD_FEATURE_BUDGET, SHARD_FEATURE_LIMIT } from '../collect.js';
 import { countCoordinate, buildTiles, DEFAULT_CELL_DEG } from '../lib/tiling.js';
 
 function tmpSource(lines) {
@@ -118,6 +118,35 @@ test('SHARD_FEATURE_LIMIT leaves room for a budget-sized tile plus its borrowed 
     // ...while staying under the 10000MB old-space heap at ~1.5KB/feature
     // (~6.8M features), with room for the rest of the process.
     t.ok(SHARD_FEATURE_LIMIT <= 4000000, 'limit stays well under the heap ceiling');
+    t.end();
+});
+
+test('createProgressLogger logs at most once per interval plus always the final item', (t) => {
+    let clock = 0;
+    const lines = [];
+    const error = console.error;
+    console.error = (line) => lines.push(line);
+
+    try {
+        const log = createProgressLogger('processing', { intervalMs: 60000, now: () => clock });
+
+        log(1, 5);
+        clock = 30000;
+        log(2, 5);
+        clock = 60000;
+        log(3, 5, ', 10 skipped');
+        clock = 61000;
+        log(4, 5);
+        clock = 62000;
+        log(5, 5);
+    } finally {
+        console.error = error;
+    }
+
+    t.deepEquals(lines, [
+        'ok - processing: 3/5, 10 skipped',
+        'ok - processing: 5/5'
+    ]);
     t.end();
 });
 

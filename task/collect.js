@@ -178,6 +178,25 @@ export const SHARD_FEATURE_BUDGET = 1000000;
 // buildShardFeatures() run peaked at ~2.9GB RSS).
 export const SHARD_FEATURE_LIMIT = 3000000;
 
+const PROGRESS_INTERVAL_MS = 60 * 1000;
+
+/**
+ * Returns a function that logs `ok - <label>: <done>/<total><detail>`, at
+ * most once per interval plus always for the final item. The processed
+ * build is hours of otherwise silent counting, assigning and per-shard
+ * work, so a stalled job looked the same as a slow one.
+ */
+export function createProgressLogger(label, { intervalMs = PROGRESS_INTERVAL_MS, now = Date.now } = {}) {
+    let last = now();
+
+    return (done, total, detail = '') => {
+        const time = now();
+        if (done < total && time - last < intervalMs) return;
+        last = time;
+        console.error(`ok - ${label}: ${done}/${total}${detail}`);
+    };
+}
+
 /**
  * Stream one source's features directly into its assigned tiles' shard
  * writers, one line at a time - never builds a features array for the file,
@@ -293,8 +312,10 @@ export async function writeFeatures(out, features) {
  */
 async function process_collection(tmp, collection, collection_data, boundaries) {
     const counts = new Map();
-    for (const relPath of collection_data) {
-        await countSourceFeatures(path.resolve(tmp, 'sources', relPath), counts);
+    const countProgress = createProgressLogger(`${collection.name}: counting source features`);
+    for (let i = 0; i < collection_data.length; i++) {
+        await countSourceFeatures(path.resolve(tmp, 'sources', collection_data[i]), counts);
+        countProgress(i + 1, collection_data.length);
     }
 
     const { tiles, cellToTile } = buildTiles(counts, { budget: SHARD_FEATURE_BUDGET, cellDeg: DEFAULT_CELL_DEG });
@@ -304,14 +325,23 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
         return null;
     }
 
+    const totalFeatures = tiles.reduce((sum, tile) => sum + tile.count, 0);
+    console.error(`ok - ${collection.name}: ${totalFeatures} features split into ${tiles.length} shards`);
+
     const writers = openShardWriters(tmp, tiles.length);
-    for (const relPath of collection_data) {
-        await assignSourceFeatures(path.resolve(tmp, 'sources', relPath), relPath, cellToTile, writers);
+    const assignProgress = createProgressLogger(`${collection.name}: assigning source features to shards`);
+    for (let i = 0; i < collection_data.length; i++) {
+        await assignSourceFeatures(path.resolve(tmp, 'sources', collection_data[i]), collection_data[i], cellToTile, writers);
+        assignProgress(i + 1, collection_data.length);
     }
     await writers.closeAll();
 
     const geojsonPath = path.resolve(tmp, `${collection.name}-processed.geojson`);
     const out = fs.createWriteStream(geojsonPath);
+
+    const shardProgress = createProgressLogger(`${collection.name}: processing shards`);
+    let skippedShards = 0;
+    let writtenFeatures = 0;
 
     for (let idx = 0; idx < tiles.length; idx++) {
         const { core, borrowed } = await readShard(tmp, idx);
@@ -321,12 +351,15 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
         if (coreCount + borrowedCount > SHARD_FEATURE_LIMIT) {
             console.error(`not ok - skipping shard ${idx} (bbox ${tiles[idx].bbox.join(',')}) for ${collection.name}: ${coreCount + borrowedCount}+ features exceeds the ${SHARD_FEATURE_LIMIT}-feature per-shard limit`);
             cleanupShard(tmp, idx);
-            continue;
+            skippedShards++;
+        } else {
+            const features = buildShardFeatures(core, borrowed, boundaries);
+            await writeFeatures(out, features);
+            writtenFeatures += features.length;
+            cleanupShard(tmp, idx);
         }
 
-        const features = buildShardFeatures(core, borrowed, boundaries);
-        await writeFeatures(out, features);
-        cleanupShard(tmp, idx);
+        shardProgress(idx + 1, tiles.length, `, ${writtenFeatures} features written, ${skippedShards} shards skipped`);
     }
 
     await new Promise((resolve, reject) => {

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { Writable } from 'node:stream';
-import { assignSourceFeatures, writeFeatures, SHARD_FEATURE_BUDGET } from '../collect.js';
+import { assignSourceFeatures, writeFeatures, createProgressLogger, SHARD_FEATURE_BUDGET, SHARD_FEATURE_LIMIT } from '../collect.js';
 import { countCoordinate, buildTiles, DEFAULT_CELL_DEG } from '../lib/tiling.js';
 
 function tmpSource(lines) {
@@ -105,6 +105,48 @@ test('SHARD_FEATURE_BUDGET is a defined, conservative per-tile safety limit', (t
     // tile's working set, so it should sit well under that ceiling with
     // room to spare for the boundary set and multiple in-flight structures.
     t.ok(SHARD_FEATURE_BUDGET > 0 && SHARD_FEATURE_BUDGET <= 2000000, 'budget leaves wide headroom under the batch worker\'s 10000MB old-space heap ceiling');
+    t.end();
+});
+
+test('SHARD_FEATURE_LIMIT leaves room for a budget-sized tile plus its borrowed boundary records', (t) => {
+    t.equals(typeof SHARD_FEATURE_LIMIT, 'number');
+    // The 2026-10-11 and 2026-10-18 global runs skipped 35 shards of
+    // 1.005M-1.23M features because core + borrowed was checked against the
+    // same budget the tiles were split to. The limit must clear those with
+    // margin...
+    t.ok(SHARD_FEATURE_LIMIT >= 2 * SHARD_FEATURE_BUDGET, 'limit is well above the split budget');
+    // ...while staying under the 10000MB old-space heap at ~1.5KB/feature
+    // (~6.8M features), with room for the rest of the process.
+    t.ok(SHARD_FEATURE_LIMIT <= 4000000, 'limit stays well under the heap ceiling');
+    t.end();
+});
+
+test('createProgressLogger logs at most once per interval plus always the final item', (t) => {
+    let clock = 0;
+    const lines = [];
+    const error = console.error;
+    console.error = (line) => lines.push(line);
+
+    try {
+        const log = createProgressLogger('processing', { intervalMs: 60000, now: () => clock });
+
+        log(1, 5);
+        clock = 30000;
+        log(2, 5);
+        clock = 60000;
+        log(3, 5, ', 10 skipped');
+        clock = 61000;
+        log(4, 5);
+        clock = 62000;
+        log(5, 5);
+    } finally {
+        console.error = error;
+    }
+
+    t.deepEquals(lines, [
+        'ok - processing: 3/5, 10 skipped',
+        'ok - processing: 5/5'
+    ]);
     t.end();
 });
 

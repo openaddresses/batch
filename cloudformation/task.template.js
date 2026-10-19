@@ -48,7 +48,13 @@ export default {
                     // job and the other fabric jobs (r6a.2xlarge, 8 vCPUs
                     // each) instead of serializing them.
                     MaxvCpus: 64,
-                    DesiredvCpus: 0,
+                    // DesiredvCpus is deliberately not set: Batch manages it
+                    // (it is the number of vCPUs currently in use). A stack
+                    // update that sends DesiredvCpus: 0 to an environment with
+                    // jobs running is rejected with "Manually scaling down
+                    // compute environment is not supported", and the rollback
+                    // fails the same way, leaving the stack in
+                    // UPDATE_ROLLBACK_FAILED (2026-10-19).
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     LaunchTemplate: {
@@ -90,7 +96,7 @@ export default {
                 ComputeResources: {
                     ImageId: 'ami-074bb5e3c681b0735',
                     MaxvCpus: 16,
-                    DesiredvCpus: 0,
+                    // No DesiredvCpus, for the same reason as the mega environment
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     LaunchTemplate: {

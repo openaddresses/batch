@@ -43,10 +43,11 @@ export default {
                 ServiceRole: cf.getAtt('BatchServiceRole', 'Arn'),
                 ComputeResources: {
                     ImageId: 'ami-074bb5e3c681b0735',
-                    // 32 (rather than 16) so an r6a.4xlarge addresses job (16
-                    // vCPUs) can run alongside the other fabric jobs
-                    // (r6a.2xlarge, 8 vCPUs each) instead of serializing them.
-                    MaxvCpus: 32,
+                    // 64 so the two r6a.4xlarge fabric jobs (addresses and
+                    // parcels, 16 vCPUs each) can run alongside the collect
+                    // job and the other fabric jobs (r6a.2xlarge, 8 vCPUs
+                    // each) instead of serializing them.
+                    MaxvCpus: 64,
                     DesiredvCpus: 0,
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
@@ -70,12 +71,12 @@ export default {
                     Type: 'EC2',
                     AllocationStrategy: 'BEST_FIT_PROGRESSIVE',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
-                    // r6a.4xlarge (16 vCPU / 128GB) added for the addresses
-                    // fabric job specifically - see api/lib/batch.js's fabric
-                    // submission, which requests 110GB for that job alone.
-                    // Batch places each job on whichever allowed type fits its
-                    // requested resources, so the other (lighter) fabric jobs
-                    // still land on r6a.2xlarge.
+                    // r6a.4xlarge (16 vCPU / 128GB) added for the addresses and
+                    // parcels fabric jobs specifically - see api/lib/batch.ts's
+                    // fabric submission, which requests 110GB for those two
+                    // alone. Batch places each job on whichever allowed type
+                    // fits its requested resources, so the other (lighter)
+                    // fabric jobs still land on r6a.2xlarge.
                     InstanceTypes : ['r6a.2xlarge', 'r6a.4xlarge']
                 },
                 State: 'ENABLED'

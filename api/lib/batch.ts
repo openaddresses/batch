@@ -332,13 +332,13 @@ export async function trigger(event: BatchEvent): Promise<void> {
         ];
 
         for (const job of fabricJobs) {
-            // addresses is by far the largest layer - tile-join's peak memory
-            // when merging its shards scales with total merged tile volume and
-            // empirically exceeds 58GB at national scale (confirmed by a real
-            // OOM here, and by local scaling tests up to 51GB of real source
-            // data). Give it a bigger box; the other layers/border fit
-            // comfortably within the default r6a.2xlarge-sized job.
-            const big = job.name === 'Addresses';
+            // addresses and parcels are by far the largest layers. 58GB was
+            // not enough for parcels: its tile-join was OOM-killed on
+            // tippecanoe 2.31.0 (2026-10-13), and on 2.79.0 tippecanoe itself
+            // died with std::bad_alloc while tiling its 16 shards at once
+            // (2026-10-18). Give both a bigger box; the other layers/border
+            // fit comfortably within the default r6a.2xlarge-sized job.
+            const big = job.name === 'Addresses' || job.name === 'Parcels';
             await submit({
                 jobDefinition: jobDefinition,
                 jobQueue: mega_queue,

@@ -164,6 +164,20 @@ async function collect(tmp, collection, oa, boundaries) {
 // remaining size-based skip, scoped to a single pathological tile.
 export const SHARD_FEATURE_BUDGET = 1000000;
 
+// buildTiles() only bounds a tile's own (core) features to
+// SHARD_FEATURE_BUDGET; the working set process_collection() actually holds
+// is core + the neighboring tiles' boundary records borrowed for matching.
+// Checking that sum against the same budget skipped 35 shards of the global
+// collection in the 2026-10-11 and 2026-10-18 runs - each 1.005M-1.23M
+// features, i.e. a tile near its budget tipped over by borrowed records, not
+// a pathological one - and silently dropped about 36.7M features (dense
+// metros such as Kansas City, Detroit, Boston and Paris) from the processed
+// output. The skip only has to protect the heap, so it gets its
+// own, higher limit: at the ~1.5KB/feature figure above, 3M features is
+// ~4.5GB, still under half the 10000MB heap (a synthetic 3M-feature
+// buildShardFeatures() run peaked at ~2.9GB RSS).
+export const SHARD_FEATURE_LIMIT = 3000000;
+
 /**
  * Stream one source's features directly into its assigned tiles' shard
  * writers, one line at a time - never builds a features array for the file,
@@ -304,8 +318,8 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
         const coreCount = [...core.values()].reduce((sum, f) => sum + f.length, 0);
         const borrowedCount = [...borrowed.values()].reduce((sum, f) => sum + f.length, 0);
 
-        if (coreCount + borrowedCount > SHARD_FEATURE_BUDGET) {
-            console.error(`not ok - skipping shard ${idx} (bbox ${tiles[idx].bbox.join(',')}) for ${collection.name}: ${coreCount + borrowedCount}+ features exceeds the ${SHARD_FEATURE_BUDGET}-feature per-shard budget`);
+        if (coreCount + borrowedCount > SHARD_FEATURE_LIMIT) {
+            console.error(`not ok - skipping shard ${idx} (bbox ${tiles[idx].bbox.join(',')}) for ${collection.name}: ${coreCount + borrowedCount}+ features exceeds the ${SHARD_FEATURE_LIMIT}-feature per-shard limit`);
             cleanupShard(tmp, idx);
             continue;
         }

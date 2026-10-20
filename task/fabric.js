@@ -298,25 +298,35 @@ async function cli() {
                 };
 
                 // Unlimited tile size at every zoom keeps every feature in
-                // every tile, so a dense metro's low-zoom tiles get enormous
-                // and tile-join has to decode 100 x threads of them at once.
-                // For addresses, tile zooms below ADDRESS_DETAIL_ZOOM as
-                // attribute-free points under tippecanoe's normal 500K /
-                // 200k-feature caps: --drop-densest-as-needed thins the dense
-                // areas but still shows where the data is. From that zoom up
-                // tiles are small enough to keep unlimited with full attributes.
-                const ADDRESS_DETAIL_ZOOM = 13;
-                const passes = l === 'addresses' ? [{
+                // every tile, so a dense metro's low-zoom tiles get enormous.
+                // tile-join then has to decode 100 x threads of them at once,
+                // and tippecanoe itself has to hold them while tiling: the
+                // parcels job died with std::bad_alloc about two hours in
+                // (2026-10-18 on 58GB, 2026-10-19 on 110GB). The low zooms only
+                // need to show that there is data, not what it is, so for
+                // layers in OVERVIEW the zooms below DETAIL_ZOOM are tiled
+                // without attributes under tippecanoe's normal 500K /
+                // 200k-feature caps (--drop-densest-as-needed thins the dense
+                // areas), with parcel polygons reduced to label points. From
+                // DETAIL_ZOOM up, tiles are small enough to keep unlimited,
+                // with every feature and all its attributes.
+                const DETAIL_ZOOM = 13;
+                const OVERVIEW = {
+                    addresses: { excludeAttributes: true },
+                    parcels: { excludeAttributes: true, labelPoints: true },
+                    centerlines: { excludeAttributes: true }
+                };
+                const passes = OVERVIEW[l] ? [{
                     suffix: 'overview',
                     options: {
-                        excludeAttributes: true,
-                        zoom: { min: zooms[l], max: ADDRESS_DETAIL_ZOOM - 1 }
+                        ...OVERVIEW[l],
+                        zoom: { min: zooms[l], max: DETAIL_ZOOM - 1 }
                     }
                 }, {
                     suffix: 'detail',
                     options: {
                         limit: { features: false, size: false },
-                        zoom: { min: ADDRESS_DETAIL_ZOOM, max: 14 }
+                        zoom: { min: DETAIL_ZOOM, max: 14 }
                     }
                 }] : [{
                     suffix: 'all',
@@ -336,7 +346,7 @@ async function cli() {
                     await Promise.all(shardInputs.map(({ index, file }) => {
                         const out = path.resolve(DRIVE, `${l}.shard${index}.${pass.suffix}.pmtiles`);
                         shardOutputs.push(out);
-                        return tippecanoe.tile(fs.createReadStream(file), out, { ...baseOptions, ...pass.options });
+                        return tippecanoe.tile(fs.createReadStream(file), out, { ...baseOptions, label: `${l} shard ${index} ${pass.suffix}`, ...pass.options });
                     }));
                 }
 

@@ -12,6 +12,7 @@ import { Transform } from 'stream';
 import path from 'path';
 import Tippecanoe from './lib/tippecanoe.js';
 import Meta from './lib/meta.js';
+import { exceedsMaxExtent, MAX_POLYGON_EXTENT_DEG } from './lib/extent.js';
 import { Unzip } from 'zlib';
 import split2 from 'split2';
 import minimist from 'minimist';
@@ -426,6 +427,7 @@ async function get_source(data) {
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         console.error(`ok - fetching ${process.env.Bucket}/${key}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
+        let dropped = 0;
         try {
             await pipeline(
                 (await s3.send(new S3.GetObjectCommand({
@@ -444,6 +446,10 @@ async function get_source(data) {
                             if (feat.geometry && feat.geometry.coordinates) {
                                 feat.geometry.coordinates = strip2D(feat.geometry.coordinates);
                             }
+                            if (exceedsMaxExtent(feat.geometry)) {
+                                dropped++;
+                                return cb();
+                            }
                             cb(null, JSON.stringify(feat) + '\n');
                         } catch {
                             cb(null, line + '\n');
@@ -452,6 +458,9 @@ async function get_source(data) {
                 }),
                 fs.createWriteStream(tmp)
             );
+            if (dropped > 0) {
+                console.error(`not ok - dropped ${dropped} polygon(s) wider than ${MAX_POLYGON_EXTENT_DEG} degrees from job ${data.job} (${data.source}): broken geometry that stalls tippecanoe`);
+            }
             return; // success
         } catch (err) {
             if (err.name === 'NoSuchKey') {

@@ -1,5 +1,5 @@
 import test from 'tape';
-import { exceedsMaxExtent, MAX_POLYGON_EXTENT_DEG } from '../lib/extent.js';
+import { badGeometry, MAX_POLYGON_EXTENT_DEG } from '../lib/extent.js';
 
 // Shape of the two us/wa/statewide parcels that stalled a fabric shard for
 // 57 hours: a world-sized outer ring with the real parcel as a hole.
@@ -11,43 +11,64 @@ const worldWithHole = {
     ]
 };
 
-test('exceedsMaxExtent reports a world-sized polygon with a parcel-sized hole', (t) => {
-    t.equals(exceedsMaxExtent(worldWithHole), true);
+const parcel = { type: 'Polygon', coordinates: [[[-117.89, 47.55], [-117.88, 47.55], [-117.88, 47.56], [-117.89, 47.55]]] };
+
+test('badGeometry reports a world-sized polygon with a parcel-sized hole as oversized', (t) => {
+    t.equals(badGeometry(worldWithHole), 'oversized');
     t.end();
 });
 
-test('exceedsMaxExtent keeps an ordinary parcel and a large legitimate one', (t) => {
-    const parcel = { type: 'Polygon', coordinates: [[[-117.89, 47.55], [-117.88, 47.55], [-117.88, 47.56], [-117.89, 47.55]]] };
-    // the biggest real polygon in us/wa/statewide is a little over 1 degree across
-    const large = { type: 'Polygon', coordinates: [[[-121, 47], [-119.9, 47], [-119.9, 48.1], [-121, 47]]] };
+test('badGeometry reports coordinates outside longitude/latitude range', (t) => {
+    // us/md/howard: Maryland State Plane feet written as lon/lat
+    const projected = { type: 'Polygon', coordinates: [[[1282935.53, 619538.58], [1282766.56, 619440.37], [1282800, 619500], [1282935.53, 619538.58]]] };
 
-    t.equals(exceedsMaxExtent(parcel), false);
-    t.equals(exceedsMaxExtent(large), false);
+    t.equals(badGeometry(projected), 'out-of-range');
+    t.equals(badGeometry({ type: 'MultiPolygon', coordinates: [parcel.coordinates, projected.coordinates] }), 'out-of-range');
+    t.equals(badGeometry({ type: 'Point', coordinates: [1282935.53, 619538.58] }), 'out-of-range');
+    t.equals(badGeometry({ type: 'LineString', coordinates: [[-117, 47], [-117.5, 91]] }), 'out-of-range', 'latitude past 90');
+    t.equals(badGeometry({ type: 'Point', coordinates: [NaN, 47] }), 'out-of-range');
     t.end();
 });
 
-test('exceedsMaxExtent checks every part of a MultiPolygon', (t) => {
-    const nearby = [[[-117.89, 47.55], [-117.88, 47.55], [-117.88, 47.56], [-117.89, 47.55]]];
-    const far = [[[-70, 42], [-70.01, 42], [-70.01, 42.01], [-70, 42]]];
+test('badGeometry keeps ordinary parcels and the large legitimate ones seen in production', (t) => {
+    // Alaska North Slope wilderness parcel: 13.3 degrees of longitude at 68N
+    const alaska = { type: 'Polygon', coordinates: [[[-162.8, 68.0], [-149.5, 68.0], [-149.5, 68.7], [-162.8, 68.0]]] };
+    // Svalbard: 11 degrees wide, 3 tall, at 78N
+    const svalbard = { type: 'Polygon', coordinates: [[[9.4, 78.0], [20.4, 78.0], [20.4, 81.0], [9.4, 78.0]]] };
 
-    t.equals(exceedsMaxExtent({ type: 'MultiPolygon', coordinates: [nearby, nearby] }), false);
-    t.equals(exceedsMaxExtent({ type: 'MultiPolygon', coordinates: [nearby, far] }), true, 'parts about 47 degrees apart');
+    t.equals(badGeometry(parcel), null);
+    t.equals(badGeometry(alaska), null);
+    t.equals(badGeometry(svalbard), null);
+    t.equals(badGeometry({ type: 'Point', coordinates: [-117.89, 47.55] }), null);
+    t.equals(badGeometry({ type: 'Point', coordinates: [180, -90] }), null, 'the exact edges are in range');
     t.end();
 });
 
-test('exceedsMaxExtent only judges polygons', (t) => {
-    t.equals(exceedsMaxExtent({ type: 'Point', coordinates: [-117.89, 47.55] }), false);
-    t.equals(exceedsMaxExtent({ type: 'LineString', coordinates: [[-117, 47], [-80, 40]] }), false, 'a long centerline is legitimate');
-    t.equals(exceedsMaxExtent(null), false);
-    t.equals(exceedsMaxExtent(undefined), false);
+test('badGeometry judges each polygon of a MultiPolygon on its own', (t) => {
+    // Aleutian-style parcel on both sides of the antimeridian: the feature
+    // spans 358 degrees of longitude but no single part is big
+    const eastPart = [[[179.5, 51.0], [179.9, 51.0], [179.9, 51.2], [179.5, 51.0]]];
+    const westPart = [[[-179.9, 51.0], [-179.5, 51.0], [-179.5, 51.2], [-179.9, 51.0]]];
+    const hugePart = [[[0, 0], [30, 0], [30, 1], [0, 0]]];
+
+    t.equals(badGeometry({ type: 'MultiPolygon', coordinates: [eastPart, westPart] }), null);
+    t.equals(badGeometry({ type: 'MultiPolygon', coordinates: [eastPart, hugePart] }), 'oversized');
     t.end();
 });
 
-test('exceedsMaxExtent honors an explicit limit and defaults to MAX_POLYGON_EXTENT_DEG', (t) => {
-    const twoDegrees = { type: 'Polygon', coordinates: [[[0, 0], [2, 0], [2, 1], [0, 0]]] };
+test('badGeometry does not size-check points and lines', (t) => {
+    t.equals(badGeometry({ type: 'LineString', coordinates: [[-117, 47], [-80, 40]] }), null, 'a long centerline is legitimate');
+    t.equals(badGeometry(null), null);
+    t.equals(badGeometry(undefined), null);
+    t.equals(badGeometry({ type: 'Point' }), null);
+    t.end();
+});
 
-    t.equals(MAX_POLYGON_EXTENT_DEG, 5);
-    t.equals(exceedsMaxExtent(twoDegrees), false);
-    t.equals(exceedsMaxExtent(twoDegrees, 1), true);
+test('badGeometry honors an explicit limit and defaults to MAX_POLYGON_EXTENT_DEG', (t) => {
+    const twentyFive = { type: 'Polygon', coordinates: [[[0, 0], [25, 0], [25, 1], [0, 0]]] };
+
+    t.equals(MAX_POLYGON_EXTENT_DEG, 20);
+    t.equals(badGeometry(twentyFive), 'oversized');
+    t.equals(badGeometry(twentyFive, 30), null);
     t.end();
 });

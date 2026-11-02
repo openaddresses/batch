@@ -9,8 +9,8 @@
                                 Supported Layers
                             </h3>
                         </div>
-                        <div class='card-body row'>
-                            <div class='col-3 d-flex justify-content-center align-items-center'>
+                        <div class='card-body row g-2'>
+                            <div class='col-6 col-md-3 d-flex justify-content-center align-items-center'>
                                 <LayerIcon
                                     layer='addresses'
                                     size='32'
@@ -18,7 +18,7 @@
                                 />
                                 Addresses
                             </div>
-                            <div class='col-3 d-flex justify-content-center align-items-center'>
+                            <div class='col-6 col-md-3 d-flex justify-content-center align-items-center'>
                                 <LayerIcon
                                     layer='buildings'
                                     size='32'
@@ -26,7 +26,7 @@
                                 />
                                 Buildings
                             </div>
-                            <div class='col-3 d-flex justify-content-center align-items-center'>
+                            <div class='col-6 col-md-3 d-flex justify-content-center align-items-center'>
                                 <LayerIcon
                                     layer='parcels'
                                     size='32'
@@ -34,7 +34,7 @@
                                 />
                                 Parcels
                             </div>
-                            <div class='col-3 d-flex justify-content-center align-items-center'>
+                            <div class='col-6 col-md-3 d-flex justify-content-center align-items-center'>
                                 <LayerIcon
                                     layer='centerlines'
                                     size='32'
@@ -84,7 +84,7 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Updated</th>
+                                    <th>Created</th>
                                     <th>Size</th>
                                 </tr>
                             </thead>
@@ -252,13 +252,16 @@
                                 label='No Data Sources'
                             />
                         </div>
-                        <template v-else>
+                        <div
+                            v-else
+                            class='table-responsive'
+                        >
                             <table class='table table-hover table-vcenter card-table'>
                                 <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Layers</th>
-                                        <th>Attributes</th>
+                                        <th>Map</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -451,7 +454,7 @@
                                     </template>
                                 </tbody>
                             </table>
-                        </template>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -495,6 +498,9 @@ import {
     TablerIconButton
 } from '@tak-ps/vue-tabler';
 import { classifyEntry, worstState } from '../util/health.js';
+
+let controller = null;
+let debounce = null;
 
 export default {
     name: 'OAData',
@@ -562,19 +568,32 @@ export default {
     },
     watch: {
         showFilter: function() {
-            this.filter.source = '';
-            this.filter.layer = 'all';
+            if (this.showFilter) return;
+
+            Object.assign(this.filter, {
+                switches: { before: false, after: false },
+                validated: false,
+                source: '',
+                layer: 'all',
+                before: '',
+                after: ''
+            });
         },
         filter: {
             deep: true,
-            handler: async function() {
-                await this.fetchData();
+            handler: function() {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => this.fetchData(), 250);
             }
         }
     },
     mounted: function() {
         this.fetchCollections();
         this.fetchData();
+    },
+    unmounted: function() {
+        clearTimeout(debounce);
+        if (controller) controller.abort();
     },
     methods: {
         fmt: function(date) {
@@ -603,17 +622,6 @@ export default {
                 })
                 .join(' | ');
         },
-        emithistory: function(jobid) {
-        },
-        datapls: function(jobid, fmt) {
-            if (!this.auth.username) return this.$emit('login');
-
-            if (fmt && this.auth.level === 'basic') {
-                return this.$emit('perk');
-            }
-
-            this.external(`${window.location.origin}/api/job/${jobid}/output/source.geojson.gz?token=${localStorage.token}`);
-        },
         collectionpls: function(c) {
             if (!this.auth.username) return this.loginModal = true;
             this.external(`${window.location.origin}/api/collections/${c.id}/data?token=${localStorage.token}`);
@@ -625,9 +633,10 @@ export default {
             try {
                 this.loading.collections = true;
                 this.collections = await window.std('/api/collections');
-                this.loading.collections = false;
             } catch (err) {
                 this.$emit('err', err);
+            } finally {
+                this.loading.collections = false;
             }
         },
         deleteData: async function(job) {
@@ -654,6 +663,10 @@ export default {
             }
         },
         fetchData: async function() {
+            if (controller) controller.abort();
+            controller = new AbortController();
+            const signal = controller.signal;
+
             try {
                 this.loading.sources = true;
 
@@ -666,7 +679,7 @@ export default {
                 if (this.filter.switches.before && this.filter.before) url.searchParams.set('before', this.filter.before);
                 if (this.filter.validated) url.searchParams.set('validated', this.filter.validated);
 
-                const res = await window.std(url);
+                const res = await window.std(url, { signal });
                 const dataname = {};
 
                 for (const data of res) {
@@ -717,10 +730,11 @@ export default {
                 }
 
                 this.datas = data;
-
-                this.loading.sources = false;
             } catch (err) {
+                if (signal.aborted) return;
                 this.$emit('err', err);
+            } finally {
+                if (!signal.aborted) this.loading.sources = false;
             }
         }
     }

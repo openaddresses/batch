@@ -111,13 +111,22 @@ API documentation is availiable [here](https://batch.openaddresses.io/docs/)
 
 In order to set up an effective dev environment, first obtain a copy of the metastore.
 
-Create a local
+From the `/api` directory, with the `oa` AWS profile logged in and a local PostGIS-enabled
+Postgres accepting connections, run
 
 ```sh
-./clone prod
+npm run dev -- --dump
 ```
 
-Then from the `/api` directory, run
+This looks up the production database URL from the `batch-prod` CloudFormation stack,
+`pg_dump`s it to `api/batch-prod.dump`, restores it into `postgres://postgres@localhost:5432/openaddresses`
+(pass `--postgres <uri>` for another target), truncates the `users_tokens` and `users_reset`
+tables (pass `--keep-tokens` to retain them) and then starts the API dev server. Pass
+`--no-start` to stop after the restore. The dump contains user emails and password hashes,
+so treat the local copy as sensitive. `./clone prod` from the repository root is the older
+shell equivalent and requires the `deploy` CLI.
+
+On later runs, start the API against the existing local database with
 
 ```sh
 npm run dev

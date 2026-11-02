@@ -21,6 +21,7 @@
     "include": [
         "*.ts",
         "*.d.ts",
+        "bin/",
         "lib/",
         "routes/",
         "test/"

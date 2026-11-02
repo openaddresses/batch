@@ -773,7 +773,7 @@ export const ListRunsResponse = Type.Object({
         id: Type.Integer(),
         live: Type.Boolean({ description: 'If true, successful jobs immediately become the most recent live data' }),
         created: Created,
-        github: RunGithub,
+        github: Type.Partial(RunGithub),
         closed: Type.Boolean({ description: 'Is the Run still accepting jobs' }),
         status: Status,
         jobs: Type.Integer({ description: 'The number of jobs in this run' }),

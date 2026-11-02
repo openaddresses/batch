@@ -1,50 +1,60 @@
 <template>
-    <div class='z2 fixed top right bottom left scroll-auto bg-darken50'>
-        <div class='flex flex--center-main pt36'>
-            <div class='bg-white round relative w600'>
-                <button
-                    class='absolute top right px12 py12'
-                    @click='$emit("perk", false)'
-                >
-                    <svg class='icon link color-darken50'><use xlink:href='#icon-close' /></svg>
-                </button>
+    <TablerModal>
+        <button
+            type='button'
+            class='btn-close'
+            aria-label='Close'
+            @click='$emit("close")'
+        />
+        <div class='modal-status bg-blue' />
+        <div class='modal-body text-center py-4'>
+            <IconHeartHandshake size='60' />
+            <h3>Donor Perk</h3>
 
-                <div class='flex flex--center-main'>
-                    <div class='pt12'>
-                        <svg class='icon h60 w60 color-gray'><use href='#icon-info' /></svg>
-                    </div>
-                </div>
-
-                <div class='txt-l mb12 align-center'>
-                    Donor Perk
-                </div>
-                <div class='txt-m align-center'>
-                    <p>The OpenAddresses project relies on donations to keeps the lights on</p>
-                </div>
-                <div class='txt-m align-center'>
-                    Downloading as a Shapefile or CSV is a small perk we offer donors as a
-                    way to say thank-you
-                </div>
-
-                <button
-                    class='fr mb12 mr12 btn round btn--gray btn--stroke'
-                    @click='donate'
-                >
-                    Donate
-                </button>
+            <p class='my6'>
+                The OpenAddresses project relies on donations to keep the lights on.
+            </p>
+            <p class='my6'>
+                Downloading as a Shapefile or CSV is a small perk we offer donors as a
+                way to say thank-you.
+            </p>
+        </div>
+        <div class='modal-footer'>
+            <div
+                class='cursor-pointer btn'
+                @click='$emit("close")'
+            >
+                Close
+            </div>
+            <div
+                class='cursor-pointer btn btn-primary'
+                @click='donate'
+            >
+                Donate
             </div>
         </div>
-    </div>
+    </TablerModal>
 </template>
 
 <script>
+import {
+    TablerModal
+} from '@tak-ps/vue-tabler';
+import {
+    IconHeartHandshake
+} from '@tabler/icons-vue';
+
 export default {
-    name: 'Err',
-    props: ['perk'],
+    name: 'Perk',
+    components: {
+        IconHeartHandshake,
+        TablerModal
+    },
+    emits: ['close'],
     methods: {
         donate: function() {
-            this.$emit('perk', false);
-            this.$router.push({ path: "/profile" })
+            this.$emit('close');
+            this.$router.push({ path: '/profile' });
         }
     }
 }

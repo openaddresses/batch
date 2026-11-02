@@ -161,7 +161,7 @@ export default class RunModel extends Modeler<GenericTable> {
                 return {
                     id: row.id,
                     live: !!row.live,
-                    created: String(row.created),
+                    created: row.created ? new Date(row.created).toISOString() : String(row.created),
                     github: (row.github ?? {}) as RunResponseType['github'],
                     closed: !!row.closed,
                     status,

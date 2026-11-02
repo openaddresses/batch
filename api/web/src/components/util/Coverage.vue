@@ -6,7 +6,7 @@
     >
         <div class='row'>
             <div
-                class='col-12'
+                class='col-12 position-relative'
                 :class='{
                     "absolute right left": fullscreen,
                 }'
@@ -15,13 +15,20 @@
 
                 <div
                     v-if='point'
-                    class='absolute top left z1'
+                    class='position-absolute top-0 start-0 m-2'
+                    style='z-index: 1;'
                 >
                     <button
-                        class='btn round btn--stroke fr color-gray bg-white my12 mx12 px6 py0'
+                        type='button'
+                        class='btn btn-sm bg-white text-dark'
                         @click='point = false'
                     >
-                        <span><svg class='icon fl h24'><use href='#icon-close' /></svg> Clear Filter</span>
+                        <IconX
+                            :size='16'
+                            stroke='1'
+                            class='me-1'
+                        />
+                        Clear map filter
                     </button>
                 </div>
 
@@ -39,10 +46,15 @@
 
 <script>
 import mapgl from '../../util/maplibre.js';
+import { LAYERS } from '../../util/health.js';
+import { IconX } from '@tabler/icons-vue';
 let map = null;
 
 export default {
     name: 'Coverage',
+    components: {
+        IconX
+    },
     props: {
         layer: {
             type: String
@@ -63,13 +75,15 @@ export default {
     },
     data: function() {
         return {
-            layers: ['addresses', 'parcels', 'buildings', 'centerlines'],
+            layers: LAYERS,
             fullscreen: false,
             point: false,
         }
     },
     watch: {
         layer: function() {
+            if (!map) return;
+
             for (const layer of this.layers) {
                 map.setLayoutProperty(`coverage-${layer}-poly`, 'visibility', 'none');
                 map.setLayoutProperty(`coverage-${layer}-point`, 'visibility', 'none');
@@ -88,6 +102,8 @@ export default {
 
         },
         point: function() {
+            if (!map) return;
+
             if (!this.point) {
                 map.getSource('click').setData({
                     type: 'FeatureCollection',
@@ -130,7 +146,6 @@ export default {
 
                 const opts = {
                     container: this.$refs.map,
-                    hash: "map",
                     style: 'https://api.protomaps.com/styles/v4/grayscale/en.json?key=' + res.protomaps_key,
                 }
 
@@ -219,7 +234,7 @@ export default {
                         }
                     }
 
-                    for (const layer of ['addresses', 'parcels', 'buildings']) {
+                    for (const layer of this.layers) {
                         map.addLayer({
                             id: `coverage-${layer}-poly`,
                             type: 'fill',
@@ -320,10 +335,13 @@ export default {
 
                     map.addLayer({
                         id: 'click',
-                        type: 'symbol',
+                        type: 'circle',
                         source: 'click',
-                        layout: {
-                            'icon-image': 'circle-15'
+                        paint: {
+                            'circle-color': '#d63939',
+                            'circle-radius': 7,
+                            'circle-stroke-color': '#ffffff',
+                            'circle-stroke-width': 2
                         }
                     });
                 });

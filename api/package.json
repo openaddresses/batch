@@ -10,12 +10,12 @@
         "node": ">= 22"
     },
     "scripts": {
-        "lint": "eslint index.ts routes/ lib/ test/ && tsc --noEmit",
+        "lint": "eslint index.ts bin/ routes/ lib/ test/ && tsc --noEmit",
         "build": "tsc && cp package.json dist/ && cp -r migrations dist/ && (cp -r web/dist dist/web/dist 2>/dev/null || true)",
         "test": "./test/test | tap-merge",
         "start": "node dist/index.js --email",
         "migratedb": "tsx ./node_modules/.bin/drizzle-kit generate",
-        "dev": "tsx watch -i ./web index.ts",
+        "dev": "tsx bin/develop.ts",
         "cov-html": "nyc tape 'test/*.test.ts' && nyc report --reporter=html",
         "cov": "nyc tape 'test/*.test.ts' && nyc report --reporter=text-lcov > coverage.lcov"
     },

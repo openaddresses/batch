@@ -1,0 +1,3 @@
+{"type":"Feature","properties":{"hash":"a1","pid":"1","owners":[{"name":"SMITH JOHN","address":"1 MAIN ST DENVER CO 80202"},{"name":"SMITH JANE"}]},"geometry":{"type":"Polygon","coordinates":[[[-105.0,39.7],[-105.0,39.71],[-104.99,39.71],[-105.0,39.7]]]}}
+{"type":"Feature","properties":{"hash":"a2","pid":"2","owners":[{"name":"ACME LLC"}]},"geometry":{"type":"Polygon","coordinates":[[[-104.99,39.7],[-104.99,39.71],[-104.98,39.71],[-104.99,39.7]]]}}
+{"type":"Feature","properties":{"hash":"a3","pid":"3","owners":[]},"geometry":{"type":"Polygon","coordinates":[[[-104.98,39.7],[-104.98,39.71],[-104.97,39.71],[-104.98,39.7]]]}}

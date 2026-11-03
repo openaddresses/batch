@@ -181,3 +181,68 @@ test('CI#format_issue - empty run returns empty string', async () => {
     const issue = await ci.format_issue({ id: 99 } as unknown as Parameters<typeof ci.format_issue>[0]);
     assert.strictEqual(issue, '');
 });
+
+test('CI#format_check - in progress', async () => {
+    const ci = new CI({
+        octo: {},
+        models: {
+            Run: {
+                jobs: async () => [
+                    { id: 1, status: 'Success', source_name: 'us/ca/alameda', layer: 'addresses', name: 'county', count: 12345 },
+                    { id: 2, status: 'Running', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: null },
+                    { id: 3, status: 'Pending', source_name: 'us/ca/la', layer: 'parcels', name: 'county', count: null },
+                ],
+            },
+        },
+    } as unknown as ConstructorParameters<typeof CI>[0]);
+
+    const output = await ci.format_check({ id: 99, status: 'Pending' });
+
+    assert.strictEqual(output.title, '1/3 jobs complete');
+    assert.ok(output.summary.includes('| 2 | 0 | 0 | 1 |'), output.summary);
+    assert.ok(output.summary.includes('/run/99)'));
+    assert.ok(output.text.includes('| ✅ Success | [Job 1]('));
+    assert.ok(output.text.includes('us/ca/alameda - addresses - county | 12,345 |'));
+    assert.ok(output.text.includes('| 🔄 Running | [Job 2]('));
+    assert.ok(!output.text.includes('null'));
+});
+
+test('CI#format_check - complete', async () => {
+    const ci = new CI({
+        octo: {},
+        models: {
+            Run: {
+                jobs: async () => [
+                    { id: 1, status: 'Success', source_name: 'us/ca/alameda', layer: 'addresses', name: 'county', count: 12345 },
+                    { id: 2, status: 'Fail', source_name: 'us/ca/kern', layer: 'addresses', name: 'county', count: 0 },
+                    { id: 3, status: 'Warn', source_name: 'us/ca/la', layer: 'parcels', name: 'county', count: 10 },
+                ],
+            },
+        },
+    } as unknown as ConstructorParameters<typeof CI>[0]);
+
+    const output = await ci.format_check({ id: 99, status: 'Fail' });
+
+    assert.strictEqual(output.title, '3 jobs: 1 succeeded, 1 warned, 1 failed');
+    assert.ok(output.summary.includes('| 0 | 1 | 1 | 1 |'), output.summary);
+    assert.ok(output.text.includes('| ❌ Fail | [Job 2]('));
+    assert.ok(output.text.includes('| ⚠️ Warn | [Job 3]('));
+});
+
+test('CI#format_check - truncates long job lists', async () => {
+    const jobs = Array.from({ length: 2000 }, (_, i) => ({
+        id: i + 1, status: 'Success', source_name: `us/xx/source-${i}`, layer: 'addresses', name: 'county', count: 1000,
+    }));
+
+    const ci = new CI({
+        octo: {},
+        models: { Run: { jobs: async () => jobs } },
+    } as unknown as ConstructorParameters<typeof CI>[0]);
+
+    const output = await ci.format_check({ id: 99, status: 'Success' });
+
+    assert.ok(output.text.length <= 65535, String(output.text.length));
+    assert.ok(output.text.endsWith('/run/99)._'));
+    assert.ok(output.text.includes('[Job 1]('));
+    assert.ok(!output.text.includes('[Job 2000]('));
+});

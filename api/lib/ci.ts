@@ -53,6 +53,22 @@ interface PullEvent {
     };
 }
 
+export interface CheckOutput {
+    title: string;
+    summary: string;
+    text: string;
+}
+
+const CHECK_TEXT_LIMIT = 65535;
+
+const STATUS_ICON: Record<string, string> = {
+    Pending: '⏳',
+    Running: '🔄',
+    Success: '✅',
+    Warn: '⚠️',
+    Fail: '❌',
+};
+
 /**
  * @class
  */
@@ -84,6 +100,7 @@ export default class CI {
                 repo: 'openaddresses',
                 check_run_id: Number(run.github?.check),
                 conclusion: conclusion,
+                output: await this.format_check(run),
             });
 
             const issue = await this.format_issue(run);
@@ -170,7 +187,9 @@ export default class CI {
                         owner: 'openaddresses',
                         repo: 'openaddresses',
                         check_run_id: gh.check,
+                        status: 'in_progress',
                         details_url: process.env.BaseUrl + `/run/${run.id}`,
+                        output: await this.format_check({ id: Number(run.id), status: 'Pending', github: gh.json() }),
                     });
                     console.error(`ok - GH:Push:${sha}: Check Updated`);
                 }
@@ -178,6 +197,74 @@ export default class CI {
         } catch (err) {
             throw err instanceof Error ? err : new Error(String(err));
         }
+    }
+
+    /**
+     * Refresh the github check output while a run is still in progress
+     */
+    async update_check(run: RunLike): Promise<void> {
+        await this.octo.checks.update({
+            owner: 'openaddresses',
+            repo: 'openaddresses',
+            check_run_id: Number(run.github?.check),
+            status: 'in_progress',
+            output: await this.format_check(run),
+        });
+    }
+
+    /**
+     * Build the github check output mirroring the run page: status counts & a job table
+     */
+    async format_check(run: RunLike): Promise<CheckOutput> {
+        const jobs = await this.config.models.Run.jobs(run.id);
+        const base = process.env.BaseUrl || 'https://batch.openaddresses.io';
+        const runUrl = `${base}/run/${run.id}`;
+
+        const counts: Record<string, number> = { Pending: 0, Warn: 0, Fail: 0, Success: 0 };
+        for (const job of jobs) {
+            const status = job.status === 'Running' ? 'Pending' : String(job.status);
+            counts[status] = (counts[status] ?? 0) + 1;
+        }
+
+        const done = jobs.length - counts.Pending;
+        const title = counts.Pending
+            ? `${done}/${jobs.length} jobs complete`
+            : `${jobs.length} jobs: ${counts.Success} succeeded, ${counts.Warn} warned, ${counts.Fail} failed`;
+
+        const summary = [
+            `[View Run ${run.id}](${runUrl})`,
+            '',
+            '| Pending | Warn | Fail | Success |',
+            '| ---: | ---: | ---: | ---: |',
+            `| ${counts.Pending} | ${counts.Warn} | ${counts.Fail} | ${counts.Success} |`,
+        ].join('\n');
+
+        const header = [
+            '| Status | Job | Source | Features |',
+            '| --- | --- | --- | ---: |',
+        ];
+
+        const rows = jobs.map((job) => {
+            const status = String(job.status);
+            const icon = STATUS_ICON[status] ?? '';
+            const count = typeof job.count === 'number' ? Number(job.count).toLocaleString('en-US') : '';
+            return `| ${icon} ${status} | [Job ${job.id}](${base}/job/${job.id}) | ${job.source_name} - ${job.layer} - ${job.name} | ${count} |`;
+        });
+
+        let text = header.concat(rows).join('\n');
+        if (text.length > CHECK_TEXT_LIMIT) {
+            const note = `\n\n_Job list truncated, see [the full run](${runUrl})._`;
+            const kept: string[] = [];
+            let length = header.join('\n').length + note.length;
+            for (const row of rows) {
+                if (length + row.length + 1 > CHECK_TEXT_LIMIT) break;
+                kept.push(row);
+                length += row.length + 1;
+            }
+            text = header.concat(kept).join('\n') + note;
+        }
+
+        return { title, summary, text };
     }
 
     /**

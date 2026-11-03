@@ -265,6 +265,11 @@ export default {
             }
         },
         getSample: async function() {
+            if (!this.job.output || !this.job.output.output) {
+                this.loading = false;
+                return;
+            }
+
             try {
                 this.loading = true;
                 const res = await window.std(`/api/job/${this.$route.params.jobid}/output/sample`);

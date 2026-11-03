@@ -86,7 +86,9 @@ export default class RunModel extends Modeler<GenericTable> {
                 return !['Success', 'Fail'].includes(String(job.status));
             }).length;
 
-            if (!is_pending) {
+            if (is_pending) {
+                await ci.update_check(run);
+            } else {
                 await ci.finish_check(run);
             }
         } catch (err) {

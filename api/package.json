@@ -36,7 +36,6 @@
         "@openaddresses/batch-error": "^2.1.0",
         "@openaddresses/batch-generic": "^25.0.0",
         "@openaddresses/batch-schema": "^10.28.1",
-        "@openaddresses/lib": "github:openaddresses/lib#v4.5.0",
         "@sinclair/typebox": "^0.34.0",
         "@turf/turf": "^6.5.0",
         "bcrypt": "^6.0.0",

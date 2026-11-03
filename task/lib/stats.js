@@ -47,7 +47,9 @@ export default class Stats {
             };
         } else if (this.layer === 'parcels') {
             this.stats.parcels = {
-                counts: {},
+                counts: {
+                    owners: 0
+                },
                 validity: this.validator.stats
             };
         } else if (this.layer === 'centerlines') {
@@ -82,6 +84,8 @@ export default class Stats {
 
                     if (this.layer === 'addresses') {
                         this.addresses(feat);
+                    } else if (this.layer === 'parcels') {
+                        this.parcels(feat);
                     }
 
                     return cb(null, '');
@@ -101,6 +105,10 @@ export default class Stats {
         if (feat.properties.district && feat.properties.district.trim().length > 0) this.stats.addresses.counts.district++;
         if (feat.properties.region && feat.properties.region.trim().length > 0) this.stats.addresses.counts.region++;
         if (feat.properties.postcode && feat.properties.postcode.trim().length > 0) this.stats.addresses.counts.postcode++;
+    }
+
+    parcels(feat) {
+        if (Array.isArray(feat.properties.owners) && feat.properties.owners.length > 0) this.stats.parcels.counts.owners++;
     }
 
     bounds(feat) {

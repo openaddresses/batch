@@ -19,7 +19,7 @@ WORKDIR $HOME/api
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
-RUN npm install --allow-git=root
+RUN npm install
 
 RUN cd web \
     && npm ci \

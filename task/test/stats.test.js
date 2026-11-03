@@ -80,3 +80,20 @@ test('Stats#calc', async (t) => {
 
     t.end();
 });
+
+test('Stats#calc - parcels', async (t) => {
+    const stats = new Stats(new URL('./fixtures/parcels.geojson', import.meta.url), 'parcels');
+
+    t.deepEquals(stats.stats.parcels.counts, { owners: 0 }, 'stats.stats.parcels.counts: { owners: 0 }');
+
+    try {
+        await stats.calc();
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.equals(stats.stats.count, 3, 'stats.stats.count: 3');
+    t.deepEquals(stats.stats.parcels.counts, { owners: 2 }, 'stats.stats.parcels.counts: { owners: 2 }');
+
+    t.end();
+});

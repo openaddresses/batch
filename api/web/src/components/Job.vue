@@ -180,7 +180,26 @@
                                     logtype='job'
                                 />
                             </template>
-                            <template v-else>
+                            <template v-else-if='job.status && !finished'>
+                                <div class='card-body'>
+                                    <div class='d-flex justify-content-center my-4'>
+                                        <div class='spinner-border' />
+                                    </div>
+                                    <h3 class='text-center'>
+                                        Job is <span v-text='job.status' />
+                                    </h3>
+                                    <div class='text-center text-muted'>
+                                        This page will update automatically when the job finishes
+                                    </div>
+                                </div>
+                                <Log
+                                    v-if='job.loglink'
+                                    :id='$route.params.jobid'
+                                    :key='poll'
+                                    logtype='job'
+                                />
+                            </template>
+                            <template v-else-if='finished'>
                                 <JobSample
                                     :job='job'
                                     @err='$emit("err", $event)'
@@ -190,7 +209,7 @@
                     </div>
 
                     <div
-                        v-if='job.status !== "Fail"'
+                        v-if='finished && job.status !== "Fail"'
                         class='col-12'
                     >
                         <div class='card'>
@@ -207,7 +226,7 @@
                         </div>
                     </div>
                     <div
-                        v-if='job.status !== "Fail"'
+                        v-if='finished && job.status !== "Fail"'
                         class='col-12'
                     >
                         <div class='card'>
@@ -277,7 +296,9 @@ export default {
     data: function() {
         return {
             mode: 'preview',
-            loading: false,
+            loading: true,
+            poll: 0,
+            timer: null,
             name: '',
             joberror: false,
             delta: {
@@ -298,8 +319,16 @@ export default {
             }
         };
     },
+    computed: {
+        finished: function() {
+            return ['Success', 'Warn', 'Fail'].includes(this.job.status);
+        }
+    },
     mounted: async function() {
         await this.refresh();
+    },
+    unmounted: function() {
+        clearTimeout(this.timer);
     },
     methods: {
         datapls: function() {
@@ -310,9 +339,17 @@ export default {
             window.open(url, "_blank");
         },
         refresh: async function() {
+            clearTimeout(this.timer);
+
             await this.getJob();
-            await this.getError();
-            await this.getDelta();
+
+            if (this.finished) {
+                await this.getError();
+                await this.getDelta();
+            } else if (this.job.status) {
+                this.poll++;
+                this.timer = setTimeout(() => this.refresh(), 10000);
+            }
         },
         getError: async function() {
             try {
@@ -322,6 +359,8 @@ export default {
             }
         },
         getDelta: async function() {
+            if (this.job.status === 'Fail') return;
+
             try {
                 const res = await window.std(window.location.origin + `/api/job/${this.$route.params.jobid}/delta`);
                 this.delta.master = res.master;
@@ -338,11 +377,11 @@ export default {
                 this.name = this.job.source
                     .replace(/.*sources\//, '')
                     .replace(/\.json/, '');
-
-                this.loading = false;
             } catch(err) {
                 this.$emit('err', err);
             }
+
+            this.loading = false;
         },
         createRerun: async function() {
             try {

@@ -80,10 +80,10 @@ async function flow(job) {
 
         await job.update(update);
         await job.get();
-        await job.fetch();
         run = await job.oa.cmd('run', 'get', {
             ':run': job.run
         });
+        await job.fetch();
 
         await job.s3_down();
         await job.check_source();
@@ -135,17 +135,7 @@ async function flow(job) {
         console.error(err);
 
         try {
-            await job.update({
-                status: 'Fail'
-            });
-
-            console.error(run);
-            if (run && run.live) {
-                await job.oa.cmd('joberror', 'create', {
-                    job: job.job,
-                    message: 'machine failed to process source'
-                });
-            }
+            await job.fail(err, run);
         } catch (err) {
             console.error(err);
         } finally {

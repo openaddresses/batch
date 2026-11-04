@@ -15,6 +15,8 @@ import find from 'find';
  * @class Job
  */
 export default class Job {
+    static RETRY_DELAY = 2000;
+
     constructor(oa, job) {
         if (!oa) throw new Error('OA Instance required');
         if (!job) throw new Error('job param required');
@@ -349,6 +351,41 @@ export default class Job {
         this.status = 'uploaded';
 
         return this.assets;
+    }
+
+    /**
+     * Mark the job as failed and, on a live run, file a joberror carrying the cause.
+     * The status update is retried so a transient API error can't leave the job stuck in Running
+     */
+    async fail(err, run = false) {
+        await Job.retry(() => this.update({ status: 'Fail' }));
+
+        if (!run && this.run) {
+            try {
+                run = await this.oa.cmd('run', 'get', { ':run': this.run });
+            } catch (runerr) {
+                console.error(runerr);
+            }
+        }
+
+        if (run && run.live) {
+            await Job.retry(() => this.oa.cmd('joberror', 'create', {
+                job: this.job,
+                message: `machine failed to process source: ${err.message}`
+            }));
+        }
+    }
+
+    static async retry(fn, attempts = 3) {
+        for (let attempt = 1; ; attempt++) {
+            try {
+                return await fn();
+            } catch (err) {
+                if (attempt >= attempts) throw err;
+                console.error(`warn - attempt ${attempt}/${attempts} failed: ${err.message}`);
+                await new Promise((resolve) => setTimeout(resolve, Job.RETRY_DELAY * attempt));
+            }
+        }
     }
 
     async update(body) {

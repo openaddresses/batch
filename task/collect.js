@@ -370,20 +370,30 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
         });
     });
 
-    // GeoParquet is an additional output: a failure here must never block the
-    // zip, which remains the canonical processed download.
-    try {
-        const parquet = await geojson_to_parquet(tmp, geojsonPath, collection.name);
-        await upload_parquet_processed(parquet, collection.name);
-        fs.unlinkSync(parquet);
-    } catch (err) {
-        console.error(`not ok - failed to build GeoParquet for ${collection.name}: ${err.message}`);
-    }
+    // The zip (single-threaded zlib in this process) and the GeoParquet
+    // conversion (a separate ogr2ogr process) both only read the finished
+    // GeoJSON, so run them concurrently on different CPUs. GeoParquet is an
+    // additional output: a failure there must never block the zip, which
+    // remains the canonical processed download.
+    const [zipSize] = await Promise.all([
+        (async () => {
+            const zip = await zip_processed(tmp, geojsonPath, collection.name);
+            const size = fs.statSync(zip).size;
+            await upload_zip_processed(zip, collection.name);
+            fs.unlinkSync(zip);
+            return size;
+        })(),
+        (async () => {
+            try {
+                const parquet = await geojson_to_parquet(tmp, geojsonPath, collection.name);
+                await upload_parquet_processed(parquet, collection.name);
+                fs.unlinkSync(parquet);
+            } catch (err) {
+                console.error(`not ok - failed to build GeoParquet for ${collection.name}: ${err.message}`);
+            }
+        })()
+    ]);
 
-    const zip = await zip_processed(tmp, geojsonPath, collection.name);
-    const zipSize = fs.statSync(zip).size;
-    await upload_zip_processed(zip, collection.name);
-    fs.unlinkSync(zip);
     fs.unlinkSync(geojsonPath);
 
     return zipSize;

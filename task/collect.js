@@ -9,6 +9,7 @@ import { Unzip } from 'zlib';
 import split from 'split2';
 import { pipeline } from 'stream/promises';
 import fs from 'node:fs';
+import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { mkdirp } from 'mkdirp';
 import S3 from '@aws-sdk/client-s3';
@@ -369,6 +370,16 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
         });
     });
 
+    // GeoParquet is an additional output: a failure here must never block the
+    // zip, which remains the canonical processed download.
+    try {
+        const parquet = await geojson_to_parquet(tmp, geojsonPath, collection.name);
+        await upload_parquet_processed(parquet, collection.name);
+        fs.unlinkSync(parquet);
+    } catch (err) {
+        console.error(`not ok - failed to build GeoParquet for ${collection.name}: ${err.message}`);
+    }
+
     const zip = await zip_processed(tmp, geojsonPath, collection.name);
     const zipSize = fs.statSync(zip).size;
     await upload_zip_processed(zip, collection.name);
@@ -600,6 +611,78 @@ function zip_processed(tmp, geojsonPath, name) {
         archive.file(geojsonPath, { name: `${name}.geojson` });
         archive.finalize();
     });
+}
+
+/**
+ * Convert the processed GeoJSON to GeoParquet with GDAL's Parquet driver
+ * (requires GDAL >= 3.5 built with Arrow/Parquet; it writes GeoParquet
+ * metadata and WKB geometry by default).
+ */
+export function geojson_to_parquet(tmp, geojsonPath, name) {
+    const out = path.resolve(tmp, `${name}-processed.parquet`);
+
+    return new Promise((resolve, reject) => {
+        const ogr = spawn('ogr2ogr', [
+            '-f', 'Parquet',
+            out,
+            geojsonPath,
+            '-lco', 'GEOMETRY_ENCODING=WKB',
+            '-lco', 'GEOMETRY_NAME=geometry',
+            '-lco', 'COMPRESSION=ZSTD',
+            '-lco', 'ROW_GROUP_SIZE=100000'
+        ], { stdio: ['ignore', 'inherit', 'pipe'] });
+
+        let stderr = '';
+        ogr.stderr.on('data', (d) => {
+            stderr = (stderr + d).slice(-2000);
+        });
+        ogr.on('error', reject);
+        ogr.on('close', (code) => {
+            if (code !== 0) return reject(new Error(`ogr2ogr exited ${code}: ${stderr.trim()}`));
+            console.error(`ok - parquet created: ${out}`);
+            return resolve(out);
+        });
+    });
+}
+
+async function upload_parquet_processed(file, name) {
+    const contentType = 'application/vnd.apache.parquet';
+    const key = `collection-${name}-processed.parquet`;
+
+    await new Upload({
+        client: s3,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: contentType,
+            Body: fs.createReadStream(file),
+            Bucket: process.env.Bucket,
+            Key: `${process.env.StackName}/${key}`
+        }
+    }).done();
+
+    console.error(`ok - s3://${process.env.Bucket}/${process.env.StackName}/${key}`);
+
+    const r2 = new S3.S3Client({
+        region: 'auto',
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+        },
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    });
+
+    await new Upload({
+        client: r2,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: contentType,
+            Body: fs.createReadStream(file),
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${process.env.StackName}/${key}`
+        }
+    }).done();
+
+    console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${process.env.StackName}/${key}`);
 }
 
 async function upload_zip_processed(file, name) {

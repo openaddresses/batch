@@ -455,6 +455,7 @@ export const CollectionResponse = Type.Object({
     sources: Type.Array(Type.String()),
     s3: Type.Optional(Type.String({ description: 'Sponsors have access to the direct S3 bucket' })),
     processed_s3: Type.Optional(Type.String({ description: 'Sponsors have access to the direct S3 bucket for the deduped/backfilled processed dataset' })),
+    processed_parquet_s3: Type.Optional(Type.String({ description: 'Sponsors have access to the direct S3 bucket for the deduped/backfilled processed dataset as GeoParquet' })),
     processed_size: Type.Optional(Size),
     created: Created,
     size: Size,
@@ -470,6 +471,7 @@ export const ListCollectionsResponse = Type.Array(Type.Object({
     created: Created,
     s3: Type.Optional(Type.String()),
     processed_s3: Type.Optional(Type.String()),
+    processed_parquet_s3: Type.Optional(Type.String()),
     processed_size: Type.Optional(Size),
     sources: Type.Any(),
 }, {

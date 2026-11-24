@@ -5,7 +5,7 @@ import Err from '@openaddresses/batch-error';
 import { Collection } from '../schema.js';
 
 export type CollectionRow = InferSelectModel<typeof Collection>;
-export type CollectionAugmented = CollectionRow & { s3?: string; processed_s3?: string };
+export type CollectionAugmented = CollectionRow & { s3?: string; processed_s3?: string; processed_parquet_s3?: string };
 
 export default class CollectionModel extends Modeler<typeof Collection> {
     constructor(pool: PostgresJsDatabase<Record<string, unknown>>) {
@@ -18,6 +18,7 @@ export default class CollectionModel extends Modeler<typeof Collection> {
     static s3(collection: CollectionAugmented): CollectionAugmented {
         collection.s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${collection.name}.zip`;
         collection.processed_s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${collection.name}-processed.zip`;
+        collection.processed_parquet_s3 = `s3://${process.env.Bucket}/${process.env.StackName}/collection-${collection.name}-processed.parquet`;
         return collection;
     }
 

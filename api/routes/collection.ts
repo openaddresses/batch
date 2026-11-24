@@ -31,6 +31,7 @@ export default async function router(schema: Schema, config: Config) {
                 for (const c of collections) {
                     delete (c as Record<string, unknown>).s3;
                     delete (c as Record<string, unknown>).processed_s3;
+                    delete (c as Record<string, unknown>).processed_parquet_s3;
                 }
             }
 
@@ -93,6 +94,32 @@ export default async function router(schema: Schema, config: Config) {
 
             const collection = await config.models.Collection.from(req.params.collection);
             return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}-processed.zip`);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.get('/collections/:collection/processed.parquet', {
+        name: 'Collection Processed GeoParquet',
+        group: 'Collections',
+        description: `
+            Download a given collection's deduped, backfilled processed dataset as GeoParquet.
+
+            Note: the user must be authenticated to perform a download. One of our largest costs is
+            S3 egress, authenticated downloads allow us to prevent abuse, keep the project running and the data free.
+
+            The Collections API also returns a "processed_parquet_s3" property which links
+            to a requester pays object on S3 for those that are able to use it.
+        `,
+        params: Type.Object({
+            collection: Type.Integer(),
+        }),
+    }, async (req, res) => {
+        try {
+            await Auth.is_auth(req, true);
+
+            const collection = await config.models.Collection.from(req.params.collection);
+            return res.redirect(`https://v2.openaddresses.io/${process.env.StackName}/collection-${collection.name}-processed.parquet`);
         } catch (err) {
             return Err.respond(err, res);
         }

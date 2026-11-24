@@ -10,4 +10,5 @@ test('Collection.s3 sets both s3 and processed_s3', () => {
 
     assert.equal(collection.s3, 's3://v2.openaddresses.io/test/collection-global.zip');
     assert.equal(collection.processed_s3, 's3://v2.openaddresses.io/test/collection-global-processed.zip');
+    assert.equal(collection.processed_parquet_s3, 's3://v2.openaddresses.io/test/collection-global-processed.parquet');
 });

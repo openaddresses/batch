@@ -71,6 +71,7 @@ test('GET: /api/collection - sponsor sees both s3 links', async () => {
         assert.equal(res.body.length, 1);
         assert.equal(res.body[0].s3, 's3://v2.openaddresses.io/test/collection-global.zip');
         assert.equal(res.body[0].processed_s3, 's3://v2.openaddresses.io/test/collection-global-processed.zip');
+        assert.equal(res.body[0].processed_parquet_s3, 's3://v2.openaddresses.io/test/collection-global-processed.parquet');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -86,6 +87,7 @@ test('GET: /api/collection - unauthenticated response strips s3 and processed_s3
         assert.equal(res.body[0].name, 'global');
         assert.ok(!('s3' in res.body[0]), 's3 is not exposed to non-sponsors');
         assert.ok(!('processed_s3' in res.body[0]), 'processed_s3 is gated by the same sponsor-only rule as s3');
+        assert.ok(!('processed_parquet_s3' in res.body[0]), 'processed_parquet_s3 is gated by the same sponsor-only rule as s3');
     } catch (err) {
         assert.ifError(err, 'no error');
     }
@@ -173,6 +175,22 @@ test('GET: /api/collection/1/processed - redirects to the processed zip', async 
 
         assert.equal(res.status, 302);
         assert.equal(res.headers.get('location'), 'https://v2.openaddresses.io/test/collection-global-processed.zip');
+    } catch (err) {
+        assert.ifError(err, 'no error');
+    }
+});
+
+test('GET: /api/collection/1/processed.parquet - redirects to the processed GeoParquet', async () => {
+    try {
+        const res = await flight.fetch('/api/collections/1/processed.parquet', {
+            headers: {
+                'shared-secret': '123',
+            },
+            redirect: 'manual',
+        }, { verify: false, json: false });
+
+        assert.equal(res.status, 302);
+        assert.equal(res.headers.get('location'), 'https://v2.openaddresses.io/test/collection-global-processed.parquet');
     } catch (err) {
         assert.ifError(err, 'no error');
     }

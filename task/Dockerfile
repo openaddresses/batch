@@ -11,3 +11,7 @@ WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch
 
 RUN npm install --allow-git=root
+
+# Pre-fetch DuckDB's spatial extension (used by lib/parquet.js) so jobs don't
+# depend on reaching extensions.duckdb.org at runtime.
+RUN node --input-type=module -e "import { DuckDBInstance } from '@duckdb/node-api'; const i = await DuckDBInstance.create(':memory:'); const c = await i.connect(); await c.run('INSTALL spatial'); c.closeSync(); i.closeSync();"

@@ -22,6 +22,7 @@ import { isValidFeature } from './lib/valid-feature.js';
 import { countCoordinate, buildTiles, assignTiles, DEFAULT_CELL_DEG } from './lib/tiling.js';
 import { openShardWriters, readShard, cleanupShard } from './lib/shard-store.js';
 import { buildShardFeatures } from './lib/process-shard.js';
+import { geojsonToGeoParquet } from './lib/parquet.js';
 
 const s3 = new S3.S3Client({
     region: process.env.AWS_DEFAULT_REGION
@@ -373,6 +374,19 @@ async function process_collection(tmp, collection, collection_data, boundaries) 
     const zipSize = fs.statSync(zip).size;
     await upload_zip_processed(zip, collection.name);
     fs.unlinkSync(zip);
+
+    // GeoParquet is a bonus output: a failure here must not lose the zip
+    // that's already uploaded or the processed_size we're about to return.
+    const parquetPath = path.resolve(tmp, `${collection.name}-processed.parquet`);
+    try {
+        await geojsonToGeoParquet(geojsonPath, parquetPath, { tempDir: tmp });
+        await upload_parquet_processed(parquetPath, collection.name);
+    } catch (err) {
+        console.error(`not ok - failed to build GeoParquet for ${collection.name}: ${err.message}`);
+    } finally {
+        fs.rmSync(parquetPath, { force: true });
+    }
+
     fs.unlinkSync(geojsonPath);
 
     return zipSize;
@@ -600,6 +614,45 @@ function zip_processed(tmp, geojsonPath, name) {
         archive.file(geojsonPath, { name: `${name}.geojson` });
         archive.finalize();
     });
+}
+
+async function upload_parquet_processed(file, name) {
+    const key = `${process.env.StackName}/collection-${name}-processed.parquet`;
+
+    await new Upload({
+        client: s3,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: 'application/vnd.apache.parquet',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.Bucket,
+            Key: key
+        }
+    }).done();
+
+    console.error(`ok - s3://${process.env.Bucket}/${key}`);
+
+    const r2 = new S3.S3Client({
+        region: 'auto',
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID,
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+        },
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    });
+
+    await new Upload({
+        client: r2,
+        partSize: 100 * 1024 * 1024,
+        params: {
+            ContentType: 'application/vnd.apache.parquet',
+            Body: fs.createReadStream(file),
+            Bucket: process.env.R2Bucket,
+            Key: `v2.openaddresses.io/${key}`
+        }
+    }).done();
+
+    console.error(`ok - uploaded: r2://${process.env.R2Bucket}/v2.openaddresses.io/${key}`);
 }
 
 async function upload_zip_processed(file, name) {

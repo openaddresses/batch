@@ -10,7 +10,7 @@
         "test": "node --test src/util/*.test.js"
     },
     "dependencies": {
-        "@scalar/api-reference": "^1.68.0",
+        "@scalar/api-reference": "^1.83.0",
         "@tabler/core": "^1.5.1",
         "@tabler/icons-vue": "^3.46.0",
         "@tak-ps/vue-tabler": "^5.4.0",
